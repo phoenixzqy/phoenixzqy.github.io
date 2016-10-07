@@ -13,7 +13,10 @@ var dayPicker = (function(){
   var gYear, gMonth;
   var options = {
     data: {},
-    submit: function(){}
+    submit: function(){},
+    first_input_box: "Check-in",
+    second_input_box: "Check-out",
+    submit_btn: "Search"
   }
 
 
@@ -86,11 +89,12 @@ var dayPicker = (function(){
     picking = undefined;
     gYear = new Date().getFullYear();
     gMonth = new Date().getMonth();
-    $("#dayPickerFirstDate").val("Check-in")
-    $("#dayPickerSecondDate").val("Check-out");
+    $("#dayPickerFirstDate").val(options.first_input_box)
+    $("#dayPickerSecondDate").val(options.second_input_box);
     // create calendar tables
     createTable(gMonth, gYear, "#dayPickerLeftCalendar", ".dayPickerLeftMonthTitle");
     createTable(gMonth + 1, gYear, "#dayPickerRightCalendar", ".dayPickerRightMonthTitle");
+    $("#dayPickerFirstDate").focus();
   }
   // generate table with given month and year
   var createTable = function(month, year, table, title){
@@ -141,38 +145,39 @@ var dayPicker = (function(){
       var month = $(this).attr("month");
       var year = $(this).attr("year");
       var date = $(this).html();
-      // linkDaysHover(date, month, year);
+      linkDaysHover(date, month, year);
     }).mouseleave(function(){
       $("#dayPicker td").each(function(){
         $(this).removeClass("dayPickerLinkDays");
       })
     });
   }
-  // // day picker hover effect, link today to hover date
-  // var linkDaysHover = function(date, month, year){
-  //   if(!date || date == "")
-  //     return;
-  //   var hoverAnchorDate = new Date(year, month, date);
-  //   var startAnchorDate;
-  //   if(picking == 2 && firstSelectedDate)
-  //     startAnchorDate = firstSelectedDate;
-  //   else if(picking == 1 && secondSelectedDate)
-  //     startAnchorDate = secondSelectedDate;
-  //   else
-  //     return;
-  //
-  //   hoverAnchorDate.setHours(0,0,0,0);
-  //   startAnchorDate.setHours(0,0,0,0)
-  //   $("#dayPicker td").each(function(){
-  //     if($(this).html() != ""){
-  //       var d = new Date($(this).attr("year"), $(this).attr("month"), $(this).html());
-  //       if((hoverAnchorDate < d && d < startAnchorDate) || (startAnchorDate < d && d < hoverAnchorDate))
-  //         $(this).addClass("dayPickerLinkDays");
-  //       else
-  //         $(this).removeClass("dayPickerLinkDays");
-  //     }
-  //   });
-  // }
+  // day picker hover effect, link today to hover date
+  var linkDaysHover = function(date, month, year){
+    if(!date || date == "")
+      return;
+    if((!firstSelectedDate && !secondSelectedDate) || (firstSelectedDate && secondSelectedDate))
+      return;
+    var hoverAnchorDate = new Date(year, month, date);
+    var startAnchorDate;
+    if(picking == 2 && firstSelectedDate)
+      startAnchorDate = firstSelectedDate;
+    else if(picking == 1 && secondSelectedDate)
+      startAnchorDate = secondSelectedDate;
+
+
+    hoverAnchorDate.setHours(0,0,0,0);
+    startAnchorDate.setHours(0,0,0,0)
+    $("#dayPicker td").each(function(){
+      if($(this).html() != ""){
+        var d = new Date($(this).attr("year"), $(this).attr("month"), $(this).html());
+        if((hoverAnchorDate < d && d < startAnchorDate) || (startAnchorDate < d && d < hoverAnchorDate))
+          $(this).addClass("dayPickerDaysBetweenPicked");
+        else
+          $(this).removeClass("dayPickerDaysBetweenPicked");
+      }
+    });
+  }
   // blur all dates before today
   var blurDaysBefore = function(){
     var today = new Date();
@@ -218,12 +223,15 @@ var dayPicker = (function(){
         // if first selected date is newer than second selected date, reset second date
         if(secondSelectedDate && firstSelectedDate > secondSelectedDate){
           secondSelectedDate = undefined;
+          $("#dayPickerSecondDate").val(options.second_input_box);
         }
         $("#dayPickerSecondDate").focus();
       }
     }
     if(picking == 2){
-      if(firstSelectedDate && pickedDate > firstSelectedDate){
+      if(!firstSelectedDate){
+        $("#dayPickerFirstDate").focus();
+      }else if(firstSelectedDate && pickedDate > firstSelectedDate){
         secondSelectedDate = pickedDate;
         secondSelectedDate.setHours(0,0,0,0);
         $("#dayPickerSecondDate").val(dateToString(secondSelectedDate));
@@ -244,11 +252,11 @@ var dayPicker = (function(){
   var addFrame = function(){
     $("#dayPicker").append('\
           <form id="dayPickerForm">\
-            <input id="dayPickerFirstDate" type="text" value="Check-in"/>\
-            <input id="dayPickerSecondDate" type="text" value="Check-out"/>\
-            <div id="dayPickerReset"><svg viewBox="0 0 12 12" data-reactid=".3.0.0.0.1.0.0.0.3.1"><path d="M11.53.47a.75.75 0 0 0-1.061 0l-4.47 4.47L1.529.47A.75.75 0 1 0 .468 1.531l4.47 4.47-4.47 4.47a.75.75 0 1 0 1.061 1.061l4.47-4.47 4.47 4.47a.75.75 0 1 0 1.061-1.061l-4.47-4.47 4.47-4.47a.75.75 0 0 0 0-1.061z" data-reactid=".3.0.0.0.1.0.0.0.3.1.0"></path></svg></div>\
+            <input id="dayPickerFirstDate" type="text" value="' + options.first_input_box + '"/>\
+            <input id="dayPickerSecondDate" type="text" value="' + options.second_input_box + '"/>\
           </form>\
-          <button id="dayPickerSubmit">Search</button>\
+          <div id="dayPickerReset"><svg viewBox="0 0 12 12" data-reactid=".3.0.0.0.1.0.0.0.3.1"><path d="M11.53.47a.75.75 0 0 0-1.061 0l-4.47 4.47L1.529.47A.75.75 0 1 0 .468 1.531l4.47 4.47-4.47 4.47a.75.75 0 1 0 1.061 1.061l4.47-4.47 4.47 4.47a.75.75 0 1 0 1.061-1.061l-4.47-4.47 4.47-4.47a.75.75 0 0 0 0-1.061z" data-reactid=".3.0.0.0.1.0.0.0.3.1.0"></path></svg></div>\
+          <button id="dayPickerSubmit">' + options.submit_btn + '</button>\
           <div class="dayPickerDualPanel">\
             <span id="dayPickerPrevBtn">&lt;</span>\
             <span id="dayPickerNextBtn">&gt;</span>\
@@ -324,7 +332,14 @@ var  createCalendar =  function(month, year){
   }
 
     return {
-      init : function(option){
+      init : function(op){
+
+        if(op.first_input_box)
+          options.first_input_box = op.first_input_box;
+        if(op.second_input_box)
+          options.second_input_box = op.second_input_box;
+        if(op.submit_btn)
+          options.submit_btn = op.submit_btn;
         createCalendar();
       },
       getDates : function(){

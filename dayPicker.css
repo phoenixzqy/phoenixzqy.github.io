@@ -67,8 +67,8 @@
   color: #fff;
 }
 .dayPickerToday{
-  background-color: #999 !important;
-  color: #fff !important;
+  background-color: #999;
+  color: #fff;
 }
 
 .dayPickerPicked{
@@ -101,17 +101,18 @@
   background-color: #eee;
 }
 #dayPickerReset{
-  position: relative;
-  float: right;
-  width: 14px;
-  height: 14px;
-  padding: 8px;
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  /*padding: 8px;*/
   border-radius: 20px;
-  border: 1px solid #aaa;
+  /*border: 1px solid #aaa;*/
   cursor: pointer;
-  top: -2px;
+  top: 16px;
+  right: 22%;
   transition-duration: .5s;
   margin: 0 5px 0 10px;
+
 }
 #dayPickerReset svg{
   width: 100%;
@@ -119,7 +120,7 @@
   fill: #777;
 }
 #dayPickerReset:hover{
-  transform: rotate(135deg);
+  transform: rotate(180deg);
 }
 #dayPicker form{
   border: 1px solid #eee;
@@ -134,6 +135,7 @@
   border-radius: 2px;
   font-size: 14px;
   color: #777;
+  width: 43%;
 }
 #dayPicker form input:focus {
   outline: none;

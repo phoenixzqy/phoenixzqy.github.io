@@ -18,7 +18,12 @@
       dayPicker.submit(dayPicker.getDates(), function(data){
         console.log(data)
       })
-      dayPicker.init();
+      var options = {
+        first_input_box: "入住日期",
+        second_input_box: "退房日期",
+        submit_btn: "搜索"
+      }
+      dayPicker.init(options);
     });
     </script>
   </head>
