@@ -206,6 +206,11 @@ var dayPicker = (function(){
         firstSelectedDate = pickedDate;
         firstSelectedDate.setHours(0,0,0,0);
         $("#dayPickerFirstDate").val(dateToString(firstSelectedDate));
+        // if first selected date is newer than second selected date, reset second date
+        if(secondSelectedDate && firstSelectedDate > secondSelectedDate){
+          secondSelectedDate = undefined;
+        }
+        $("#dayPickerSecondDate").focus();
       }
     }
     if(picking == 2){
