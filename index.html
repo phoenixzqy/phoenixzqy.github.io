@@ -15,8 +15,10 @@
     </style>
     <script>
     $( document ).ready(function() {
-
-      dayPicker();
+      dayPicker.submit(dayPicker.getDates(), function(data){
+        console.log(data)
+      })
+      dayPicker.init();
     });
     </script>
   </head>
