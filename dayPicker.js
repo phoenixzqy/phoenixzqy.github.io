@@ -232,6 +232,7 @@ var dayPicker = (function(){
           // close calendar window after selection
           $(".dayPickerDualPanel").css("display", "none");
         }
+        pickedDateEffect();
       }
     }
     if(picking == 1){
@@ -246,9 +247,8 @@ var dayPicker = (function(){
         }
         $("#dayPickerSecondDate").focus();
       }
-
+      pickedDateEffect();
     }
-    pickedDateEffect();
   }
   // change the current displayed calendar by given number, +1 means month +1, -1 means month -1
   var changeCalendar = function(x){
