@@ -332,7 +332,7 @@ var  createCalendar =  function(month, year){
     });
     // submit button
     $("#dayPickerSubmit").click(function(){
-      options.submit(options.data);
+      options.submit();
     })
   }
 
@@ -354,8 +354,7 @@ var  createCalendar =  function(month, year){
         }
         return dates;
       },
-      submit : function(data, cb){
-        options.data = data;
+      submit : function(cb){
         options.submit = cb;
       }
     }
