@@ -210,24 +210,28 @@ var dayPicker = (function(){
   }
   // pick a date by user click on date
   var pickDate = function(e){
+    if(!$(e).attr("year"))
+      return;
     var pickedDate = new Date($(e).attr("year"), $(e).attr("month"), $(e).html());
     var today = new Date();
     today.setHours(0,0,0,0);
     pickedDate.setHours(0,0,0,0);
     if(picking == 2){
-      if(!firstSelectedDate){
-        $("#dayPickerFirstDate").focus();
-      }else if(pickedDate < firstSelectedDate){
-        secondSelectedDate = undefined;
-        firstSelectedDate = pickedDate;
-        $("#dayPickerSecondDate").val(options.second_input_box);
-        $("#dayPickerFirstDate").focus();
-      }else{
-        secondSelectedDate = pickedDate;
-        secondSelectedDate.setHours(0,0,0,0);
-        $("#dayPickerSecondDate").val(dateToString(secondSelectedDate));
-        // close calendar window after selection
-        $(".dayPickerDualPanel").css("display", "none");
+      if(pickedDate >= today){
+        if(!firstSelectedDate){
+          $("#dayPickerFirstDate").focus();
+        }else if(pickedDate < firstSelectedDate){
+          secondSelectedDate = undefined;
+          firstSelectedDate = pickedDate;
+          $("#dayPickerSecondDate").val(options.second_input_box);
+          $("#dayPickerFirstDate").focus();
+        }else{
+          secondSelectedDate = pickedDate;
+          secondSelectedDate.setHours(0,0,0,0);
+          $("#dayPickerSecondDate").val(dateToString(secondSelectedDate));
+          // close calendar window after selection
+          $(".dayPickerDualPanel").css("display", "none");
+        }
       }
     }
     if(picking == 1){
