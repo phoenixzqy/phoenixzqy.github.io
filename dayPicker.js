@@ -135,7 +135,7 @@ var dayPicker = (function(){
     }
     pickedDateEffect();
     // Date Click event: pick a date
-    $("#dayPicker td").click(function(){
+    $("#dayPicker td").unbind('click').bind('click',function(){
       pickDate(this);
     });
     // blur all dates before today
@@ -167,7 +167,7 @@ var dayPicker = (function(){
 
 
     hoverAnchorDate.setHours(0,0,0,0);
-    startAnchorDate.setHours(0,0,0,0)
+    startAnchorDate.setHours(0,0,0,0);
     $("#dayPicker td").each(function(){
       if($(this).html() != ""){
         var d = new Date($(this).attr("year"), $(this).attr("month"), $(this).html());
@@ -192,7 +192,6 @@ var dayPicker = (function(){
     })
   }
   var pickedDateEffect = function(){
-    console.log(secondSelectedDate)
     // add css effect to picked date and days between picked days
     $("#dayPicker td").each(function(){
       if($(this).html() != ''){
@@ -215,6 +214,22 @@ var dayPicker = (function(){
     var today = new Date();
     today.setHours(0,0,0,0);
     pickedDate.setHours(0,0,0,0);
+    if(picking == 2){
+      if(!firstSelectedDate){
+        $("#dayPickerFirstDate").focus();
+      }else if(pickedDate < firstSelectedDate){
+        secondSelectedDate = undefined;
+        firstSelectedDate = pickedDate;
+        $("#dayPickerSecondDate").val(options.second_input_box);
+        $("#dayPickerFirstDate").focus();
+      }else{
+        secondSelectedDate = pickedDate;
+        secondSelectedDate.setHours(0,0,0,0);
+        $("#dayPickerSecondDate").val(dateToString(secondSelectedDate));
+        // close calendar window after selection
+        $(".dayPickerDualPanel").css("display", "none");
+      }
+    }
     if(picking == 1){
       if(pickedDate >= today){
         firstSelectedDate = pickedDate;
@@ -227,17 +242,7 @@ var dayPicker = (function(){
         }
         $("#dayPickerSecondDate").focus();
       }
-    }
-    if(picking == 2){
-      if(!firstSelectedDate){
-        $("#dayPickerFirstDate").focus();
-      }else if(firstSelectedDate && pickedDate > firstSelectedDate){
-        secondSelectedDate = pickedDate;
-        secondSelectedDate.setHours(0,0,0,0);
-        $("#dayPickerSecondDate").val(dateToString(secondSelectedDate));
-        // close calendar window after selection
-        $(".dayPickerDualPanel").css("display", "none");
-      }
+
     }
     pickedDateEffect();
   }
