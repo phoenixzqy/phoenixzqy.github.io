@@ -1,4 +1,4 @@
-thvar dayPicker = (function () {
+var dayPicker = (function () {
 	/*
 	  Global Variables
 	*/
