@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Calendar Tool Kit</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- dayPicker -->
+    <script src="../modules/dayPicker/dayPicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="../modules/dayPicker/dayPicker.css">
+    <!-- CTK -->
+    <script type="text/javascript" src="../modules/calendarToolKit/calendarToolKit.js"></script>
+    <link rel="stylesheet" type="text/css" href="../modules/calendarToolKit/calendarToolKit.css">
+    <style>
+    .wrapper{
+      margin: 100px auto;
+      width: 600px;
+      height: 600px;
+    }
+    </style>
+    <script>
+    $(document).ready(function(){
+      calendarTool.init();
+      calendarTool.getAvailableDate();
+      dayPicker.init();
+    });
+    </script>
+  </head>
+  <body>
+    <div class="wrapper">
+
+      <div id="calendarToolKit"></div>
+    </div>
+  </body>
+</html>
