@@ -342,14 +342,17 @@ var dayPicker = (function () {
 	};
 
 	return {
-		init: function (op) {
+		init: function (opt) {
 
-			if (op.first_input_box)
-				options.first_input_box = op.first_input_box;
-			if (op.second_input_box)
-				options.second_input_box = op.second_input_box;
-			if (op.submit_btn)
-				options.submit_btn = op.submit_btn;
+			// cusom options
+			if (opt && typeof opt === "object") {
+				var keys = Object.keys(opt);
+				for (var k in keys) {
+					if (keys[k] in options) {
+						options[keys[k]] = opt[keys[k]];
+					}
+				}
+			}
 			createCalendar();
 		},
 		getDates: function () {
