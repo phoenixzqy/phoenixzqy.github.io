@@ -1,3 +1,13 @@
+#calendarToolKit{
+  font-size: 14px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+   -khtml-user-select: none; /* Konqueror */
+     -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                not supported by any browser */
+}
 .CTKdate{
   position: absolute;
   top: 5px;
@@ -21,10 +31,48 @@
   padding: .5px;
 }
 .CTKtable td:hover{
-  background-color: #ccc;
+  /*background-color: #ccc;*/
+  transform: scale(1.05);
+  z-index: 1;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-transition-duration: .5s; /* Safari */
+  transition-duration: .5s;
+}
+
+.CTKCheck, .CTKCross{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  text-shadow: 0px 0px 6px #fff;
+}
+.CTKCheck:before, .CTKCross:before{
+  /*font-family: FontAwesome;*/
+  font-size: 2em;
+  position: absolute;
+  top: 25%;
+  left: 35%;
+}
+.CTKCheck:before{
+  content: "☑︎";
+  color: #058df5;;
+}
+.CTKCross:before{
+  content: "☒";
+  color: #fd5858;
 }
 .CTKselected{
   border: 2px solid rgb(10, 195, 213) !important;
+}
+.CTKmultiSelect{
+  transform: scale(1.03);
+  border-color: #058df5 !important;
+  z-index: 1;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-transition-duration: .5s; /* Safari */
+  transition-duration: .5s;
 }
 .CTKavailableDate{
   background-color: rgb(141, 231, 247) !important;
@@ -78,26 +126,26 @@
   right: 2%;
 }
 
-.CTKcol-4{
-  width: 33%;
+.CTKcol-3, .CTKcol-4, .CTKcol-6, .CTKcol-8, .CTKcol-12{
   margin: 0;
   padding: 0;
   float: left;
   border: none;
+}
+.CTKcol-3{
+  width: 25%;
+}
+.CTKcol-4{
+  width: 33%;
 }
 .CTKcol-6{
   width: 50%;
-  margin: 0;
-  padding: 0;
-  float: left;
-  border: none;
 }
 .CTKcol-8{
   width: 66%;
-  margin: 0;
-  padding: 0;
-  float: left;
-  border: none;
+}
+.CTKcol-12{
+  width: 100%;
 }
 
 
@@ -111,19 +159,21 @@
   margin-top: 8px;
 }
 .CTKCustomPenel input{
-  width: 43%;
-  height: 30px;
+  width: 100%;
+  height: 32px;
   border: 1px solid #eee;
   border-radius: 0px;
   padding-left: 10px;
   font-size: 15px;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
 }
 .CTKCustomPenel input:focus{
   outline: none;
 }
 .CTKCustomPenel button{
   margin: 0;
-  font-size: 1em;
   margin-top: 0;
   width: 90%;
   height: 32px;

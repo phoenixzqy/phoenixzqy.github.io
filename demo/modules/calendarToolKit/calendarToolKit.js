@@ -115,13 +115,13 @@ var Calendar = (function () {
 		}
 	};
 	/**
-	 * [calDataParser description]
-	 * @method calDataParser
-	 * @param  {[number/string]}      y [year or data of array in string type]
-	 * @param  {[number]}      m [month]
-	 * @param  {[number]}      r [month]
-	 * @return {[array]}        [array of y m d]
-	 */
+ * [calDataParser description]
+ * @method calDataParser
+ * @param  {[number/string]}      y [year or data of array in string type]
+ * @param  {[number]}      m [month]
+ * @param  {[number]}      r [month]
+ * @return {[array]}        [array of y m d]
+ */
 	calDataParser = function(y,m,d){
 		if(typeof m !== 'undefined' && typeof d !== 'undefined')
 			return [y, m, d];
@@ -218,7 +218,11 @@ var Calendar = (function () {
 			$("#calendarToolKit").css("height",height);
 			$("#calendarToolKit").css("position","relative");
 
-
+			// change the height with width changing. Making calendar height responsible with width
+			$(window).resize(function(){
+				height = $("#calendarToolKit").outerWidth() * 10 / 16;
+				$("#calendarToolKit").css("height",height);
+			});
 
 			// WEEKDAYS list
 	    for(var i in WEEKDAYS_SHORT) {
@@ -237,7 +241,7 @@ var Calendar = (function () {
 			for (var i = 0; i < 6; i++) {
 				var row = "";
 				for (var j = 0; j < 7; j++) {
-					row += ("<td ><div class='CTKdate'></div>" + options.customDateInfo + "</td>");
+					row += ("<td ><div class='CTKCheck'></div><div class='CTKCross'></div><div class='CTKdate'></div>" + options.customDateInfo + "</td>");
 				}
 				$("#CTKTable").append("<tr>" + row + "</tr>");
 			}
@@ -274,7 +278,8 @@ var calendarTool = (function () {
 			price: "Price",
 			available: "Available:",
 			multiSelect: "Multi-Select:",
-			submit: "Submit"
+			submit: "Submit",
+			unselectAll: "Unselect All"
 		},
 		customDateInfo : "<div class='CTKDatePrice'></div>",
 		// Customable submit callback function
@@ -406,6 +411,24 @@ var calendarTool = (function () {
 	};
 
 	/**
+	 * select dates between 2 dates
+	 * @method selectBetween
+	 * @param  {[int]}      i1 [start date index in table]
+	 * @param  {[int]}      i2 [end date index in table]
+	 * @return {[type]}         [description]
+	 */
+	var selectBetween = function(i1, i2){
+		for(var i in table){
+			if(i >= i1 && i <= i2){
+				console.log(selectedDate.indexOf(table[i]))
+				// if it is not selected yet
+				if(selectedDate.indexOf(table[i]) < 0){
+					dateOnClick(table[i]);
+				}
+			}
+		}
+	}
+	/**
 	 * private Driver
 	 * @method main
 	 * @param  {[type]} opt [description]
@@ -433,15 +456,13 @@ var calendarTool = (function () {
 				  <div class="CTKslider"></div>\
 				</label>\
 			</div>\
-		<div id="CTKMultiSelectBtn" class="CTKcol-4">\
-			<p class="CTKcol-6">' + options.lang.multiSelect + '</p>\
-			<label class="CTKswitch CTKcol-6">\
-			  <input type="checkbox" checked>\
-			  <div class="CTKslider"></div>\
-			</label>\
+		<div id="CTKUnselectAllBtn" class="CTKcol-4">\
+			<div class="CTKcol-12"><button type="button">' + options.lang.unselectAll + '</button></div>\
 		</div>\
-		<div class="CTKcol-4"><input id="CTKDatePriceIn" class="CTKcol-6" type="text" maxlength="7" placeholder="' + options.lang.price + '"/>\
-		<div id="CTKSubmit" class="CTKcol-6"><button>' + options.lang.submit + '</button></div></div>\
+		<div class="CTKcol-4">\
+			<div class="CTKcol-8"><input id="CTKDatePriceIn" type="text" maxlength="7" placeholder="' + options.lang.price + '"/></div>\
+			<div id="CTKSubmit" class="CTKcol-4"><button type="button">' + options.lang.submit + '</button></div>\
+		</div>\
 		');
 
 		// bind click event for every td element
@@ -496,8 +517,76 @@ var calendarTool = (function () {
 			// }
 			// if(emptyPriceArr.length <= 0){
 				options.submitFct();
+				resetSelection();
 			// }
 		});
+
+		// add click event for available btn
+		$(".CTKswitch").unbind("change").bind("change", function(){
+			var isChecked = $("#CTKisAvalabe").is(":checked");
+			while(!isChecked && selectedDate.length > 0){
+				dateOnClick(selectedDate[0]);
+			}
+			resetSelection();
+		});
+
+		// add click event for unselectAll button
+		$("#CTKUnselectAllBtn button").unbind("click").bind("click", function(){
+			resetSelection();
+			$("#CTKDatePriceIn").val('');
+		});
+
+		// add hover event for table cells: if available is checked, then show green check symbol. otherwise, show red cross symbol instead.
+		$(".CTKtable td").hover(function(){
+			// mute dates before today
+			var today = new Date();
+			today.setHours(0,0,0,0);
+			var dateArr = cal.dateParser($(this).find(".CTKdate").attr('caldata'));
+			var d = new Date(dateArr[0], dateArr[1],dateArr[2]);
+			d.setHours(0,0,0,0);
+
+			if($("#CTKisAvalabe").is(":checked") && d >= today){
+				$(this).find(".CTKCheck").css("opacity", 1);
+			}else{
+				$(this).find(".CTKCross").css("opacity", 1);
+			}
+		}, function(){
+			$(this).find(".CTKCheck").css("opacity", 0);
+			$(this).find(".CTKCross").css("opacity", 0);
+		})
+
+		// add multiSelect function to calendar  --- start
+		var startDateIndex = -1;
+		var endDateIndex = -1;
+		var isMouseDown = false;
+		// detect mousedown event as multiSelect action starting point
+		$(".CTKtable td").mousedown(function(){
+			isMouseDown = true;
+			startDateIndex = table.indexOf(this);
+		}).mouseup(function(){// detect mouseup event as multiSelect action end point
+			selectBetween(startDateIndex, endDateIndex);
+
+			// reset all relative variables
+			isMouseDown = false;
+			startDateIndex = -1;
+			endDateIndex = -1;
+			for(var i in table)
+				$(table[i]).removeClass("CTKmultiSelect");
+		});
+		// detect mouseover event as the current multiSelect stage point
+		$(".CTKtable td").mouseover(function(){
+			if(isMouseDown){
+				endDateIndex = table.indexOf(this);
+				for(var i in table){
+					if(i >= startDateIndex && i <= endDateIndex){
+						$(table[i]).addClass("CTKmultiSelect");
+					}else{
+						$(table[i]).removeClass("CTKmultiSelect");
+					}
+				}
+			}
+		})
+		// multiSelect --- end
 	};
 
 	return{
