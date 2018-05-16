@@ -8,7 +8,7 @@ module.exports = {
     app: "./index.js"
   },
   output: {
-    path: path.resolve(__dirname, "compiled_bundles"),
+    path: path.resolve(__dirname, "../assets/js/dist"),
     filename: "[name].js"
   },
   mode: "production",
