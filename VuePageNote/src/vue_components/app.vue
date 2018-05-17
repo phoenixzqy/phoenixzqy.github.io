@@ -6,14 +6,14 @@
     </v-toolbar>
     <v-content>
       <section>
-        <v-parallax src="images/hero.jpeg" height="600">
+        <v-parallax src="assets/images/hero.jpeg" height="600">
           <v-layout
             column
             align-center
             justify-center
             class="white--text"
           >
-            <img src="images/vuetify.png" alt="Vuetify.js" height="200">
+            <img src="assets/images/vuetify.png" alt="Vuetify.js" height="200">
             <h1 class="white--text mb-2 display-1 text-xs-center">Parallax Template</h1>
             <div class="subheading mb-3 text-xs-center">Powered by Vuetify</div>
             <v-btn
@@ -98,7 +98,7 @@
       </section>
 
       <section>
-        <v-parallax src="images/section.jpg" height="380">
+        <v-parallax src="assets/images/section.jpg" height="380">
           <v-layout column align-center justify-center>
             <div class="headline white--text mb-3 text-xs-center">Web development has never been easier</div>
             <em>Kick-start your application today</em>
