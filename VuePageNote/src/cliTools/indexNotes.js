@@ -2,6 +2,8 @@ const path = require("path");
 const fs = require('fs');
 const notePath = path.resolve(__dirname, "../../public/notes");
 const outputPath = path.resolve(__dirname, "../../database/noteStructure.json");
+const appRoot = path.resolve(__dirname, "../../../");
+
 // List all files [as directory tree] in Node.js recursively in a synchronous fashion
 var walkSync = function(dir) {
     var files = fs.readdirSync(dir);
@@ -19,7 +21,8 @@ var walkSync = function(dir) {
                         file_name: file,
                         updated_at: target.mtime,
                         created_at: target.ctime,
-                        size: target.size
+                        size: target.size,
+                        path: `${dir.replace(appRoot, '')}/${file}`
                     }); 
                     break;
                 case '.json':
@@ -33,6 +36,7 @@ var walkSync = function(dir) {
         directories: subDirList
     };
 };
+
 
 // write to database
 fs.writeFile(outputPath, JSON.stringify(walkSync(notePath)), function(err) {

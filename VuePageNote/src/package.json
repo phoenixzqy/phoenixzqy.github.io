@@ -4,12 +4,14 @@
   "description": "Note viewer build with Vue.js and Github-Pages",
   "main": "index.js",
   "scripts": {
-    "build": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js"
+    "build": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js",
+    "build --watch": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js --watch"
   },
   "author": "Felix Zhao",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
+    "marked": "0.3.19",
     "style-loader": "^0.20.3",
     "vue": "^2.5.16",
     "vue-loader": "^14.2.2",
