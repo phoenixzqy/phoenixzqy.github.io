@@ -10,7 +10,7 @@
         </ul>
       </div>
       <div class="note">
-        <div v-if="noteContent" v-html="noteContent">
+        <div class="md-air" v-if="noteContent" v-html="noteContent">
         </div>
       </div>
     </div>
