@@ -1,20 +1,26 @@
 const path = require("path");
 const fs = require('fs');
-const notePath = path.resolve(__dirname, "../notes");
-const outputPath = path.resolve(__dirname, "../database/noteStructure.json");
+const notePath = path.resolve(__dirname, "../../public/notes");
+const outputPath = path.resolve(__dirname, "../../database/noteStructure.json");
 // List all files [as directory tree] in Node.js recursively in a synchronous fashion
 var walkSync = function(dir) {
     var files = fs.readdirSync(dir);
     var fileList = [];
     var subDirList = {};
     files.forEach(function(file) {
-        if (fs.statSync(dir + '/' + file).isDirectory()) {
+        var target = fs.statSync(dir + '/' + file);
+        if (target.isDirectory()) {
             subDirList[file] = walkSync(dir + '/' + file);
         }
         else { 
             switch(path.extname(file)) {
                 case '.md' :
-                    fileList.push(file); 
+                    fileList.push({
+                        file_name: file,
+                        updated_at: target.mtime,
+                        created_at: target.ctime,
+                        size: target.size
+                    }); 
                     break;
                 case '.json':
                 //TODO: config.json?
@@ -33,5 +39,5 @@ fs.writeFile(outputPath, JSON.stringify(walkSync(notePath)), function(err) {
     if(err) {
         return console.log(err);
     }
-    console.log("Your note structure is created!");
+    console.log("[Index Notes] Your note structure is created!\n");
 });

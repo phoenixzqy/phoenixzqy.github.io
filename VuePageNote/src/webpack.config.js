@@ -8,7 +8,7 @@ module.exports = {
     app: "./index.js"
   },
   output: {
-    path: path.resolve(__dirname, "../assets/js/dist"),
+    path: path.resolve(__dirname, "../public/assets/js/dist"),
     filename: "[name].js"
   },
   mode: "production",

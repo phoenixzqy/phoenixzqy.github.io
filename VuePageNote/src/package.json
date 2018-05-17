@@ -4,7 +4,7 @@
   "description": "Note viewer build with Vue.js and Github-Pages",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js"
   },
   "author": "Felix Zhao",
   "license": "ISC",
@@ -18,5 +18,8 @@
     "vue-template-compiler": "^2.5.16",
     "vuetify": "^1.0.17",
     "webpack": "^4.6.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.1.3"
   }
 }
