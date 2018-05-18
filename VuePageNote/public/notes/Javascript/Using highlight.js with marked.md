@@ -1,6 +1,6 @@
-### add highlight.js to marked.js `pre` `code` renderer
+### add highlight.js to marked.js <pre> <code> renderer
 
-Marked.js only render markdown into html(and other formats), left the `code` block with single color. If you want to colorize your `code` block in your app, here is a solution.
+`Marked.js` only render markdown into html(and other formats), left the `code` block with single color. If you want to colorize your `code` block in your app, here is a solution.
 
 Solution:
 
