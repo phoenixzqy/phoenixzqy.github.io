@@ -22,6 +22,8 @@ The app is only for reading. You can take advantage to use Github to sync public
     * export/download as html/md/pdf
     * ~~syntax highlight (highlight.js)~~
   * Most recent notes (use vuetify bottom navigation)
+  * fix ul,li indentation bug
+  * add note slug to url (for sharing purpose)
 * Public Notes:
   * ~~public notes structure~~
   * ~~public notes index generator tool~~
