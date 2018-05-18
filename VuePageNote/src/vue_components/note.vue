@@ -1,5 +1,5 @@
 <template>
-    <div class="body" @mouseup="stopDrag"  @mousemove="doDrag">
+    <div class="body" @mouseup="stopDrag" @touchend="stopDrag" @mousemove="doDrag" @touchmove="doDrag">
         <div class="left-penal" :style="{width:treeViewWidth + 'px'}">
           <div class="tree-view">
             <!-- root node -->
@@ -8,7 +8,7 @@
             </ul>
           </div>
         </div>
-        <div class="mid-bar" @mousedown="startDrag">
+        <div class="mid-bar" @mousedown="startDrag" @touchstart="startDrag">
           <span class="vertical-bar"></span>
           <span class="vertical-bar"></span>
           <span class="vertical-bar"></span>
@@ -29,11 +29,11 @@ export default {
   data: function() {
     return {
       treeData: data,
-      noteContent: `<div style="text-align: center; color: #424242; margin-top: 30%;">
+      noteContent: `<div style="text-align: center; color: #424242; margin-top: 25vh;">
       <h1>Powered by Vue.js + Vuetify</h1>
       <h4>Produced by Felix Zhao</h4>
       </div>`,
-      treeViewWidth: 250,
+      treeViewWidth: 250
     };
   },
   components: {
@@ -41,13 +41,27 @@ export default {
   },
   methods: {
     startDrag(event) {
-      if (event.which === 1)
-        // left mouse only
-        this.dragging = true;
+      switch (event.constructor.name) {
+        case "TouchEvent":
+          this.dragging = true;
+          break;
+        case "MouseEvent":
+          if (event.which === 1)
+            // left mouse only
+            this.dragging = true;
+          break;
+      }
     },
     doDrag(event) {
       if (this.dragging) {
-        this.treeViewWidth = event.screenX;
+        switch (event.constructor.name) {
+          case "TouchEvent":
+            this.treeViewWidth = event.touches[0].clientX;
+            break;
+          case "MouseEvent":
+            this.treeViewWidth = event.screenX;
+            break;
+        }
       }
     },
     stopDrag() {
@@ -55,12 +69,27 @@ export default {
     }
   },
   mounted() {
+    const renderer = new marked.Renderer();
+    renderer.code = (code, language) => {
+      // Check whether the given language is valid for highlight.js.
+      const validLang = !!(language && hljs.getLanguage(language));
+      // Highlight only if the language is valid.
+      const highlighted = validLang
+        ? hljs.highlight(language, code).value
+        : code;
+      // Render the highlighted code with `hljs` class.
+      return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+    };
+    // Set the renderer to marked.
+    marked.setOptions({ renderer });
+
     eventBus.$on("file-selected", payload => {
       var rootUrl = "https://phoenixzqy.github.io"; // this is for testing purpose
       axios
         .get(rootUrl + payload.url)
         .then(response => {
           var mdContent = response.data;
+
           this.noteContent = marked(mdContent);
         })
         .catch(error => console.log(error));
@@ -70,7 +99,7 @@ export default {
 </script>
 <style lang="less">
 .body {
-  height: calc(~"100vh - 100px");
+  height: calc(~"100vh - 80px");
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -155,7 +184,6 @@ export default {
     }
   }
   .right-penal {
-    margin-left: 200px;
     padding: 50px;
     overflow-y: auto;
     box-sizing: border-box;

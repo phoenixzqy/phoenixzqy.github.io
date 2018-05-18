@@ -31,7 +31,7 @@
     <v-content>
       <note/>
     </v-content>
-    <v-footer app fixed style="text-align: center;padding-top: 7px; display: inline-block;">
+    <v-footer app fixed>
       <span v-html="copyright"></span>
     </v-footer>
   </v-app>
@@ -48,8 +48,13 @@ export default {
   },
   components: {
     note
-  },
+  }
 };
 </script>
-<style lang="less">
+<style lang="less" scoped>
+.footer {
+  text-align: center;
+  padding-top: 7px;
+  display: inline-block;
+}
 </style>
