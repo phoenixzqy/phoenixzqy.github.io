@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js",
-    "build --watch": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js --watch"
+    "build-watch": "node ./cliTools/indexNotes.js && node ./node_modules/webpack/bin/webpack.js --watch"
   },
   "author": "Felix Zhao",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
+    "css-loader": "^0.28.11",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
     "marked": "0.3.19",
     "style-loader": "^0.20.3",
     "vue": "^2.5.16",

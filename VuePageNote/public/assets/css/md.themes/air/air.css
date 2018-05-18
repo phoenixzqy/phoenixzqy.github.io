@@ -17,16 +17,17 @@
 .md-air pre,
 .md-air code {
   font-family: Menlo, Monaco, "Courier New", monospace;
-  color: antiquewhite;
-  background-color: #222;
+  color: #c0c0c0;
+  background-color: #333;
   width: 100%;
   padding: 15px;
+  font-size: 14px;
 }
 .md-air pre {
-  padding: 0.5rem;
+  padding: 5px;
+  border-radius: 5px;
   line-height: 1.25;
-  overflow-x: scroll;
-  background-color: #fbf1e7;
+  background-color: #944a00fc;
 }
 @media print {
   .md-air *,
@@ -138,17 +139,8 @@
   margin: 0 auto;
   width: 200px;
 }
-.md-air a,
-.md-air a:visited {
-  color: #3498db;
-}
-.md-air a:hover,
-.md-air a:focus,
-.md-air a:active {
-  color: #2980b9;
-}
 .md-air pre {
-  padding: 1rem;
+  padding: 5px;
   text-align: left;
 }
 .md-air blockquote {
@@ -162,7 +154,4 @@
 .md-air ol,
 .md-air li {
   text-align: left;
-}
-.md-air p {
-  color: #777;
 }

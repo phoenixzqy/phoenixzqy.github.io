@@ -27,6 +27,10 @@ module.exports = {
           // `vue-loader` options
         }
       },
+      {
+        test: /\.less$/,
+        loader: 'less-loader' // compiles Less to CSS
+      }
     ]
   },
   plugins: [

@@ -1,50 +1,55 @@
 <template>
-  <div id="app">
-    <div class="header">
-
-    </div>
-    <div class="body">
-      <div class="tree-view">
-        <ul id="root">
-          <folder :folder="treeData" :fname="''"></folder>
-        </ul>
-      </div>
-      <div class="note">
-        <div class="md-air" v-if="noteContent" v-html="noteContent">
-        </div>
-      </div>
-    </div>
-    <div class="footer">
-
-    </div>
-  </div>
+  <v-app dark>
+    <v-navigation-drawer
+      v-model="drawer"
+      fixed
+      app
+    >
+      <v-list dense>
+        <v-list-tile >
+          <v-list-tile-action>
+            <v-icon>dashboard</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Dashboard</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>settings</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Settings</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar app fixed>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Felix's Notes App</v-toolbar-title>
+    </v-toolbar>
+    <v-content>
+      <note/>
+    </v-content>
+    <v-footer app fixed style="text-align: center;padding-top: 7px; display: inline-block;">
+      <span v-html="copyright"></span>
+    </v-footer>
+  </v-app>
 </template>
 <script>
-import folder from "./folder";
-import data from "../../database/noteStructure.json";
-import eventBus from "../utils/eventBus.js";
+import note from "./note";
 
 export default {
   data: function() {
     return {
-      treeData: data,
-      noteContent: null
+      copyright: `Copyright &copy; ${new Date().getFullYear()}, Felix Zhao`,
+      drawer: false
     };
   },
   components: {
-    folder
+    note
   },
-  mounted() {
-    eventBus.$on("file-selected", payload => {
-      var rootUrl = 'https://phoenixzqy.github.io'; // this is for testing purpose
-      axios
-        .get(rootUrl+ payload.url)
-        .then(response => {
-          var mdContent = response.data;
-          this.noteContent = marked(mdContent);
-        })
-        .catch(error => console.log(error));
-    });
-  }
 };
 </script>
+<style lang="less">
+</style>

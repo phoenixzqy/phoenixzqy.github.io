@@ -5,7 +5,7 @@
 .md-retro pre,
 .md-retro code {
   font-family: Menlo, Monaco, "Courier New", monospace;
-  color: antiquewhite;
+  color: #eee;
   background-color: #222;
   width: 100%;
   padding: 15px;
@@ -13,7 +13,6 @@
 .md-retro pre {
   padding: 0.5rem;
   line-height: 1.25;
-  overflow-x: scroll;
   background-color: #fbf1e7;
 }
 @media print {
@@ -64,15 +63,6 @@
   .md-retro h3 {
     page-break-after: avoid;
   }
-}
-.md-retro a,
-.md-retro a:visited {
-  color: #01ff70;
-}
-.md-retro a:hover,
-.md-retro a:focus,
-.md-retro a:active {
-  color: #2ecc40;
 }
 .md-retro .retro-no-decoration {
   text-decoration: none;
