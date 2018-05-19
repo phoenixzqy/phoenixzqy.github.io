@@ -27,13 +27,14 @@ export default {
   },
   methods: {
     startDrag(event) {
-      this.distance = event.screenY - this.topPanelHeight;
       switch (event.constructor.name) {
         case "TouchEvent":
+        this.distance = event.touches[0].clientY - this.topPanelHeight;
           this.dragging = true;
           break;
         case "MouseEvent":
           if (event.which === 1)
+      this.distance = event.screenY - this.topPanelHeight;
             // left mouse only
             this.dragging = true;
           break;
@@ -43,7 +44,7 @@ export default {
       if (this.dragging) {
         switch (event.constructor.name) {
           case "TouchEvent":
-            this.topPanelHeight = event.touches[0].clientY;
+            this.topPanelHeight = event.touches[0].clientY - this.distance;
             break;
           case "MouseEvent":
             this.topPanelHeight = event.screenY - this.distance;
