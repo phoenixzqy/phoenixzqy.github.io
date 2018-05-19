@@ -1,46 +1,33 @@
 <template>
-    <div class="body" @mouseup="stopDrag" @touchend="stopDrag" @mousemove="doDrag" @touchmove="doDrag">
-        <div class="left-penal" :style="{width:treeViewWidth + 'px'}">
-          <div class="tree-view">
-            <!-- root node -->
-            <ul style="margin-left: -70px;">
-              <folder :folder="treeData" :fname="''"></folder>
-            </ul>
-          </div>
+    <div class="panel-container" @mouseup="stopDrag" @touchend="stopDrag" @mousemove="doDrag" @touchmove="doDrag">
+        <div class="top-panel" :style="{height:topPanelHeight + 'px'}">
+          <slot name="top-panel"></slot>
         </div>
         <div class="mid-bar" @mousedown="startDrag" @touchstart="startDrag">
           <span class="vertical-bar"></span>
           <span class="vertical-bar"></span>
           <span class="vertical-bar"></span>
         </div>
-        <div class="right-penal">
-          <div class="md-air note-wrapper" v-if="noteContent" v-html="noteContent">
-          </div>
+        <div class="bottom-panel">
+          <slot name="bottom-panel"></slot>
         </div>
       </div>
 </template>
-
 <script>
-import folder from "./folder";
-import data from "../../database/noteStructure.json";
-import eventBus from "../utils/eventBus.js";
-
 export default {
+  props: {
+    height: Object
+  },
   data: function() {
     return {
-      treeData: data,
-      noteContent: `<div style="text-align: center; color: #424242; margin-top: 25vh;">
-      <h1>Powered by Vue.js + Vuetify</h1>
-      <h4>Produced by Felix Zhao</h4>
-      </div>`,
-      treeViewWidth: 250
+      topPanelHeight: 250,
+      dragging: false,
+      distance: null
     };
-  },
-  components: {
-    folder
   },
   methods: {
     startDrag(event) {
+      this.distance = event.screenY - this.topPanelHeight;
       switch (event.constructor.name) {
         case "TouchEvent":
           this.dragging = true;
@@ -56,10 +43,10 @@ export default {
       if (this.dragging) {
         switch (event.constructor.name) {
           case "TouchEvent":
-            this.treeViewWidth = event.touches[0].clientX;
+            this.topPanelHeight = event.touches[0].clientY;
             break;
           case "MouseEvent":
-            this.treeViewWidth = event.screenX;
+            this.topPanelHeight = event.screenY - this.distance;
             break;
         }
       }
@@ -69,58 +56,38 @@ export default {
     }
   },
   mounted() {
-    const renderer = new marked.Renderer();
-    renderer.code = (code, language) => {
-      // Check whether the given language is valid for highlight.js.
-      const validLang = !!(language && hljs.getLanguage(language));
-      // Highlight only if the language is valid.
-      const highlighted = validLang
-        ? hljs.highlight(language, code).value
-        : code;
-      // Render the highlighted code with `hljs` class.
-      return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
-    };
-    // Set the renderer to marked.
-    marked.setOptions({ renderer });
-
-    eventBus.$on("file-selected", payload => {
-      var rootUrl = "https://phoenixzqy.github.io"; // this is for testing purpose
-      axios
-        .get(rootUrl + payload.url)
-        .then(response => {
-          var mdContent = response.data;
-
-          this.noteContent = marked(mdContent);
-        })
-        .catch(error => console.log(error));
-    });
+    if (typeof this.height !== "undefined") {
+      this.topPanelHeight = this.height;
+    }
   }
 };
 </script>
-<style lang="less">
-.body {
-  height: calc(~"100vh - 80px");
+<style lang="less" scoped>
+.panel-container {
+  height: 100%;
   width: 100%;
   box-sizing: border-box;
   position: relative;
   top: 0;
   left: 0;
   display: block;
-  .left-penal,
+  overflow: hidden;
+  .top-panel,
   .mid-bar,
-  .right-penal {
+  .bottom-panel {
     position: relative;
-    height: 100%;
+    width: 100%;
     display: block;
+    overflow: hidden;
   }
-  .left-penal {
+  .top-panel {
     float: left;
-    overflow: auto;
     white-space: nowrap;
     background-color: #222;
   }
   .mid-bar {
-    width: 10px;
+    width: 100%;
+    height: 10px;
     background-color: #424242;
     float: left;
     box-sizing: border-box;
@@ -166,47 +133,24 @@ export default {
     .vertical-bar {
       display: block;
       width: 2px;
-      height: 20px;
+      height: 2px;
       background-color: #757575;
       position: absolute;
+      left: 50%;
       top: 50%;
-      margin-top: -10px;
+      margin-top: -1px;
+      margin-left: -1px;
       border-radius: 5px;
       &:nth-child(1) {
-        left: 1px;
-      }
-      &:nth-child(2) {
-        left: 4px;
+        margin-left: -5px;
       }
       &:nth-child(3) {
-        left: 7px;
+        margin-left: 3px;
       }
     }
   }
-  .right-penal {
-    padding: 50px;
-    overflow-y: auto;
+  .bottom-panel {
     box-sizing: border-box;
-    .note-wrapper {
-      max-width: 960px;
-      margin: 0 auto;
-    }
-  }
-  .tree-view {
-    margin: 20px 35px;
-    ul,
-    li {
-      list-style-type: none !important;
-      font-size: 16px;
-    }
-    li {
-      margin-left: 25px;
-    }
-    span {
-      text-decoration: none;
-      cursor: pointer;
-    }
   }
 }
 </style>
-

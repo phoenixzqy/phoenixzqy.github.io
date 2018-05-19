@@ -29,7 +29,7 @@
       <v-toolbar-title>Felix's Notes App</v-toolbar-title>
     </v-toolbar>
     <v-content>
-      <note/>
+      <note></note>
     </v-content>
     <v-footer app fixed>
       <span v-html="copyright"></span>
@@ -37,7 +37,7 @@
   </v-app>
 </template>
 <script>
-import note from "./note";
+import note from "./note/note";
 
 export default {
   data: function() {
