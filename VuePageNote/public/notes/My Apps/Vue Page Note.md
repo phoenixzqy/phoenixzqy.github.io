@@ -19,6 +19,7 @@ The app is only for reading. You can take advantage to use Github to sync public
   * ~~fix ul,li indentation bug~~
   * ~~add note slug to url (for sharing purpose)~~
   * ~~Most recent notes (use vuetify bottom navigation)~~
+  * ~~Highlight folder/parent folders and both `notes` and `recent notes` when any note is selected~~
   * Mobile friendly
   * ~~Make the re-sizable(vertical & horizontal ) panel as a reusable component~~
   * Markdown

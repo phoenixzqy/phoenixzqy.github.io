@@ -75,9 +75,12 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style lang="less" scoped>
 .active {
   color: #fb5d00 !important;
+  i {
+    color: #fb5d00 !important;
+  }
 }
 .note-list {
   margin-top: 20px;

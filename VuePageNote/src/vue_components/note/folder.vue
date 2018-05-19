@@ -1,7 +1,7 @@
 <template>
   <li>
     <span 
-    :class="{folder_active: activeIndex >= 0}"
+    :class="{folder_active: isFolderActive}"
     @click="showNodes = !showNodes">
       <v-icon small outline  v-if="fname">{{showNodes ? 'folder_open' : 'folder'}}</v-icon> {{fname}}
     </span>
@@ -37,7 +37,8 @@ export default {
   data: function() {
     return {
       showNodes: false,
-      activeIndex: -1
+      activeIndex: -1,
+      isFolderActive: false
     };
   },
   methods: {
@@ -45,6 +46,19 @@ export default {
       eventBus.$emit("file-selected", {
         file: file
       });
+    },
+    isSubfolderActive(folder, targetFilePath) {
+        var isActive = false;
+        folder.files.forEach((file, index) => {
+          if (file.path === targetFilePath) {
+            this.showNodes = true;
+            isActive = true;
+          }
+        });
+        for(var i in folder.directories) {
+          isActive = isActive || this.isSubfolderActive(folder.directories[i], targetFilePath);
+        }
+        return isActive;
     }
   },
   mounted() {
@@ -58,6 +72,7 @@ export default {
           this.showNodes = true;
         }
       });
+      this.isFolderActive =  this.isSubfolderActive(this.folder, atob(currentParams.note));
     }
 
     // unselect all node.
@@ -67,6 +82,7 @@ export default {
       that.folder.files.forEach((file, index) => {
         if (file.path === payload.file.path) that.activeIndex = index;
       });
+      that.isFolderActive = that.isSubfolderActive(that.folder, payload.file.path);
     });
 
     // menu items
@@ -83,9 +99,15 @@ export default {
 <style lang="less" scoped>
 .active {
   color: #fb5d00 !important;
+  i {
+    color: #fb5d00 !important;
+  }
 }
 .folder_active {
   color: #ff9b52 !important;
+  i {
+    color: #ff9b52 !important;
+  }
 }
 </style>
 
