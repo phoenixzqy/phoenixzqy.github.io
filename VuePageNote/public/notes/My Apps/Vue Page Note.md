@@ -13,6 +13,7 @@ The app is only for reading. You can take advantage to use Github to sync public
   * ~~build app structure~~
   * ~~tree view~~
     * Search by title/tags?/content?
+      * Search in Most Renct Notes only, lets make it easy!
     * ~~fold all/unfold all~~
   * ~~markdown render~~
   * ~~Basic UI~~

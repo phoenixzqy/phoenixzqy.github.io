@@ -86,11 +86,11 @@ export default {
     background-color: #222;
   }
   .mid-bar {
-    width: 10px;
+    width: 20px;
     background-color: #424242;
     float: left;
     box-sizing: border-box;
-    cursor: pointer;
+    cursor: col-resize;
     user-select: none;
     -moz-user-select: none;
     -khtml-user-select: none;

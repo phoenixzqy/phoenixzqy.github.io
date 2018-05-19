@@ -161,7 +161,9 @@ export default {
   }
 }
 .tree-view {
-  margin: 45px 0 0 35px;
+    padding: 45px 0 0 35px;
+    overflow: auto;
+    height: 100%;
 }
 .most-rencent-notes {
   margin: 45px 0px 15px -10px;
@@ -183,6 +185,7 @@ export default {
   box-shadow: 0 2px 20px 0px black;
   -moz-box-shadow: 0 2px 20px 0px black;
   -webkit-box-shadow: 0 2px 20px 0px black;
+  background-color: #222;
 }
 .tree-menu {
   position: absolute;

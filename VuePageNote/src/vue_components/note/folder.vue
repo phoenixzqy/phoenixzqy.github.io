@@ -18,7 +18,7 @@
         :title="file.updated_at"
         @click="loadNote(file, index)"
         :class="{active: activeIndex === index}">
-          <v-icon small outline>library_books</v-icon> {{file.file_name}}
+          <v-icon small outline>library_books</v-icon> {{getFileName(file.file_name)}}
         </span>
         </li>
     </ul>
@@ -46,6 +46,9 @@ export default {
       eventBus.$emit("file-selected", {
         file: file
       });
+    },
+    getFileName(fileName){
+      return helpers.getFileName(fileName);
     },
     isSubfolderActive(folder, targetFilePath) {
         var isActive = false;

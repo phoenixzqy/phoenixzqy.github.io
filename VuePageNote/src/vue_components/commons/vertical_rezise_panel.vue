@@ -88,11 +88,11 @@ export default {
   }
   .mid-bar {
     width: 100%;
-    height: 10px;
+    height: 20px;
     background-color: #424242;
     float: left;
     box-sizing: border-box;
-    cursor: pointer;
+    cursor: row-resize;
     user-select: none;
     -moz-user-select: none;
     -khtml-user-select: none;
