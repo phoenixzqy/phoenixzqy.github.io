@@ -1,0 +1,7 @@
+html,body,main {
+  background-color: #4dc3fe4f;
+}
+.content-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+}
