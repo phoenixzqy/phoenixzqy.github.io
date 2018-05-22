@@ -1,3 +1,7 @@
+# My git alias setting
+
+> Note: most of the alias are from others' work. I just collect them online, and combine and modify some for my personal usage. 
+
 ```bash
 [alias]
   # one-line log
@@ -20,7 +24,13 @@
   cob = checkout -b
 
   pon = push -u origin
-  rbs = "!echo \"\\033[32m[fetching...]\\033[0m\"; git fetch; echo \"\\033[32m[pull and rebasing...]\\033[0m\"; git pull origin master --rebase"
+  # first fetch your repo, then pull and rebase from master.
+  rbs = "!echo \"[fetching...]\"; git fetch; echo \"[pull and rebasing...]\"; git pull origin master --rebase"
+
+  # remove all local branches but keep master
+  gbr = "git branch | grep -v "master" | xargs git branch -D"
+  
+  # this is very useful to view your project version history as other GUI. 
   graph = log --graph --date-order -C -M --pretty=format:\"<%h> %ad [%an] %Cgreen%d%Creset %s\" --all --date=short
 
   # list branches sorted by last modified
@@ -37,26 +47,4 @@
 
   # list aliases
   la = "!git config -l | grep alias | cut -c 7-"
-
-  # cozstay alias
-  rbd = rebase origin/develop
-  cod = checkout origin/develop
-  coznb = "!f() { \
-      if [ -z $1 ]; then \
-          echo ERROR: No Branch Name Supplied; \
-                                                  else \
-                                                          git fetch && git checkout origin/develop && git checkout -b $1; \
-      fi; \
-  }; f"
-
-  lac = "!f()\
-  {\
-          echo '# cozstay alias';\
-          echo 'rbd = rebase origin/develop';\
-          echo 'cod = checkout origin/develop';\
-          echo 'cob = checkout -b <your_new_branch_name>';\
-          echo 'pon = push -u origin <origin_new_branch_name>';\
-          echo 'coznb = git fetch && git checkout origin/develop && git checkout -b <your_new_branch_name>';\
-  }; f"
-  up-sub = "!f() { cd $1 && git checkout master && git pull && git submodule update --init --recursive; }; f"
 ```

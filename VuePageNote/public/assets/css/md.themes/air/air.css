@@ -58,6 +58,8 @@
   }
   .md-air pre,
   .md-air blockquote {
+    margin: 20px;
+    padding: 0 0 0 10px;
     border: 1px solid #999;
     page-break-inside: avoid;
   }
@@ -151,10 +153,10 @@
   text-align: left;
 }
 .md-air blockquote {
-  margin: 0;
+  margin: 20px;
+  padding: 0 0 0 10px;
   border-left: 5px solid #7a7a7a;
   font-style: italic;
-  padding: 1.33em;
   text-align: left;
 }
 .md-air ul,
