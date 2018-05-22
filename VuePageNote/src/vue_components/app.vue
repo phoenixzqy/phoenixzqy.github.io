@@ -6,20 +6,12 @@
       app
     >
       <v-list dense>
-        <v-list-tile >
+        <v-list-tile v-for="(item, index) in drawerItems" :key="index" @click="goTo(item.href, item.isBlank)">
           <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
+            <v-icon>{{item.icon}}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Dashboard</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile>
-          <v-list-tile-action>
-            <v-icon>settings</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Settings</v-list-tile-title>
+            <v-list-tile-title>{{item.title}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -43,11 +35,46 @@ export default {
   data: function() {
     return {
       copyright: `Copyright &copy; ${new Date().getFullYear()}, Felix Zhao`,
-      drawer: false
+      drawer: false,
+      drawerItems: [
+        {
+          icon: 'note',
+          title: 'My Notes',
+          href: '/',
+          isBlank: false
+        },
+        {
+          icon: 'date_range',
+          title: 'Calendar Toolkit Demo',
+          href: '/demo/calendar/index.html',
+          isBlank: true
+        },
+        {
+          icon: 'layers',
+          title: 'Algorithm Simulator Demo',
+          href: '/demo/algorithmSimulator/index.html',
+          isBlank: true
+        },
+        {
+          icon: 'mood',
+          title: 'Yorke Demo',
+          href: '/demo/yorkeApp/app.html',
+          isBlank: true
+        },
+      ]
     };
   },
   components: {
     note
+  },
+  methods: {
+    goTo(url, isBlank) {
+      if(isBlank) {
+        window.open(url,'_blank');
+      } else {
+        location.href = url;
+      }
+    }
   }
 };
 </script>
