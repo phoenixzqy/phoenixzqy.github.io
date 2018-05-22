@@ -83,7 +83,7 @@ export default {
   data: function() {
     return {
       treeData: data,
-      noteContent: `<div style="text-align: center; color: #424242; margin-top: 25vh;">
+      noteContent: `<div style="text-align: center; color: #424242; margin-top: 25vh; user-select:none;">
       <h1>Powered by Vue.js + Vuetify</h1>
       <h4>Produced by Felix Zhao</h4>
       </div>`
