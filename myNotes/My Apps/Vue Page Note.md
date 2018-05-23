@@ -34,7 +34,11 @@ The app is only for reading. You can take advantage to use Github to sync public
   * ~~public notes structure~~
   * ~~public notes index generator tool~~
   * edit notes online?
-    * Maybe integrate with github web hook? But I think it is not necessary.
+    * Maybe integrate with github api.
+      * Before everything. This is IMPOSSIBLE for Github Page users since your client secret MUST be server to server scenarios. You should never leak it to public, where Github Page is a public repo.
+      * for learning purpose:
+        * [auth](https://developer.github.com/v3/oauth_authorizations/)
+        * [get and update a file of any repository](https://developer.github.com/v3/repos/contents/#update-a-file)
 * Private Notes:
   * Google Drive support
     * Login
