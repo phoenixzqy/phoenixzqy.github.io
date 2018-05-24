@@ -23,7 +23,7 @@
       :class="{active: activeIndex === index}"
       @click="loadNote(file, index)">
         <v-list-tile-avatar>
-          <v-icon>insert_drive_file</v-icon>
+          <v-icon class="grey darken-3 white--text">insert_drive_file</v-icon>
         </v-list-tile-avatar>
         <v-list-tile-content>
           <v-list-tile-title class="subheading"><span v-html="file.display_name"></span></v-list-tile-title>
@@ -60,7 +60,7 @@ export default {
     getFileDetailes(file) {
       var updatedAt = new Date(file.updated_at);
       var size = (file.size / 1024).toFixed(2);
-      return `Updated at: ${updatedAt.toLocaleDateString(
+      return `${updatedAt.toLocaleDateString(
         "zh"
       )}&nbsp;&nbsp;[ ${size} kb ]`;
     }

@@ -1,6 +1,6 @@
 <template>
     <div class="panel-container" @mouseup="stopDrag" @touchend="stopDrag" @mousemove="doDrag" @touchmove="doDrag">
-        <div class="left-panel" :style="{width:leftPanelWidth + 'px'}">
+        <div class="left-panel" :style="{width:(leftPanelWidth - 10) + 'px'}">
             <slot name="left-panel"></slot>
         </div>
         <div class="mid-bar" @mousedown="startDrag" @touchstart="startDrag">
