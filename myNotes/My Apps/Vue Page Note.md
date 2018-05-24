@@ -12,8 +12,9 @@ The app is only for reading. You can take advantage to use Github to sync public
 * APP:
   * ~~build app structure~~
   * ~~tree view~~
-    * Search by title/tags?/content?
-      * Search in Most Renct Notes only, lets make it easy!
+    * Search/filter by fileName/tags?
+      * Search in Most Recent Notes only, lets make it easy!
+      * ~~Filter by file fileName~~
     * ~~fold all/unfold all~~
   * ~~markdown render~~
   * ~~Basic UI~~

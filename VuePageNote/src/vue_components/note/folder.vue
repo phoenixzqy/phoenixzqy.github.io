@@ -18,7 +18,7 @@
         :title="file.updated_at"
         @click="loadNote(file, index)"
         :class="{active: activeIndex === index}">
-          <v-icon small outline>library_books</v-icon> {{getFileName(file.file_name)}}
+          <v-icon small outline>insert_drive_file</v-icon> {{getFileName(file.file_name)}}
         </span>
         </li>
     </ul>
