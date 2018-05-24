@@ -27,7 +27,7 @@ The app is only for reading. You can take advantage to use Github to sync public
     * PPT mode
     * export/download as html/md/pdf
     * ~~syntax highlight (highlight.js)~~
-    * create a note index based on `<h2/>` and `<h3/>`
+    * create a note category based on `<h2/>` and `<h3/>`
   * Change themes?
     * load custom background theme for single note
 * Public Notes:
