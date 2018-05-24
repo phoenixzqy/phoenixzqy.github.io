@@ -6,7 +6,7 @@
           <template slot="top-panel">
             <div class="tree-view">
               <div class="left-title">
-                <h3>-- Public Notes --</h3>
+                <h3>-- Tree View --</h3>
               </div>
               
               <!-- root node -->
@@ -147,6 +147,8 @@ export default {
 }
 .tree-view,
 .most-rencent-notes {
+  height: calc(100% - 40px);
+  overflow-y: auto;
   ul,
   li {
     list-style-type: none !important;
@@ -161,12 +163,12 @@ export default {
   }
 }
 .tree-view {
-    padding: 45px 0 0 35px;
-    overflow: auto;
-    height: 100%;
+  padding: 45px 0 0 35px;
+  overflow: auto;
+  height: 100%;
 }
 .most-rencent-notes {
-  margin: 45px 0px 15px -10px;
+  margin: 40px 0px 15px -10px;
 }
 .note-wrapper {
   max-width: 960px;

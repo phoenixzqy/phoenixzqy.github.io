@@ -1,5 +1,6 @@
 <template>
-    <ul class="note-list">
+<div>
+  <!-- <ul class="note-list">
         <li v-for="(file, index) in getSortedFiles" :key="index">
             <span 
                 href="javascript:;" 
@@ -9,13 +10,29 @@
                 <v-icon small outline>library_books</v-icon> {{getFileName(file.file_name)}}
             </span>
         </li>
-    </ul>
-    
+    </ul> -->
+  <v-list two-line dense class="note-list">
+    <v-list-tile 
+    v-for="(file, index) in getSortedFiles" 
+    :key="index" 
+    avatar 
+    :class="{active: activeIndex === index}"
+    @click="loadNote(file, index)">
+      <v-list-tile-avatar>
+        <v-icon>insert_drive_file</v-icon>
+      </v-list-tile-avatar>
+      <v-list-tile-content>
+        <v-list-tile-title class="subheading">{{ getFileName(file.file_name) }}</v-list-tile-title>
+        <v-list-tile-sub-title><span v-html="getFileDetailes(file)"></span></v-list-tile-sub-title>
+      </v-list-tile-content>
+    </v-list-tile>
+  </v-list>
+</div>
 </template>
 <script>
 import data from "../../../database/noteStructure.json";
 import eventBus from "../../utils/eventBus.js";
-import helpers from "../../utils/helpers.js"
+import helpers from "../../utils/helpers.js";
 
 export default {
   data: function() {
@@ -50,15 +67,20 @@ export default {
   methods: {
     loadNote(file, index) {
       eventBus.$emit("file-selected", {
-        file: file,
+        file: file
       });
     },
-    getFileName(fileName){
+    getFileName(fileName) {
       return helpers.getFileName(fileName);
     },
+    getFileDetailes(file) {
+      var updatedAt = new Date(file.updated_at);
+      var size = (file.size / 1024).toFixed(2);
+      return `Updated at: ${updatedAt.toLocaleDateString("zh")}&nbsp;&nbsp;[ ${size} kb ]`;
+    }
   },
   mounted() {
-      // load initial note if available
+    // load initial note if available
     var currentParams = helpers.getCurrentParams();
     if (currentParams && currentParams.note && this.files) {
       this.files.forEach((file, index) => {
@@ -71,9 +93,9 @@ export default {
     var that = this;
     eventBus.$on("file-selected", payload => {
       that.activeIndex = -1;
-        that.files.forEach((file, index) => {
-            if(file.path === payload.file.path) that.activeIndex = index;
-        })
+      that.files.forEach((file, index) => {
+        if (file.path === payload.file.path) that.activeIndex = index;
+      });
     });
   }
 };
@@ -85,7 +107,7 @@ export default {
     color: #fb5d00 !important;
   }
 }
-.note-list {
-  margin-top: 20px;
+.list {
+  background-color: transparent;
 }
 </style>

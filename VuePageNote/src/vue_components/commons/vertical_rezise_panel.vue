@@ -8,7 +8,7 @@
           <span class="vertical-bar"></span>
           <span class="vertical-bar"></span>
         </div>
-        <div class="bottom-panel">
+        <div class="bottom-panel" :style="{height:'calc( 100% - ' + (topPanelHeight + 20) + 'px' + ')'}">
           <slot name="bottom-panel"></slot>
         </div>
       </div>
