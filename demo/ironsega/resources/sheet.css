@@ -55696,7 +55696,7 @@ div.waffle-filterbox-label-icon {
 
 .softmerge-inner {
   white-space: nowrap;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-overflow: hidden;
   position: relative
 }
