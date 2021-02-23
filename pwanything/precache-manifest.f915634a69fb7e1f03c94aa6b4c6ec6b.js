@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/pwanything/assets/android/mipmap-xxhdpi/ic_launcher.png"
   },
   {
-    "revision": "f9f28cfa1dc4e346c755a6530dd81422",
+    "revision": "df5c2eb6833dad3378235739493e880a",
     "url": "/pwanything/index.html"
   },
   {
@@ -15,12 +15,12 @@ self.__precacheManifest = [
     "url": "/pwanything/eeece9123acb4559517c80f8fba1f370.svg"
   },
   {
-    "revision": "c04f49aeb8a861322d83",
+    "revision": "2d4a4d51fe5841560e0d",
     "url": "/pwanything/bundle.ea2e662a.css"
   },
   {
-    "revision": "c04f49aeb8a861322d83",
-    "url": "/pwanything/bundle.c04f49ae.js"
+    "revision": "2d4a4d51fe5841560e0d",
+    "url": "/pwanything/bundle.2d4a4d51.js"
   },
   {
     "revision": "50112d1e49e5f4b41c1839e6075ff6ba",
