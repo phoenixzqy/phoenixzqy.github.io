@@ -4,30 +4,15 @@
   "description": "This is just a pwa wrapper to loader other websites",
   "icons": [
     {
-      "src": "/pwanything/assets/android/mipmap-mhdpi/ic_launcher.png",
-      "sizes": "48x48",
+      "src": "/pwanything/assets/favicon_64x64.png",
+      "sizes": "64x64",
       "type": "image/png"
     },
     {
-      "src": "/pwanything/assets/android/mipmap-hdpi/ic_launcher.png",
-      "sizes": "72x72",
+      "src": "/pwanything/assets/gem_icon_128x128.png",
+      "sizes": "128x128",
       "type": "image/png"
     },
-    {
-      "src": "/pwanything/assets/android/mipmap-xhdpi/ic_launcher.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/pwanything/assets/android/mipmap-xxhdpi/ic_launcher.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "/pwanything/assets/android/mipmap-xxxhdpi/ic_launcher.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
   ],
   "start_url": "/pwanything/app.html",
   "display": "fullscreen",
