@@ -1,26 +1,23 @@
 self.__precacheManifest = [
   {
-    "revision": "0662cdb92f4ccdd0171fe97c703da71a",
-    "url": "/pwanything/assets/android/mipmap-xxhdpi/ic_launcher.png"
-  },
-  {
-    "revision": "c6aa0d9865b8028d9b4e35c6dea80427",
-    "url": "/pwanything/index.html"
-  },
-  {
     "revision": "da49d254ac07351958b1e19c97f38162",
     "url": "/pwanything/assets/android/mipmap-xxxhdpi/ic_launcher.png"
   },
   {
-    "url": "/pwanything/eeece9123acb4559517c80f8fba1f370.svg"
+    "revision": "1cffa5e51f1d7580de0a707c93e9da13",
+    "url": "/pwanything/index.html"
   },
   {
-    "revision": "23a011f746760d129dd8",
-    "url": "/pwanything/bundle.ea2e662a.css"
+    "revision": "bb2eb7d03932d51d570e7541cbe09b1f",
+    "url": "/pwanything/assets/appstore.png"
   },
   {
-    "revision": "23a011f746760d129dd8",
-    "url": "/pwanything/bundle.23a011f7.js"
+    "revision": "e78e4d4bafdeed40e35b",
+    "url": "/pwanything/bundle.d2ff08d0.css"
+  },
+  {
+    "revision": "e78e4d4bafdeed40e35b",
+    "url": "/pwanything/bundle.e78e4d4b.js"
   },
   {
     "revision": "50112d1e49e5f4b41c1839e6075ff6ba",
@@ -31,12 +28,16 @@ self.__precacheManifest = [
     "url": "/pwanything/assets/manifest.json"
   },
   {
+    "revision": "eeece9123acb4559517c80f8fba1f370",
+    "url": "/pwanything/assets/iconfinder-icon.svg"
+  },
+  {
     "revision": "7ee65e273045c22650f0fdacfd875e32",
     "url": "/pwanything/assets/favicon.png"
   },
   {
-    "revision": "bb2eb7d03932d51d570e7541cbe09b1f",
-    "url": "/pwanything/assets/appstore.png"
+    "revision": "0662cdb92f4ccdd0171fe97c703da71a",
+    "url": "/pwanything/assets/android/mipmap-xxhdpi/ic_launcher.png"
   },
   {
     "revision": "ac5af379dbae19ee76a77611410bac1b",
