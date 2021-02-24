@@ -1,23 +1,27 @@
 self.__precacheManifest = [
   {
-    "revision": "da49d254ac07351958b1e19c97f38162",
-    "url": "/pwanything/assets/android/mipmap-xxxhdpi/ic_launcher.png"
-  },
-  {
-    "revision": "1cffa5e51f1d7580de0a707c93e9da13",
-    "url": "/pwanything/index.html"
-  },
-  {
     "revision": "bb2eb7d03932d51d570e7541cbe09b1f",
     "url": "/pwanything/assets/appstore.png"
   },
   {
-    "revision": "e78e4d4bafdeed40e35b",
-    "url": "/pwanything/bundle.d2ff08d0.css"
+    "revision": "502e02929168b65d8904152df1228f16",
+    "url": "/pwanything/index.html"
   },
   {
-    "revision": "e78e4d4bafdeed40e35b",
-    "url": "/pwanything/bundle.e78e4d4b.js"
+    "revision": "7ee65e273045c22650f0fdacfd875e32",
+    "url": "/pwanything/assets/favicon.png"
+  },
+  {
+    "revision": "3561e1ed89dc1f158939",
+    "url": "/pwanything/bundle.002ea26f.css"
+  },
+  {
+    "revision": "3561e1ed89dc1f158939",
+    "url": "/pwanything/bundle.3561e1ed.js"
+  },
+  {
+    "revision": "5f6fdd1bc3a0c466092e69fbf5b4bac0",
+    "url": "/pwanything/assets/title_bg_1.png"
   },
   {
     "revision": "50112d1e49e5f4b41c1839e6075ff6ba",
@@ -32,8 +36,8 @@ self.__precacheManifest = [
     "url": "/pwanything/assets/iconfinder-icon.svg"
   },
   {
-    "revision": "7ee65e273045c22650f0fdacfd875e32",
-    "url": "/pwanything/assets/favicon.png"
+    "revision": "da49d254ac07351958b1e19c97f38162",
+    "url": "/pwanything/assets/android/mipmap-xxxhdpi/ic_launcher.png"
   },
   {
     "revision": "0662cdb92f4ccdd0171fe97c703da71a",
