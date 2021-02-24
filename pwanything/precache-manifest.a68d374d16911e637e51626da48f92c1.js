@@ -12,7 +12,7 @@ self.__precacheManifest = [
     "url": "/pwanything/bundle.08fb6baa.css"
   },
   {
-    "revision": "ae90b7f1d0a618663c381c9d63014e7f",
+    "revision": "ed94e647cb35d6a76bc6ca574f41e328",
     "url": "/pwanything/assets/manifest.json"
   },
   {
