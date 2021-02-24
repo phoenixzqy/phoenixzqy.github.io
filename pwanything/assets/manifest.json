@@ -20,7 +20,7 @@
     },
   ],
   "start_url": "/pwanything/app.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#fff",
   "background_color": "#fff"
 }
