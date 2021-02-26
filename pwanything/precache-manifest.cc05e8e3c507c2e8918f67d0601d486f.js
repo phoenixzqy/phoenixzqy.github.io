@@ -1,18 +1,18 @@
 self.__precacheManifest = [
   {
-    "revision": "d8b88bc5bbe495e1c3901e63af042490",
+    "revision": "eb4643443023f43d776097b2c333a9c9",
     "url": "/pwanything/index.html"
   },
   {
-    "revision": "ade23201705d60bb393c",
-    "url": "/pwanything/bundle.ade23201.js"
+    "revision": "98fc50f5ca9e44d3c8ed",
+    "url": "/pwanything/bundle.98fc50f5.js"
   },
   {
-    "revision": "ade23201705d60bb393c",
+    "revision": "98fc50f5ca9e44d3c8ed",
     "url": "/pwanything/bundle.047aaffd.css"
   },
   {
-    "revision": "3ef9d5eab7517eab29716574f0e1b0aa",
+    "revision": "00077d4d71c48236f86de7d48accd581",
     "url": "/pwanything/assets/manifest.json"
   },
   {
