@@ -1,6 +1,6 @@
 self.__precacheManifest = [
   {
-    "revision": "b7a3b05b528212de729e44fcc4de7858",
+    "revision": "a39fa2072d4e0752d2907a57eea18b90",
     "url": "/pwanything/index.html"
   },
   {
