@@ -1,3 +1,0 @@
-# Just like this note app
-
-### To be continued...
