@@ -5,11 +5,12 @@ This blog is a fork of [VBlog](https://github.com/GitHub-Laziji/VBlog). If you w
 ### New Features:
 
 - [x] Browser version personalization
-- [ ] Mobile version personalization
+- [x] Mobile version personalization
 - [x] Add SoundsGood player
 - [x] Extending SoundsGood player size.
 - [x] Fix SoundsGood player position to bottom right
 - [x] highlight all markdown for blog defail pages and README page.
+- [x] update github authentication
 - [ ] render emoji
 - [ ] edit project/repo README.md files
 - [ ] comments? chat?
