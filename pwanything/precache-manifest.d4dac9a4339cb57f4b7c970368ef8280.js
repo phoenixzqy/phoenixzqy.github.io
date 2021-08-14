@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "cd61561078f928a017c8",
-    "url": "/pwanything/bundle.35888843.css"
+    "revision": "5286699b38d4ce8699b6",
+    "url": "/pwanything/bundle.d41d9051.css"
   },
   {
-    "revision": "cd61561078f928a017c8",
-    "url": "/pwanything/bundle.cd615610.js"
+    "revision": "5286699b38d4ce8699b6",
+    "url": "/pwanything/bundle.5286699b.js"
   },
   {
     "revision": "72d32f6e98262c3143d9e7ca1aa8d068",
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/pwanything/assets/manifest.json"
   },
   {
-    "revision": "e7c28dde5ef9bfd5b5a95742612f228f",
+    "revision": "090616a3ea50716732c7f191af80c6f4",
     "url": "/pwanything/index.html"
   }
 ];
