@@ -1,1 +1,36 @@
-{"githubUsername":"phoenixzqy","blogTitle":"Felix Zhao","blogDescribe":"你有故事，我有酒。","htmlTitle":"Felix Zhao's playland","fontColor":"#ffffff","useBackgroundImage":false,"backgroundColorLeft":"#2F90B9","backgroundColorRight":"#E77C8E","audioUrl":"https://github.com/phoenixzqy/phoenixzqy.github.io/blob/master/music/talking_to_the_moon.mp3?raw=true","soundsgoodIframeUrl":"https://play.soundsgood.co/embed/5b1068987c26a8fb47bb454d?","mini":false,"webSites":[{"name":"Algorithm Simulator","url":"https://phoenixzqy.github.io/demo/algorithmSimulator/index.html"},{"name":"Calendar Tool","url":"https://phoenixzqy.github.io/demo/calendar/index.html"},{"name":"Matching Game","url":"https://phoenixzqy.github.io/demo/Matching-Game-H5/src/index.html"},{"name":"PWAnything","url":"https://phoenixzqy.github.io/pwanything/app.html"}],"pageSize":"10"}
+{
+  "githubUsername": "phoenixzqy",
+  "blogTitle": "Felix Zhao",
+  "blogDescribe": "你有故事，我有酒。",
+  "htmlTitle": "Felix Zhao's playland",
+  "fontColor": "#ffffff",
+  "useBackgroundImage": false,
+  "backgroundColorLeft": "#2F90B9",
+  "backgroundColorRight": "#E77C8E",
+  "audioUrl": "https://github.com/phoenixzqy/phoenixzqy.github.io/blob/master/music/talking_to_the_moon.mp3?raw=true",
+  "soundsgoodIframeUrl": "https://play.soundsgood.co/embed/5b1068987c26a8fb47bb454d?",
+  "mini": false,
+  "webSites": [
+    {
+      "name": "Algorithm Simulator",
+      "url": "https://phoenixzqy.github.io/demo/algorithmSimulator/index.html"
+    },
+    {
+      "name": "Calendar Tool",
+      "url": "https://phoenixzqy.github.io/demo/calendar/index.html"
+    },
+    {
+      "name": "Matching Game",
+      "url": "https://phoenixzqy.github.io/demo/Matching-Game-H5/src/index.html"
+    },
+    {
+      "name": "PWAnything",
+      "url": "https://phoenixzqy.github.io/pwanything/app.html"
+    },
+    {
+      "name": "mBookmark",
+      "url": "https://phoenixzqy.github.io/demo/mBookmark/index.html"
+    }
+  ],
+  "pageSize": "10"
+}
