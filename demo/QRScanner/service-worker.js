@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/demo/QRScannerprecache-manifest.4cdc3e37b999e080cec9f3fc3d530e8e.js"
+  "/demo/QRScannerprecache-manifest.c5b099090e4c4226caa0829875756bf7.js"
 );
 
 workbox.skipWaiting();
