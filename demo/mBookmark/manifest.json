@@ -1,0 +1,25 @@
+{
+  "index.html": {
+    "file": "assets/main.e52eac19.js",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_vendor.40dbf55d.js"
+    ],
+    "css": [
+      "assets/main.d9e91637.css"
+    ],
+    "assets": [
+      "assets/Pokeball.08405e7f.svg",
+      "assets/qrcode.3b9df612.png",
+      "assets/settings.17bb5709.png",
+      "assets/default_wallpaper.0d87bd85.jpg",
+      "assets/maxresdefault.c097630c.webp",
+      "assets/default_live_wallpaper.a9a734d8.webm",
+      "assets/dragon_icon_128x128.d2aa5433.png"
+    ]
+  },
+  "_vendor.40dbf55d.js": {
+    "file": "assets/vendor.40dbf55d.js"
+  }
+}
