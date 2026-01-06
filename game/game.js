@@ -21,16 +21,16 @@
 	im.type = "importmap";
 	im.textContent = `{
   "imports": {
-    "noname": "/nonamekill/noname.js",
-    "vue": "/nonamekill/node_modules/vue/dist/vue.esm-browser.js",
-    "pinyin-pro": "/nonamekill/node_modules/pinyin-pro/dist/index.js",
-    "dedent": "/nonamekill/node_modules/dedent/dist/dedent.js"
+    "noname": "/noname.js",
+    "vue": "/node_modules/vue/dist/vue.esm-browser.js",
+    "pinyin-pro": "/node_modules/pinyin-pro/dist/index.js",
+    "dedent": "/node_modules/dedent/dist/dedent.js"
   }
 }`;
 	document.currentScript.after(im);
 
 	const script = document.createElement("script");
 	script.type = "module";
-	script.src = "/nonamekill/noname/entry.js";
+	script.src = "/noname/entry.js";
 	document.head.appendChild(script);
 })();

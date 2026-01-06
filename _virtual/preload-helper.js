@@ -1,6 +1,6 @@
 const scriptRel = "modulepreload";
 const assetsURL = function(dep) {
-  return "/nonamekill/" + dep;
+  return "/" + dep;
 };
 const seen = {};
 const __vitePreload = function preload(baseModule, deps, importerUrl) {
