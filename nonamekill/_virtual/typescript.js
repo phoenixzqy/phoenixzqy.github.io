@@ -1,7 +1,0 @@
-import { getDefaultExportFromCjs } from "./_commonjsHelpers.js";
-import { __require as requireTypescript } from "../node_modules/typescript/lib/typescript.js";
-var typescriptExports = requireTypescript();
-const ts = /* @__PURE__ */ getDefaultExportFromCjs(typescriptExports);
-export {
-  ts as default
-};
