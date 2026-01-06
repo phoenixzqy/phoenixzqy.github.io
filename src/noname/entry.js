@@ -1,0 +1,140 @@
+import { lib, game, get, _status, ui, ai } from "noname";
+import { boot } from "@/init/index.js";
+import { userAgentLowerCase, device } from "@/util/index.js";
+import { requestWakeLock, isPWAInstalled, isWakeLockSupported } from "@/util/pwa.js";
+import "core-js-bundle";
+import "../jit/index.js";
+// 保证打包时存在(importmap)
+import "vue/dist/vue.esm-browser.js";
+
+function allowServiceWorker() {
+	return import.meta.env.PROD && "serviceWorker" in navigator && location.protocol === "https:";
+}
+
+// Get the base path from the current location for PWA registration
+function getBasePath() {
+	// Get the directory path of the current URL
+	const pathname = location.pathname;
+	const lastSlash = pathname.lastIndexOf('/');
+	return lastSlash > 0 ? pathname.substring(0, lastSlash + 1) : '/';
+}
+
+// PWA Service Worker Registration
+async function registerPWA() {
+	if (!allowServiceWorker()) {
+		console.log('[PWA] Service workers are not supported');
+		return;
+	}
+	
+	const basePath = getBasePath();
+	
+	try {
+		const registration = await navigator.serviceWorker.register(basePath + 'pwa-sw.js', {
+			scope: basePath
+		});
+		console.log('[PWA] Service Worker registered with scope:', registration.scope);
+		
+		// Check for updates
+		registration.addEventListener('updatefound', () => {
+			const newWorker = registration.installing;
+			if (newWorker) {
+				newWorker.addEventListener('statechange', () => {
+					if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+						console.log('[PWA] New version available');
+					}
+				});
+			}
+		});
+	} catch (error) {
+		console.error('[PWA] Service Worker registration failed:', error);
+	}
+}
+
+// Request Wake Lock to keep screen on during gameplay
+// This is especially important for PWA on iOS/Safari
+async function setupWakeLock() {
+	// Only enable wake lock if running as PWA or on mobile devices
+	const shouldEnableWakeLock = isPWAInstalled() || device === 'ios' || device === 'android';
+	
+	if (shouldEnableWakeLock) {
+		console.log('[PWA] Requesting wake lock for gameplay...');
+		const acquired = await requestWakeLock();
+		if (acquired) {
+			console.log('[PWA] Wake lock acquired - screen will stay on during gameplay');
+		} else if (isWakeLockSupported()) {
+			console.log('[PWA] Wake lock request failed, but API is supported');
+		} else {
+			console.log('[PWA] Wake lock API not supported, using fallback method');
+		}
+	}
+}
+
+(async () => {
+	try {
+		// Register PWA Service Worker
+		registerPWA();
+		
+		// Enable wake lock to keep screen on during gameplay
+		setupWakeLock();
+		
+		window["bannedExtensions"] = [
+			"\u4fa0\u4e49",
+			"\u5168\u6559\u7a0b",
+			"在线更新", //游戏内在线更新方式修改了，不再依赖于在线更新扩展了
+		];
+
+		lib.device = device;
+
+		// 预加载脚本
+		const path = "/preload.js";
+		const { default: preload } = await import(/* @vite-ignore */ path).catch(() => {
+			// Electron平台
+			if (typeof window.require === "function") {
+				return import("./init/node.js");
+			} else {
+				// 仅在“确实是移动端客户端/cordova环境”时才走 cordova 分支；
+				// 否则（如 macOS 桌面 Safari/Chrome、普通手机浏览器）应走 browser 分支，避免请求 /cordova.js 并卡死在 deviceready。
+				const isCordovaLike = typeof window.cordova !== "undefined" || typeof window.NonameAndroidBridge !== "undefined" || typeof window.noname_shijianInterfaces !== "undefined";
+
+				if (import.meta.env.DEV || typeof lib.device == "undefined" || !isCordovaLike) {
+					return import("./init/browser.js");
+				} else {
+					return import("./init/cordova.js");
+				}
+			}
+		});
+		await preload({ lib, game, get, _status, ui, ai });
+
+		// GPL确认
+		if (!localStorage.getItem("gplv3_noname_alerted")) {
+			if (
+				confirm(`①无名杀是一款基于GPLv3协议的开源软件
+你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的扩展
+点击“确定”即代表您认可并接受GPLv3协议↓️
+https://www.gnu.org/licenses/gpl-3.0.html
+②无名杀官方发布地址仅有GitHub仓库
+其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关`)
+			) {
+				localStorage.setItem("gplv3_noname_alerted", String(true));
+			} else {
+				game.exit();
+				return;
+			}
+		}
+
+		await boot();
+	} catch (e) {
+		console.error(e);
+		alert(`《无名杀》加载内容失败
+浏览器UA信息: 
+${userAgentLowerCase}
+错误信息: 
+${e instanceof Error ? e.stack : String(e)}
+若您不理解该信息，请依次检查：
+1. 游戏文件是否完整（重新下载完整包）
+2. 客户端是否需要更新
+3. 浏览器是否需要更新
+4. 若您直接打开index.html进行游戏，请改为运行文件夹内的noname-server.exe
+5. 若以上步骤均无法解决问题，请及时向开发组反馈`);
+	}
+})();
