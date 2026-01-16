@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160">
+  <defs>
+    <linearGradient id="skyBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e90ff"/>
+      <stop offset="40%" style="stop-color:#87ceeb"/>
+      <stop offset="70%" style="stop-color:#b0e0e6"/>
+      <stop offset="100%" style="stop-color:#ffffff"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="160" fill="url(#skyBgGrad)" rx="12"/>
+  
+  <!-- Sun with rays -->
+  <circle cx="150" cy="40" r="22" fill="#f1c40f" opacity="0.3"/>
+  <circle cx="150" cy="40" r="16" fill="#f39c12"/>
+  <circle cx="150" cy="40" r="12" fill="#f1c40f"/>
+  
+  <!-- Fluffy clouds -->
+  <g fill="white" opacity="0.9">
+    <ellipse cx="45" cy="45" rx="20" ry="12"/>
+    <ellipse cx="60" cy="42" rx="15" ry="10"/>
+    <ellipse cx="30" cy="48" rx="12" ry="8"/>
+  </g>
+  <g fill="white" opacity="0.8">
+    <ellipse cx="120" cy="70" rx="18" ry="10"/>
+    <ellipse cx="135" cy="68" rx="14" ry="9"/>
+    <ellipse cx="108" cy="72" rx="12" ry="7"/>
+  </g>
+  
+  <!-- Small birds -->
+  <path d="M25 80 Q30 75 35 80" stroke="#2c3e50" stroke-width="1.5" fill="none"/>
+  <path d="M40 85 Q45 80 50 85" stroke="#2c3e50" stroke-width="1.5" fill="none"/>
+  
+  <!-- Label -->
+  <rect x="50" y="95" width="100" height="26" fill="rgba(255,255,255,0.9)" rx="13"/>
+  <text x="100" y="113" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e90ff">Sky Theme</text>
+  
+  <!-- Decorative corners -->
+  <text x="15" y="25" font-size="14">☀️</text>
+  <text x="175" y="150" font-size="14">🌤️</text>
+  
+  <!-- Badge -->
+  <rect x="55" y="130" width="90" height="18" fill="rgba(30,144,255,0.2)" rx="9"/>
+  <text x="100" y="143" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1e90ff">☁️ Background Skin ☁️</text>
+</svg>
