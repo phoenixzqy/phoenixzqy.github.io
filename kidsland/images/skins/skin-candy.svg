@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="candy" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff69b4"/>
+      <stop offset="50%" style="stop-color:#ff8dc7"/>
+      <stop offset="100%" style="stop-color:#ff69b4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="20" fill="#fff5f8"/>
+
+  <!-- Candy button preview -->
+  <rect x="25" y="70" width="150" height="60" rx="12" fill="url(#candy)"/>
+  <rect x="30" y="75" width="140" height="50" rx="10" fill="none" stroke="#fff" stroke-width="3" opacity="0.6"/>
+
+  <!-- Candy decorations -->
+  <circle cx="50" cy="90" r="6" fill="#fff" opacity="0.4"/>
+  <circle cx="150" cy="110" r="5" fill="#fff" opacity="0.3"/>
+  <circle cx="70" cy="115" r="4" fill="#fff" opacity="0.3"/>
+  <circle cx="130" cy="85" r="5" fill="#fff" opacity="0.4"/>
+
+  <!-- Button text -->
+  <text x="100" y="108" font-family="Arial, sans-serif" font-size="18" fill="#fff" text-anchor="middle" font-weight="bold">Candy</text>
+
+  <!-- Floating candy decorations -->
+  <circle cx="30" cy="40" r="8" fill="#ff69b4" opacity="0.5"/>
+  <circle cx="170" cy="35" r="6" fill="#ff8dc7" opacity="0.5"/>
+  <circle cx="25" cy="160" r="7" fill="#ff8dc7" opacity="0.4"/>
+  <circle cx="175" cy="165" r="8" fill="#ff69b4" opacity="0.5"/>
+
+  <!-- Sprinkles -->
+  <rect x="45" y="35" width="8" height="3" rx="1" fill="#ffeb3b" transform="rotate(30 45 35)"/>
+  <rect x="155" y="50" width="6" height="2" rx="1" fill="#4fc3f7" transform="rotate(-20 155 50)"/>
+  <rect x="40" y="155" width="7" height="2" rx="1" fill="#81c784" transform="rotate(15 40 155)"/>
+  <rect x="160" y="150" width="8" height="3" rx="1" fill="#ffeb3b" transform="rotate(-30 160 150)"/>
+
+  <!-- Label -->
+  <text x="100" y="165" font-family="Arial, sans-serif" font-size="14" fill="#ff69b4" text-anchor="middle">Button Skin</text>
+</svg>

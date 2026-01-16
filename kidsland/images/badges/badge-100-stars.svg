@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="starGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="50%" style="stop-color:#ffb800"/>
+      <stop offset="100%" style="stop-color:#ffd700"/>
+    </linearGradient>
+    <filter id="starGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Badge background circle -->
+  <circle cx="75" cy="75" r="65" fill="url(#starGold)"/>
+  <circle cx="75" cy="75" r="58" fill="none" stroke="#b8860b" stroke-width="4"/>
+  <circle cx="75" cy="75" r="52" fill="none" stroke="#ffd700" stroke-width="2"/>
+
+  <!-- Big star -->
+  <polygon points="75,25 85,55 118,55 92,73 102,105 75,85 48,105 58,73 32,55 65,55" fill="#fff" filter="url(#starGlow)"/>
+  <polygon points="75,32 83,55 110,55 88,70 96,95 75,78 54,95 62,70 40,55 67,55" fill="#ffd700"/>
+
+  <!-- 100 number -->
+  <circle cx="75" cy="65" r="20" fill="#e74c3c"/>
+  <text x="75" y="72" font-family="Arial Black, sans-serif" font-size="16" fill="#fff" text-anchor="middle" font-weight="bold">100</text>
+
+  <!-- Small stars around -->
+  <polygon points="30,30 32,36 39,36 34,40 36,47 30,43 24,47 26,40 21,36 28,36" fill="#fff" filter="url(#starGlow)"/>
+  <polygon points="120,35 122,40 128,40 124,43 125,49 120,46 115,49 116,43 112,40 118,40" fill="#fff" filter="url(#starGlow)"/>
+  <polygon points="35,100 37,105 42,105 38,108 39,113 35,110 31,113 32,108 28,105 33,105" fill="#fff" filter="url(#starGlow)"/>
+  <polygon points="115,100 117,105 122,105 118,108 119,113 115,110 111,113 112,108 108,105 113,105" fill="#fff" filter="url(#starGlow)"/>
+
+  <!-- Banner -->
+  <path d="M10 118 L75 103 L140 118 L140 140 L75 125 L10 140 Z" fill="#e74c3c"/>
+  <text x="75" y="134" font-family="Arial, sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">STAR COLLECTOR</text>
+</svg>

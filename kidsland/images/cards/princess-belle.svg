@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <defs>
+    <linearGradient id="roseBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8e8d0"/>
+      <stop offset="100%" style="stop-color:#e8d0b8"/>
+    </linearGradient>
+    <linearGradient id="yellowDress" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f4d03f"/>
+      <stop offset="100%" style="stop-color:#d4a010"/>
+    </linearGradient>
+    <filter id="roseGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect width="300" height="400" rx="16" fill="url(#roseBg)"/>
+  <rect x="8" y="8" width="284" height="384" rx="12" fill="none" stroke="#d4a010" stroke-width="3"/>
+
+  <!-- Rose decorations -->
+  <circle cx="40" cy="45" r="12" fill="#c0392b"/>
+  <circle cx="35" cy="40" r="5" fill="#e74c3c"/>
+  <circle cx="260" cy="50" r="10" fill="#c0392b"/>
+  <circle cx="256" cy="46" r="4" fill="#e74c3c"/>
+  <circle cx="45" cy="355" r="11" fill="#c0392b"/>
+  <circle cx="41" cy="351" r="4" fill="#e74c3c"/>
+  <circle cx="255" cy="350" r="10" fill="#c0392b"/>
+
+  <!-- Belle Princess -->
+  <!-- Hair (brown, elegant updo) -->
+  <ellipse cx="150" cy="75" rx="45" ry="40" fill="#6b4423"/>
+  <ellipse cx="150" cy="65" rx="35" ry="25" fill="#8b5a2b"/>
+  <!-- Hair bun -->
+  <circle cx="150" cy="40" r="18" fill="#6b4423"/>
+  <circle cx="150" cy="35" r="12" fill="#8b5a2b"/>
+  <!-- Side curls -->
+  <ellipse cx="105" cy="85" rx="8" ry="15" fill="#6b4423"/>
+  <ellipse cx="195" cy="85" rx="8" ry="15" fill="#6b4423"/>
+
+  <!-- Face -->
+  <ellipse cx="150" cy="90" rx="32" ry="38" fill="#fce4d4"/>
+  <!-- Eyes (brown, kind) -->
+  <ellipse cx="138" cy="88" rx="8" ry="10" fill="#fff"/>
+  <ellipse cx="162" cy="88" rx="8" ry="10" fill="#fff"/>
+  <ellipse cx="138" cy="90" rx="5" ry="6" fill="#6b4423"/>
+  <ellipse cx="162" cy="90" rx="5" ry="6" fill="#6b4423"/>
+  <circle cx="139" cy="88" r="2" fill="#000"/>
+  <circle cx="163" cy="88" r="2" fill="#000"/>
+  <!-- Eyebrows -->
+  <path d="M130 78 Q138 74 145 78" fill="none" stroke="#5d3d1e" stroke-width="2"/>
+  <path d="M155 78 Q162 74 170 78" fill="none" stroke="#5d3d1e" stroke-width="2"/>
+  <!-- Nose & Lips -->
+  <path d="M150 95 L148 105" fill="none" stroke="#e8c4b4" stroke-width="2"/>
+  <ellipse cx="150" cy="112" rx="9" ry="4" fill="#d47878"/>
+  <path d="M143 112 Q150 116 157 112" fill="none" stroke="#b85555" stroke-width="1"/>
+  <!-- Blush -->
+  <ellipse cx="125" cy="100" rx="8" ry="5" fill="#ffb8b8" opacity="0.4"/>
+  <ellipse cx="175" cy="100" rx="8" ry="5" fill="#ffb8b8" opacity="0.4"/>
+  <!-- Smile -->
+  <path d="M140 115 Q150 122 160 115" fill="none" stroke="#c07070" stroke-width="1"/>
+
+  <!-- Yellow ball gown -->
+  <path d="M115 128 Q150 120 185 128 L220 320 Q150 340 80 320 Z" fill="url(#yellowDress)"/>
+  <!-- Dress top -->
+  <path d="M120 128 Q150 118 180 128 L178 155 Q150 145 122 155 Z" fill="#e8c020"/>
+  <!-- Dress ruffles -->
+  <path d="M80 280 Q120 270 160 280 Q200 270 220 280" fill="none" stroke="#c4a000" stroke-width="3"/>
+  <path d="M85 300 Q125 290 165 300 Q205 290 215 300" fill="none" stroke="#c4a000" stroke-width="2"/>
+  <!-- Sparkles on dress -->
+  <circle cx="120" cy="200" r="3" fill="#fff" filter="url(#roseGlow)"/>
+  <circle cx="180" cy="220" r="2" fill="#fff" filter="url(#roseGlow)"/>
+  <circle cx="140" cy="260" r="3" fill="#fff" filter="url(#roseGlow)"/>
+  <circle cx="165" cy="290" r="2" fill="#fff" filter="url(#roseGlow)"/>
+
+  <!-- Arms with gloves -->
+  <path d="M115 135 Q85 165 80 200" fill="none" stroke="#fce4d4" stroke-width="16" stroke-linecap="round"/>
+  <path d="M185 135 Q215 165 220 200" fill="none" stroke="#fce4d4" stroke-width="16" stroke-linecap="round"/>
+  <!-- Yellow gloves -->
+  <path d="M80 195 Q75 215 82 230" fill="none" stroke="#f4d03f" stroke-width="14" stroke-linecap="round"/>
+  <path d="M220 195 Q225 215 218 230" fill="none" stroke="#f4d03f" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Rose in hair -->
+  <circle cx="175" cy="55" r="10" fill="#c0392b"/>
+  <circle cx="172" cy="52" r="4" fill="#e74c3c"/>
+
+  <!-- Name plate -->
+  <rect x="35" y="335" width="230" height="50" rx="10" fill="rgba(212,160,16,0.5)"/>
+  <text x="150" y="360" font-family="Georgia, serif" font-size="22" fill="#5d3d1e" text-anchor="middle" font-weight="bold">BELLE</text>
+  <text x="150" y="378" font-family="Arial, sans-serif" font-size="10" fill="#6b4423" text-anchor="middle">Beauty and Kindness</text>
+</svg>

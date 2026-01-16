@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="platinum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8e8e8"/>
+      <stop offset="50%" style="stop-color:#c0c0c0"/>
+      <stop offset="100%" style="stop-color:#e8e8e8"/>
+    </linearGradient>
+    <filter id="sparkle">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Badge background circle -->
+  <circle cx="75" cy="75" r="65" fill="url(#platinum)"/>
+  <circle cx="75" cy="75" r="58" fill="none" stroke="#9b59b6" stroke-width="4"/>
+  <circle cx="75" cy="75" r="52" fill="none" stroke="#c0c0c0" stroke-width="2"/>
+
+  <!-- Trophy -->
+  <path d="M55 40 L95 40 L90 75 Q75 85 60 75 Z" fill="#f4d03f"/>
+  <rect x="65" y="80" width="20" height="10" fill="#d4a010"/>
+  <rect x="55" y="90" width="40" height="8" rx="2" fill="#8b6914"/>
+
+  <!-- 100% text -->
+  <circle cx="75" cy="58" r="18" fill="#9b59b6"/>
+  <text x="75" y="64" font-family="Arial Black, sans-serif" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">100%</text>
+
+  <!-- Handles on trophy -->
+  <path d="M55 48 Q40 48 40 58 Q40 68 50 68" fill="none" stroke="#d4a010" stroke-width="5"/>
+  <path d="M95 48 Q110 48 110 58 Q110 68 100 68" fill="none" stroke="#d4a010" stroke-width="5"/>
+
+  <!-- Star bursts -->
+  <polygon points="75,20 77,26 84,26 79,30 81,37 75,33 69,37 71,30 66,26 73,26" fill="#f4d03f" filter="url(#sparkle)"/>
+  <polygon points="30,55 32,59 37,59 33,62 35,67 30,64 25,67 27,62 23,59 28,59" fill="#f4d03f" filter="url(#sparkle)"/>
+  <polygon points="120,55 122,59 127,59 123,62 125,67 120,64 115,67 117,62 113,59 118,59" fill="#f4d03f" filter="url(#sparkle)"/>
+
+  <!-- Banner -->
+  <path d="M10 118 L75 103 L140 118 L140 140 L75 125 L10 140 Z" fill="#9b59b6"/>
+  <text x="75" y="134" font-family="Arial, sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">PERFECT SCORE</text>
+</svg>

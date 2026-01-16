@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="space" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a2e"/>
+      <stop offset="50%" style="stop-color:#4a1a6e"/>
+      <stop offset="100%" style="stop-color:#2a0a4e"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="20" fill="#0a0a1a"/>
+
+  <!-- Space button preview -->
+  <rect x="25" y="70" width="150" height="60" rx="12" fill="url(#space)"/>
+  <rect x="30" y="75" width="140" height="50" rx="10" fill="none" stroke="#9b59b6" stroke-width="2" opacity="0.6"/>
+
+  <!-- Stars on button -->
+  <circle cx="40" cy="85" r="2" fill="#fff" filter="url(#glow)"/>
+  <circle cx="160" cy="80" r="1.5" fill="#fff" filter="url(#glow)"/>
+  <circle cx="55" cy="115" r="1" fill="#fff"/>
+  <circle cx="145" cy="110" r="2" fill="#fff" filter="url(#glow)"/>
+  <circle cx="100" cy="78" r="1.5" fill="#fff"/>
+  <circle cx="80" cy="118" r="1" fill="#fff"/>
+  <circle cx="120" cy="85" r="1" fill="#fff"/>
+
+  <!-- Button text -->
+  <text x="100" y="108" font-family="Arial, sans-serif" font-size="18" fill="#e8daef" text-anchor="middle" font-weight="bold">Space</text>
+
+  <!-- Decorative stars around -->
+  <circle cx="15" cy="30" r="2" fill="#9b59b6" filter="url(#glow)"/>
+  <circle cx="185" cy="40" r="1.5" fill="#9b59b6" filter="url(#glow)"/>
+  <circle cx="25" cy="170" r="1.5" fill="#9b59b6"/>
+  <circle cx="175" cy="165" r="2" fill="#9b59b6" filter="url(#glow)"/>
+
+  <!-- Label -->
+  <text x="100" y="165" font-family="Arial, sans-serif" font-size="14" fill="#9b59b6" text-anchor="middle">Button Skin</text>
+</svg>

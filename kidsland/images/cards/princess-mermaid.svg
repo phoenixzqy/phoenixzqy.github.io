@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <defs>
+    <linearGradient id="oceanBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a5a7a"/>
+      <stop offset="100%" style="stop-color:#0d3a4a"/>
+    </linearGradient>
+    <linearGradient id="mermaidTail" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3cb371"/>
+      <stop offset="100%" style="stop-color:#228b22"/>
+    </linearGradient>
+    <filter id="waterGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Card Background - Ocean -->
+  <rect width="300" height="400" rx="16" fill="url(#oceanBg)"/>
+  <rect x="8" y="8" width="284" height="384" rx="12" fill="none" stroke="#5dd3e8" stroke-width="3" opacity="0.6"/>
+
+  <!-- Bubbles -->
+  <circle cx="40" cy="60" r="8" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="55" cy="90" r="5" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/>
+  <circle cx="250" cy="80" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="265" cy="120" r="4" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/>
+  <circle cx="45" cy="300" r="7" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="255" cy="280" r="5" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/>
+
+  <!-- Mermaid Princess -->
+  <!-- Hair (flowing red) -->
+  <path d="M90 75 Q60 120 55 200 Q52 250 70 300" fill="#c0392b" opacity="0.8"/>
+  <path d="M210 75 Q240 120 245 200 Q248 250 230 300" fill="#c0392b" opacity="0.8"/>
+  <ellipse cx="150" cy="80" rx="50" ry="45" fill="#e74c3c"/>
+  <path d="M100 80 Q90 150 100 220" fill="#e74c3c"/>
+  <path d="M200 80 Q210 150 200 220" fill="#e74c3c"/>
+
+  <!-- Face -->
+  <ellipse cx="150" cy="85" rx="35" ry="40" fill="#fce4d4"/>
+  <!-- Eyes -->
+  <ellipse cx="135" cy="82" rx="9" ry="11" fill="#fff"/>
+  <ellipse cx="165" cy="82" rx="9" ry="11" fill="#fff"/>
+  <ellipse cx="135" cy="84" rx="5" ry="7" fill="#3498db"/>
+  <ellipse cx="165" cy="84" rx="5" ry="7" fill="#3498db"/>
+  <circle cx="136" cy="82" r="2.5" fill="#000"/>
+  <circle cx="166" cy="82" r="2.5" fill="#000"/>
+  <!-- Eyelashes -->
+  <path d="M128 75 L125 70" stroke="#c0392b" stroke-width="1.5"/>
+  <path d="M133 73 L132 68" stroke="#c0392b" stroke-width="1.5"/>
+  <path d="M172 75 L175 70" stroke="#c0392b" stroke-width="1.5"/>
+  <path d="M167 73 L168 68" stroke="#c0392b" stroke-width="1.5"/>
+  <!-- Eyebrows -->
+  <path d="M125 72 Q135 68 143 72" fill="none" stroke="#a93226" stroke-width="2"/>
+  <path d="M157 72 Q165 68 175 72" fill="none" stroke="#a93226" stroke-width="2"/>
+  <!-- Nose & Lips -->
+  <path d="M150 90 L148 100" fill="none" stroke="#e8c4b4" stroke-width="2"/>
+  <ellipse cx="150" cy="108" rx="10" ry="5" fill="#e57373"/>
+  <path d="M142 108 Q150 112 158 108" fill="none" stroke="#c0392b" stroke-width="1"/>
+  <!-- Blush -->
+  <ellipse cx="122" cy="95" rx="10" ry="6" fill="#ffb8b8" opacity="0.5"/>
+  <ellipse cx="178" cy="95" rx="10" ry="6" fill="#ffb8b8" opacity="0.5"/>
+
+  <!-- Shell top -->
+  <ellipse cx="130" cy="145" rx="22" ry="18" fill="#9b59b6"/>
+  <ellipse cx="170" cy="145" rx="22" ry="18" fill="#9b59b6"/>
+  <path d="M115 155 Q130 135 145 155" fill="none" stroke="#7d3c98" stroke-width="2"/>
+  <path d="M155 155 Q170 135 185 155" fill="none" stroke="#7d3c98" stroke-width="2"/>
+
+  <!-- Arms -->
+  <path d="M108 140 Q75 170 70 200" fill="none" stroke="#fce4d4" stroke-width="18" stroke-linecap="round"/>
+  <path d="M192 140 Q225 170 230 200" fill="none" stroke="#fce4d4" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Tail -->
+  <path d="M120 165 Q150 175 180 165 L185 280 Q150 300 115 280 Z" fill="url(#mermaidTail)"/>
+  <!-- Scales pattern -->
+  <ellipse cx="135" cy="200" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="165" cy="200" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="150" cy="220" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="135" cy="240" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="165" cy="240" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="150" cy="260" rx="12" ry="8" fill="none" stroke="#228b22" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Fin -->
+  <path d="M115 280 Q90 310 70 320 Q100 310 115 295" fill="#3cb371"/>
+  <path d="M185 280 Q210 310 230 320 Q200 310 185 295" fill="#3cb371"/>
+  <path d="M135 290 Q150 330 165 290" fill="#3cb371"/>
+
+  <!-- Sparkles -->
+  <circle cx="95" cy="180" r="3" fill="#fff" filter="url(#waterGlow)"/>
+  <circle cx="205" cy="220" r="2" fill="#fff" filter="url(#waterGlow)"/>
+
+  <!-- Name plate -->
+  <rect x="35" y="335" width="230" height="50" rx="10" fill="rgba(93,211,232,0.4)"/>
+  <text x="150" y="360" font-family="Georgia, serif" font-size="20" fill="#fff" text-anchor="middle" font-weight="bold">MERMAID</text>
+  <text x="150" y="378" font-family="Arial, sans-serif" font-size="10" fill="#a8e4ec" text-anchor="middle">Princess of the Sea</text>
+</svg>

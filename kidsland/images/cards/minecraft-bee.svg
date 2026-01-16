@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="beeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="100%" style="stop-color:#98FB98"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="100" height="100" fill="url(#beeBg)"/>
+  <!-- Flowers -->
+  <circle cx="15" cy="85" r="5" fill="#ff69b4"/>
+  <circle cx="85" cy="80" r="6" fill="#ff6347"/>
+  <circle cx="25" cy="75" r="4" fill="#ffd700"/>
+  <!-- Bee Body -->
+  <ellipse cx="50" cy="50" rx="18" ry="14" fill="#f4d03f"/>
+  <!-- Black Stripes -->
+  <rect x="38" y="40" width="6" height="20" fill="#1a1a1a" rx="2"/>
+  <rect x="48" y="40" width="6" height="20" fill="#1a1a1a" rx="2"/>
+  <rect x="58" y="42" width="5" height="16" fill="#1a1a1a" rx="2"/>
+  <!-- Head -->
+  <rect x="26" y="42" width="12" height="12" fill="#1a1a1a" rx="2"/>
+  <!-- Eyes -->
+  <rect x="28" y="44" width="4" height="4" fill="#fff"/>
+  <rect x="33" y="44" width="4" height="4" fill="#fff"/>
+  <rect x="29" y="45" width="2" height="2" fill="#000"/>
+  <rect x="34" y="45" width="2" height="2" fill="#000"/>
+  <!-- Wings -->
+  <ellipse cx="45" cy="35" rx="10" ry="6" fill="#fff" opacity="0.7"/>
+  <ellipse cx="55" cy="35" rx="10" ry="6" fill="#fff" opacity="0.7"/>
+  <!-- Stinger -->
+  <polygon points="68,50 75,50 72,54" fill="#1a1a1a"/>
+  <!-- Antennae -->
+  <line x1="28" y1="42" x2="24" y2="35" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="36" y1="42" x2="32" y2="35" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Label -->
+  <text x="50" y="92" text-anchor="middle" fill="#2d5016" font-family="Arial, sans-serif" font-size="12" font-weight="bold">BEE</text>
+</svg>

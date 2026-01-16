@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f4d03f"/>
+      <stop offset="50%" style="stop-color:#d4a010"/>
+      <stop offset="100%" style="stop-color:#f4d03f"/>
+    </linearGradient>
+    <filter id="shine">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Badge background circle -->
+  <circle cx="75" cy="75" r="65" fill="url(#gold)"/>
+  <circle cx="75" cy="75" r="58" fill="none" stroke="#8b6914" stroke-width="3"/>
+  <circle cx="75" cy="75" r="52" fill="none" stroke="#d4a010" stroke-width="2"/>
+
+  <!-- Quiz icon -->
+  <rect x="50" y="40" width="50" height="60" rx="5" fill="#fff"/>
+  <rect x="55" y="48" width="30" height="4" rx="2" fill="#d4a010"/>
+  <rect x="55" y="58" width="35" height="4" rx="2" fill="#d4a010"/>
+  <rect x="55" y="68" width="25" height="4" rx="2" fill="#d4a010"/>
+
+  <!-- Checkmark -->
+  <circle cx="85" cy="85" r="18" fill="#2ecc71"/>
+  <path d="M77 85 L82 90 L93 79" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Sparkles -->
+  <circle cx="35" cy="35" r="4" fill="#fff" filter="url(#shine)"/>
+  <circle cx="115" cy="40" r="3" fill="#fff" filter="url(#shine)"/>
+  <circle cx="40" cy="110" r="3" fill="#fff" filter="url(#shine)"/>
+
+  <!-- Banner -->
+  <path d="M20 120 L75 105 L130 120 L130 140 L75 125 L20 140 Z" fill="#c0392b"/>
+  <text x="75" y="135" font-family="Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">QUIZ STARTER</text>
+</svg>

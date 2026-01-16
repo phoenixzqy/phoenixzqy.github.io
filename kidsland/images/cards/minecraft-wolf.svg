@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="wolfBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#228B22"/>
+      <stop offset="100%" style="stop-color:#2E8B57"/>
+    </linearGradient>
+  </defs>
+  <!-- Background (forest) -->
+  <rect width="100" height="100" fill="url(#wolfBg)"/>
+  <!-- Trees in background -->
+  <rect x="10" y="30" width="8" height="40" fill="#2d5016"/>
+  <polygon points="14,10 0,40 28,40" fill="#1a4010"/>
+  <rect x="82" y="35" width="6" height="35" fill="#2d5016"/>
+  <polygon points="85,15 75,42 95,42" fill="#1a4010"/>
+  <!-- Wolf Body -->
+  <ellipse cx="50" cy="60" rx="22" ry="15" fill="#d3d3d3"/>
+  <ellipse cx="50" cy="60" rx="18" ry="12" fill="#e8e8e8"/>
+  <!-- Tail -->
+  <ellipse cx="75" cy="55" rx="10" ry="5" fill="#d3d3d3" transform="rotate(-30, 75, 55)"/>
+  <!-- Head -->
+  <rect x="22" y="42" width="20" height="18" fill="#d3d3d3" rx="3"/>
+  <rect x="24" y="44" width="16" height="14" fill="#e8e8e8"/>
+  <!-- Snout -->
+  <rect x="15" y="48" width="10" height="10" fill="#d3d3d3" rx="2"/>
+  <rect x="16" y="54" width="8" height="4" fill="#1a1a1a"/>
+  <!-- Eyes -->
+  <rect x="26" y="47" width="5" height="4" fill="#fff"/>
+  <rect x="34" y="47" width="5" height="4" fill="#fff"/>
+  <rect x="27" y="48" width="3" height="2" fill="#1a1a1a"/>
+  <rect x="35" y="48" width="3" height="2" fill="#1a1a1a"/>
+  <!-- Ears -->
+  <polygon points="24,42 28,30 32,42" fill="#d3d3d3"/>
+  <polygon points="36,42 40,30 44,42" fill="#d3d3d3"/>
+  <polygon points="26,42 28,34 30,42" fill="#e8e8e8"/>
+  <polygon points="38,42 40,34 42,42" fill="#e8e8e8"/>
+  <!-- Collar (tamed) -->
+  <rect x="20" y="58" width="14" height="4" fill="#e74c3c"/>
+  <!-- Legs -->
+  <rect x="32" y="70" width="6" height="12" fill="#d3d3d3"/>
+  <rect x="42" y="70" width="6" height="12" fill="#d3d3d3"/>
+  <rect x="52" y="70" width="6" height="12" fill="#d3d3d3"/>
+  <rect x="62" y="70" width="6" height="12" fill="#d3d3d3"/>
+  <!-- Label -->
+  <text x="50" y="95" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">WOLF</text>
+</svg>

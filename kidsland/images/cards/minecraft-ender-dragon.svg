@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <defs>
+    <linearGradient id="enderBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a2e"/>
+      <stop offset="50%" style="stop-color:#0d0d1a"/>
+      <stop offset="100%" style="stop-color:#2d1f4e"/>
+    </linearGradient>
+    <filter id="purpleGlow">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect width="300" height="400" rx="16" fill="url(#enderBg)"/>
+  <rect x="8" y="8" width="284" height="384" rx="12" fill="none" stroke="#9b59b6" stroke-width="4"/>
+
+  <!-- End stars -->
+  <circle cx="28" cy="32" r="2.5" fill="#e8daef" filter="url(#purpleGlow)"/>
+  <circle cx="272" cy="48" r="2" fill="#e8daef" filter="url(#purpleGlow)"/>
+  <circle cx="48" cy="105" r="1.5" fill="#d7bde2"/>
+  <circle cx="252" cy="140" r="2.5" fill="#e8daef" filter="url(#purpleGlow)"/>
+  <circle cx="38" cy="220" r="2" fill="#d7bde2"/>
+  <circle cx="262" cy="270" r="1.5" fill="#e8daef"/>
+
+  <!-- Ender Dragon Body -->
+  <ellipse cx="150" cy="185" rx="85" ry="55" fill="#1a1a2e"/>
+  <ellipse cx="150" cy="185" rx="78" ry="48" fill="#2d2d44"/>
+
+  <!-- Wings -->
+  <path d="M65 165 L15 75 L38 98 L25 52 L52 92 L45 42 L72 100 L78 145" fill="#1a1a2e" stroke="#9b59b6" stroke-width="2.5"/>
+  <path d="M235 165 L285 75 L262 98 L275 52 L248 92 L255 42 L228 100 L222 145" fill="#1a1a2e" stroke="#9b59b6" stroke-width="2.5"/>
+  <path d="M65 165 L38 98 L52 92 L72 100 L78 145" fill="rgba(155,89,182,0.25)"/>
+  <path d="M235 165 L262 98 L248 92 L228 100 L222 145" fill="rgba(155,89,182,0.25)"/>
+
+  <!-- Head -->
+  <ellipse cx="150" cy="100" rx="45" ry="35" fill="#2d2d44"/>
+  <ellipse cx="150" cy="118" rx="24" ry="14" fill="#1a1a2e"/>
+  <!-- Eyes -->
+  <ellipse cx="125" cy="95" rx="14" ry="10" fill="#9b59b6" filter="url(#purpleGlow)"/>
+  <ellipse cx="175" cy="95" rx="14" ry="10" fill="#9b59b6" filter="url(#purpleGlow)"/>
+  <ellipse cx="125" cy="95" rx="7" ry="5" fill="#e8daef"/>
+  <ellipse cx="175" cy="95" rx="7" ry="5" fill="#e8daef"/>
+  <!-- Horns -->
+  <path d="M110 78 L92 45 L105 68" fill="#2d2d44"/>
+  <path d="M190 78 L208 45 L195 68" fill="#2d2d44"/>
+  <!-- Spikes -->
+  <path d="M128 128 L122 105 L135 122" fill="#1a1a2e"/>
+  <path d="M150 122 L150 95 L158 118" fill="#1a1a2e"/>
+  <path d="M172 128 L178 105 L165 122" fill="#1a1a2e"/>
+
+  <!-- Tail -->
+  <path d="M150 240 Q205 265 238 298" fill="none" stroke="#2d2d44" stroke-width="22" stroke-linecap="round"/>
+  <path d="M238 298 L258 312 L242 295 L262 302 L240 290" fill="#1a1a2e"/>
+
+  <!-- Legs -->
+  <path d="M95 218 L78 282 L92 276 L85 298 L98 292 L102 270 L115 262 L108 228" fill="#2d2d44"/>
+  <path d="M205 218 L222 282 L208 276 L215 298 L202 292 L198 270 L185 262 L192 228" fill="#2d2d44"/>
+
+  <!-- Dragon breath -->
+  <circle cx="128" cy="135" r="5" fill="#9b59b6" opacity="0.55" filter="url(#purpleGlow)"/>
+  <circle cx="145" cy="148" r="4" fill="#9b59b6" opacity="0.4"/>
+  <circle cx="162" cy="140" r="6" fill="#9b59b6" opacity="0.5" filter="url(#purpleGlow)"/>
+
+  <!-- Legendary badge -->
+  <polygon points="268,18 282,38 268,58 254,38" fill="#f1c40f" filter="url(#purpleGlow)"/>
+  <text x="268" y="44" font-family="Arial" font-size="14" fill="#000" text-anchor="middle" font-weight="bold">★</text>
+
+  <!-- Name plate -->
+  <rect x="25" y="330" width="250" height="55" rx="10" fill="rgba(155,89,182,0.4)"/>
+  <text x="150" y="356" font-family="Arial Black, sans-serif" font-size="20" fill="#e8daef" text-anchor="middle" font-weight="bold">ENDER DRAGON</text>
+  <text x="150" y="376" font-family="Arial, sans-serif" font-size="11" fill="#d7bde2" text-anchor="middle">The Final Boss</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="spiderBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="100" height="100" fill="url(#spiderBg)"/>
+  <!-- Cobweb -->
+  <path d="M0 0 L50 50 M100 0 L50 50 M0 100 L50 50 M100 100 L50 50 M50 0 L50 50 M50 100 L50 50 M0 50 L50 50 M100 50 L50 50" stroke="#444" stroke-width="0.5" opacity="0.3"/>
+  <!-- Spider Body -->
+  <ellipse cx="50" cy="55" rx="12" ry="10" fill="#2d2d2d"/>
+  <ellipse cx="50" cy="42" rx="8" ry="7" fill="#2d2d2d"/>
+  <!-- Red Eyes -->
+  <rect x="44" y="39" width="4" height="3" fill="#ff0000"/>
+  <rect x="52" y="39" width="4" height="3" fill="#ff0000"/>
+  <!-- Legs -->
+  <g stroke="#2d2d2d" stroke-width="3" fill="none">
+    <!-- Left legs -->
+    <path d="M42 45 Q25 35 15 25"/>
+    <path d="M40 50 Q22 45 10 40"/>
+    <path d="M40 55 Q22 60 10 65"/>
+    <path d="M42 60 Q25 70 15 80"/>
+    <!-- Right legs -->
+    <path d="M58 45 Q75 35 85 25"/>
+    <path d="M60 50 Q78 45 90 40"/>
+    <path d="M60 55 Q78 60 90 65"/>
+    <path d="M58 60 Q75 70 85 80"/>
+  </g>
+  <!-- Label -->
+  <text x="50" y="92" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="10" font-weight="bold">SPIDER</text>
+</svg>
