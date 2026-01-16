@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="desertBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87ceeb"/>
+      <stop offset="25%" style="stop-color:#f4d03f"/>
+      <stop offset="50%" style="stop-color:#e67e22"/>
+      <stop offset="100%" style="stop-color:#d35400"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.8"/>
+      <stop offset="50%" style="stop-color:#f1c40f;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#f39c12;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Sky to desert gradient -->
+  <rect width="400" height="800" fill="url(#desertBg)"/>
+  
+  <!-- Sun with glow -->
+  <circle cx="320" cy="100" r="80" fill="url(#sunGlow)"/>
+  <circle cx="320" cy="100" r="45" fill="#f39c12" opacity="0.9"/>
+  <circle cx="320" cy="100" r="35" fill="#f1c40f"/>
+  
+  <!-- Heat waves -->
+  <g fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2">
+    <path d="M0 250 Q50 240 100 250 T200 250 T300 250 T400 250"/>
+    <path d="M0 280 Q50 270 100 280 T200 280 T300 280 T400 280"/>
+  </g>
+  
+  <!-- Distant mountains/dunes -->
+  <polygon points="0,450 80,350 160,450" fill="#c0392b" opacity="0.3"/>
+  <polygon points="100,450 200,320 300,450" fill="#d35400" opacity="0.35"/>
+  <polygon points="250,450 350,360 450,450" fill="#c0392b" opacity="0.3"/>
+  
+  <!-- Sand dunes -->
+  <ellipse cx="100" cy="550" rx="150" ry="60" fill="#e67e22" opacity="0.6"/>
+  <ellipse cx="300" cy="580" rx="160" ry="70" fill="#d35400" opacity="0.7"/>
+  <ellipse cx="200" cy="650" rx="250" ry="80" fill="#f4d03f" opacity="0.5"/>
+  <ellipse cx="200" cy="750" rx="300" ry="100" fill="#e67e22" opacity="0.6"/>
+  
+  <!-- Cactus 1 -->
+  <g transform="translate(80, 520)">
+    <rect x="-8" y="-80" width="16" height="100" rx="8" fill="#27ae60"/>
+    <rect x="-25" y="-60" width="12" height="40" rx="6" fill="#27ae60"/>
+    <rect x="13" y="-50" width="12" height="35" rx="6" fill="#27ae60"/>
+    <!-- Spines -->
+    <g stroke="#1a5a1c" stroke-width="1">
+      <line x1="-8" y1="-70" x2="-12" y2="-72"/>
+      <line x1="8" y1="-60" x2="12" y2="-62"/>
+      <line x1="-8" y1="-40" x2="-12" y2="-42"/>
+      <line x1="8" y1="-30" x2="12" y2="-32"/>
+    </g>
+  </g>
+  
+  <!-- Cactus 2 -->
+  <g transform="translate(320, 550)">
+    <rect x="-6" y="-60" width="12" height="75" rx="6" fill="#2ecc71"/>
+    <rect x="-18" y="-45" width="10" height="30" rx="5" fill="#2ecc71"/>
+    <rect x="8" y="-40" width="10" height="28" rx="5" fill="#2ecc71"/>
+  </g>
+  
+  <!-- Small cactus -->
+  <g transform="translate(200, 600)">
+    <rect x="-5" y="-35" width="10" height="45" rx="5" fill="#27ae60"/>
+    <rect x="-12" y="-25" width="7" height="20" rx="3.5" fill="#27ae60"/>
+  </g>
+  
+  <!-- Tumbleweeds -->
+  <circle cx="150" cy="680" r="15" fill="none" stroke="#8b7355" stroke-width="2" opacity="0.5"/>
+  <circle cx="280" cy="700" r="12" fill="none" stroke="#8b7355" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Skull (desert decoration) -->
+  <g transform="translate(250, 720)" fill="#f5e6c8" opacity="0.6">
+    <ellipse cx="0" cy="0" rx="12" ry="10"/>
+    <ellipse cx="-5" cy="2" rx="3" ry="4" fill="#d35400"/>
+    <ellipse cx="5" cy="2" rx="3" ry="4" fill="#d35400"/>
+    <rect x="-2" y="8" width="4" height="6" fill="#d35400"/>
+  </g>
+  
+  <!-- Lizard -->
+  <g transform="translate(100, 750)" fill="#2ecc71" opacity="0.6">
+    <ellipse cx="0" cy="0" rx="10" ry="5"/>
+    <ellipse cx="12" cy="-2" rx="5" ry="3"/>
+    <path d="M-10 0 L-25 5" stroke="#2ecc71" stroke-width="3"/>
+    <circle cx="14" cy="-3" r="1" fill="#1a5a1c"/>
+  </g>
+  
+  <!-- Flying birds -->
+  <g fill="none" stroke="#2c3e50" stroke-width="1.5" opacity="0.5">
+    <path d="M50 180 Q58 172 66 180"/>
+    <path d="M80 190 Q88 182 96 190"/>
+    <path d="M60 210 Q68 202 76 210"/>
+  </g>
+</svg>

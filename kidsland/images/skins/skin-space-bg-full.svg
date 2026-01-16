@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="spaceBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a"/>
+      <stop offset="30%" style="stop-color:#1a0a2e"/>
+      <stop offset="60%" style="stop-color:#2a0a4e"/>
+      <stop offset="100%" style="stop-color:#1a0a2e"/>
+    </linearGradient>
+    <radialGradient id="nebula1" cx="30%" cy="20%" r="40%">
+      <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#9b59b6;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="nebula2" cx="70%" cy="60%" r="35%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#3498db;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="nebula3" cx="20%" cy="80%" r="30%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#e74c3c;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Deep space background -->
+  <rect width="400" height="800" fill="url(#spaceBg)"/>
+  
+  <!-- Nebula clouds -->
+  <rect width="400" height="800" fill="url(#nebula1)"/>
+  <rect width="400" height="800" fill="url(#nebula2)"/>
+  <rect width="400" height="800" fill="url(#nebula3)"/>
+  
+  <!-- Milky way band -->
+  <ellipse cx="200" cy="400" rx="400" ry="150" fill="rgba(155,89,182,0.08)" transform="rotate(-30 200 400)"/>
+  <ellipse cx="200" cy="400" rx="350" ry="100" fill="rgba(232,218,239,0.05)" transform="rotate(-30 200 400)"/>
+  
+  <!-- Large stars with glow -->
+  <circle cx="50" cy="100" r="3" fill="#fff" filter="url(#bigGlow)"/>
+  <circle cx="350" cy="80" r="2.5" fill="#e8daef" filter="url(#bigGlow)"/>
+  <circle cx="100" cy="250" r="2" fill="#fff" filter="url(#glow)"/>
+  <circle cx="320" cy="200" r="3" fill="#9b59b6" filter="url(#bigGlow)"/>
+  <circle cx="180" cy="150" r="2" fill="#fff" filter="url(#glow)"/>
+  <circle cx="280" cy="350" r="2.5" fill="#e8daef" filter="url(#glow)"/>
+  <circle cx="60" cy="450" r="3" fill="#fff" filter="url(#bigGlow)"/>
+  <circle cx="340" cy="500" r="2" fill="#9b59b6" filter="url(#glow)"/>
+  <circle cx="150" cy="550" r="2.5" fill="#fff" filter="url(#glow)"/>
+  <circle cx="250" cy="650" r="3" fill="#e8daef" filter="url(#bigGlow)"/>
+  <circle cx="80" cy="700" r="2" fill="#fff" filter="url(#glow)"/>
+  <circle cx="380" cy="750" r="2.5" fill="#9b59b6" filter="url(#glow)"/>
+  
+  <!-- Medium stars -->
+  <g fill="#fff" opacity="0.8">
+    <circle cx="30" cy="180" r="1.5"/>
+    <circle cx="120" cy="50" r="1.5"/>
+    <circle cx="220" cy="120" r="1.5"/>
+    <circle cx="370" cy="150" r="1.5"/>
+    <circle cx="90" cy="320" r="1.5"/>
+    <circle cx="200" cy="280" r="1.5"/>
+    <circle cx="310" cy="400" r="1.5"/>
+    <circle cx="40" cy="550" r="1.5"/>
+    <circle cx="180" cy="480" r="1.5"/>
+    <circle cx="350" cy="600" r="1.5"/>
+    <circle cx="120" cy="680" r="1.5"/>
+    <circle cx="280" cy="720" r="1.5"/>
+  </g>
+  
+  <!-- Small stars -->
+  <g fill="#e8daef" opacity="0.6">
+    <circle cx="70" cy="70" r="1"/>
+    <circle cx="160" cy="90" r="1"/>
+    <circle cx="260" cy="60" r="1"/>
+    <circle cx="330" cy="120" r="1"/>
+    <circle cx="20" cy="220" r="1"/>
+    <circle cx="150" cy="200" r="1"/>
+    <circle cx="240" cy="240" r="1"/>
+    <circle cx="380" cy="280" r="1"/>
+    <circle cx="50" cy="380" r="1"/>
+    <circle cx="140" cy="420" r="1"/>
+    <circle cx="230" cy="380" r="1"/>
+    <circle cx="290" cy="450" r="1"/>
+    <circle cx="360" cy="420" r="1"/>
+    <circle cx="100" cy="520" r="1"/>
+    <circle cx="200" cy="580" r="1"/>
+    <circle cx="320" cy="550" r="1"/>
+    <circle cx="60" cy="620" r="1"/>
+    <circle cx="170" cy="660" r="1"/>
+    <circle cx="340" cy="680" r="1"/>
+    <circle cx="220" cy="750" r="1"/>
+    <circle cx="390" cy="700" r="1"/>
+  </g>
+  
+  <!-- Tiny stars -->
+  <g fill="#fff" opacity="0.4">
+    <circle cx="45" cy="130" r="0.5"/>
+    <circle cx="190" cy="170" r="0.5"/>
+    <circle cx="300" cy="90" r="0.5"/>
+    <circle cx="110" cy="290" r="0.5"/>
+    <circle cx="270" cy="310" r="0.5"/>
+    <circle cx="175" cy="350" r="0.5"/>
+    <circle cx="85" cy="480" r="0.5"/>
+    <circle cx="250" cy="520" r="0.5"/>
+    <circle cx="130" cy="590" r="0.5"/>
+    <circle cx="300" cy="630" r="0.5"/>
+    <circle cx="50" cy="740" r="0.5"/>
+    <circle cx="200" cy="700" r="0.5"/>
+  </g>
+  
+  <!-- Planet with rings -->
+  <g transform="translate(320, 300)">
+    <ellipse cx="0" cy="0" rx="50" ry="15" fill="none" stroke="rgba(232,218,239,0.3)" stroke-width="8" transform="rotate(-20)"/>
+    <circle cx="0" cy="0" r="30" fill="#4a1a6e"/>
+    <circle cx="0" cy="0" r="30" fill="url(#nebula1)" opacity="0.5"/>
+    <ellipse cx="-8" cy="-5" rx="8" ry="6" fill="rgba(155,89,182,0.4)"/>
+    <ellipse cx="0" cy="0" rx="50" ry="15" fill="none" stroke="rgba(232,218,239,0.2)" stroke-width="4" transform="rotate(-20)"/>
+  </g>
+  
+  <!-- Small planet -->
+  <g transform="translate(80, 600)">
+    <circle cx="0" cy="0" r="20" fill="#2980b9"/>
+    <circle cx="-5" cy="-5" rx="5" ry="4" fill="rgba(255,255,255,0.2)"/>
+    <ellipse cx="5" cy="8" rx="8" ry="5" fill="rgba(26,90,138,0.6)"/>
+  </g>
+  
+  <!-- Moon -->
+  <g transform="translate(350, 650)">
+    <circle cx="0" cy="0" r="15" fill="#bdc3c7"/>
+    <circle cx="-3" cy="-4" r="3" fill="#95a5a6" opacity="0.6"/>
+    <circle cx="5" cy="2" r="2" fill="#95a5a6" opacity="0.5"/>
+    <circle cx="-5" cy="5" r="1.5" fill="#95a5a6" opacity="0.4"/>
+  </g>
+  
+  <!-- Shooting stars -->
+  <g opacity="0.7">
+    <line x1="100" y1="100" x2="140" y2="60" stroke="#fff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="2" fill="#fff" filter="url(#glow)"/>
+  </g>
+  <g opacity="0.5">
+    <line x1="300" y1="450" x2="330" y2="420" stroke="#e8daef" stroke-width="1.5"/>
+    <circle cx="300" cy="450" r="1.5" fill="#e8daef"/>
+  </g>
+  <g opacity="0.6">
+    <line x1="50" y1="350" x2="80" y2="320" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="50" cy="350" r="1.5" fill="#fff"/>
+  </g>
+  
+  <!-- Constellation pattern -->
+  <g stroke="rgba(232,218,239,0.2)" stroke-width="1" fill="none">
+    <path d="M150 400 L180 380 L210 390 L190 420 L150 400"/>
+    <circle cx="150" cy="400" r="2" fill="#e8daef" opacity="0.6"/>
+    <circle cx="180" cy="380" r="2" fill="#e8daef" opacity="0.6"/>
+    <circle cx="210" cy="390" r="2" fill="#e8daef" opacity="0.6"/>
+    <circle cx="190" cy="420" r="2" fill="#e8daef" opacity="0.6"/>
+  </g>
+  
+  <!-- Spaceship -->
+  <g transform="translate(280, 150) rotate(30)">
+    <ellipse cx="0" cy="0" rx="15" ry="6" fill="#7f8c8d"/>
+    <ellipse cx="0" cy="-2" rx="8" ry="4" fill="#3498db" opacity="0.6"/>
+    <polygon points="-15,0 -25,5 -25,-5" fill="#95a5a6"/>
+    <!-- Engine glow -->
+    <ellipse cx="-22" cy="0" rx="5" ry="3" fill="#e74c3c" opacity="0.6" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Asteroid -->
+  <g transform="translate(60, 200)">
+    <ellipse cx="0" cy="0" rx="12" ry="8" fill="#5d4e37" transform="rotate(20)"/>
+    <circle cx="-4" cy="-2" r="2" fill="#4a3f2f"/>
+    <circle cx="3" cy="1" r="1.5" fill="#4a3f2f"/>
+  </g>
+</svg>

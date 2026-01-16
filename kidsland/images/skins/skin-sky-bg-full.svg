@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="skyBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e90ff"/>
+      <stop offset="30%" style="stop-color:#4aa3df"/>
+      <stop offset="60%" style="stop-color:#87ceeb"/>
+      <stop offset="85%" style="stop-color:#b0e0e6"/>
+      <stop offset="100%" style="stop-color:#ffffff"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:1"/>
+      <stop offset="30%" style="stop-color:#fff5cc;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#f1c40f;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Sky gradient -->
+  <rect width="400" height="800" fill="url(#skyBg)"/>
+  
+  <!-- Sun with rays -->
+  <circle cx="300" cy="150" r="100" fill="url(#sunGlow)"/>
+  <circle cx="300" cy="150" r="50" fill="#f1c40f" opacity="0.9"/>
+  <circle cx="300" cy="150" r="40" fill="#fff" opacity="0.5"/>
+  
+  <!-- Sun rays -->
+  <g stroke="#f1c40f" stroke-width="3" opacity="0.4">
+    <line x1="300" y1="40" x2="300" y2="0"/>
+    <line x1="380" y1="70" x2="420" y2="30"/>
+    <line x1="410" y1="150" x2="450" y2="150"/>
+    <line x1="380" y1="230" x2="420" y2="270"/>
+    <line x1="220" y1="70" x2="180" y2="30"/>
+  </g>
+  
+  <!-- Big fluffy clouds -->
+  <g fill="white" opacity="0.95">
+    <ellipse cx="80" cy="100" rx="50" ry="30"/>
+    <ellipse cx="120" cy="90" rx="40" ry="25"/>
+    <ellipse cx="50" cy="110" rx="35" ry="22"/>
+    <ellipse cx="100" cy="115" rx="30" ry="18"/>
+  </g>
+  
+  <g fill="white" opacity="0.9">
+    <ellipse cx="350" cy="280" rx="45" ry="28"/>
+    <ellipse cx="380" cy="270" rx="35" ry="22"/>
+    <ellipse cx="320" cy="290" rx="30" ry="18"/>
+  </g>
+  
+  <g fill="white" opacity="0.85">
+    <ellipse cx="150" cy="350" rx="55" ry="32"/>
+    <ellipse cx="195" cy="340" rx="42" ry="26"/>
+    <ellipse cx="115" cy="360" rx="38" ry="24"/>
+    <ellipse cx="170" cy="365" rx="32" ry="20"/>
+  </g>
+  
+  <!-- Medium clouds -->
+  <g fill="white" opacity="0.8">
+    <ellipse cx="50" cy="450" rx="40" ry="24"/>
+    <ellipse cx="80" cy="445" rx="30" ry="18"/>
+    <ellipse cx="30" cy="455" rx="25" ry="15"/>
+  </g>
+  
+  <g fill="white" opacity="0.75">
+    <ellipse cx="320" cy="480" rx="50" ry="28"/>
+    <ellipse cx="360" cy="470" rx="38" ry="22"/>
+    <ellipse cx="290" cy="490" rx="32" ry="18"/>
+  </g>
+  
+  <!-- Small distant clouds -->
+  <g fill="white" opacity="0.7">
+    <ellipse cx="200" cy="200" rx="25" ry="15"/>
+    <ellipse cx="220" cy="195" rx="20" ry="12"/>
+  </g>
+  <g fill="white" opacity="0.65">
+    <ellipse cx="100" cy="550" rx="30" ry="16"/>
+    <ellipse cx="125" cy="545" rx="22" ry="14"/>
+  </g>
+  
+  <!-- Birds in formation -->
+  <g fill="none" stroke="#2c3e50" stroke-width="2" opacity="0.6">
+    <path d="M180 420 Q190 408 200 420"/>
+    <path d="M200 430 Q210 418 220 430"/>
+    <path d="M160 435 Q170 423 180 435"/>
+    <path d="M220 440 Q230 428 240 440"/>
+    <path d="M175 450 Q185 438 195 450"/>
+  </g>
+  
+  <!-- More birds -->
+  <g fill="none" stroke="#2c3e50" stroke-width="1.5" opacity="0.5">
+    <path d="M60 300 Q68 290 76 300"/>
+    <path d="M75 310 Q83 300 91 310"/>
+  </g>
+  
+  <!-- Hot air balloon -->
+  <g transform="translate(80, 600)">
+    <ellipse cx="0" cy="0" rx="35" ry="45" fill="#e74c3c" opacity="0.8"/>
+    <path d="M-35 0 Q-35 30 -20 50 L20 50 Q35 30 35 0" fill="#c0392b" opacity="0.8"/>
+    <rect x="-15" y="55" width="30" height="20" rx="3" fill="#8b4513" opacity="0.7"/>
+    <!-- Balloon stripes -->
+    <path d="M-20 -40 Q-20 0 -15 45" fill="none" stroke="#f1c40f" stroke-width="8" opacity="0.6"/>
+    <path d="M20 -40 Q20 0 15 45" fill="none" stroke="#f1c40f" stroke-width="8" opacity="0.6"/>
+  </g>
+  
+  <!-- Rainbow (subtle) -->
+  <g opacity="0.3" fill="none" stroke-width="8">
+    <path d="M-50 700 Q200 500 450 700" stroke="#ff0000"/>
+    <path d="M-50 710 Q200 510 450 710" stroke="#ff8000"/>
+    <path d="M-50 720 Q200 520 450 720" stroke="#ffff00"/>
+    <path d="M-50 730 Q200 530 450 730" stroke="#00ff00"/>
+    <path d="M-50 740 Q200 540 450 740" stroke="#0080ff"/>
+    <path d="M-50 750 Q200 550 450 750" stroke="#8000ff"/>
+  </g>
+  
+  <!-- Airplane -->
+  <g transform="translate(350, 380)" fill="#ecf0f1" opacity="0.7">
+    <ellipse cx="0" cy="0" rx="20" ry="5"/>
+    <polygon points="-15,-5 -25,-15 -25,-5"/>
+    <polygon points="10,0 25,-8 25,0"/>
+    <polygon points="-10,0 -15,8 -5,0"/>
+  </g>
+</svg>

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="snowBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87ceeb"/>
+      <stop offset="25%" style="stop-color:#a8d8ea"/>
+      <stop offset="50%" style="stop-color:#d4e5f7"/>
+      <stop offset="75%" style="stop-color:#e8f4f8"/>
+      <stop offset="100%" style="stop-color:#ffffff"/>
+    </linearGradient>
+    
+    <!-- Snowflake pattern -->
+    <g id="snowflake">
+      <line x1="0" y1="-6" x2="0" y2="6" stroke="currentColor" stroke-width="1"/>
+      <line x1="-6" y1="0" x2="6" y2="0" stroke="currentColor" stroke-width="1"/>
+      <line x1="-4" y1="-4" x2="4" y2="4" stroke="currentColor" stroke-width="1"/>
+      <line x1="-4" y1="4" x2="4" y2="-4" stroke="currentColor" stroke-width="1"/>
+    </g>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="400" height="800" fill="url(#snowBgGrad)"/>
+  
+  <!-- Distant mountains -->
+  <polygon points="0,600 80,450 160,600" fill="rgba(180,200,220,0.6)"/>
+  <polygon points="100,600 200,400 300,600" fill="rgba(190,210,230,0.5)"/>
+  <polygon points="250,600 350,480 450,600" fill="rgba(185,205,225,0.55)"/>
+  
+  <!-- Snow caps -->
+  <polygon points="80,450 65,480 95,480" fill="rgba(255,255,255,0.9)"/>
+  <polygon points="200,400 175,450 225,450" fill="rgba(255,255,255,0.9)"/>
+  <polygon points="350,480 330,510 370,510" fill="rgba(255,255,255,0.9)"/>
+  
+  <!-- Ground snow -->
+  <ellipse cx="200" cy="780" rx="250" ry="80" fill="rgba(255,255,255,0.95)"/>
+  
+  <!-- Scattered snowflakes with varying opacity and size -->
+  <g fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1">
+    <use href="#snowflake" transform="translate(50, 80) scale(0.8)"/>
+    <use href="#snowflake" transform="translate(150, 120) scale(1)"/>
+    <use href="#snowflake" transform="translate(300, 60) scale(0.6)"/>
+    <use href="#snowflake" transform="translate(80, 200) scale(0.7)"/>
+    <use href="#snowflake" transform="translate(250, 180) scale(0.9)"/>
+    <use href="#snowflake" transform="translate(350, 220) scale(0.5)"/>
+    <use href="#snowflake" transform="translate(30, 300) scale(0.8)"/>
+    <use href="#snowflake" transform="translate(180, 280) scale(0.6)"/>
+    <use href="#snowflake" transform="translate(320, 320) scale(1)"/>
+    <use href="#snowflake" transform="translate(100, 380) scale(0.7)"/>
+    <use href="#snowflake" transform="translate(270, 400) scale(0.5)"/>
+    <use href="#snowflake" transform="translate(380, 360) scale(0.8)"/>
+    <use href="#snowflake" transform="translate(60, 480) scale(0.6)"/>
+    <use href="#snowflake" transform="translate(200, 450) scale(0.9)"/>
+    <use href="#snowflake" transform="translate(340, 500) scale(0.7)"/>
+    <use href="#snowflake" transform="translate(130, 550) scale(0.5)"/>
+    <use href="#snowflake" transform="translate(290, 580) scale(0.8)"/>
+  </g>
+  
+  <!-- Pine trees silhouettes -->
+  <g fill="rgba(45,90,48,0.7)">
+    <!-- Tree 1 -->
+    <polygon points="60,650 75,580 90,650"/>
+    <polygon points="63,610 75,560 87,610"/>
+    <rect x="72" y="650" width="6" height="15" fill="rgba(90,60,40,0.8)"/>
+    
+    <!-- Tree 2 -->
+    <polygon points="320,680 340,600 360,680"/>
+    <polygon points="325,640 340,570 355,640"/>
+    <rect x="337" y="680" width="6" height="12" fill="rgba(90,60,40,0.8)"/>
+  </g>
+  
+  <!-- Snowman -->
+  <g transform="translate(350, 700)">
+    <circle cx="0" cy="25" r="25" fill="rgba(255,255,255,0.95)" stroke="rgba(200,220,235,0.5)" stroke-width="1"/>
+    <circle cx="0" cy="-10" r="18" fill="rgba(255,255,255,0.95)" stroke="rgba(200,220,235,0.5)" stroke-width="1"/>
+    <circle cx="0" cy="-40" r="12" fill="rgba(255,255,255,0.95)" stroke="rgba(200,220,235,0.5)" stroke-width="1"/>
+    <!-- Eyes -->
+    <circle cx="-4" cy="-43" r="2" fill="#2c3e50"/>
+    <circle cx="4" cy="-43" r="2" fill="#2c3e50"/>
+    <!-- Nose -->
+    <polygon points="0,-38 8,-36 0,-34" fill="#ff6b35"/>
+    <!-- Buttons -->
+    <circle cx="0" cy="-5" r="2" fill="#2c3e50"/>
+    <circle cx="0" cy="8" r="2" fill="#2c3e50"/>
+    <circle cx="0" cy="21" r="2" fill="#2c3e50"/>
+  </g>
+</svg>

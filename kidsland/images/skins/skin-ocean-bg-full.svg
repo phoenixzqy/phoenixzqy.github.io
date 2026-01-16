@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="oceanBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87ceeb"/>
+      <stop offset="30%" style="stop-color:#4a9fd4"/>
+      <stop offset="60%" style="stop-color:#2980b9"/>
+      <stop offset="100%" style="stop-color:#1a5a8a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky to ocean gradient -->
+  <rect width="400" height="800" fill="url(#oceanBg)"/>
+  
+  <!-- Sun -->
+  <circle cx="320" cy="80" r="50" fill="#f4d03f" opacity="0.6"/>
+  <circle cx="320" cy="80" r="40" fill="#f9e076" opacity="0.8"/>
+  <circle cx="320" cy="80" r="30" fill="#fff" opacity="0.3"/>
+  
+  <!-- Clouds -->
+  <g fill="white" opacity="0.85">
+    <ellipse cx="80" cy="60" rx="40" ry="24"/>
+    <ellipse cx="110" cy="55" rx="30" ry="20"/>
+    <ellipse cx="55" cy="65" rx="25" ry="16"/>
+  </g>
+  <g fill="white" opacity="0.75">
+    <ellipse cx="250" cy="120" rx="35" ry="20"/>
+    <ellipse cx="280" cy="115" rx="28" ry="18"/>
+    <ellipse cx="225" cy="125" rx="22" ry="14"/>
+  </g>
+  
+  <!-- Seagulls -->
+  <g fill="none" stroke="#2c3e50" stroke-width="2">
+    <path d="M120 140 Q130 130 140 140"/>
+    <path d="M160 150 Q170 140 180 150"/>
+    <path d="M100 170 Q108 162 116 170"/>
+  </g>
+  
+  <!-- Ocean waves -->
+  <path d="M0 350 Q50 330 100 350 T200 350 T300 350 T400 350 L400 800 L0 800 Z" fill="#2980b9" opacity="0.4"/>
+  <path d="M0 400 Q50 380 100 400 T200 400 T300 400 T400 400 L400 800 L0 800 Z" fill="#1a5a8a" opacity="0.5"/>
+  <path d="M0 450 Q50 430 100 450 T200 450 T300 450 T400 450 L400 800 L0 800 Z" fill="#1a5a8a" opacity="0.6"/>
+  <path d="M0 500 Q50 480 100 500 T200 500 T300 500 T400 500 L400 800 L0 800 Z" fill="#15496e" opacity="0.7"/>
+  
+  <!-- Underwater elements -->
+  <!-- Fish school -->
+  <g transform="translate(80, 550)" fill="#f39c12" opacity="0.6">
+    <ellipse cx="0" cy="0" rx="10" ry="6"/>
+    <polygon points="-10,0 -16,-4 -16,4"/>
+  </g>
+  <g transform="translate(100, 560)" fill="#f39c12" opacity="0.5">
+    <ellipse cx="0" cy="0" rx="8" ry="5"/>
+    <polygon points="-8,0 -12,-3 -12,3"/>
+  </g>
+  <g transform="translate(65, 570)" fill="#f39c12" opacity="0.55">
+    <ellipse cx="0" cy="0" rx="9" ry="5"/>
+    <polygon points="-9,0 -14,-3 -14,3"/>
+  </g>
+  
+  <!-- Bubbles -->
+  <circle cx="150" cy="480" r="6" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+  <circle cx="160" cy="510" r="4" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="145" cy="530" r="3" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="300" cy="550" r="5" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="310" cy="580" r="3" fill="rgba(255,255,255,0.2)"/>
+  
+  <!-- Seaweed -->
+  <g fill="#27ae60" opacity="0.6">
+    <path d="M50 800 Q55 750 45 700 Q55 650 50 600"/>
+    <path d="M60 800 Q65 760 55 720 Q65 680 60 640"/>
+  </g>
+  <g fill="#2ecc71" opacity="0.5">
+    <path d="M340 800 Q345 740 335 680 Q345 620 340 560"/>
+    <path d="M355 800 Q360 750 350 700 Q360 650 355 600"/>
+  </g>
+  
+  <!-- Starfish -->
+  <g transform="translate(320, 720)" fill="#e74c3c" opacity="0.6">
+    <polygon points="0,-15 4,-5 15,-5 6,2 9,12 0,6 -9,12 -6,2 -15,-5 -4,-5"/>
+  </g>
+  
+  <!-- Shell -->
+  <g transform="translate(100, 750)">
+    <ellipse cx="0" cy="0" rx="15" ry="10" fill="#f5deb3" opacity="0.6"/>
+    <path d="M-12 0 Q0 -8 12 0" fill="none" stroke="#d4a574" stroke-width="1" opacity="0.5"/>
+    <path d="M-8 0 Q0 -5 8 0" fill="none" stroke="#d4a574" stroke-width="1" opacity="0.5"/>
+  </g>
+</svg>
