@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#6366f1"/>
+  <rect x="48" y="48" width="120" height="120" rx="16" fill="#f472b6"/>
+  <rect x="196" y="48" width="120" height="120" rx="16" fill="#fbbf24"/>
+  <rect x="344" y="48" width="120" height="120" rx="16" fill="#34d399"/>
+  <rect x="48" y="196" width="120" height="120" rx="16" fill="#60a5fa"/>
+  <rect x="196" y="196" width="120" height="120" rx="16" fill="#ffffff"/>
+  <rect x="344" y="196" width="120" height="120" rx="16" fill="#f87171"/>
+  <rect x="48" y="344" width="120" height="120" rx="16" fill="#a78bfa"/>
+  <rect x="196" y="344" width="120" height="120" rx="16" fill="#fb923c"/>
+  <rect x="344" y="344" width="120" height="120" rx="16" fill="#4ade80"/>
+  <text x="84" y="130" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">1</text>
+  <text x="232" y="130" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">2</text>
+  <text x="380" y="130" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">3</text>
+  <text x="84" y="278" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">4</text>
+  <text x="232" y="278" font-size="64" fill="#6366f1" font-family="system-ui" font-weight="bold">5</text>
+  <text x="380" y="278" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">6</text>
+  <text x="84" y="426" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">7</text>
+  <text x="232" y="426" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">8</text>
+  <text x="380" y="426" font-size="64" fill="#fff" font-family="system-ui" font-weight="bold">9</text>
+</svg>
