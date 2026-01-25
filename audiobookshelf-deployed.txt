@@ -1,3 +1,7 @@
+apple-touch-icon.png
 config.js
+favicon.png
+icon-192.png
+icon-512.png
 index.html
 manifest.json
