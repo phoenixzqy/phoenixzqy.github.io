@@ -1,4 +1,5 @@
 assets
+audiobookshelf
 config.js
 favicon.png
 icons
