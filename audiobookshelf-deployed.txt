@@ -1,7 +1,11 @@
-apple-touch-icon.png
+assets
 config.js
 favicon.png
-icon-192.png
-icon-512.png
+icons
 index.html
-manifest.json
+manifest.webmanifest
+registerSW.js
+sw.js
+sw.js.map
+workbox-331bc27b.js
+workbox-331bc27b.js.map
