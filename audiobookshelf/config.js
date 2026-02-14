@@ -3,5 +3,6 @@
 // Last updated: 2026-02-08 01:26:46
 window.AUDIOBOOKSHELF_CONFIG = {
   tunnelUrl: 'https://call-cycles-role-pepper.trycloudflare.com',
+  localUrl: 'http://192.168.1.100:8081',
   lastUpdated: '2026-02-08 01:26:46'
 };
