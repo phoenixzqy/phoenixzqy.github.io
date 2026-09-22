@@ -213,8 +213,8 @@ dialog > .mono { color: var(--muted); font-size: 9px; margin-bottom: 12px; }
 html[data-motion="off"] { scroll-behavior: auto; }
 html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation: none !important; transition: none !important; }
 html[data-motion="off"] .reveal.is-pending { opacity: 1; transform: none; }
-@media (min-width: 1600px) { .hero { min-height: 800px; } }
-@media (max-width: 1100px) {
+@media screen and (min-width: 1600px) { .hero { min-height: 800px; } }
+@media screen and (max-width: 1100px) {
   .section-shell { width: calc(100% - 72px); }
   .site-header { padding-inline: 36px; }
   .hero { min-height: 690px; gap: 5px; }
@@ -236,7 +236,7 @@ html[data-motion="off"] .reveal.is-pending { opacity: 1; transform: none; }
   .role-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
   .about-section { gap: 8%; }
 }
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   html { scroll-padding-top: 92px; }
   .section-shell { width: calc(100% - 40px); }
   .site-header { height: 76px; padding-inline: 20px; }
@@ -328,7 +328,7 @@ html[data-motion="off"] .reveal.is-pending { opacity: 1; transform: none; }
   .section-heading { margin-bottom: 15px !important; }
   .section-heading h2 br, .section-heading > p, .section-index { display: none; }
   .experience-section { padding: 0; }
-  .experience-entry { grid-template-columns: 25% 1fr; gap: 20px; padding-block: 20px; }
+  .experience-entry { grid-template-columns: 25% 1fr; gap: 20px; padding-block: 12px; }
   .experience-meta { display: flex; flex-direction: column; align-items: flex-start; }
   .company-name { font-size: 14pt !important; }
   .experience-body h3 { font-size: 13pt; }

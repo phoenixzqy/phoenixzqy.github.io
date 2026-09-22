@@ -82,6 +82,8 @@ system reduced-motion preferences. A footer control pauses all decorative
 motion. The SVG illustration and full résumé remain available without JavaScript.
 Ctrl/Cmd+K opens keyboard navigation. **Print résumé** opens the browser's print
 dialog; choose **Save as PDF** for a clean, text-based résumé including earlier roles.
+Responsive layout breakpoints are screen-only so A4 and Letter printouts retain
+the résumé's two-column experience layout without inheriting mobile flex rules.
 
 ## Content provenance
 

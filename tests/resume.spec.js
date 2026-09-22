@@ -97,6 +97,36 @@ test("print includes all earlier roles and restores collapsed details", async ({
   await expect(page.locator("details")).not.toHaveAttribute("open", "");
 });
 
+test("print keeps company names and dates inside their column at paper widths", async ({ page }) => {
+  await page.emulateMedia({ media: "print" });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  // Printable widths for A4 and Letter with the stylesheet's 16mm margins.
+  for (const width of [673, 695, 1024]) {
+    await page.setViewportSize({ width, height: 1056 });
+    const entries = await page.locator(".experience-entry").evaluateAll((elements) =>
+      elements.map((entry) => {
+        const bounds = (selector) => {
+          const { top, bottom, left, right } = entry.querySelector(selector).getBoundingClientRect();
+          return { top, bottom, left, right };
+        };
+        return {
+          meta: bounds(".experience-meta"),
+          company: bounds(".company-name"),
+          date: bounds(".experience-meta > .mono"),
+          body: bounds(".experience-body"),
+        };
+      }));
+    for (const { meta, company, date, body } of entries) {
+      expect(company.top).toBeLessThanOrEqual(body.top + 4);
+      expect(date.top).toBeGreaterThanOrEqual(company.bottom);
+      expect(date.left).toBeGreaterThanOrEqual(meta.left);
+      expect(date.right).toBeLessThanOrEqual(meta.right + 1);
+      expect(date.right).toBeLessThan(body.left);
+    }
+  }
+});
+
 test("content and static artwork remain usable without JavaScript", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
