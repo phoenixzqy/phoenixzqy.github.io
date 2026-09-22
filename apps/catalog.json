@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "apps": [
+    {
+      "id": "bplayer",
+      "name": "BPlayer",
+      "category": "AUDIO & MEDIA",
+      "tagline": "Your library. Your pace.",
+      "summary": "A local-first audiobook player for your own media and authorized Bilibili sources. Build a library, shape your albums, and pick up where you left off.",
+      "description": [
+        "Bring your own audio and video into editable local albums. Keep chapters in your preferred order, save bookmarks, and return to the listening position that belongs to each album.",
+        "Explore Bilibili sources through an explicit provider, preview imports, and choose what becomes part of your library. Local files work without an account; online sources remain subject to the provider's access rules.",
+        "BPlayer is a Flutter-based prototype. Windows is the primary verification host; Android, iOS, and macOS are development targets, not certified releases."
+      ],
+      "stage": "Development preview",
+      "platforms": [
+        { "id": "windows", "name": "Windows", "status": "Primary preview platform. Requires the complete application bundle and, where needed, the Microsoft Visual C++ x64 runtime." },
+        { "id": "android", "name": "Android", "status": "Experimental target. Native background audio, headset, and vehicle integration still need physical-device validation." },
+        { "id": "ios", "name": "iOS", "status": "Experimental target. An unsigned IPA cannot be installed as a normal App Store app; authorized signing and provisioning are required." },
+        { "id": "macos", "name": "macOS", "status": "Experimental target. Distribution signing, notarization, and native release validation must be confirmed per package." }
+      ],
+      "features": [
+        { "title": "A library that stays yours", "description": "Import your own media, rename albums, reorder chapters, and maintain local collections independently of their source." },
+        { "title": "Resume, without the guesswork", "description": "Per-album listening positions, bookmarks, a listening timeline, and sequential, repeat, or shuffle playback." },
+        { "title": "Offline, with permission", "description": "Save authorized audio to app-private storage and manage saved files separately from caches and original media." },
+        { "title": "Bilibili, explicitly connected", "description": "Discover and import permitted videos and collections. Preview source changes before applying them to an album." },
+        { "title": "A player that adapts", "description": "Compact and desktop layouts, a separate queue, audio/video switching, and saved appearance preferences." },
+        { "title": "English & Simplified Chinese", "description": "Choose the interface language without changing your own album names or source metadata." }
+      ],
+      "notice": "Personal and educational use. Respect copyright, provider terms, and content permissions. Do not download or redistribute media without permission. BPlayer is not affiliated with or endorsed by Bilibili.",
+      "installation": [
+        "Only download packages you are authorized to use. Read the signing status and installation notes for the specific build.",
+        "For a Windows ZIP, extract the entire archive and keep the full bundle together. Close an older BPlayer instance before launching the included executable.",
+        "Do not disable operating-system or company security policies to run a package. Unsigned and self-signed development builds are not publicly trusted releases.",
+        "Import your own audio or video to listen without a provider account. Local imports reference the original files, so moving those files makes them unavailable."
+      ]
+    }
+  ]
+}

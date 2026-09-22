@@ -6,7 +6,9 @@
   "description": "Qiyu Zhao's static, accessible, AI-inspired resume.",
   "scripts": {
     "start": "python3 -m http.server 4173 --bind 127.0.0.1",
-    "test": "playwright test",
+    "validate:apps": "node scripts/validate-apps.mjs",
+    "test:unit": "node --test tests/*.test.js",
+    "test": "npm run validate:apps && npm run test:unit && playwright test",
     "test:ui": "playwright test --ui"
   },
   "devDependencies": {

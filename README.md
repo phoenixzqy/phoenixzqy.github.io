@@ -11,6 +11,23 @@ GitHub Pages is configured to publish the repository root on `master`.
 Push the finished site to that branch to publish. `.nojekyll` keeps the site
 as plain static files.
 
+## Apps and downloads
+
+The résumé navigation links to the multi-app catalog at `/apps/`. Shared detail
+and download pages read `apps/catalog.json` and each app's
+`releases/<id>/latest/manifest.json`. BPlayer is the first entry, with a
+local-first audiobook-player introduction and explicit platform-readiness
+notes. Its descriptions are paraphrased from the authorized local product
+documentation; no private source or builds were copied. No package is offered
+until a release is published.
+
+See [the publishing contract](releases/README.md) for folder layout, manifest
+fields, checksum/size validation, safe pipeline handoff, signing notices, and
+large-package hosting through public GitHub Release assets. Run
+`npm run validate:apps` before publishing metadata or binaries.
+The app catalog uses JavaScript with explicit loading/error/no-JavaScript
+messages; the résumé remains usable without JavaScript.
+
 Edit résumé content in `index.html`, visual styles in `styles.css`, and
 interactions in `script.js`. Google Fonts supplies DM Sans, IBM Plex Mono,
 and Instrument Serif, with local system-font fallbacks. There are no analytics,
@@ -71,3 +88,6 @@ npm test
 Playwright covers desktop/mobile layouts, root routing, résumé content,
 navigation, keyboard dialog behavior, print controls, no-JavaScript rendering,
 reduced motion, and WCAG accessibility checks using axe-core.
+App coverage also exercises multiple catalog entries, empty and populated
+releases, exact downloaded bytes, platform filtering, unsafe metadata, and
+checksum/size validation for pipeline-published packages.
