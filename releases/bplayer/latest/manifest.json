@@ -2,69 +2,69 @@
   "schemaVersion": 1,
   "appId": "bplayer",
   "release": {
-    "version": "0.7.1+8",
+    "version": "0.7.2+9",
     "channel": "preview",
-    "publishedAt": "2026-09-22T04:17:53Z",
+    "publishedAt": "2026-09-22T05:38:49Z",
     "notes": [
-      { "en": "Cross-platform development packages built from one pinned BPlayer source revision.", "zh-CN": "各平台开发安装包均由同一个固定的 BPlayer 源代码版本构建。" },
-      { "en": "Release assets are mirrored publicly while the application source remains private.", "zh-CN": "安装包以公开镜像形式提供，应用源代码保持私有。" },
-      { "en": "All packages are unsigned development builds; review each package note before use.", "zh-CN": "所有安装包均为未签名开发版本，使用前请阅读各安装包的说明。" }
+      "Cross-platform development packages built from one pinned BPlayer source revision.",
+      "Release assets are mirrored publicly while the application source remains private.",
+      "Android and Windows are self-signed; iOS and macOS are ad-hoc signed development builds."
     ],
     "assets": [
       {
-        "name": { "en": "Android APK", "zh-CN": "Android APK 安装包" },
+        "name": "Android APK",
         "platform": "android",
         "architecture": "universal",
-        "file": "BPlayer-0.7.1+8-android-unsigned.apk",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-android-unsigned.apk",
-        "bytes": 107967225,
-        "sha256": "03b061d2240bbfc8776116006912f5e75f30f93fae9de8bccbcb9e2ec8711328",
-        "signing": "unsigned",
-        "installNotes": { "en": "Unsigned development APK. It must be signed before Android will install it.", "zh-CN": "未签名的开发 APK，必须签名后才能在 Android 上安装。" }
+        "file": "BPlayer-0.7.2+9-android-selfsigned.apk",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.2+9/BPlayer-0.7.2+9-android-selfsigned.apk",
+        "bytes": 107975417,
+        "sha256": "72061eee7fe995a9d6dbad1443ea6b81eb16ed59914cf67b5ed88d7f700d8221",
+        "signing": "self-signed",
+        "installNotes": "Installable self-signed development APK. Future BPlayer upgrades must use the same signing identity."
       },
       {
-        "name": { "en": "Android App Bundle", "zh-CN": "Android 应用发布包（AAB）" },
+        "name": "Android App Bundle",
         "platform": "android",
         "architecture": "universal",
-        "file": "BPlayer-0.7.1+8-android-unsigned.aab",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-android-unsigned.aab",
-        "bytes": 82741002,
-        "sha256": "93418cc0e51bdcd18898894843c3e2daeba629f7ecd91508ce5a6bd7845e00d0",
-        "signing": "unsigned",
-        "installNotes": { "en": "Unsigned publishing bundle for authorized testing or store preparation; it is not directly installable.", "zh-CN": "供授权测试或商店发布准备使用的未签名应用包，不能直接安装。" }
+        "file": "BPlayer-0.7.2+9-android-selfsigned.aab",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.2+9/BPlayer-0.7.2+9-android-selfsigned.aab",
+        "bytes": 82750129,
+        "sha256": "e903d553949e464003ad1b975201d773628ecd05bbbfbe2669948de611e320a7",
+        "signing": "self-signed",
+        "installNotes": "Signed publishing bundle for authorized testing or store preparation; it is not directly installable."
       },
       {
-        "name": { "en": "iOS application archive", "zh-CN": "iOS 应用归档包" },
+        "name": "iOS application archive",
         "platform": "ios",
         "architecture": "arm64",
-        "file": "BPlayer-0.7.1+8-ios-unsigned.ipa",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-ios-unsigned.ipa",
-        "bytes": 17349340,
-        "sha256": "d98765a2456d022698de1254c37fa3b272cb84f20691590263473a93c095c7bb",
-        "signing": "unsigned",
-        "installNotes": { "en": "Requires authorized signing and provisioning before installation on an iPhone or iPad.", "zh-CN": "安装到 iPhone 或 iPad 前，需要经过授权的签名和描述文件配置。" }
+        "file": "BPlayer-0.7.2+9-ios-adhoc-signed.ipa",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.2+9/BPlayer-0.7.2+9-ios-adhoc-signed.ipa",
+        "bytes": 17365272,
+        "sha256": "3fcc705c792948dbed531344c41eabdbf965a9ef7864e303d435258e3aed18c3",
+        "signing": "ad-hoc",
+        "installNotes": "Ad-hoc signed development archive. It still requires authorized signing and provisioning before installation on an iPhone or iPad."
       },
       {
-        "name": { "en": "macOS application", "zh-CN": "macOS 应用程序" },
+        "name": "macOS application",
         "platform": "macos",
         "architecture": "universal",
-        "file": "BPlayer-0.7.1+8-macos-unsigned.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-macos-unsigned.zip",
-        "bytes": 40771879,
-        "sha256": "bac5d89b08a29255f6114d761c641bdd26465fb9fa45ba68dca0ce3c648083b1",
-        "signing": "unsigned",
-        "installNotes": { "en": "Unsigned and not notarized. Follow macOS and organization security policy before use.", "zh-CN": "未签名且未经公证。使用前请遵守 macOS 和组织的安全策略。" }
+        "file": "BPlayer-0.7.2+9-macos-adhoc-signed.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.2+9/BPlayer-0.7.2+9-macos-adhoc-signed.zip",
+        "bytes": 40771728,
+        "sha256": "5fb31ad6c7e266535998df461cb763023795f8899cebcd799c3571caf294b1a6",
+        "signing": "ad-hoc",
+        "installNotes": "Ad-hoc signed but not notarized. Follow macOS and organization security policy before use."
       },
       {
-        "name": { "en": "Windows application", "zh-CN": "Windows 应用程序" },
+        "name": "Windows application",
         "platform": "windows",
         "architecture": "x64",
-        "file": "BPlayer-0.7.1+8-windows-x64-unsigned.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-windows-x64-unsigned.zip",
-        "bytes": 35704539,
-        "sha256": "ef130c21c550b43192afb938f03e452ead951c9b72ff00af069ebaa98d1dab7a",
-        "signing": "unsigned",
-        "installNotes": { "en": "Extract the complete ZIP and keep every file together. The executable is not Authenticode-signed.", "zh-CN": "请完整解压 ZIP 并保留所有文件。可执行文件未进行 Authenticode 签名。" }
+        "file": "BPlayer-0.7.2+9-windows-x64-selfsigned.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.2+9/BPlayer-0.7.2+9-windows-x64-selfsigned.zip",
+        "bytes": 35708276,
+        "sha256": "c84c6d0b8981e6214da319049bfc1274a8b97bc8e984989b74fd6f5259058333",
+        "signing": "self-signed",
+        "installNotes": "Extract the complete ZIP and keep every file together. The executable has a stable self-signed Authenticode development signature."
       }
     ]
   }
