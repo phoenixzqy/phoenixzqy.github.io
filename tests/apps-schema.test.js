@@ -63,6 +63,12 @@ test("release contract rejects unsafe or unusable package metadata", async (t) =
   }
 });
 
+test("release contract accepts explicit ad-hoc signing", () => {
+  const fixture = releaseFixture();
+  fixture.release.assets[0].signing = "ad-hoc";
+  assert.equal(validateManifest(fixture, app).release.assets[0].signing, "ad-hoc");
+});
+
 test("release contract validates dates, versions, and duplicate filenames", () => {
   for (const value of ["2026-02-30T00:00:00Z", "not-a-date", "2026-09-22"]) {
     const fixture = releaseFixture();

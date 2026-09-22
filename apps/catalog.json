@@ -47,7 +47,7 @@
       "installation": [
         "Only download packages you are authorized to use. Read the signing status and installation notes for the specific build.",
         "For a Windows ZIP, extract the entire archive and keep the full bundle together. Close an older BPlayer instance before launching the included executable.",
-        "Do not disable operating-system or company security policies to run a package. Unsigned and self-signed development builds are not publicly trusted releases.",
+        "Do not disable operating-system or company security policies to run a package. Ad-hoc and self-signed development builds are not publicly trusted releases.",
         "Import your own audio or video to listen without a provider account. Local imports reference the original files, so moving those files makes them unavailable."
       ]
     }

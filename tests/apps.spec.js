@@ -60,6 +60,14 @@ test("published releases filter platforms, expose checksums, and download exact 
   }
 });
 
+test("release pages distinguish ad-hoc signatures from unsigned packages", async ({ page }) => {
+  const manifest = releaseFixture();
+  manifest.release.assets[0].signing = "ad-hoc";
+  await mockRelease(page, manifest);
+  await page.goto("/apps/releases/?id=bplayer");
+  await expect(page.getByText("Ad-hoc signed development build", { exact: true })).toBeVisible();
+});
+
 test("multiple apps reuse detail and download pages without mixing release metadata", async ({ page }) => {
   const second = { ...structuredClone(catalog.apps[0]), id: "another-player", name: "Another Player", tagline: "A second test app.", screenshots: undefined };
   await page.route("**/apps/catalog.json", (route) => route.fulfill({ json: { schemaVersion: 1, apps: [...catalog.apps, second] } }));

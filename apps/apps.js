@@ -163,7 +163,14 @@ function packageCard(app, asset) {
   const info = element("div", "package-info");
   info.append(paragraph(`${platform.name.toUpperCase()} / ${asset.architecture}`, "mono package-platform"), element("h3", "", asset.name));
   const meta = element("div", "tags");
-  meta.append(element("span", "", formatBytes(asset.bytes)), element("span", "", asset.file.split(".").at(-1).toUpperCase()), element("span", `signing signing-${asset.signing}`, asset.signing === "signed" ? "Signed (publisher-reported)" : asset.signing === "self-signed" ? "Self-signed development build" : "Unsigned development build"));
+  const signingLabel = asset.signing === "signed"
+    ? "Signed (publisher-reported)"
+    : asset.signing === "self-signed"
+      ? "Self-signed development build"
+      : asset.signing === "ad-hoc"
+        ? "Ad-hoc signed development build"
+        : "Unsigned development build";
+  meta.append(element("span", "", formatBytes(asset.bytes)), element("span", "", asset.file.split(".").at(-1).toUpperCase()), element("span", `signing signing-${asset.signing}`, signingLabel));
   info.append(meta, paragraph(asset.installNotes, "package-notes"), paragraph(asset.file, "package-filename mono"));
   const download = link("Download package ↓", assetHref(app.id, asset), "button button-primary download-link");
   if (!asset.url) download.download = asset.file;
@@ -196,7 +203,7 @@ function renderReleases(app, manifest) {
   const notes = element("ul", "release-notes");
   release.notes.forEach((note) => notes.append(element("li", "", note)));
   summary.append(notes);
-  content.append(summary, notice("Before installing", "Signing status is supplied by the publisher. Unsigned and self-signed packages are development builds, not publicly trusted software. Follow your device and organization policies; do not disable security protections to install an app."));
+  content.append(summary, notice("Before installing", "Signing status is supplied by the publisher. Unsigned, ad-hoc, and self-signed packages are development builds, not publicly trusted software. Follow your device and organization policies; do not disable security protections to install an app."));
   const downloads = element("section", "app-section");
   downloads.append(element("h2", "", "Choose your package."));
   const filters = element("div", "platform-filter");

@@ -71,7 +71,7 @@
 .package-platform { color: var(--accent); font-size: 9px; margin-bottom: 12px; }
 .package-info h3 { font-size: 25px; letter-spacing: -.5px; overflow-wrap: anywhere; }
 .package-info .tags { margin-top: 15px; }
-.package-info .signing-unsigned, .package-info .signing-self-signed { border-color: #75623a; color: #e0c589; background: #3b2e1533; }
+.package-info .signing-unsigned, .package-info .signing-ad-hoc, .package-info .signing-self-signed { border-color: #75623a; color: #e0c589; background: #3b2e1533; }
 .package-notes { color: var(--muted); font-size: 13px; margin-top: 16px; max-width: 740px; }
 .package-filename { color: #b5c1a8; font-size: 10px; letter-spacing: .3px; margin-top: 14px; overflow-wrap: anywhere; }
 .download-link { margin-top: 22px; }

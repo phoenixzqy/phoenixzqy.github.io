@@ -93,7 +93,7 @@ export function validateManifest(manifest, app) {
     requireValue(typeof asset.file === "string" && asset.file.length <= 200 && PACKAGE.test(asset.file) && !asset.file.includes(".."), "Asset file must be a package basename, not a path.");
     requireValue(Number.isSafeInteger(asset.bytes) && asset.bytes > 0, "Asset bytes must be a positive safe integer.");
     requireValue(typeof asset.sha256 === "string" && /^[a-f0-9]{64}$/.test(asset.sha256), "Asset sha256 must be 64 lowercase hexadecimal characters.");
-    requireValue(["unsigned", "self-signed", "signed"].includes(asset.signing), "Asset signing must be unsigned, self-signed, or signed.");
+    requireValue(["unsigned", "ad-hoc", "self-signed", "signed"].includes(asset.signing), "Asset signing must be unsigned, ad-hoc, self-signed, or signed.");
     text(asset.installNotes, "Asset installation notes");
     if (asset.url !== undefined) {
       text(asset.url, "Asset URL", 2048);
