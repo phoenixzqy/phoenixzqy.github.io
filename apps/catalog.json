@@ -4,51 +4,54 @@
     {
       "id": "bplayer",
       "name": "BPlayer",
-      "category": "AUDIO & MEDIA",
-      "tagline": "Your library. Your pace.",
-      "summary": "A local-first audiobook player for your own media and authorized Bilibili sources. Build a library, shape your albums, and pick up where you left off.",
+      "category": { "en": "AUDIO & MEDIA", "zh-CN": "音频与媒体" },
+      "tagline": { "en": "Your library. Your pace.", "zh-CN": "你的媒体库，你的节奏。" },
+      "summary": {
+        "en": "A local-first audiobook player for your own media and authorized Bilibili sources. Build a library, shape your albums, and pick up where you left off.",
+        "zh-CN": "一款本地优先的有声书播放器，支持自有媒体和获准使用的哔哩哔哩内容。整理媒体库，编辑专辑，随时继续上次的聆听。"
+      },
       "description": [
-        "Bring your own audio and video into editable local albums. Keep chapters in your preferred order, save bookmarks, and return to the listening position that belongs to each album.",
-        "Explore Bilibili sources through an explicit provider, preview imports, and choose what becomes part of your library. Local files work without an account; online sources remain subject to the provider's access rules.",
-        "BPlayer is a Flutter-based prototype. Windows is the primary verification host; Android, iOS, and macOS are development targets, not certified releases."
+        { "en": "Bring your own audio and video into editable local albums. Keep chapters in your preferred order, save bookmarks, and return to the listening position that belongs to each album.", "zh-CN": "将自有音频和视频导入可编辑的本地专辑。按喜好排列章节、保存书签，并恢复每个专辑各自的聆听进度。" },
+        { "en": "Explore Bilibili sources through an explicit provider, preview imports, and choose what becomes part of your library. Local files work without an account; online sources remain subject to the provider's access rules.", "zh-CN": "通过专门的哔哩哔哩内容源浏览内容，预览导入结果，再决定将哪些内容加入媒体库。本地文件无需账号即可播放；在线内容仍须遵守提供方的访问规则。" },
+        { "en": "BPlayer is a Flutter-based prototype. Windows is the primary verification host; Android, iOS, and macOS are development targets, not certified releases.", "zh-CN": "BPlayer 是基于 Flutter 的原型应用，主要在 Windows 上验证。Android、iOS 和 macOS 仍是开发目标，并非已完成发布验证的平台。" }
       ],
-      "stage": "Development preview",
+      "stage": { "en": "Development preview", "zh-CN": "开发预览版" },
       "screenshots": [
         {
           "src": "/apps/media/bplayer/player-desktop.png",
-          "alt": "BPlayer expanded desktop layout showing an album chapter list beside the now-playing controls.",
-          "caption": "Expanded player / 1280 × 800 logical pixels",
+          "alt": { "en": "BPlayer expanded desktop layout showing an album chapter list beside the now-playing controls.", "zh-CN": "BPlayer 桌面展开布局：专辑章节列表与当前播放控件并排显示。" },
+          "caption": { "en": "Expanded player / 1280 × 800 logical pixels", "zh-CN": "展开播放器 / 1280 × 800 逻辑像素" },
           "width": 2560,
           "height": 1600
         },
         {
           "src": "/apps/media/bplayer/player-mobile.png",
-          "alt": "BPlayer compact mobile-shaped layout showing the same album, chapter list, mini player, and bottom navigation.",
-          "caption": "Compact player / 390 × 844 logical pixels",
+          "alt": { "en": "BPlayer compact mobile-shaped layout showing the same album, chapter list, mini player, and bottom navigation.", "zh-CN": "BPlayer 手机比例的紧凑布局：同一专辑的章节列表、迷你播放器和底部导航。" },
+          "caption": { "en": "Compact player / 390 × 844 logical pixels", "zh-CN": "紧凑播放器 / 390 × 844 逻辑像素" },
           "width": 780,
           "height": 1688
         }
       ],
       "platforms": [
-        { "id": "windows", "name": "Windows", "status": "Primary preview platform. Requires the complete application bundle and, where needed, the Microsoft Visual C++ x64 runtime." },
-        { "id": "android", "name": "Android", "status": "Experimental target. Native background audio, headset, and vehicle integration still need physical-device validation." },
-        { "id": "ios", "name": "iOS", "status": "Experimental target. An unsigned IPA cannot be installed as a normal App Store app; authorized signing and provisioning are required." },
-        { "id": "macos", "name": "macOS", "status": "Experimental target. Distribution signing, notarization, and native release validation must be confirmed per package." }
+        { "id": "windows", "name": "Windows", "status": { "en": "Primary preview platform. Requires the complete application bundle and, where needed, the Microsoft Visual C++ x64 runtime.", "zh-CN": "主要预览平台。请保留完整的应用程序包；部分设备还需要安装 Microsoft Visual C++ x64 运行库。" } },
+        { "id": "android", "name": "Android", "status": { "en": "Experimental target. Native background audio, headset, and vehicle integration still need physical-device validation.", "zh-CN": "实验性平台。原生后台音频、耳机和车载集成仍需在实体设备上验证。" } },
+        { "id": "ios", "name": "iOS", "status": { "en": "Experimental target. An unsigned IPA cannot be installed as a normal App Store app; authorized signing and provisioning are required.", "zh-CN": "实验性平台。未签名的 IPA 无法像普通 App Store 应用一样安装，需要经过授权的签名和描述文件配置。" } },
+        { "id": "macos", "name": "macOS", "status": { "en": "Experimental target. Distribution signing, notarization, and native release validation must be confirmed per package.", "zh-CN": "实验性平台。请逐个安装包确认分发签名、公证状态及原生发布验证情况。" } }
       ],
       "features": [
-        { "title": "A library that stays yours", "description": "Import your own media, rename albums, reorder chapters, and maintain local collections independently of their source." },
-        { "title": "Resume, without the guesswork", "description": "Per-album listening positions, bookmarks, a listening timeline, and sequential, repeat, or shuffle playback." },
-        { "title": "Offline, with permission", "description": "Save authorized audio to app-private storage and manage saved files separately from caches and original media." },
-        { "title": "Bilibili, explicitly connected", "description": "Discover and import permitted videos and collections. Preview source changes before applying them to an album." },
-        { "title": "A player that adapts", "description": "Compact and desktop layouts, a separate queue, audio/video switching, and saved appearance preferences." },
-        { "title": "English & Simplified Chinese", "description": "Choose the interface language without changing your own album names or source metadata." }
+        { "title": { "en": "A library that stays yours", "zh-CN": "属于你的媒体库" }, "description": { "en": "Import your own media, rename albums, reorder chapters, and maintain local collections independently of their source.", "zh-CN": "导入自有媒体、重命名专辑、调整章节顺序，让本地收藏独立于内容源维护。" } },
+        { "title": { "en": "Resume, without the guesswork", "zh-CN": "继续聆听，无需寻找" }, "description": { "en": "Per-album listening positions, bookmarks, a listening timeline, and sequential, repeat, or shuffle playback.", "zh-CN": "每个专辑拥有独立的播放进度，支持书签、聆听时间线，以及顺序、循环和随机播放。" } },
+        { "title": { "en": "Offline, with permission", "zh-CN": "获准内容，离线聆听" }, "description": { "en": "Save authorized audio to app-private storage and manage saved files separately from caches and original media.", "zh-CN": "将获准保存的音频存入应用专用空间，并将已保存文件、缓存与原始媒体分开管理。" } },
+        { "title": { "en": "Bilibili, explicitly connected", "zh-CN": "明确连接哔哩哔哩" }, "description": { "en": "Discover and import permitted videos and collections. Preview source changes before applying them to an album.", "zh-CN": "发现并导入获准使用的视频和合集。先预览内容源的变更，再决定是否应用到专辑。" } },
+        { "title": { "en": "A player that adapts", "zh-CN": "适应不同屏幕的播放器" }, "description": { "en": "Compact and desktop layouts, a separate queue, audio/video switching, and saved appearance preferences.", "zh-CN": "支持紧凑和桌面布局、独立播放队列、音视频切换，以及可保存的外观偏好。" } },
+        { "title": { "en": "English & Simplified Chinese", "zh-CN": "英语与简体中文" }, "description": { "en": "Choose the interface language without changing your own album names or source metadata.", "zh-CN": "自由选择界面语言，不改变自定义专辑名称或内容源元数据。" } }
       ],
-      "notice": "Personal and educational use. Respect copyright, provider terms, and content permissions. Do not download or redistribute media without permission. BPlayer is not affiliated with or endorsed by Bilibili.",
+      "notice": { "en": "Personal and educational use. Respect copyright, provider terms, and content permissions. Do not download or redistribute media without permission. BPlayer is not affiliated with or endorsed by Bilibili.", "zh-CN": "仅供个人和学习使用。请尊重版权、提供方条款与内容授权，未经许可不得下载或重新分发媒体。BPlayer 与哔哩哔哩无隶属关系，也未获得其背书。" },
       "installation": [
-        "Only download packages you are authorized to use. Read the signing status and installation notes for the specific build.",
-        "For a Windows ZIP, extract the entire archive and keep the full bundle together. Close an older BPlayer instance before launching the included executable.",
-        "Do not disable operating-system or company security policies to run a package. Ad-hoc and self-signed development builds are not publicly trusted releases.",
-        "Import your own audio or video to listen without a provider account. Local imports reference the original files, so moving those files makes them unavailable."
+        { "en": "Only download packages you are authorized to use. Read the signing status and installation notes for the specific build.", "zh-CN": "仅下载你获准使用的安装包，并阅读具体版本的签名状态和安装说明。" },
+        { "en": "For a Windows ZIP, extract the entire archive and keep the full bundle together. Close an older BPlayer instance before launching the included executable.", "zh-CN": "使用 Windows ZIP 时，请完整解压并保留所有文件。启动其中的可执行文件前，请先关闭旧版本的 BPlayer。" },
+        { "en": "Do not disable operating-system or company security policies to run a package. Ad-hoc and self-signed development builds are not publicly trusted releases.", "zh-CN": "不要为了运行安装包而关闭操作系统或公司的安全策略。临时签名和自签名开发版本并非获得公开信任的正式版本。" },
+        { "en": "Import your own audio or video to listen without a provider account. Local imports reference the original files, so moving those files makes them unavailable.", "zh-CN": "导入自有音频或视频后，无需内容提供方账号即可聆听。本地导入引用的是原始文件，移动这些文件会使它们无法播放。" }
       ]
     }
   ]

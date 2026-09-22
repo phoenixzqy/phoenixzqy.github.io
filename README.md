@@ -45,6 +45,32 @@ large-package hosting through public GitHub Release assets. Run
 The app catalog uses JavaScript with explicit loading/error/no-JavaScript
 messages; the résumé remains usable without JavaScript.
 
+### App page languages and titles
+
+The app catalog, details, and downloads support English and Simplified Chinese.
+Use the header language selector or share a URL with `?lang=zh-CN` (append
+`&lang=zh-CN` when an `id` is already present). Language priority is an explicit
+`en`/`zh-CN` URL parameter, a saved `apps.locale` preference, a supported browser
+language, then English. Browser `zh-*` preferences select Simplified Chinese.
+Only deliberate language selections are stored locally; blocked storage does
+not prevent switching or sharing locale-specific links. The résumé is unchanged.
+
+UI strings live in `apps/locales.js`. Publisher content in `apps/catalog.json`
+and release manifests accepts plain English text or `{ "en": "...", "zh-CN":
+"..." }` values for display fields. English is required; missing Chinese text
+falls back to English, with a notice on Chinese pages. See
+[localized publishing metadata](releases/README.md#localized-display-text).
+Download URLs, filenames, hashes, sizes, version identifiers, and signing states
+are never translated. The existing gallery and actual release assets are shared
+between locales.
+Chinese app pages use Noto Sans SC from the same Google Fonts provider as the
+existing site typography, with PingFang SC/Microsoft YaHei system fallbacks.
+
+Page titles, descriptions, Open Graph metadata, and the document's `lang` are
+updated centrally for each route and language, including loading/error states.
+Release pages receive their app-specific title as soon as the app is known,
+without waiting for the release manifest to load.
+
 Edit résumé content in `index.html`, visual styles in `styles.css`, and
 interactions in `script.js`. Google Fonts supplies DM Sans, IBM Plex Mono,
 and Instrument Serif, with local system-font fallbacks. There are no analytics,

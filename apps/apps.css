@@ -1,4 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap");
+
 .app-main { min-height: calc(100vh - 215px); padding-bottom: 70px; }
+.apps-site .site-header { gap: 24px; }
+.apps-site .site-header nav { margin-left: auto; }
+.locale-control select { color: var(--text); background: #172010; border: 1px solid #596d42; border-radius: 4px; padding: 9px 7px; font: 12px var(--sans); cursor: pointer; }
+.translation-note { color: var(--muted); font-size: 12px; margin-top: 24px; }
+.error-details { color: var(--muted); font-size: 12px; margin-top: 20px; overflow-wrap: anywhere; }
+.error-details summary { cursor: pointer; }
+.error-details p { margin-top: 10px; }
+html[lang="zh-CN"] .apps-site {
+  --sans: "DM Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "IBM Plex Mono", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", monospace;
+  font-family: var(--sans);
+}
+.locale-control option[lang="zh-CN"] { font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; }
+html[lang="zh-CN"] .app-heading h1 { letter-spacing: -1px; line-height: 1.25; }
+html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style: normal; }
 .breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding-block: 32px; color: var(--muted); font-size: 9px; }
 .breadcrumbs a:hover { color: var(--accent); }
 .breadcrumbs [aria-current] { color: var(--accent); }
@@ -91,6 +108,9 @@
   .download-link { justify-self: start; margin-top: 0; }
 }
 @media (max-width: 760px) {
+  .apps-site .site-header { gap: 10px; }
+  .apps-site .site-header nav { gap: 14px; }
+  .locale-control select { font-size: 10px; max-width: 90px; }
   .app-main { padding-bottom: 45px; }
   .breadcrumbs { font-size: 8px; gap: 10px; padding-block: 25px; }
   .app-heading { padding-block: 24px; }

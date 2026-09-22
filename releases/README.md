@@ -33,8 +33,46 @@ Every app must have a manifest. Before its first public build:
 ```
 
 `null` means intentionally unpublished. Missing, invalid, or unreadable metadata
-is an error, not an empty successful release. BPlayer is initially unpublished;
-no private source, local build, or private repository release has been copied.
+is an error, not an empty successful release. Published package metadata belongs
+in the app's current manifest, independently of its source repository.
+
+## Localized display text
+
+The app pages support `en` and `zh-CN`, with a header selector and shareable
+`lang` URL parameter. Existing pipelines that publish plain English strings
+remain supported. To include Simplified Chinese, use a localized text object:
+
+```json
+{
+  "name": {
+    "en": "Windows application",
+    "zh-CN": "Windows 应用程序"
+  },
+  "installNotes": {
+    "en": "Extract the entire archive and keep the bundle together.",
+    "zh-CN": "请完整解压并保留整个应用程序包。"
+  }
+}
+```
+
+This format is supported for these display fields:
+
+- Catalog: app name, category, tagline, summary, stage, notice, each description
+  and installation paragraph; platform names/statuses; feature titles and
+  descriptions; screenshot alt text and captions.
+- Release: each release note and each asset's `name` and `installNotes`.
+
+Every localized object requires non-empty `en`. `zh-CN` is optional, but must
+be non-empty when supplied; unsupported locale keys are rejected by
+`npm run validate:apps`. A plain string or missing Chinese entry is shown in
+English. Chinese pages explain this fallback instead of claiming a machine
+translation. There are no translation API calls.
+
+Do not localize IDs, platform/architecture identifiers, file paths, URLs, image
+dimensions, version/channel values, timestamps, byte counts, checksums, or
+signing states. One manifest describes the same packages in both languages.
+Refresh translations with each release; do not carry old release notes into
+a new version merely to populate a locale.
 
 ## Pipeline contract
 
@@ -111,7 +149,7 @@ human-readable label such as `x64`, `arm64`, or `universal`.
 Each asset needs a unique package basename (`file`), display name, positive
 byte count, SHA-256 hash, signing status, and non-empty installation notes.
 Supported extensions: ZIP, APK, AAB, IPA, EXE, MSIX, DMG, PKG, DEB, RPM, AppImage.
-Signing is publisher-reported: `unsigned`, `self-signed`, or `signed`; do not
+Signing is publisher-reported: `unsigned`, `ad-hoc`, `self-signed`, or `signed`; do not
 claim a development/self-signed certificate establishes public trust.
 An AAB is a store-distribution artifact, not a directly installable APK.
 An unsigned IPA needs authorized signing/provisioning before installation.

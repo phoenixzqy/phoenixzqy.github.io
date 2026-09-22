@@ -1,3 +1,5 @@
+import { SUPPORTED_LOCALES } from "./locales.js";
+
 export const MAX_LOCAL_BYTES = 100 * 1024 * 1024;
 const RELEASE_PREFIX = "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/";
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -12,6 +14,15 @@ function object(value, label) {
 }
 function text(value, label, max = 4000) {
   requireValue(typeof value === "string" && value.trim().length > 0 && value.length <= max, `${label} must be non-empty text (up to ${max} characters).`);
+}
+function localizedText(value, label, max = 4000) {
+  if (typeof value === "string") return text(value, label, max);
+  object(value, label);
+  text(value.en, `${label}.en`, max);
+  for (const [locale, translation] of Object.entries(value)) {
+    requireValue(SUPPORTED_LOCALES.includes(locale), `${label} contains an unsupported locale: ${locale}.`);
+    text(translation, `${label}.${locale}`, max);
+  }
 }
 function list(value, label, min = 1, max = 100) {
   requireValue(Array.isArray(value) && value.length >= min && value.length <= max, `${label} must contain ${min}–${max} items.`);
@@ -29,10 +40,10 @@ export function validateCatalog(catalog) {
   for (const app of catalog.apps) {
     object(app, "App");
     requireValue(validAppId(app.id), "App id must be a lowercase URL-safe slug.");
-    for (const key of ["name", "category", "tagline", "summary", "stage", "notice"]) text(app[key], `${app.id}.${key}`);
+    for (const key of ["name", "category", "tagline", "summary", "stage", "notice"]) localizedText(app[key], `${app.id}.${key}`);
     for (const key of ["description", "installation"]) {
       list(app[key], `${app.id}.${key}`);
-      app[key].forEach((item) => text(item, `${app.id}.${key} item`));
+      app[key].forEach((item) => localizedText(item, `${app.id}.${key} item`));
     }
     if (app.screenshots !== undefined) {
       list(app.screenshots, `${app.id}.screenshots`, 1, 6);
@@ -41,8 +52,8 @@ export function validateCatalog(catalog) {
         const match = typeof screenshot.src === "string" && screenshot.src.match(SCREENSHOT);
         requireValue(match && match[1] === app.id && !screenshot.src.includes(".."),
           "Screenshot src must be an app-owned image under /apps/media/<app-id>/.");
-        text(screenshot.alt, "Screenshot alt text", 240);
-        text(screenshot.caption, "Screenshot caption", 160);
+        localizedText(screenshot.alt, "Screenshot alt text", 240);
+        localizedText(screenshot.caption, "Screenshot caption", 160);
         requireValue(Number.isSafeInteger(screenshot.width) && screenshot.width > 0 &&
           Number.isSafeInteger(screenshot.height) && screenshot.height > 0,
         "Screenshot dimensions must be positive integers.");
@@ -53,15 +64,15 @@ export function validateCatalog(catalog) {
     for (const platform of app.platforms) {
       object(platform, "Platform");
       requireValue(validAppId(platform.id), "Platform id must be a lowercase slug.");
-      text(platform.name, "Platform name", 80);
-      text(platform.status, "Platform status");
+      localizedText(platform.name, "Platform name", 80);
+      localizedText(platform.status, "Platform status");
     }
     unique(app.platforms.map(({ id }) => id), "Platform ids");
     list(app.features, `${app.id}.features`);
     for (const feature of app.features) {
       object(feature, "Feature");
-      text(feature.title, "Feature title", 120);
-      text(feature.description, "Feature description");
+      localizedText(feature.title, "Feature title", 120);
+      localizedText(feature.description, "Feature description");
     }
   }
   unique(catalog.apps.map(({ id }) => id), "App ids");
@@ -83,18 +94,18 @@ export function validateManifest(manifest, app) {
     new Date(release.publishedAt).toISOString().replace(".000Z", "Z") === release.publishedAt,
   "Release publishedAt must be a valid UTC timestamp, such as 2026-09-22T12:00:00Z.");
   list(release.notes, "Release notes");
-  release.notes.forEach((note) => text(note, "Release note"));
+  release.notes.forEach((note) => localizedText(note, "Release note"));
   list(release.assets, "Release assets");
   for (const asset of release.assets) {
     object(asset, "Asset");
-    text(asset.name, "Asset name", 120);
+    localizedText(asset.name, "Asset name", 120);
     requireValue(app.platforms.some(({ id }) => id === asset.platform), "Asset platform must be listed in the app catalog.");
     text(asset.architecture, "Asset architecture", 80);
     requireValue(typeof asset.file === "string" && asset.file.length <= 200 && PACKAGE.test(asset.file) && !asset.file.includes(".."), "Asset file must be a package basename, not a path.");
     requireValue(Number.isSafeInteger(asset.bytes) && asset.bytes > 0, "Asset bytes must be a positive safe integer.");
     requireValue(typeof asset.sha256 === "string" && /^[a-f0-9]{64}$/.test(asset.sha256), "Asset sha256 must be 64 lowercase hexadecimal characters.");
     requireValue(["unsigned", "ad-hoc", "self-signed", "signed"].includes(asset.signing), "Asset signing must be unsigned, ad-hoc, self-signed, or signed.");
-    text(asset.installNotes, "Asset installation notes");
+    localizedText(asset.installNotes, "Asset installation notes");
     if (asset.url !== undefined) {
       text(asset.url, "Asset URL", 2048);
       const url = new URL(asset.url);

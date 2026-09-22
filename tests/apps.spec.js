@@ -12,11 +12,12 @@ async function mockRelease(page, manifest = releaseFixture()) {
 test("homepage links to catalog, BPlayer details, and unpublished downloads", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  await mockRelease(page, { schemaVersion: 1, appId: "bplayer", release: null });
   await page.goto("/");
   await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Apps", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Small ideas. Real software.");
   await page.getByRole("link", { name: "Explore app" }).click();
-  await expect(page).toHaveURL(/\/apps\/app\/\?id=bplayer$/);
+  await expect(page).toHaveURL(/\/apps\/app\/\?id=bplayer&lang=en$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("BPlayer");
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "One library, shaped to the screen." })).toBeVisible();
@@ -26,7 +27,7 @@ test("homepage links to catalog, BPlayer details, and unpublished downloads", as
   await page.getByRole("link", { name: "View releases & downloads" }).click();
   await expect(page.getByRole("heading", { name: "Not released here. Yet.", exact: true })).toBeVisible();
   await expect(page.locator(".download-link")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "About BPlayer" })).toHaveAttribute("href", "/apps/app/?id=bplayer");
+  await expect(page.getByRole("link", { name: "About BPlayer" })).toHaveAttribute("href", "/apps/app/?id=bplayer&lang=en");
   expect(errors).toEqual([]);
 });
 

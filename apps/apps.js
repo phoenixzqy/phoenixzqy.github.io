@@ -1,9 +1,71 @@
 import { validateCatalog, validateManifest, validAppId, assetHref } from "./schema.js";
+import { chooseLocale, localizeData, translate } from "./locales.js";
 
 const content = document.querySelector("#app-content");
 const pageType = document.body.dataset.page;
-const detailHref = (id) => `/apps/app/?id=${encodeURIComponent(id)}`;
-const releasesHref = (id) => `/apps/releases/?id=${encodeURIComponent(id)}`;
+const localeSelect = document.querySelector("#locale-select");
+const preferenceKey = "apps.locale";
+let savedLocale;
+try {
+  savedLocale = localStorage.getItem(preferenceKey);
+} catch (error) {
+  console.warn("Language preference storage is unavailable; using the URL or browser language.", error);
+}
+let locale = chooseLocale({ search: location.search, saved: savedLocale, languages: navigator.languages });
+const state = { catalog: null, app: null, manifest: undefined, error: null };
+let selectedPlatform = "all";
+const t = (key, values) => translate(locale, key, values);
+function appsHref(path = "/apps/", id) {
+  const params = new URLSearchParams();
+  if (id) params.set("id", id);
+  params.set("lang", locale);
+  return `${path}?${params}`;
+}
+const detailHref = (id) => appsHref("/apps/app/", id);
+const releasesHref = (id) => appsHref("/apps/releases/", id);
+
+class PageError extends Error {
+  constructor(key, values = {}, cause) {
+    super(key, { cause });
+    this.key = key;
+    this.values = values;
+  }
+}
+
+function updateShell() {
+  document.documentElement.lang = locale;
+  localeSelect.value = locale;
+  document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-label]").forEach((node) => { node.setAttribute("aria-label", t(node.dataset.i18nLabel)); });
+  document.querySelectorAll("[data-apps-link]").forEach((node) => { node.href = appsHref(); });
+}
+
+function updateMetadata(app) {
+  const titles = { catalog: "titleCatalog", detail: "titleDetail", releases: "titleReleases" };
+  const descriptions = { catalog: "descriptionCatalog", detail: "descriptionDetail", releases: "descriptionReleases" };
+  let title = t(titles[pageType]);
+  let description = t(descriptions[pageType]);
+  if (app) {
+    title = t(pageType === "detail" ? "titleApp" : "titleAppReleases", { name: app.name });
+    description = pageType === "detail" ? app.summary : t("descriptionAppReleases", { name: app.name });
+    const crumb = document.querySelector("#breadcrumb-current, #breadcrumb-app");
+    if (crumb) {
+      crumb.textContent = app.name.toLocaleUpperCase(locale);
+      if (crumb.tagName === "A") crumb.href = detailHref(app.id);
+    }
+  }
+  document.title = state.error ? t("titleError", { title }) : title;
+  document.querySelector('meta[name="description"]').content = state.error ? t("errorHeading") : description;
+  for (const [property, value] of [["og:title", document.title], ["og:description", document.querySelector('meta[name="description"]').content]]) {
+    let meta = document.querySelector(`meta[property="${property}"]`);
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("property", property);
+      document.head.append(meta);
+    }
+    meta.content = value;
+  }
+}
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -39,7 +101,7 @@ function appArt(app, large = false) {
     bar.style.setProperty("--bar-height", `${20 + ((i * 37 + 19) % 75)}%`);
     bars.append(bar);
   }
-  art.append(symbol, bars, paragraph("PURPOSE-BUILT / INDEPENDENT SOFTWARE", "mono"));
+  art.append(symbol, bars, paragraph(t("artwork"), "mono"));
   return art;
 }
 function notice(title, text) {
@@ -48,26 +110,37 @@ function notice(title, text) {
   return block;
 }
 async function fetchJSON(url) {
-  const response = await fetch(url, { cache: "no-cache" });
-  if (!response.ok) throw new Error(`Could not load ${url} (HTTP ${response.status}).`);
+  let response;
+  try {
+    response = await fetch(url, { cache: "no-cache" });
+  } catch (error) {
+    throw new PageError("networkError", {}, error);
+  }
+  if (!response.ok) throw new PageError("httpError", { path: url, status: response.status });
   return response.json();
 }
 function showError(error) {
-  console.error("App page could not be loaded:", error);
   const block = element("section", "app-error");
   block.setAttribute("role", "alert");
-  block.append(element("h1", "", "This page couldn't be loaded."), paragraph(error.message));
+  block.append(element("h1", "", t("errorHeading")), paragraph(error instanceof PageError ? t(error.key, error.values) : t("metadataError")));
+  if (!(error instanceof PageError)) {
+    const details = element("details", "error-details");
+    const diagnostic = paragraph(error.message);
+    diagnostic.lang = "en";
+    details.append(element("summary", "", t("technicalDetails")), diagnostic);
+    block.append(details);
+  }
   const actions = element("div", "app-actions");
-  const retry = element("button", "button button-primary", "Try again");
+  const retry = element("button", "button button-primary", t("retry"));
   retry.type = "button";
   retry.addEventListener("click", () => window.location.reload());
-  actions.append(retry, link("All apps", "/apps/", "button button-secondary"));
+  actions.append(retry, link(t("allApps"), appsHref(), "button button-secondary"));
   block.append(actions);
   content.replaceChildren(block);
 }
 function renderCatalog(catalog) {
-  const hero = heading("THE APP COLLECTION", "Small ideas. Real software.", "Tools made for the way we listen, create, and work. Get to know each app, then find its published builds.");
-  const count = paragraph(`${String(catalog.apps.length).padStart(2, "0")} APP${catalog.apps.length === 1 ? "" : "S"} / EXPLORE THE COLLECTION`, "collection-count mono");
+  const hero = heading(t("collection"), t("catalogHeading"), t("catalogLead"));
+  const count = paragraph(t("collectionCount", { count: String(catalog.apps.length).padStart(2, "0"), unit: t(catalog.apps.length === 1 ? "appUnit" : "appsUnit") }), "collection-count mono");
   const grid = element("div", "app-catalog");
   for (const app of catalog.apps) {
     const card = element("article", "catalog-card");
@@ -78,30 +151,27 @@ function renderCatalog(catalog) {
     title.append(link(app.name, detailHref(app.id), "app-title-link"));
     body.append(title, paragraph(app.tagline, "app-tagline"), paragraph(app.summary, "catalog-summary"), tags(app));
     const actions = element("div", "app-actions");
-    actions.append(link("Explore app ↗", detailHref(app.id), "button button-primary"), link("Releases ↓", releasesHref(app.id)));
+    actions.append(link(t("explore"), detailHref(app.id), "button button-primary"), link(t("releases"), releasesHref(app.id)));
     body.append(actions);
     card.append(top, appArt(app), body);
     grid.append(card);
   }
-  content.replaceChildren(hero, count, grid, notice("About these releases", "This collection shares app introductions and approved build packages. Platform support and installation requirements vary by release; read the package notes before downloading."));
+  content.replaceChildren(hero, count, grid, notice(t("aboutReleases"), t("aboutReleasesText")));
 }
 function renderDetail(app) {
-  document.title = `${app.name} | Apps by Qiyu Zhao`;
-  document.querySelector('meta[name="description"]').content = app.summary;
-  document.querySelector("#breadcrumb-current").textContent = app.name.toUpperCase();
   const hero = element("section", "app-detail-hero");
   const intro = heading(`${app.category} / ${app.stage.toUpperCase()}`, app.name, app.tagline);
   intro.append(paragraph(app.summary, "app-summary"), tags(app));
   const actions = element("div", "app-actions");
-  actions.append(link("View releases & downloads ↓", releasesHref(app.id), "button button-primary"), link("All apps", "/apps/"));
+  actions.append(link(t("viewReleases"), releasesHref(app.id), "button button-primary"), link(t("allApps"), appsHref()));
   intro.append(actions);
   hero.append(intro, appArt(app, true));
   const story = element("section", "app-story");
-  story.append(element("h2", "", "A closer look."));
+  story.append(element("h2", "", t("closerLook")));
   app.description.forEach((text) => story.append(paragraph(text)));
   const gallery = screenshotSection(app);
   const featureSection = element("section", "app-section");
-  featureSection.append(paragraph("WHAT'S INSIDE", "eyebrow section-index"), element("h2", "", "Thoughtful by design."));
+  featureSection.append(paragraph(t("inside"), "eyebrow section-index"), element("h2", "", t("featuresHeading")));
   const features = element("div", "feature-grid");
   app.features.forEach((feature, index) => {
     const card = element("article", "feature-card");
@@ -111,19 +181,19 @@ function renderDetail(app) {
   featureSection.append(features);
   const platforms = platformSection(app);
   const install = element("section", "app-section");
-  install.append(paragraph("BEFORE YOU START", "eyebrow section-index"), element("h2", "", "A little context."));
+  install.append(paragraph(t("beforeStart"), "eyebrow section-index"), element("h2", "", t("context")));
   const steps = element("ol", "installation-list");
   app.installation.forEach((text) => steps.append(element("li", "", text)));
   install.append(steps);
   content.replaceChildren(hero, story);
   if (gallery) content.append(gallery);
-  content.append(featureSection, platforms, install, notice("Use responsibly", app.notice));
+  content.append(featureSection, platforms, install, notice(t("responsible"), app.notice));
 }
 function screenshotSection(app) {
   if (!app.screenshots?.length) return null;
   const section = element("section", "app-section app-gallery");
-  section.append(paragraph("IN THE APP", "eyebrow section-index"), element("h2", "", "One library, shaped to the screen."));
-  const intro = paragraph("The same listening context adapts from a focused compact window to a persistent desktop player—without hiding the queue, chapters, or primary playback controls.", "gallery-intro");
+  section.append(paragraph(t("inApp"), "eyebrow section-index"), element("h2", "", t("galleryHeading")));
+  const intro = paragraph(t("galleryIntro"), "gallery-intro");
   const grid = element("div", "screenshot-grid");
   app.screenshots.forEach((screenshot, index) => {
     const figure = element("figure", `screenshot-card${index === 0 ? " screenshot-wide" : ""}`);
@@ -142,7 +212,7 @@ function screenshotSection(app) {
 }
 function platformSection(app) {
   const section = element("section", "app-section");
-  section.append(paragraph("PLATFORMS", "eyebrow section-index"), element("h2", "", "Know your build."));
+  section.append(paragraph(t("platforms"), "eyebrow section-index"), element("h2", "", t("platformHeading")));
   const grid = element("div", "platform-grid");
   app.platforms.forEach((platform) => {
     const card = element("article", "platform-card");
@@ -153,9 +223,10 @@ function platformSection(app) {
   return section;
 }
 function formatBytes(bytes) {
+  const number = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   return bytes < 1024 * 1024
-    ? `${(bytes / 1024).toFixed(1)} KiB`
-    : `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+    ? `${number.format(bytes / 1024)} KiB`
+    : `${number.format(bytes / (1024 * 1024))} MiB`;
 }
 function packageCard(app, asset) {
   const card = element("article", "package-card");
@@ -163,55 +234,46 @@ function packageCard(app, asset) {
   const info = element("div", "package-info");
   info.append(paragraph(`${platform.name.toUpperCase()} / ${asset.architecture}`, "mono package-platform"), element("h3", "", asset.name));
   const meta = element("div", "tags");
-  const signingLabel = asset.signing === "signed"
-    ? "Signed (publisher-reported)"
-    : asset.signing === "self-signed"
-      ? "Self-signed development build"
-      : asset.signing === "ad-hoc"
-        ? "Ad-hoc signed development build"
-        : "Unsigned development build";
+  const signingLabel = t({ signed: "signed", "self-signed": "selfSigned", "ad-hoc": "adHoc", unsigned: "unsigned" }[asset.signing]);
   meta.append(element("span", "", formatBytes(asset.bytes)), element("span", "", asset.file.split(".").at(-1).toUpperCase()), element("span", `signing signing-${asset.signing}`, signingLabel));
   info.append(meta, paragraph(asset.installNotes, "package-notes"), paragraph(asset.file, "package-filename mono"));
-  const download = link("Download package ↓", assetHref(app.id, asset), "button button-primary download-link");
+  const download = link(t("download"), assetHref(app.id, asset), "button button-primary download-link");
   if (!asset.url) download.download = asset.file;
   const checksum = element("details", "checksum");
-  checksum.append(element("summary", "", "SHA-256 checksum"));
-  checksum.append(element("code", "", asset.sha256), paragraph("Compare this value with a locally computed SHA-256 hash. A matching checksum detects file changes; it does not establish publisher identity or replace signature verification."));
+  checksum.append(element("summary", "", t("checksum")));
+  checksum.append(element("code", "", asset.sha256), paragraph(t("checksumHelp")));
   card.append(info, download, checksum);
   return card;
 }
 function renderReleases(app, manifest) {
-  document.title = `${app.name} downloads | Qiyu Zhao`;
-  const crumb = document.querySelector("#breadcrumb-app");
-  crumb.textContent = app.name.toUpperCase();
-  crumb.href = detailHref(app.id);
-  const hero = heading("RELEASE CHANNEL", `${app.name} downloads`, "The latest published build, with the details you need before you install.");
-  hero.append(link(`About ${app.name} ↗`, detailHref(app.id)));
+  const hero = heading(t("releaseChannel"), t("downloadsHeading", { name: app.name }), t("downloadsLead"));
+  hero.append(link(t("aboutApp", { name: app.name }), detailHref(app.id)));
   content.replaceChildren(hero);
   const release = manifest.release;
   if (release === null) {
     const empty = element("section", "release-empty");
-    empty.append(paragraph("AWAITING FIRST PUBLIC BUILD", "mono"), element("h2", "", "Not released here. Yet."), paragraph("No public release has been uploaded for this app. Download links will appear when a build is published. A development version is not a downloadable release."));
-    content.append(empty, platformSection(app), notice("Use responsibly", app.notice));
+    empty.append(paragraph(t("awaiting"), "mono"), element("h2", "", t("emptyHeading")), paragraph(t("emptyText")));
+    content.append(empty, platformSection(app), notice(t("responsible"), app.notice));
     return;
   }
   const summary = element("section", "release-summary");
-  summary.append(paragraph(release.channel.toUpperCase(), "eyebrow section-index"), element("h2", "", `Version ${release.version}`));
-  const published = element("time", "mono", `PUBLISHED ${release.publishedAt.slice(0, 10)} UTC`);
+  summary.append(paragraph(t(release.channel), "eyebrow section-index"), element("h2", "", t("version", { version: release.version })));
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(release.publishedAt));
+  const published = element("time", "mono", t("published", { date }));
   published.dateTime = release.publishedAt;
   summary.append(published);
   const notes = element("ul", "release-notes");
   release.notes.forEach((note) => notes.append(element("li", "", note)));
   summary.append(notes);
-  content.append(summary, notice("Before installing", "Signing status is supplied by the publisher. Unsigned, ad-hoc, and self-signed packages are development builds, not publicly trusted software. Follow your device and organization policies; do not disable security protections to install an app."));
+  content.append(summary, notice(t("beforeInstall"), t("signingHelp")));
   const downloads = element("section", "app-section");
-  downloads.append(element("h2", "", "Choose your package."));
+  downloads.append(element("h2", "", t("choosePackage")));
   const filters = element("div", "platform-filter");
-  const label = element("label", "mono", "PLATFORM");
+  const label = element("label", "mono", t("platform"));
   label.htmlFor = "platform-filter";
   const select = element("select");
   select.id = "platform-filter";
-  const all = element("option", "", "All platforms");
+  const all = element("option", "", t("allPlatforms"));
   all.value = "all";
   select.append(all);
   app.platforms.filter((platform) => release.assets.some((asset) => asset.platform === platform.id)).forEach((platform) => {
@@ -226,35 +288,69 @@ function renderReleases(app, manifest) {
   function renderPackages() {
     const assets = release.assets.filter((asset) => select.value === "all" || select.value === asset.platform);
     packages.replaceChildren(...assets.map((asset) => packageCard(app, asset)));
-    count.textContent = `${assets.length} PACKAGE${assets.length === 1 ? "" : "S"}`;
+    count.textContent = t("packageCount", { count: assets.length, unit: t(assets.length === 1 ? "packageUnit" : "packagesUnit") });
   }
-  select.addEventListener("change", renderPackages);
+  if ([...select.options].some((option) => option.value === selectedPlatform)) select.value = selectedPlatform;
+  select.addEventListener("change", () => {
+    selectedPlatform = select.value;
+    renderPackages();
+  });
   renderPackages();
   downloads.append(filters, packages);
-  content.append(downloads, notice("Use responsibly", app.notice));
+  content.append(downloads, notice(t("responsible"), app.notice));
+}
+
+function render() {
+  const app = state.app ? localizeData(state.app, locale) : null;
+  updateMetadata(app);
+  if (state.error) return showError(state.error);
+  if (!state.catalog || (pageType === "releases" && state.manifest === undefined)) {
+    content.replaceChildren(paragraph(t({ catalog: "loadingCatalog", detail: "loadingDetail", releases: "loadingReleases" }[pageType]), "load-status"));
+    content.firstElementChild.setAttribute("role", "status");
+    return;
+  }
+  if (pageType === "catalog") renderCatalog(localizeData(state.catalog, locale));
+  else if (pageType === "detail") renderDetail(app);
+  else renderReleases(app, localizeData(state.manifest, locale));
+  if (locale !== "en") content.append(paragraph(t("translationNote"), "translation-note"));
 }
 
 async function load() {
   try {
-    const catalog = validateCatalog(await fetchJSON("/apps/catalog.json"));
-    if (pageType === "catalog") {
-      renderCatalog(catalog);
-      return;
-    }
-    const id = new URLSearchParams(window.location.search).get("id");
-    if (!validAppId(id)) throw new Error("Choose an app from the collection. This address has a missing or invalid app id.");
-    const app = catalog.apps.find((candidate) => candidate.id === id);
-    if (!app) throw new Error(`App "${id}" was not found in the collection.`);
-    if (pageType === "detail") renderDetail(app);
-    else {
-      const manifest = validateManifest(await fetchJSON(`/releases/${app.id}/latest/manifest.json`), app);
-      renderReleases(app, manifest);
+    state.catalog = validateCatalog(await fetchJSON("/apps/catalog.json"));
+    if (pageType !== "catalog") {
+      const id = new URLSearchParams(window.location.search).get("id");
+      if (!validAppId(id)) throw new PageError("invalidApp");
+      state.app = state.catalog.apps.find((candidate) => candidate.id === id);
+      if (!state.app) throw new PageError("unknownApp", { id });
+      updateMetadata(localizeData(state.app, locale));
+      if (pageType === "releases") {
+        state.manifest = validateManifest(await fetchJSON(`/releases/${state.app.id}/latest/manifest.json`), state.app);
+      }
     }
   } catch (error) {
-    showError(error);
+    console.error("App page could not be loaded:", error);
+    state.error = error;
   } finally {
     content.setAttribute("aria-busy", "false");
+    render();
   }
 }
 
+localeSelect.addEventListener("change", () => {
+  locale = localeSelect.value;
+  try {
+    localStorage.setItem(preferenceKey, locale);
+  } catch (error) {
+    console.warn("Language preference could not be saved; the URL still records your selection.", error);
+  }
+  const url = new URL(location.href);
+  url.searchParams.set("lang", locale);
+  history.replaceState(null, "", url);
+  updateShell();
+  render();
+});
+document.querySelector(".locale-control").hidden = false;
+updateShell();
+render();
 load();

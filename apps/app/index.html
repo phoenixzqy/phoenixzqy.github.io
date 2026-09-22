@@ -12,16 +12,17 @@
   <script type="module" src="/apps/apps.js"></script>
 </head>
 <body class="apps-site" data-page="detail">
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Qiyu Zhao, home"><span class="brand-mark" aria-hidden="true">qz<span>_</span></span><span class="brand-label">QIYU ZHAO</span></a>
-    <nav aria-label="Main navigation"><a href="/">Résumé</a><a href="/apps/" aria-current="location">Apps</a><a href="/#contact">Contact</a></nav>
+    <a class="brand" href="/" aria-label="Qiyu Zhao, home" data-i18n-label="homeLabel"><span class="brand-mark" aria-hidden="true">qz<span>_</span></span><span class="brand-label">QIYU ZHAO</span></a>
+    <nav aria-label="Main navigation" data-i18n-label="navigation"><a href="/" data-i18n="resume">Résumé</a><a href="/apps/" aria-current="location" data-apps-link data-i18n="apps">Apps</a><a href="/#contact" data-i18n="contact">Contact</a></nav>
+    <div class="locale-control" hidden><label class="sr-only" for="locale-select" data-i18n="language">Language</label><select id="locale-select"><option value="en" lang="en">English</option><option value="zh-CN" lang="zh-CN">简体中文</option></select></div>
   </header>
   <main id="main" class="section-shell app-main">
-    <nav class="breadcrumbs mono" aria-label="Breadcrumb"><a href="/">HOME</a><span aria-hidden="true">/</span><a href="/apps/">APPS</a><span aria-hidden="true">/</span><span id="breadcrumb-current" aria-current="page">APP DETAILS</span></nav>
+    <nav class="breadcrumbs mono" aria-label="Breadcrumb" data-i18n-label="breadcrumb"><a href="/" data-i18n="home">HOME</a><span aria-hidden="true">/</span><a href="/apps/" data-apps-link data-i18n="apps">APPS</a><span aria-hidden="true">/</span><span id="breadcrumb-current" aria-current="page" data-i18n="appDetails">APP DETAILS</span></nav>
     <div id="app-content" aria-busy="true"><p class="load-status" role="status">Loading app details…</p></div>
-    <noscript><div class="notice"><h1>App details</h1><p>Enable JavaScript to load app information. <a href="/apps/">Return to the app collection.</a></p></div></noscript>
+    <noscript><div class="notice"><h1>App details</h1><p>Enable JavaScript to load app information. <a href="/apps/">Return to the app collection.</a></p><p lang="zh-CN">请启用 JavaScript，以查看应用详情和切换语言。<a href="/apps/">返回应用列表。</a></p></div></noscript>
   </main>
-  <footer class="site-footer section-shell"><a class="brand-mark" href="/" aria-label="Back to résumé">qz<span>_</span></a><p>Independent apps. Purpose-built.</p><a class="text-link" href="/apps/">All apps <span aria-hidden="true">↗</span></a></footer>
+  <footer class="site-footer section-shell"><a class="brand-mark" href="/" aria-label="Back to résumé" data-i18n-label="backResume">qz<span>_</span></a><p data-i18n="footer">Independent apps. Purpose-built.</p><a class="text-link" href="/apps/" data-apps-link><span data-i18n="allApps">All apps</span> <span aria-hidden="true">↗</span></a></footer>
 </body>
 </html>
