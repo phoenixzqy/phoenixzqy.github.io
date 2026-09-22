@@ -1,5 +1,71 @@
 {
   "schemaVersion": 1,
   "appId": "bplayer",
-  "release": null
+  "release": {
+    "version": "0.7.1+8",
+    "channel": "preview",
+    "publishedAt": "2026-09-22T04:17:53Z",
+    "notes": [
+      "Cross-platform development packages built from one pinned BPlayer source revision.",
+      "Release assets are mirrored publicly while the application source remains private.",
+      "All packages are unsigned development builds; review each package note before use."
+    ],
+    "assets": [
+      {
+        "name": "Android APK",
+        "platform": "android",
+        "architecture": "universal",
+        "file": "BPlayer-0.7.1+8-android-unsigned.apk",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-android-unsigned.apk",
+        "bytes": 107967225,
+        "sha256": "03b061d2240bbfc8776116006912f5e75f30f93fae9de8bccbcb9e2ec8711328",
+        "signing": "unsigned",
+        "installNotes": "Unsigned development APK. It must be signed before Android will install it."
+      },
+      {
+        "name": "Android App Bundle",
+        "platform": "android",
+        "architecture": "universal",
+        "file": "BPlayer-0.7.1+8-android-unsigned.aab",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-android-unsigned.aab",
+        "bytes": 82741002,
+        "sha256": "93418cc0e51bdcd18898894843c3e2daeba629f7ecd91508ce5a6bd7845e00d0",
+        "signing": "unsigned",
+        "installNotes": "Unsigned publishing bundle for authorized testing or store preparation; it is not directly installable."
+      },
+      {
+        "name": "iOS application archive",
+        "platform": "ios",
+        "architecture": "arm64",
+        "file": "BPlayer-0.7.1+8-ios-unsigned.ipa",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-ios-unsigned.ipa",
+        "bytes": 17349340,
+        "sha256": "d98765a2456d022698de1254c37fa3b272cb84f20691590263473a93c095c7bb",
+        "signing": "unsigned",
+        "installNotes": "Requires authorized signing and provisioning before installation on an iPhone or iPad."
+      },
+      {
+        "name": "macOS application",
+        "platform": "macos",
+        "architecture": "universal",
+        "file": "BPlayer-0.7.1+8-macos-unsigned.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-macos-unsigned.zip",
+        "bytes": 40771879,
+        "sha256": "bac5d89b08a29255f6114d761c641bdd26465fb9fa45ba68dca0ce3c648083b1",
+        "signing": "unsigned",
+        "installNotes": "Unsigned and not notarized. Follow macOS and organization security policy before use."
+      },
+      {
+        "name": "Windows application",
+        "platform": "windows",
+        "architecture": "x64",
+        "file": "BPlayer-0.7.1+8-windows-x64-unsigned.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.1+8/BPlayer-0.7.1+8-windows-x64-unsigned.zip",
+        "bytes": 35704539,
+        "sha256": "ef130c21c550b43192afb938f03e452ead951c9b72ff00af069ebaa98d1dab7a",
+        "signing": "unsigned",
+        "installNotes": "Extract the complete ZIP and keep every file together. The executable is not Authenticode-signed."
+      }
+    ]
+  }
 }
