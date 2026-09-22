@@ -36,6 +36,11 @@
 .app-story h2, .app-section > h2 { font-size: 35px; letter-spacing: -1px; margin-bottom: 24px; }
 .app-story > p { max-width: 810px; color: var(--muted); font-size: 15px; margin-bottom: 16px; }
 .app-section { margin-top: 60px; }
+.gallery-intro { max-width: 760px; color: var(--muted); font-size: 14px; margin: -8px 0 26px; }
+.screenshot-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(230px, .72fr); gap: 18px; align-items: start; }
+.screenshot-card { margin: 0; min-width: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #11160f; }
+.screenshot-card img { display: block; width: 100%; height: auto; background: #e9edf3; }
+.screenshot-card figcaption { padding: 13px 15px; border-top: 1px solid var(--line); color: #b5c1a8; font-size: 8px; letter-spacing: .7px; }
 .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .feature-card { padding: 25px; border: 1px solid var(--line); border-radius: 6px; background: #14191188; }
 .feature-number { color: var(--accent); margin-bottom: 25px; }
@@ -103,6 +108,8 @@
   .app-story { margin-top: 38px; padding-top: 30px; }
   .app-story h2, .app-section > h2 { font-size: 29px; }
   .app-section { margin-top: 42px; }
+  .screenshot-grid { grid-template-columns: 1fr; }
+  .screenshot-card:not(.screenshot-wide) { max-width: 390px; }
   .feature-grid, .platform-grid { grid-template-columns: 1fr; }
   .feature-card { padding: 23px; }
   .notice { padding: 22px; }

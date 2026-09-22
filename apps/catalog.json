@@ -13,6 +13,22 @@
         "BPlayer is a Flutter-based prototype. Windows is the primary verification host; Android, iOS, and macOS are development targets, not certified releases."
       ],
       "stage": "Development preview",
+      "screenshots": [
+        {
+          "src": "/apps/media/bplayer/player-desktop.png",
+          "alt": "BPlayer expanded desktop layout showing an album chapter list beside the now-playing controls.",
+          "caption": "Expanded player / 1280 × 800 logical pixels",
+          "width": 2560,
+          "height": 1600
+        },
+        {
+          "src": "/apps/media/bplayer/player-mobile.png",
+          "alt": "BPlayer compact mobile-shaped layout showing the same album, chapter list, mini player, and bottom navigation.",
+          "caption": "Compact player / 390 × 844 logical pixels",
+          "width": 780,
+          "height": 1688
+        }
+      ],
       "platforms": [
         { "id": "windows", "name": "Windows", "status": "Primary preview platform. Requires the complete application bundle and, where needed, the Microsoft Visual C++ x64 runtime." },
         { "id": "android", "name": "Android", "status": "Experimental target. Native background audio, headset, and vehicle integration still need physical-device validation." },

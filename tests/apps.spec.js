@@ -19,6 +19,10 @@ test("homepage links to catalog, BPlayer details, and unpublished downloads", as
   await expect(page).toHaveURL(/\/apps\/app\/\?id=bplayer$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("BPlayer");
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "One library, shaped to the screen." })).toBeVisible();
+  await expect(page.locator(".screenshot-card img")).toHaveCount(2);
+  await expect(page.locator(".screenshot-card img").first()).toHaveJSProperty("naturalWidth", 2560);
+  await expect(page.locator(".screenshot-card img").last()).toHaveJSProperty("naturalWidth", 780);
   await page.getByRole("link", { name: "View releases & downloads" }).click();
   await expect(page.getByRole("heading", { name: "Not released here. Yet.", exact: true })).toBeVisible();
   await expect(page.locator(".download-link")).toHaveCount(0);
@@ -57,7 +61,7 @@ test("published releases filter platforms, expose checksums, and download exact 
 });
 
 test("multiple apps reuse detail and download pages without mixing release metadata", async ({ page }) => {
-  const second = { ...structuredClone(catalog.apps[0]), id: "another-player", name: "Another Player", tagline: "A second test app." };
+  const second = { ...structuredClone(catalog.apps[0]), id: "another-player", name: "Another Player", tagline: "A second test app.", screenshots: undefined };
   await page.route("**/apps/catalog.json", (route) => route.fulfill({ json: { schemaVersion: 1, apps: [...catalog.apps, second] } }));
   await page.route("**/releases/another-player/latest/manifest.json", (route) =>
     route.fulfill({ json: { schemaVersion: 1, appId: "another-player", release: null } }));

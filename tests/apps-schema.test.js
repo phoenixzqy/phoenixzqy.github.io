@@ -10,10 +10,17 @@ import { catalog, releaseFixture, packageBytes } from "./apps-fixtures.js";
 const app = catalog.apps[0];
 
 test("catalog supports additional apps without new page implementations", () => {
-  const otherApp = { ...structuredClone(app), id: "second-app", name: "Second app" };
+  const otherApp = { ...structuredClone(app), id: "second-app", name: "Second app", screenshots: undefined };
   assert.equal(validateCatalog({ schemaVersion: 1, apps: [app, otherApp] }).apps.length, 2);
   assert.throws(() => validateCatalog({ schemaVersion: 1, apps: [app, app] }), /unique/);
   assert.throws(() => validateCatalog({ schemaVersion: 2, apps: [app] }), /schemaVersion/);
+});
+
+test("catalog accepts app-owned screenshots and rejects unsafe media paths", () => {
+  const fixture = structuredClone(catalog);
+  assert.equal(validateCatalog(fixture).apps[0].screenshots.length, 2);
+  fixture.apps[0].screenshots[0].src = "/apps/media/another-app/private.png";
+  assert.throws(() => validateCatalog(fixture), /app-owned image/);
 });
 
 test("unpublished releases are explicit, not missing metadata", () => {

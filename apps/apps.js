@@ -99,6 +99,7 @@ function renderDetail(app) {
   const story = element("section", "app-story");
   story.append(element("h2", "", "A closer look."));
   app.description.forEach((text) => story.append(paragraph(text)));
+  const gallery = screenshotSection(app);
   const featureSection = element("section", "app-section");
   featureSection.append(paragraph("WHAT'S INSIDE", "eyebrow section-index"), element("h2", "", "Thoughtful by design."));
   const features = element("div", "feature-grid");
@@ -114,7 +115,30 @@ function renderDetail(app) {
   const steps = element("ol", "installation-list");
   app.installation.forEach((text) => steps.append(element("li", "", text)));
   install.append(steps);
-  content.replaceChildren(hero, story, featureSection, platforms, install, notice("Use responsibly", app.notice));
+  content.replaceChildren(hero, story);
+  if (gallery) content.append(gallery);
+  content.append(featureSection, platforms, install, notice("Use responsibly", app.notice));
+}
+function screenshotSection(app) {
+  if (!app.screenshots?.length) return null;
+  const section = element("section", "app-section app-gallery");
+  section.append(paragraph("IN THE APP", "eyebrow section-index"), element("h2", "", "One library, shaped to the screen."));
+  const intro = paragraph("The same listening context adapts from a focused compact window to a persistent desktop player—without hiding the queue, chapters, or primary playback controls.", "gallery-intro");
+  const grid = element("div", "screenshot-grid");
+  app.screenshots.forEach((screenshot, index) => {
+    const figure = element("figure", `screenshot-card${index === 0 ? " screenshot-wide" : ""}`);
+    const image = element("img");
+    image.src = screenshot.src;
+    image.alt = screenshot.alt;
+    image.width = screenshot.width;
+    image.height = screenshot.height;
+    image.loading = index === 0 ? "eager" : "lazy";
+    image.decoding = "async";
+    figure.append(image, element("figcaption", "mono", screenshot.caption));
+    grid.append(figure);
+  });
+  section.append(intro, grid);
+  return section;
 }
 function platformSection(app) {
   const section = element("section", "app-section");

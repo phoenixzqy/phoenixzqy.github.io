@@ -2,6 +2,7 @@ export const MAX_LOCAL_BYTES = 100 * 1024 * 1024;
 const RELEASE_PREFIX = "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/";
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PACKAGE = /^[A-Za-z0-9][A-Za-z0-9._+-]*\.(?:zip|apk|aab|ipa|exe|msix|dmg|pkg|deb|rpm|AppImage)$/;
+const SCREENSHOT = /^\/apps\/media\/([a-z0-9]+(?:-[a-z0-9]+)*)\/[A-Za-z0-9][A-Za-z0-9._-]*\.(?:png|webp|avif)$/;
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
@@ -32,6 +33,21 @@ export function validateCatalog(catalog) {
     for (const key of ["description", "installation"]) {
       list(app[key], `${app.id}.${key}`);
       app[key].forEach((item) => text(item, `${app.id}.${key} item`));
+    }
+    if (app.screenshots !== undefined) {
+      list(app.screenshots, `${app.id}.screenshots`, 1, 6);
+      for (const screenshot of app.screenshots) {
+        object(screenshot, "Screenshot");
+        const match = typeof screenshot.src === "string" && screenshot.src.match(SCREENSHOT);
+        requireValue(match && match[1] === app.id && !screenshot.src.includes(".."),
+          "Screenshot src must be an app-owned image under /apps/media/<app-id>/.");
+        text(screenshot.alt, "Screenshot alt text", 240);
+        text(screenshot.caption, "Screenshot caption", 160);
+        requireValue(Number.isSafeInteger(screenshot.width) && screenshot.width > 0 &&
+          Number.isSafeInteger(screenshot.height) && screenshot.height > 0,
+        "Screenshot dimensions must be positive integers.");
+      }
+      unique(app.screenshots.map(({ src }) => src), "Screenshot sources");
     }
     list(app.platforms, `${app.id}.platforms`);
     for (const platform of app.platforms) {
