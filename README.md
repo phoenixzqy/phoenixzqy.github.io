@@ -11,6 +11,23 @@ GitHub Pages is configured to publish the repository root on `master`.
 Push the finished site to that branch to publish. `.nojekyll` keeps the site
 as plain static files.
 
+## Retired game PWA
+
+The former game manifest, game page, icons, and registration code have been
+removed. The current site does not install a PWA. Keep `pwa-sw.js` at its old
+root URL as an **uninstall worker**, not an active offline feature: returning
+browsers can update an already-installed worker even if their game page is
+cached. On activation it removes only `noname-pwa-*`, `noname-static-*`, and
+`noname-dynamic-*` caches, unregisters itself, and reloads controlled tabs onto
+the network site. The old `/nonamekill.html` launch URL is sent to the résumé;
+other open page URLs are preserved. Other apps' caches are left alone.
+
+Cleanup requires the browser to come online and update the old worker. A
+website cannot uninstall an existing OS/home-screen app shortcut; remove the
+old game manually through the browser/device's installed-app controls. If a
+browser still shows stale content, clear this site's stored data and reopen it.
+Clearing site data also removes other locally stored data for this origin.
+
 ## Apps and downloads
 
 The résumé navigation links to the multi-app catalog at `/apps/`. Shared detail
