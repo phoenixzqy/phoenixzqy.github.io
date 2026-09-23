@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+printf '%s\n' 'pre-push: Running the full test suite; any failure blocks this push.'
+exec npm test </dev/null

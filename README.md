@@ -126,9 +126,22 @@ schematic project illustrations, and a quiet chronological résumé underneath.
 
 ```sh
 npm ci
-npx playwright install chromium
+npx playwright install --with-deps chromium
+npm run hooks:install
 npm test
 ```
+
+Run `npm run hooks:install` once per checkout to enable the versioned
+`.githooks/pre-push` hook using repository-local Git configuration. Every push
+then runs `npm test`: app/release validation, Node.js unit tests, and the full
+desktop/mobile Playwright suite. Any failure blocks the push. Installing
+Playwright's system dependencies may require administrator privileges on Linux.
+Stop the local preview server before pushing; the browser tests start their own
+server on port 4173.
+
+The hook tests the current working tree, so commit the intended changes before
+pushing. This is a local safeguard, not server-side CI: other clones and release
+automation must enable it separately.
 
 Playwright covers desktop/mobile layouts, root routing, résumé content,
 navigation, keyboard dialog behavior, print controls, no-JavaScript rendering,
