@@ -6,6 +6,11 @@ API keys, or runtime JavaScript dependencies are required.
 
 ## Develop and publish
 
+Development and tests use Node.js 24.21.0, pinned in `.nvmrc`; `package.json`
+supports Node 24.21.0 and newer 24.x releases. With nvm, run `nvm install` and
+`nvm use` in this checkout before installing dependencies. Python 3 is also
+required for the local server.
+
 Run `npm start` (Python 3 required), then open `http://127.0.0.1:4173`.
 GitHub Pages is configured to publish the repository root on `master`.
 Push the finished site to that branch to publish. `.nojekyll` keeps the site
@@ -21,6 +26,12 @@ cached. On activation it removes only `noname-pwa-*`, `noname-static-*`, and
 `noname-dynamic-*` caches, unregisters itself, and reloads controlled tabs onto
 the network site. The old `/nonamekill.html` launch URL is sent to the résumé;
 other open page URLs are preserved. Other apps' caches are left alone.
+
+Keep `pwa-retired.html` alongside the worker. It provides a fresh-document
+redirect because WebKit can treat navigation to the same fragment URL as a
+same-document change, leaving the old document controlled. The helper restores
+the original same-origin URL, including its query and fragment, using
+`location.replace`; it never registers a worker or permits external redirects.
 
 Cleanup requires the browser to come online and update the old worker. A
 website cannot uninstall an existing OS/home-screen app shortcut; remove the
@@ -126,7 +137,7 @@ schematic project illustrations, and a quiet chronological résumé underneath.
 
 ```sh
 npm ci
-npx playwright install --with-deps chromium
+npx playwright install --with-deps chromium webkit
 npm run hooks:install
 npm test
 ```
@@ -134,8 +145,9 @@ npm test
 Run `npm run hooks:install` once per checkout to enable the versioned
 `.githooks/pre-push` hook using repository-local Git configuration. Every push
 then runs `npm test`: app/release validation, Node.js unit tests, and the full
-desktop/mobile Playwright suite. Any failure blocks the push. Installing
-Playwright's system dependencies may require administrator privileges on Linux.
+desktop/mobile Chromium and WebKit suite, plus PDF checks. Any failure blocks
+the push. Installing Playwright's system dependencies may require administrator
+privileges on Linux.
 Stop the local preview server before pushing; the browser tests start their own
 server on port 4173.
 
@@ -149,3 +161,16 @@ reduced motion, and WCAG accessibility checks using axe-core.
 App coverage also exercises multiple catalog entries, empty and populated
 releases, exact downloaded bytes, platform filtering, unsafe metadata, and
 checksum/size validation for pipeline-published packages.
+
+The `desktop` and `mobile` projects use Chromium; `webkit` and `mobile-webkit`
+use WebKit, including iPhone emulation rather than a Chromium-only phone
+viewport. Emulation does not replace physical Safari/iOS device testing.
+Run `npx playwright test --project=webkit --project=mobile-webkit` for those
+browser checks alone.
+
+The `pdf` project runs `tests/resume.pdf.spec.js` in Chromium, the Playwright
+engine that supports PDF generation. It parses actual A4 and Letter exports
+with the dev-only PDF.js dependency, checking two-page pagination, résumé content,
+page bounds, company/date/role alignment, and restoration of collapsed details.
+Generated PDFs are attached to the test results. Run
+`npx playwright test --project=pdf` for just these checks.

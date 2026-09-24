@@ -118,9 +118,9 @@ test("unpublished, invalid-app, and untranslated publisher content remain explic
   await expect(page.locator(".download-link").first()).toHaveAttribute("href", "/releases/bplayer/latest/BPlayer-1.2.3-windows-x64.zip");
 });
 
-test("Chinese pages fit mobile and retain accessible controls", async ({ page }, testInfo) => {
+test("Chinese pages fit mobile and retain accessible controls", async ({ page, isMobile }) => {
   await mockLocalizedRelease(page);
-  await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 320 : 1440, height: 900 });
+  await page.setViewportSize({ width: isMobile ? 320 : 1440, height: 900 });
   for (const path of ["/apps/?lang=zh-CN", "/apps/app/?id=bplayer&lang=zh-CN", "/apps/releases/?id=bplayer&lang=zh-CN"]) {
     await page.goto(path);
     await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");

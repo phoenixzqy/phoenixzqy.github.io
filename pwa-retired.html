@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Refreshing the website | Qiyu Zhao</title>
+</head>
+<body>
+  <h1>The old game has been removed.</h1>
+  <p id="status" role="status">Returning to your page with a fresh document.</p>
+  <a href="/">Open the résumé</a>
+  <script>
+    try {
+      const destination = new URL(decodeURIComponent(location.hash.slice(1)), location.origin);
+      if (destination.origin !== location.origin || destination.pathname === location.pathname) {
+        throw new Error("The return address must be another page on this website.");
+      }
+      location.replace(destination.href);
+    } catch (error) {
+      console.error("Could not restore the page after retiring the game worker:", error);
+      document.getElementById("status").textContent = "The return address is invalid. Use the résumé link to continue.";
+    }
+  </script>
+</body>
+</html>

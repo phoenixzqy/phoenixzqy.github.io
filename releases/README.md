@@ -91,8 +91,9 @@ After building and approving packages in the private app pipeline:
    `shasum -a 256 <file>` (macOS), or
    `Get-FileHash <file> -Algorithm SHA256` (PowerShell).
    Store the hash in lowercase.
-4. Run `npm run validate:apps` using Node.js 20 or newer. This validation uses
-   only Node's standard library; an `npm install` is not needed for this command.
+4. Run `npm run validate:apps` using the Node.js version pinned in `.nvmrc`.
+   This validation uses only Node's standard library; an `npm install` is not
+   needed for this command.
    It checks the catalog and every manifest, enforces safe package paths,
    rejects unlisted files/symlinks, and verifies the size and checksum of every
    locally stored package.

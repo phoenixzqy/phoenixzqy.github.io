@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap");
 
-.app-main { min-height: calc(100vh - 215px); padding-bottom: 70px; }
+.app-main { min-height: calc(100vh - 215px); padding-bottom: 70px; overflow-wrap: anywhere; }
 .apps-site .site-header { gap: 24px; }
 .apps-site .site-header nav { margin-left: auto; }
 .locale-control select { color: var(--text); background: #172010; border: 1px solid #596d42; border-radius: 4px; padding: 9px 7px; font: 12px var(--sans); cursor: pointer; }

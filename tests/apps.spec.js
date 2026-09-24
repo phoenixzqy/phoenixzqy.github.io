@@ -83,6 +83,27 @@ test("multiple apps reuse detail and download pages without mixing release metad
   await expect(page.getByRole("heading", { name: "Not released here. Yet.", exact: true })).toBeVisible();
 });
 
+test("long app names remain within the catalog, detail, and release layouts", async ({ page }) => {
+  const app = { ...structuredClone(catalog.apps[0]), name: "AccessibilityToolkit" };
+  await page.route("**/apps/catalog.json", (route) =>
+    route.fulfill({ json: { schemaVersion: 1, apps: [app] } }));
+  await mockRelease(page);
+  await page.setViewportSize({ width: 320, height: 900 });
+  for (const path of ["/apps/", "/apps/app/?id=bplayer", "/apps/releases/?id=bplayer"]) {
+    await page.goto(path);
+    await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");
+    const bounds = await page.locator(".app-main").evaluate((main) => {
+      const rect = main.getBoundingClientRect();
+      return { width: rect.width, scrollWidth: main.scrollWidth, right: rect.right };
+    });
+    expect(bounds.scrollWidth).toBeLessThanOrEqual(bounds.width + 1);
+    expect(bounds.right).toBeLessThanOrEqual(320);
+    const headingsFit = await page.locator(".catalog-card h2, .app-heading h1").evaluateAll((headings) =>
+      headings.every((heading) => heading.scrollWidth <= heading.clientWidth + 1));
+    expect(headingsFit).toBe(true);
+  }
+});
+
 test("missing, invalid, and unknown app ids show errors instead of fabricated content", async ({ page }) => {
   for (const url of ["/apps/app/", "/apps/app/?id=../private", "/apps/releases/?id=unknown-app"]) {
     await page.goto(url);
@@ -115,10 +136,10 @@ test("metadata strings render as text, not executable markup", async ({ page }) 
   expect(await page.evaluate(() => window.injected)).toBeUndefined();
 });
 
-test("catalog, details, and populated downloads fit narrow viewports and pass accessibility", async ({ page }, testInfo) => {
+test("catalog, details, and populated downloads fit narrow viewports and pass accessibility", async ({ page, isMobile }) => {
   await mockRelease(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  const width = testInfo.project.name === "mobile" ? 320 : 1440;
+  const width = isMobile ? 320 : 1440;
   await page.setViewportSize({ width, height: 900 });
   for (const path of ["/apps/", "/apps/app/?id=bplayer", "/apps/releases/?id=bplayer"]) {
     await page.goto(path);
