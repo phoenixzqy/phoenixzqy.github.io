@@ -1,7 +1,7 @@
 # Contributor instructions
 
 This repository is a static GitHub Pages site published from the root of
-`master`. Keep it static: no build output, application server, secrets, private
+`main`. Keep it static: no build output, application server, secrets, private
 source, or runtime API credentials belong in the public tree. `.nojekyll` keeps
 the files as-is.
 

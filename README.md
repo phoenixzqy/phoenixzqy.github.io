@@ -18,7 +18,7 @@ supports Node 24.21.0 and newer 24.x releases. With nvm, run `nvm install` and
 required for the local server.
 
 Run `npm start` (Python 3 required), then open `http://127.0.0.1:4173`.
-GitHub Pages is configured to publish the repository root on `master`.
+GitHub Pages is configured to publish the repository root on `main`.
 Push the finished site to that branch to publish. `.nojekyll` keeps the site
 as plain static files.
 
