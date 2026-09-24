@@ -4,6 +4,12 @@ A static, AI-inspired résumé at **https://phoenixzqy.github.io/**. The root
 `index.html` is the GitHub Pages homepage. No build step, application server,
 API keys, or runtime JavaScript dependencies are required.
 
+Contributors: start with [agent coding guidance](AGENTS.md) and the reusable
+[design research](.github/skills/design-research/SKILL.md) and
+[app-release](.github/skills/app-releases/SKILL.md) workflows. The
+[publishing contract](releases/README.md) remains the standalone reference
+for other repositories.
+
 ## Develop and publish
 
 Development and tests use Node.js 24.21.0, pinned in `.nvmrc`; `package.json`
@@ -18,20 +24,10 @@ as plain static files.
 
 ## Retired game PWA
 
-The former game manifest, game page, icons, and registration code have been
-removed. The current site does not install a PWA. Keep `pwa-sw.js` at its old
-root URL as an **uninstall worker**, not an active offline feature: returning
-browsers can update an already-installed worker even if their game page is
-cached. On activation it removes only `noname-pwa-*`, `noname-static-*`, and
-`noname-dynamic-*` caches, unregisters itself, and reloads controlled tabs onto
-the network site. The old `/nonamekill.html` launch URL is sent to the résumé;
-other open page URLs are preserved. Other apps' caches are left alone.
-
-Keep `pwa-retired.html` alongside the worker. It provides a fresh-document
-redirect because WebKit can treat navigation to the same fragment URL as a
-same-document change, leaving the old document controlled. The helper restores
-the original same-origin URL, including its query and fragment, using
-`location.replace`; it never registers a worker or permits external redirects.
+The former game manifest, page, and icons have been removed; the current site
+does not install a PWA. The old root `pwa-sw.js` remains an uninstall worker
+for returning browsers, alongside `pwa-retired.html` to redirect old tabs.
+See [contributor instructions](AGENTS.md#edit-map) for the preservation rules.
 
 Cleanup requires the browser to come online and update the old worker. A
 website cannot uninstall an existing OS/home-screen app shortcut; remove the
@@ -82,8 +78,7 @@ updated centrally for each route and language, including loading/error states.
 Release pages receive their app-specific title as soon as the app is known,
 without waiting for the release manifest to load.
 
-Edit résumé content in `index.html`, visual styles in `styles.css`, and
-interactions in `script.js`. Google Fonts supplies DM Sans, IBM Plex Mono,
+Google Fonts supplies DM Sans, IBM Plex Mono,
 and Instrument Serif, with local system-font fallbacks. There are no analytics,
 tracking scripts, or AI API calls.
 
@@ -135,42 +130,7 @@ schematic project illustrations, and a quiet chronological résumé underneath.
 
 ## Checks
 
-```sh
-npm ci
-npx playwright install --with-deps chromium webkit
-npm run hooks:install
-npm test
-```
-
-Run `npm run hooks:install` once per checkout to enable the versioned
-`.githooks/pre-push` hook using repository-local Git configuration. Every push
-then runs `npm test`: app/release validation, Node.js unit tests, and the full
-desktop/mobile Chromium and WebKit suite, plus PDF checks. Any failure blocks
-the push. Installing Playwright's system dependencies may require administrator
-privileges on Linux.
-Stop the local preview server before pushing; the browser tests start their own
-server on port 4173.
-
-The hook tests the current working tree, so commit the intended changes before
-pushing. This is a local safeguard, not server-side CI: other clones and release
-automation must enable it separately.
-
-Playwright covers desktop/mobile layouts, root routing, résumé content,
-navigation, keyboard dialog behavior, print controls, no-JavaScript rendering,
-reduced motion, and WCAG accessibility checks using axe-core.
-App coverage also exercises multiple catalog entries, empty and populated
-releases, exact downloaded bytes, platform filtering, unsafe metadata, and
-checksum/size validation for pipeline-published packages.
-
-The `desktop` and `mobile` projects use Chromium; `webkit` and `mobile-webkit`
-use WebKit, including iPhone emulation rather than a Chromium-only phone
-viewport. Emulation does not replace physical Safari/iOS device testing.
-Run `npx playwright test --project=webkit --project=mobile-webkit` for those
-browser checks alone.
-
-The `pdf` project runs `tests/resume.pdf.spec.js` in Chromium, the Playwright
-engine that supports PDF generation. It parses actual A4 and Letter exports
-with the dev-only PDF.js dependency, checking two-page pagination, résumé content,
-page bounds, company/date/role alignment, and restoration of collapsed details.
-Generated PDFs are attached to the test results. Run
-`npx playwright test --project=pdf` for just these checks.
+Run `npm run validate:apps` for app/release metadata, or `npm test` for the
+complete Node and browser/PDF suite. See [local checks](AGENTS.md#local-checks)
+for dependency setup, focused test commands, and the optional local pre-push
+hook.
