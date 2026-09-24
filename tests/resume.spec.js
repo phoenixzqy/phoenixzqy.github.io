@@ -21,8 +21,8 @@ test("root homepage contains real resume content and working navigation", async 
   expect(errors).toEqual([]);
 });
 
-test("layouts fit small and large viewports without horizontal overflow", async ({ page }, testInfo) => {
-  const widths = testInfo.project.name === "mobile" ? [320, 390, 760] : [768, 1024, 1440, 1920];
+test("layouts fit small and large viewports without horizontal overflow", async ({ page, isMobile }) => {
+  const widths = isMobile ? [320, 390, 760] : [768, 1024, 1440, 1920];
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");

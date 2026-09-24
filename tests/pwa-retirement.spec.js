@@ -25,6 +25,7 @@ async function legacySite() {
   const retirementWorker = await readFile(new URL("../pwa-sw.js", import.meta.url));
   const homepage = await readFile(new URL("../index.html", import.meta.url));
   const assets = new Map([
+    ["/pwa-retired.html", { type: "text/html", body: await readFile(new URL("../pwa-retired.html", import.meta.url)) }],
     ["/styles.css", { type: "text/css", body: await readFile(new URL("../styles.css", import.meta.url)) }],
     ["/script.js", { type: "text/javascript", body: await readFile(new URL("../script.js", import.meta.url)) }],
     ["/favicon.svg", { type: "image/svg+xml", body: await readFile(new URL("../favicon.svg", import.meta.url)) }],
@@ -58,7 +59,7 @@ async function legacySite() {
   };
 }
 
-for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details"]) {
+for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details", "/apps/?lang=zh-CN&view=collection"]) {
   test(`installed game worker retires safely from ${initialPath}`, async ({ page }) => {
     const site = await legacySite();
     try {
@@ -70,6 +71,7 @@ for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details"]
       await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL)).toBe(`${site.origin}/pwa-sw.js`);
       expect(await page.evaluate(async () => (await fetch("/styles.css")).text())).toContain("cached legacy game CSS");
       expect(await page.evaluate(() => caches.keys())).toContain("unrelated-app-v1");
+      await page.evaluate(() => { window.retirementMarker = "old-document"; });
 
       site.retire();
       const navigated = page.waitForEvent("framenavigated", (frame) => frame === page.mainFrame());
@@ -82,7 +84,8 @@ for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details"]
       await expect(page).toHaveURL(`${site.origin}${initialPath === "/nonamekill.html" ? "/" : initialPath}`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("Qiyu Zhao.");
       await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
-      expect(await page.evaluate(() => navigator.serviceWorker.controller)).toBeNull();
+      await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller)).toBeNull();
+      expect(await page.evaluate(() => window.retirementMarker)).toBeUndefined();
       expect(await page.evaluate(() => caches.keys())).toEqual(["unrelated-app-v1"]);
       expect(await page.evaluate(async () => (await fetch("/styles.css")).text())).not.toContain("cached legacy game CSS");
     } finally {
@@ -91,6 +94,16 @@ for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details"]
     }
   });
 }
+
+test("retirement redirect rejects external, malformed, and looping destinations", async ({ page, baseURL }) => {
+  for (const destination of ["https://example.invalid/", `${baseURL}/pwa-retired.html`, "%"]) {
+    const hash = destination === "%" ? "%" : encodeURIComponent(destination);
+    await page.goto(`/pwa-retired.html#${hash}`);
+    await expect(page.getByRole("status")).toHaveText("The return address is invalid. Use the résumé link to continue.");
+    await expect(page).toHaveURL(`${baseURL}/pwa-retired.html#${hash}`);
+    await expect(page.getByRole("link", { name: "Open the résumé" })).toHaveAttribute("href", "/");
+  }
+});
 
 test("current site does not install a PWA or expose old game assets", async ({ page, request }) => {
   await page.goto("/");

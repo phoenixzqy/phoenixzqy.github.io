@@ -21,11 +21,15 @@ async function retireLegacyGame() {
 
   const windows = await self.clients.matchAll({ type: "window" });
   await self.registration.unregister();
-  await Promise.all(windows.map((client) => {
+  await Promise.all(windows.map(async (client) => {
     const url = new URL(client.url);
     const destination = url.pathname === "/nonamekill.html"
       ? new URL("/", self.location.origin).href
       : client.url;
-    return client.navigate(destination);
+    // A distinct document avoids WebKit's same-document fragment navigation.
+    // Once unregistered, this worker cannot navigate the replacement client.
+    const refresh = new URL("/pwa-retired.html", self.location.origin);
+    refresh.hash = encodeURIComponent(destination);
+    await client.navigate(refresh.href);
   }));
 }
