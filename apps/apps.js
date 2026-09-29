@@ -1,4 +1,4 @@
-import { validateCatalog, validateManifest, validAppId, assetHref } from "./schema.js";
+import { validateCatalog, validateManifest, validateDocsIndex, validAppId, assetHref, videoType } from "./schema.js";
 import { chooseLocale, localizeData, translate } from "./locales.js";
 
 const content = document.querySelector("#app-content");
@@ -12,7 +12,7 @@ try {
   console.warn("Language preference storage is unavailable; using the URL or browser language.", error);
 }
 let locale = chooseLocale({ search: location.search, saved: savedLocale, languages: navigator.languages });
-const state = { catalog: null, app: null, manifest: undefined, error: null };
+const state = { catalog: null, app: null, manifest: undefined, docs: null, doc: null, error: null };
 let selectedPlatform = "all";
 const t = (key, values) => translate(locale, key, values);
 function appsHref(path = "/apps/", id) {
@@ -23,6 +23,13 @@ function appsHref(path = "/apps/", id) {
 }
 const detailHref = (id) => appsHref("/apps/app/", id);
 const releasesHref = (id) => appsHref("/apps/releases/", id);
+const docsHref = (id, doc) => {
+  const params = new URLSearchParams();
+  params.set("id", id);
+  if (doc) params.set("doc", doc);
+  params.set("lang", locale);
+  return `/apps/docs/?${params}`;
+};
 
 class PageError extends Error {
   constructor(key, values = {}, cause) {
@@ -41,13 +48,16 @@ function updateShell() {
 }
 
 function updateMetadata(app) {
-  const titles = { catalog: "titleCatalog", detail: "titleDetail", releases: "titleReleases" };
-  const descriptions = { catalog: "descriptionCatalog", detail: "descriptionDetail", releases: "descriptionReleases" };
+  const titles = { catalog: "titleCatalog", detail: "titleDetail", releases: "titleReleases", docs: "titleDocs" };
+  const descriptions = { catalog: "descriptionCatalog", detail: "descriptionDetail", releases: "descriptionReleases", docs: "descriptionDocs" };
   let title = t(titles[pageType]);
   let description = t(descriptions[pageType]);
   if (app) {
-    title = t(pageType === "detail" ? "titleApp" : "titleAppReleases", { name: app.name });
-    description = pageType === "detail" ? app.summary : t("descriptionAppReleases", { name: app.name });
+    const appTitles = { detail: "titleApp", releases: "titleAppReleases", docs: "titleAppDocs" };
+    title = t(appTitles[pageType] ?? "titleApp", { name: app.name });
+    if (pageType === "detail") description = app.summary;
+    else if (pageType === "docs") description = t("descriptionAppDocs", { name: app.name });
+    else description = t("descriptionAppReleases", { name: app.name });
     const crumb = document.querySelector("#breadcrumb-current, #breadcrumb-app");
     if (crumb) {
       crumb.textContent = app.name.toLocaleUpperCase(locale);
@@ -93,6 +103,18 @@ function tags(app) {
 }
 function appArt(app, large = false) {
   const art = element("div", `app-art${large ? " app-art-large" : ""}`);
+  if (app.artwork) {
+    art.classList.add("app-art-image");
+    const image = element("img", "app-artwork");
+    image.src = app.artwork.src;
+    image.alt = app.artwork.alt;
+    image.width = app.artwork.width;
+    image.height = app.artwork.height;
+    image.loading = large ? "eager" : "lazy";
+    image.decoding = "async";
+    art.append(image, paragraph(t("artwork"), "mono"));
+    return art;
+  }
   art.setAttribute("aria-hidden", "true");
   const symbol = element("div", "app-symbol", app.name.slice(0, 1));
   const bars = element("div", "audio-bars");
@@ -109,7 +131,7 @@ function notice(title, text) {
   block.append(element("h2", "", title), paragraph(text));
   return block;
 }
-async function fetchJSON(url) {
+async function request(url) {
   let response;
   try {
     response = await fetch(url, { cache: "no-cache" });
@@ -117,7 +139,13 @@ async function fetchJSON(url) {
     throw new PageError("networkError", {}, error);
   }
   if (!response.ok) throw new PageError("httpError", { path: url, status: response.status });
-  return response.json();
+  return response;
+}
+async function fetchJSON(url) {
+  return (await request(url)).json();
+}
+async function fetchText(url) {
+  return (await request(url)).text();
 }
 function showError(error) {
   const block = element("section", "app-error");
@@ -158,18 +186,80 @@ function renderCatalog(catalog) {
   }
   content.replaceChildren(hero, count, grid, notice(t("aboutReleases"), t("aboutReleasesText")));
 }
+function videoSection(app) {
+  if (!app.videos?.length) return null;
+  const section = element("section", "app-section app-videos");
+  section.append(paragraph(t("inMotion"), "eyebrow section-index"), element("h2", "", t("videoHeading")));
+  section.append(paragraph(t("videoIntro"), "gallery-intro"));
+  const grid = element("div", "video-grid");
+  app.videos.forEach((entry) => {
+    const figure = element("figure", "video-card");
+    const media = element("video", "video-player");
+    media.controls = true;
+    media.preload = "none";
+    media.playsInline = true;
+    media.setAttribute("playsinline", "");
+    if (entry.muted) media.muted = true;
+    media.poster = entry.poster;
+    media.width = entry.width;
+    media.height = entry.height;
+    media.setAttribute("aria-label", entry.title);
+    const source = element("source");
+    source.src = entry.src;
+    source.type = videoType(entry.src);
+    const fallback = paragraph(t("videoFallback"), "video-fallback");
+    fallback.append(" ", link(t("videoDownload"), entry.src, "text-link"));
+    media.append(source, fallback);
+    const caption = element("figcaption", "video-caption");
+    caption.append(element("h3", "", entry.title), paragraph(entry.caption));
+    figure.append(media, caption);
+    grid.append(figure);
+  });
+  section.append(grid);
+  return section;
+}
+function commandBlock(entry) {
+  const row = element("div", "command-block");
+  const label = element("p", "mono command-label", entry.label);
+  const code = element("code", "command-text", entry.command);
+  // The command scrolls sideways on narrow screens, so it is focusable and
+  // named for people who scroll with the keyboard.
+  code.setAttribute("tabindex", "0");
+  code.setAttribute("role", "region");
+  code.setAttribute("aria-label", entry.label);
+  const copy = element("button", "button button-secondary command-copy", t("copy"));
+  copy.type = "button";
+  const status = element("span", "sr-only");
+  status.setAttribute("role", "status");
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(entry.command);
+      status.textContent = t("copied");
+      copy.textContent = t("copied");
+    } catch (error) {
+      console.warn("The command could not be copied; select it manually.", error);
+      status.textContent = t("copyFailed");
+      copy.textContent = t("copyFailed");
+    }
+    setTimeout(() => { copy.textContent = t("copy"); }, 2500);
+  });
+  row.append(label, code, copy, status);
+  return row;
+}
 function renderDetail(app) {
   const hero = element("section", "app-detail-hero");
   const intro = heading(`${app.category} / ${app.stage.toUpperCase()}`, app.name, app.tagline);
   intro.append(paragraph(app.summary, "app-summary"), tags(app));
   const actions = element("div", "app-actions");
   actions.append(link(t("viewReleases"), releasesHref(app.id), "button button-primary"), link(t("allApps"), appsHref()));
+  if (app.documentation) actions.append(link(t("documentation"), docsHref(app.id)));
   intro.append(actions);
   hero.append(intro, appArt(app, true));
   const story = element("section", "app-story");
   story.append(element("h2", "", t("closerLook")));
   app.description.forEach((text) => story.append(paragraph(text)));
   const gallery = screenshotSection(app);
+  const videos = videoSection(app);
   const featureSection = element("section", "app-section");
   featureSection.append(paragraph(t("inside"), "eyebrow section-index"), element("h2", "", t("featuresHeading")));
   const features = element("div", "feature-grid");
@@ -182,11 +272,24 @@ function renderDetail(app) {
   const platforms = platformSection(app);
   const install = element("section", "app-section");
   install.append(paragraph(t("beforeStart"), "eyebrow section-index"), element("h2", "", t("context")));
+  if (app.installCommands?.length) {
+    install.append(paragraph(t("installCommandsIntro"), "gallery-intro"));
+    const commands = element("div", "command-list");
+    app.installCommands.forEach((entry) => commands.append(commandBlock(entry)));
+    install.append(commands);
+  }
   const steps = element("ol", "installation-list");
   app.installation.forEach((text) => steps.append(element("li", "", text)));
   install.append(steps);
+  if (app.documentation) {
+    const more = paragraph("");
+    more.className = "docs-pointer";
+    more.append(link(t("readDocumentation", { name: app.name }), docsHref(app.id)));
+    install.append(more);
+  }
   content.replaceChildren(hero, story);
   if (gallery) content.append(gallery);
+  if (videos) content.append(videos);
   content.append(featureSection, platforms, install, notice(t("responsible"), app.notice));
 }
 function screenshotSection(app) {
@@ -300,17 +403,96 @@ function renderReleases(app, manifest) {
   content.append(downloads, notice(t("responsible"), app.notice));
 }
 
+function renderDocs(app) {
+  const index = state.docs;
+  const { entry, markdown, render: renderMarkdown } = state.doc;
+  const hero = heading(`${app.name} / ${t("docsChannel")}`, entry.title, t("docsLead", { name: app.name }));
+  hero.append(link(t("backToApp", { name: app.name }), detailHref(app.id)));
+  content.replaceChildren(hero);
+
+  const layout = element("div", "docs-layout");
+  const nav = element("nav", "docs-nav");
+  nav.setAttribute("aria-label", t("docsNav"));
+  nav.append(element("h2", "mono docs-nav-heading", t("docsNav")));
+  const list = element("ul", "docs-nav-list");
+  index.documents.forEach((document_) => {
+    const item = element("li");
+    const anchor_ = link(document_.title, docsHref(app.id, document_.slug), "docs-nav-link");
+    if (document_.slug === entry.slug) anchor_.setAttribute("aria-current", "page");
+    item.append(anchor_);
+    list.append(item);
+  });
+  nav.append(list);
+
+  const article = element("article", "docs-body");
+  const { fragment, headings } = renderMarkdown(markdown, {
+    resolve(url, kind) {
+      if (kind === "image" && !/^[a-z][a-z0-9+.-]*:/i.test(url) && !url.startsWith("/")) {
+        return `/apps/docs/${app.id}/${url}`;
+      }
+      if (kind === "link" && url.startsWith("?")) {
+        const [query, hash = ""] = url.slice(1).split("#");
+        const params = new URLSearchParams(query);
+        params.set("lang", locale);
+        return `/apps/docs/?${params}${hash ? `#${hash}` : ""}`;
+      }
+      return url;
+    },
+  });
+  // The document's own title is already the page heading, so the mirrored copy
+  // of it is dropped and the page keeps exactly one h1.
+  if (fragment.firstElementChild?.localName === "h1") fragment.firstElementChild.remove();
+  article.append(fragment);
+  // Long code samples scroll sideways, so they have to be reachable from the
+  // keyboard as well as the pointer.
+  article.querySelectorAll("pre").forEach((block) => block.setAttribute("tabindex", "0"));
+  // Wide reference tables get their own scroll container so a narrow viewport
+  // never forces the whole page sideways; it is focusable so it can be scrolled
+  // from the keyboard too.
+  article.querySelectorAll("table").forEach((table) => {
+    const wrap = element("div", "docs-table-wrap");
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("tabindex", "0");
+    wrap.setAttribute("aria-label", entry.title);
+    table.replaceWith(wrap);
+    wrap.append(table);
+  });
+  const source = paragraph(t("docsSource", { repository: index.repository, commit: index.commit.slice(0, 12) }), "docs-source mono");
+  article.append(source);
+
+  const aside = element("div", "docs-side");
+  aside.append(nav);
+  if (headings.length > 1) {
+    const toc = element("nav", "docs-toc");
+    toc.setAttribute("aria-label", t("docsOnThisPage"));
+    toc.append(element("h2", "mono docs-nav-heading", t("docsOnThisPage")));
+    const tocList = element("ul", "docs-toc-list");
+    headings.filter((item) => item.level === 2).forEach((item) => {
+      const li = element("li");
+      li.append(link(item.text, `#${item.id}`, "docs-toc-link"));
+      tocList.append(li);
+    });
+    if (tocList.childElementCount > 0) {
+      toc.append(tocList);
+      aside.append(toc);
+    }
+  }
+  layout.append(aside, article);
+  content.append(layout);
+}
+
 function render() {
   const app = state.app ? localizeData(state.app, locale) : null;
   updateMetadata(app);
   if (state.error) return showError(state.error);
-  if (!state.catalog || (pageType === "releases" && state.manifest === undefined)) {
-    content.replaceChildren(paragraph(t({ catalog: "loadingCatalog", detail: "loadingDetail", releases: "loadingReleases" }[pageType]), "load-status"));
+  if (!state.catalog || (pageType === "releases" && state.manifest === undefined) || (pageType === "docs" && state.docs === null)) {
+    content.replaceChildren(paragraph(t({ catalog: "loadingCatalog", detail: "loadingDetail", releases: "loadingReleases", docs: "loadingDocs" }[pageType]), "load-status"));
     content.firstElementChild.setAttribute("role", "status");
     return;
   }
   if (pageType === "catalog") renderCatalog(localizeData(state.catalog, locale));
   else if (pageType === "detail") renderDetail(app);
+  else if (pageType === "docs") renderDocs(app);
   else renderReleases(app, localizeData(state.manifest, locale));
   if (locale !== "en") content.append(paragraph(t("translationNote"), "translation-note"));
 }
@@ -326,6 +508,18 @@ async function load() {
       updateMetadata(localizeData(state.app, locale));
       if (pageType === "releases") {
         state.manifest = validateManifest(await fetchJSON(`/releases/${state.app.id}/latest/manifest.json`), state.app);
+      }
+      if (pageType === "docs") {
+        const index = validateDocsIndex(await fetchJSON(`/apps/docs/${state.app.id}/index.json`), state.app);
+        const requested = new URLSearchParams(window.location.search).get("doc");
+        const entry = requested ? index.documents.find((candidate) => candidate.slug === requested) : index.documents[0];
+        if (!entry) throw new PageError("docsMissing");
+        const [markdown, markdownModule] = await Promise.all([
+          fetchText(`/apps/docs/${state.app.id}/${entry.file}`),
+          import("./markdown.js"),
+        ]);
+        state.docs = index;
+        state.doc = { entry, markdown, render: markdownModule.renderMarkdown };
       }
     }
   } catch (error) {

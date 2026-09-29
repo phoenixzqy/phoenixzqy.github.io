@@ -14,8 +14,9 @@ Review the contents of each package, not just its filename.
   notes, signing status, and SHA-256 checksums.
 - `/releases/bplayer/latest/manifest.json` — release metadata.
 - `/releases/bplayer/latest/<package-filename>` — locally hosted package.
-- `/install/<app-id>.sh` and `/install/<app-id>.ps1` — optional one-line
-  installers for an app that ships a command-line package.
+- `/apps/docs/?id=bplayer` — mirrored user documentation, when the entry sets
+  `"documentation": true`.
+- `/install/<app-id>.sh` and `/install/<app-id>.ps1` — one-line installers.
 
 The detail and download pages are shared by every app. Add an entry to
 `apps/catalog.json` and a `releases/<id>/latest/manifest.json`; no new HTML or
@@ -23,11 +24,6 @@ JavaScript is needed for an additional project. IDs must be lowercase,
 hyphen-separated slugs, such as `bplayer` or `another-app`. Follow BPlayer's
 catalog fields for the introduction, features, platform notes, and installation
 instructions. The catalog order is the display order.
-
-`npm run validate:apps` walks the catalog, so a manifest for an app that is not
-listed there is never validated and would publish unchecked. Land the catalog
-entry before the app's first manifest, and keep its platform IDs in step with
-the `platform` values the app's pipeline writes into its manifest.
 
 Every app must have a manifest. Before its first public build:
 
@@ -66,7 +62,8 @@ This format is supported for these display fields:
 
 - Catalog: app name, category, tagline, summary, stage, notice, each description
   and installation paragraph; platform names/statuses; feature titles and
-  descriptions; screenshot alt text and captions.
+  descriptions; screenshot alt text and captions; artwork alt text; video title
+  and caption; installation command labels.
 - Release: each release note and each asset's `name` and `installNotes`.
 
 Every localized object requires non-empty `en`. `zh-CN` is optional, but must
@@ -81,56 +78,81 @@ signing states. One manifest describes the same packages in both languages.
 Refresh translations with each release; do not carry old release notes into
 a new version merely to populate a locale.
 
+## App media
+
+Screenshots, demo videos, and artwork live in the app's own folder,
+`apps/media/<app-id>/`. An entry may only reference files in its own folder;
+`npm run validate:apps` rejects anything else and confirms every referenced
+file exists as a regular file in this repository.
+
+```json
+{
+  "artwork": { "src": "/apps/media/zai-gitter/zai-logo.png", "alt": "…", "width": 414, "height": 164 },
+  "videos": [
+    {
+      "src": "/apps/media/zai-gitter/review-demo.mp4",
+      "poster": "/apps/media/zai-gitter/review-demo-poster.webp",
+      "width": 1280,
+      "height": 768,
+      "muted": true,
+      "title": { "en": "…", "zh-CN": "…" },
+      "caption": { "en": "…", "zh-CN": "…" }
+    }
+  ]
+}
+```
+
+Videos must be `.mp4` or `.webm`, posters `.png`, `.webp`, or `.avif`. Each
+video renders as `<video controls preload="none" playsinline poster=…>`: it
+never autoplays or loops, so it costs nothing until a visitor asks for it and
+needs no separate reduced-motion handling. Set `"muted": true` only when the
+file genuinely has no audio, and describe the content in the caption so the
+video is not the only way to learn what the app does. Keep encodes small —
+H.264, `+faststart`, no wider than 1280 px, a few megabytes each — because Pages
+serves them from this repository.
+
 ## One-line installers
 
-An app whose packages are command-line tools may publish an installer script at
-`/install/<app-id>.sh` (macOS and Linux) and `/install/<app-id>.ps1` (Windows),
-so a user can install it with a single command:
+`install/<app-id>.sh` and `install/<app-id>.ps1` are served as plain static
+files and must stay self-contained: they are consumed as
+`curl -fsSL https://phoenixzqy.github.io/install/<app-id>.sh | sh` and
+`irm https://phoenixzqy.github.io/install/<app-id>.ps1 | iex`. Generate them
+with `npm run build:installers` from `install/templates/`; `npm test` fails if a
+published file drifts from its template.
 
-```sh
-curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh
+Downloads use HTTPS, including every redirect. The manifest URL override
+permits plain HTTP only for literal `127.0.0.1` test fixtures; plaintext
+redirects are rejected, and non-loopback HTTP overrides are not trusted.
+
+An installer reads `/releases/<app-id>/latest/manifest.json`, selects the asset
+matching the machine's platform and architecture, downloads it, verifies its
+SHA-256 against the manifest, and installs it. When `release` is `null` it
+explains that nothing is published yet and exits non-zero. `ZAI_INSTALL_DIR`
+and `ZAI_RELEASE_MANIFEST_URL` override the install location and the metadata
+source. Because the installers only trust the manifest, publishing a release is
+a pure data change to `manifest.json`.
+
+An entry may advertise these commands on its detail page:
+
+```json
+{
+  "installCommands": [
+    { "label": { "en": "macOS and Linux", "zh-CN": "macOS 与 Linux" }, "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh" }
+  ]
+}
 ```
 
-```powershell
-irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex
-```
+Commands must be plain printable ASCII so they survive copy and paste.
 
-These scripts are owned by this repository, not by the app's pipeline. They are
-ordinary static files, reviewed here, and they run on a user's machine with that
-user's privileges, so they are held to the same rules as a published package:
+## Mirrored documentation
 
-- **Be inert until complete.** A piped shell and `iex` cannot observe a failed
-  or truncated transfer, so all work lives in a function that is invoked only on
-  the script's final line. Any earlier prefix of the file must do nothing. The
-  PowerShell script must also leave the caller's variables and preferences
-  unchanged, because `iex` runs it in the caller's scope.
-- **Read the published manifest, not a hardcoded version.** Resolve the package
-  from `/releases/<app-id>/latest/manifest.json` and select it by the manifest's
-  own `platform` and `architecture` values. An unpublished (`release: null`)
-  manifest is an explicit error, never a silent success.
-- **Verify before use.** Compare the download's SHA-256 with the manifest value
-  and stop on any mismatch, before extracting or executing anything from it.
-- **Download only from this site.** Accept a locally hosted package path or a
-  public GitHub Release URL of this repository, exactly as
-  [large packages](#large-packages-public-github-releases) defines it. Reject
-  any other host, and never let a redirect downgrade the transfer to HTTP.
-  The metadata URL override permits plaintext only for local tests on literal
-  `127.0.0.1`; redirects must use HTTPS. PowerShell checks every redirect before
-  following it, limiting release-asset redirects to GitHub and its asset hosts.
-- **Leave the user's directories alone.** Stage downloads in the system
-  temporary directory and remove them on success and on failure. Never write to
-  the current working directory.
-- **Stay reviewable.** No obfuscation, no credentials, no telemetry, and no
-  privilege escalation. The script's only job is to fetch, verify, extract, and
-  hand over to the package's own installer.
-
-Extra arguments are forwarded to the package's own installer. Pass an option and
-its value as separate arguments on Windows: PowerShell's command line parser
-reads `-name:value` as parameter binding and splits a joined argument at its
-colon before the script runs.
-
-`tests/installers.test.js` exercises these rules with `npm run test:unit`, using
-a local stand-in for this site. Update those tests with the scripts.
+An entry with `"documentation": true` must have a matching allowlist entry in
+`apps/docs/sources.json` and a generated mirror in `apps/docs/<app-id>/`.
+Mirrors are produced by `scripts/sync-app-docs.mjs` and are never hand-edited;
+`npm run validate:apps` checks that the committed files match the generated
+index and that the recorded source commits agree. See
+[app docs sync](../.github/skills/app-docs-sync/SKILL.md) for the workflow and
+the required privacy review.
 
 ## Pipeline contract
 

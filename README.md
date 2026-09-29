@@ -42,22 +42,18 @@ and download pages read `apps/catalog.json` and each app's
 `releases/<id>/latest/manifest.json`. BPlayer is the first entry, with a
 local-first audiobook-player introduction and explicit platform-readiness
 notes. Its descriptions are paraphrased from the authorized local product
-documentation; no private source or builds were copied. `zai-cli` is the second
-entry, a terminal workspace for coding agents whose packages are published as
-public GitHub Release assets of this repository. No package is offered until a
-release is published.
+documentation; no private source or builds were copied. No package is offered
+until a release is published.
 
-`install/` holds the published one-line installers, `install/zai-cli.sh` for
-macOS and Linux and `install/zai-cli.ps1` for Windows. They are static files
-served from this site: each one reads the app's release manifest, downloads only
-the package built for the running platform, verifies its SHA-256 before using
-it, and removes its downloads afterwards. See
-[one-line installers](releases/README.md#one-line-installers).
+The zai apps — zai (`zai-cli`), zai-editor, and zai-gitter — follow the same
+entry style. Their pages add short demo videos, copyable one-line install
+commands, and a link to the user documentation mirrored under `/apps/docs/`.
 
 See [the publishing contract](releases/README.md) for folder layout, manifest
-fields, checksum/size validation, safe pipeline handoff, signing notices, and
-large-package hosting through public GitHub Release assets. Run
-`npm run validate:apps` before publishing metadata or binaries.
+fields, checksum/size validation, app media, one-line installers, mirrored
+documentation, safe pipeline handoff, signing notices, and large-package
+hosting through public GitHub Release assets. Run `npm run validate:apps`
+before publishing metadata or binaries.
 The app catalog uses JavaScript with explicit loading/error/no-JavaScript
 messages; the résumé remains usable without JavaScript.
 
@@ -111,6 +107,14 @@ information has been invented. Both Microsoft roles retain the supplied
 “Present” end dates, rather than inferring an unconfirmed transition date.
 The introduction paraphrases the supplied experience; project artwork is
 conceptual, not an actual Microsoft product interface.
+
+The zai-cli, zai-editor, and zai-gitter descriptions paraphrase the app
+author's supplied README material; the allowlisted user documentation has
+source commit identifiers in `apps/docs/sources.json`. The app author supplied
+the wordmark and demo recordings for this public-site PR. The video captions
+describe the recordings rather than claiming independent product benchmarks;
+no private source, contributor instructions, or unpublished packages belong
+in the public mirror.
 
 ## Design research
 

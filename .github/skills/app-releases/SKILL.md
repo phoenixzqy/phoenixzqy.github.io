@@ -20,8 +20,6 @@ this skill is a navigation and execution workflow, not an alternative contract.
    for handoff, final package verification, staging, and publishing. For
    remotely hosted packages, also follow
    [large packages](../../../releases/README.md#large-packages-public-github-releases).
-   When the app publishes a one-line installer, follow
-   [one-line installers](../../../releases/README.md#one-line-installers).
    Do not introduce private-repository automation in this public site.
 3. Run `npm run validate:apps`; inspect the intended catalog, manifest, and
    package diff for unapproved files or misleading descriptions. If validation

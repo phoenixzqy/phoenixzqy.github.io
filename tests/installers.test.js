@@ -3,428 +3,421 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, writeFile, rm, readdir, chmod } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { buildInstallers, INSTALLERS } from "../scripts/build-installers.mjs";
+import { createZip } from "./zip-fixture.js";
 
 const run = promisify(execFile);
-const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const scratchRoot = join(root, ".test-scratch");
-const shellInstaller = join(root, "install", "zai-cli.sh");
-const powershellInstaller = join(root, "install", "zai-cli.ps1");
-const APP_ID = "zai-cli";
-const VERSION = "1.2.3";
+const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const installerPath = (name) => join(siteRoot, "install", name);
 
-function which(command) {
-  return (process.env.PATH ?? "").split(":").some((entry) => entry && existsSync(join(entry, command)));
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
+function manifest(appId, assets) {
+  return { schemaVersion: 1, appId, release: {
+    version: "0.1.0",
+    channel: "preview",
+    publishedAt: "2026-09-22T12:00:00Z",
+    notes: ["Test-only release metadata."],
+    assets,
+  } };
 }
 
-const shellTools = ["curl", "unzip", "python3"].filter((tool) => !which(tool));
-const powershellMissing = which("pwsh") ? false : "pwsh is required to run the Windows installer";
-
-async function scratch(prefix) {
-  await mkdir(scratchRoot, { recursive: true });
-  return mkdtemp(join(scratchRoot, `${prefix}-`));
-}
-
-// The published archive holds the package contents at its root, including the
-// install.py entry point the installer runs. The stand-in records how it was
-// invoked so the test can assert the forwarded arguments and working directory.
-async function buildArchive(directory, file, { exitCode = 0 } = {}) {
-  const source = join(directory, "package");
-  await mkdir(source, { recursive: true });
-  await writeFile(
-    join(source, "install.py"),
-    [
-      "import json, os, sys",
-      "record = {'arguments': sys.argv[1:], 'cwd': os.getcwd(), 'installDir': os.environ.get('ZAI_INSTALL_DIR', '')}",
-      "open(os.environ['INSTALL_RECORD'], 'w').write(json.dumps(record))",
-      `sys.exit(${exitCode})`,
-    ].join("\n"),
-    "utf8",
-  );
-  const archive = join(directory, file);
-  await run("python3", [
-    "-c",
-    "import shutil,sys; shutil.make_archive(sys.argv[1], 'zip', sys.argv[2])",
-    archive.replace(/\.zip$/, ""),
-    source,
-  ]);
-  const bytes = await readFile(archive);
-  return { archive, bytes, sha256: createHash("sha256").update(bytes).digest("hex") };
-}
-
-function manifestFor(file, sha256, overrides = {}) {
-  const asset = {
-    name: "zai CLI Linux x64",
-    platform: "linux",
-    architecture: "x64",
+function asset(platform, architecture, file, bytes) {
+  return {
+    name: `Test package for ${platform}`,
+    platform,
+    architecture,
     file,
-    bytes: 1,
-    sha256,
+    bytes: bytes.length,
+    sha256: sha256(bytes),
     signing: "unsigned",
     installNotes: "Test fixture only.",
-    ...overrides.asset,
-  };
-  return {
-    schemaVersion: 1,
-    appId: APP_ID,
-    release: { version: VERSION, channel: "preview", publishedAt: "2026-09-22T12:00:00Z", notes: ["Test fixture."], assets: [asset] },
-    ...overrides.manifest,
   };
 }
 
-async function serve(routes) {
+// Serves a manifest and its packages the way GitHub Pages does, so the shell
+// installers exercise real HTTP downloads rather than a mocked transport.
+async function withServer(files, body) {
   const server = createServer((request, response) => {
-    const body = routes[request.url.split("?")[0]];
-    if (!body) {
-      response.writeHead(404).end("not found");
+    const path = new URL(request.url, "http://127.0.0.1").pathname;
+    const content = files.get(path);
+    if (!content) {
+      response.writeHead(404).end("Not found");
       return;
     }
-    if (typeof body === "object" && !Buffer.isBuffer(body)) {
-      response.writeHead(body.status, { Location: body.location }).end();
-    } else {
-      response.writeHead(200).end(body);
+    if (content.redirect) {
+      response.writeHead(302, { Location: content.redirect }).end();
+      return;
     }
+    response.writeHead(200, { "content-length": content.length }).end(content);
   });
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const { port } = server.address();
-  return { base: `http://127.0.0.1:${port}`, close: () => new Promise((resolve) => server.close(resolve)) };
-}
-
-// The installer asks the operating system which package it needs, so the tests
-// drive that answer instead of depending on the machine they run on.
-async function unameShim(directory, system, machine) {
-  const bin = join(directory, "bin");
-  await mkdir(bin, { recursive: true });
-  const shim = join(bin, "uname");
-  await writeFile(shim, `#!/bin/sh\ncase "$1" in\n-s) echo "${system}" ;;\n-m) echo "${machine}" ;;\nesac\n`, "utf8");
-  await chmod(shim, 0o700);
-  return bin;
-}
-
-// PowerShell decorates and gutter-wraps error output, so read the message back
-// as one plain line.
-function plain(text) {
-  return text
-    .replace(/\u001b\[[0-9;]*m/g, "")
-    .replace(/\n\s*\|\s*/g, " ")
-    .replace(/[ \t]+/g, " ");
-}
-
-async function installWith({ manifest, archive, archiveExit = 0, system = "Linux", machine = "x86_64", args = [], env = {}, shell = "sh", configureRoutes }) {
-  const directory = await scratch("install");
+  await new Promise((done) => server.listen(0, "127.0.0.1", done));
   try {
-    const built = await buildArchive(directory, archive ?? `${APP_ID}-${VERSION}-linux-amd64.zip`, { exitCode: archiveExit });
-    const body = manifest(built);
-    const routes = {
-      "/releases/zai-cli/latest/manifest.json": JSON.stringify(body),
-      [`/releases/zai-cli/latest/${built.archive.split("/").pop()}`]: built.bytes,
-      "/downloads/package.zip": built.bytes,
-    };
-    const site = await serve(routes);
-    configureRoutes?.(routes, site);
-    const staging = join(directory, "staging");
-    const cwd = join(directory, "cwd");
-    const record = join(directory, "record.json");
-    await mkdir(staging, { recursive: true });
-    await mkdir(cwd, { recursive: true });
-    try {
-      const bin = await unameShim(directory, system, machine);
-      const command = await invocation(shell, directory, args);
-      const result = await run(command[0], command.slice(1), {
-        cwd,
-        env: {
-          ...process.env,
-          PATH: `${bin}:${process.env.PATH}`,
-          TMPDIR: staging,
-          TMP: staging,
-          TEMP: staging,
-          PROCESSOR_ARCHITECTURE: machine === "arm64" ? "ARM64" : "AMD64",
-          PROCESSOR_ARCHITEW6432: "",
-          INSTALL_RECORD: record,
-          ZAI_RELEASE_METADATA_URL: `${site.base}/releases/zai-cli/latest/manifest.json`,
-          ZAI_INSTALL_DIR: "",
-          ...env,
-        },
-      }).then(
-        (ok) => ({ code: 0, ...ok }),
-        (error) => ({ code: error.code ?? 1, stdout: error.stdout ?? "", stderr: error.stderr ?? String(error) }),
-      );
-      return {
-        ...result,
-        stderr: plain(result.stderr),
-        staging: await readdir(staging),
-        workingDirectory: await readdir(cwd),
-        record: existsSync(record) ? JSON.parse(await readFile(record, "utf8")) : null,
-        siteBase: site.base,
-      };
-    } finally {
-      await site.close();
-    }
+    return await body(`http://127.0.0.1:${server.address().port}`);
   } finally {
-    await rm(directory, { recursive: true, force: true });
+    await new Promise((done) => server.close(done));
   }
 }
 
-// Windows users run the installer both ways: piped into the shell from the web
-// and as a downloaded file, as an updater does.
-async function invocation(shell, directory, args) {
-  if (shell === "sh") return ["sh", shellInstaller, ...args];
-  if (shell === "pwsh") return ["pwsh", "-NoProfile", "-File", powershellInstaller, ...args];
-  const driver = join(directory, "driver.ps1");
-  await writeFile(
-    driver,
-    [
-      "$ErrorActionPreference = 'Continue'",
-      "$installer = 'caller variable'",
-      `Get-Content -LiteralPath ${JSON.stringify(powershellInstaller)} -Raw | Invoke-Expression`,
-      "if ($installer -ne 'caller variable' -or $ErrorActionPreference -ne 'Continue') {",
-      "    throw 'The installer changed the caller''s variables or preferences.'",
-      "}",
-    ].join("\n"),
-    "utf8",
+async function withHome(body) {
+  const home = await mkdtemp(join(tmpdir(), "zai-installer-home-"));
+  try {
+    return await body(home);
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
+}
+
+async function runInstaller(script, { manifestUrl, home, installDir, args = [] }) {
+  try {
+    const { stdout, stderr } = await run("sh", [installerPath(script), ...args], {
+      env: {
+        PATH: process.env.PATH,
+        HOME: home,
+        SHELL: "/bin/bash",
+        ZAI_RELEASE_MANIFEST_URL: manifestUrl,
+        ...(installDir ? { ZAI_INSTALL_DIR: installDir } : {}),
+      },
+    });
+    return { code: 0, stdout, stderr };
+  } catch (error) {
+    return { code: error.code, stdout: error.stdout ?? "", stderr: error.stderr ?? "" };
+  }
+}
+
+test("every published installer is generated from the shared templates", async () => {
+  for (const [path, content] of await buildInstallers()) {
+    assert.equal(await readFile(join(siteRoot, path), "utf8"), content,
+      `${path} is stale. Run "npm run build:installers".`);
+  }
+});
+
+test("shell installers are self-contained, fail-safe, and honour the documented overrides", async () => {
+  for (const { appId } of INSTALLERS) {
+    const script = await readFile(installerPath(`${appId}.sh`), "utf8");
+    const label = `${appId}.sh`;
+    assert.match(script, /^#!\/bin\/sh\n/, label);
+    assert.match(script, /\nset -eu\n/, label);
+    assert.match(script, /trap cleanup EXIT HUP INT TERM/, label);
+    assert.match(script, /ZAI_INSTALL_DIR/, label);
+    assert.match(script, /ZAI_RELEASE_MANIFEST_URL/, label);
+    assert.match(script, /sha256sum[\s\S]*shasum -a 256/, label);
+    assert.match(script, /unzip[\s\S]*bsdtar[\s\S]*python3 -m zipfile/, label);
+    assert.match(script, /python3 - "\$MANIFEST"[\s\S]*json\.load\(manifest_file\)/, label);
+    assert.match(script, /x86_64 \| amd64[\s\S]*aarch64 \| arm64/, label);
+    // A piped installer cannot read sibling files, and bash-only syntax breaks dash.
+    assert.doesNotMatch(script, /^\s*(?:\.|source)\s+\S*templates/m, label);
+    const shellOnly = script.replace(/awk -v[\s\S]*?\n' "\$MANIFEST"\)"/, "");
+    assert.doesNotMatch(shellOnly, /\[\[\s|\bdeclare\s+-|\becho\s+-e\b|\$\{[A-Za-z_]+\[|\$'/, label);
+    // dash is the strictest POSIX shell commonly used as /bin/sh.
+    await run("dash", ["-n", installerPath(`${appId}.sh`)]).catch(() =>
+      run("sh", ["-n", installerPath(`${appId}.sh`)]));
+  }
+});
+
+test("PowerShell installers stay compatible with Windows PowerShell 5.1", async () => {
+  for (const { appId, executable } of INSTALLERS) {
+    const script = await readFile(installerPath(`${appId}.ps1`), "utf8");
+    const label = `${appId}.ps1`;
+    assert.match(script, /#Requires -Version 5\.1/, label);
+    assert.match(script, /SecurityProtocolType\]::Tls12/, label);
+    assert.match(script, /Get-FileHash -Path \$archive -Algorithm SHA256/, label);
+    assert.match(script, /Expand-Archive/, label);
+    // The user PATH is edited through the registry so REG_EXPAND_SZ entries
+    // such as %USERPROFILE%\bin keep their unexpanded form and value kind.
+    assert.match(script, /Registry\]::CurrentUser\.OpenSubKey\('Environment', \$true\)/, label);
+    assert.match(script, /DoNotExpandEnvironmentNames/, label);
+    assert.match(script, /\$key\.SetValue\('Path', \$updated, \$kind\)/, label);
+    assert.doesNotMatch(script, /SetEnvironmentVariable\('Path'/, label);
+    assert.match(script, /RuntimeInformation\]::OSArchitecture/, label);
+    assert.match(script, /PROCESSOR_ARCHITECTURE/, label);
+    assert.match(script, /ZAI_INSTALL_DIR/, label);
+    assert.match(script, /ZAI_RELEASE_MANIFEST_URL/, label);
+    assert.match(script, new RegExp(`\\$executable = '${executable}\\.exe'`), label);
+    // PowerShell 7 dropped these Windows PowerShell-only aliases and switches.
+    assert.doesNotMatch(script, /\bwget\b|\bcurl\b|Invoke-WebRequest[^\n]*-UseDefaultCredentials/, label);
+    assert.equal((script.match(/\{/g) ?? []).length, (script.match(/\}/g) ?? []).length, `${label} braces`);
+  }
+});
+
+test("the shell installer verifies, extracts, and installs a published package", async () => {
+  const bytes = createZip({
+    "zai-editor-0.1.0-linux-x64/zai-editor": "#!/bin/sh\necho test-only fixture\n",
+    "zai-editor-0.1.0-linux-x64/LICENSE": "Apache License 2.0 (test fixture)\n",
+  });
+  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const files = new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [
+      asset("linux", "x64", file, bytes),
+      asset("linux", "arm64", "zai-editor-0.1.0-linux-arm64.zip", Buffer.from("other")),
+    ]), null, 2))],
+    [`/${file}`, bytes],
+  ]);
+  await withServer(files, (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    const first = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
+    assert.equal(first.code, 0, first.stderr);
+    assert.match(first.stdout, /Verified SHA-256/);
+    const installed = join(installDir, "zai-editor");
+    assert.equal((await stat(installed)).mode & 0o111, 0o111);
+    assert.match(await readFile(installed, "utf8"), /test-only fixture/);
+    assert.match(await readFile(join(installDir, "licenses/zai-editor/LICENSE"), "utf8"), /Apache License/);
+
+    const profile = join(home, ".profile");
+    const line = `export PATH='${installDir}':"$PATH"  # Added by zai installer`;
+    assert.equal((await readFile(profile, "utf8")).split("\n").filter((entry) => entry === line).length, 1);
+    const second = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
+    assert.equal(second.code, 0, second.stderr);
+    assert.equal((await readFile(profile, "utf8")).split("\n").filter((entry) => entry === line).length, 1,
+      "the PATH update must be idempotent");
+  }));
+});
+
+test("the shell installer parses minified manifests with localized asset text", async () => {
+  const bytes = createZip({ "zai-editor": "#!/bin/sh\necho localized fixture\n" });
+  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const localized = manifest("zai-editor", [
+    {
+      ...asset("linux", "arm64", "zai-editor-0.1.0-linux-arm64.zip", Buffer.from("other")),
+      name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
+      installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
+    },
+    {
+      ...asset("linux", "x64", file, bytes),
+      name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
+      installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
+      metadata: {
+        assets: [{ file: "not-the-release-asset.zip" }],
+        release: null,
+        escaped: "quote: \" slash: \\ unicode: \u2603",
+      },
+    },
+  ]);
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(localized))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir,
+    });
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(await readFile(join(installDir, "zai-editor"), "utf8"), /localized fixture/);
+  }));
+});
+
+test("the shell installer rejects malformed JSON rather than partially parsing it", async () => {
+  const malformed = Buffer.from(
+    '{"schemaVersion":1,"appId":"zai-editor","release":{"assets":[' +
+    '{"platform":"linux","architecture":"x64","file":"package.zip",' +
+    '"sha256":"' + "0".repeat(64) + '"}',
   );
-  return ["pwsh", "-NoProfile", "-File", driver];
-}
-
-test("the shell installer is inert until its final line invokes the installer", async () => {
-  const script = await readFile(shellInstaller, "utf8");
-  const lines = script.trimEnd().split("\n");
-  assert.equal(lines.at(-1), 'zai_cli_install "$@"');
-  assert.equal(script.split("\n").filter((line) => line === 'zai_cli_install "$@"').length, 1);
-  const directory = await scratch("truncated");
-  try {
-    // A piped shell cannot observe a failed or truncated transfer, so every
-    // prefix of the published script must do nothing at all.
-    const marker = join(directory, "executed");
-    const truncated = script.slice(0, script.lastIndexOf("zai_cli_install \"$@\""));
-    await run("sh", ["-c", truncated], { cwd: directory, env: { ...process.env, MARKER: marker } });
-    assert.deepEqual(await readdir(directory), []);
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
-});
-
-test("the shell installer verifies, installs, and cleans up", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
-  const result = await installWith({
-    manifest: ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256),
-    args: ["--on-conflict", "keep"],
-  });
-  assert.equal(result.code, 0, result.stderr);
-  assert.deepEqual(result.record.arguments, ["--on-conflict", "keep"]);
-  assert.deepEqual(result.staging, []);
-  assert.deepEqual(result.workingDirectory, []);
-});
-
-test("the shell installer refuses a package whose bytes changed", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
-  const result = await installWith({
-    manifest: ({ archive }) => manifestFor(archive.split("/").pop(), "b".repeat(64)),
-  });
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /Checksum mismatch/);
-  assert.equal(result.record, null);
-  assert.deepEqual(result.staging, []);
-});
-
-test("the shell installer rejects non-loopback HTTP metadata overrides", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
-  const result = await installWith({
-    manifest: ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256),
-    env: { ZAI_RELEASE_METADATA_URL: "http://example.com/releases/zai-cli/latest/manifest.json" },
-  });
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /downloads must use HTTPS/);
-  assert.equal(result.record, null);
-  assert.deepEqual(result.staging, []);
-});
-
-test("the shell installer reports an unpublished app instead of installing nothing quietly", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
-  const result = await installWith({
-    manifest: () => ({ schemaVersion: 1, appId: APP_ID, release: null }),
-  });
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /no public release has been published yet/i);
-  assert.equal(result.record, null);
-});
-
-test("the shell installer rejects metadata that points somewhere else", { skip: shellTools.length ? `missing ${shellTools}` : false }, async (t) => {
-  const cases = [
-    ["another host", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256, { asset: { url: "https://example.com/zai.zip" } })],
-    ["a private repository", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256, { asset: { url: "https://github.com/example/private/releases/download/v1/zai.zip" } })],
-    ["a mismatched filename", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256, { asset: { url: "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v1.2.3/other.zip" } })],
-    ["another application", ({ archive, sha256 }) => ({ ...manifestFor(archive.split("/").pop(), sha256), appId: "bplayer" })],
-  ];
-  for (const [name, manifest] of cases) {
-    await t.test(name, async () => {
-      const result = await installWith({ manifest });
-      assert.notEqual(result.code, 0);
-      assert.equal(result.record, null);
-      assert.deepEqual(result.staging, []);
+  await withServer(new Map([["/manifest.json", malformed]]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed"),
     });
-  }
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /could not be read as valid JSON/);
+  }));
 });
 
-test("the shell installer only installs a package built for this machine", { skip: shellTools.length ? `missing ${shellTools}` : false }, async (t) => {
-  const manifest = ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256);
-  await t.test("macOS asks for the macos package", async () => {
-    const result = await installWith({ manifest, system: "Darwin", machine: "arm64" });
-    assert.notEqual(result.code, 0);
-    assert.match(result.stderr, /no published package for macos arm64/i);
-  });
-  await t.test("an unknown system is refused", async () => {
-    const result = await installWith({ manifest, system: "SunOS", machine: "x86_64" });
-    assert.notEqual(result.code, 0);
-    assert.match(result.stderr, /operating system/i);
-  });
-  await t.test("an unknown architecture is refused", async () => {
-    const result = await installWith({ manifest, system: "Linux", machine: "mips" });
-    assert.notEqual(result.code, 0);
-    assert.match(result.stderr, /architecture/i);
-  });
-});
-
-test("the shell installer forwards the requested install directory", { skip: shellTools.length ? `missing ${shellTools}` : false }, async (t) => {
-  const manifest = ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256);
-  await t.test("from the environment", async () => {
-    const result = await installWith({ manifest, env: { ZAI_INSTALL_DIR: "/opt/zai" } });
+test("the shell installer quotes metacharacters before updating startup PATH", async () => {
+  const bytes = createZip({ "zai-editor": "#!/bin/sh\nexit 0\n" });
+  const file = "zai-editor-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [
+      asset("linux", "x64", file, bytes),
+    ])))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed-$(touch${IFS}pwned)-'quoted'");
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir,
+    });
     assert.equal(result.code, 0, result.stderr);
-    assert.deepEqual(result.record.arguments, ["--install-dir", "/opt/zai"]);
-  });
-  await t.test("without overriding an explicit argument", async () => {
-    const result = await installWith({ manifest, env: { ZAI_INSTALL_DIR: "/opt/zai" }, args: ["--install-dir=/opt/chosen"] });
-    assert.equal(result.code, 0, result.stderr);
-    assert.deepEqual(result.record.arguments, ["--install-dir=/opt/chosen"]);
-  });
+
+    const profile = join(home, ".profile");
+    const { stdout: updatedPath } = await run("sh", ["-c", '. "$1"; printf %s "$PATH"', "sh", profile], {
+      cwd: home,
+      env: { PATH: process.env.PATH, HOME: home },
+    });
+    assert.equal(updatedPath.split(":")[0], installDir);
+    await assert.rejects(stat(join(home, "pwned")), /ENOENT/,
+      "sourcing the generated profile must not execute install-path metacharacters");
+  }));
 });
 
-test("the PowerShell installer keeps the same contract for Windows", async () => {
-  const script = await readFile(powershellInstaller, "utf8");
-  assert.equal(script.trimEnd().split("\n").at(-1), "Install-ZaiCli @args");
-  assert.equal(script.split("\n").filter((line) => line.startsWith("Install-ZaiCli ")).length, 1);
-  assert.match(script, /https:\/\/phoenixzqy\.github\.io\/releases\/zai-cli\/latest\/manifest\.json/);
-  assert.match(script, /https:\/\/github\.com\/phoenixzqy\/phoenixzqy\.github\.io\/releases\/download\//);
-  // The download is verified before it is extracted, the bundled entry point is
-  // required, and the staging directory is always removed.
-  assert.match(script, /Get-FileHash .*-Algorithm SHA256/);
-  assert.ok(script.indexOf("Get-FileHash") < script.indexOf("Expand-Archive"));
-  assert.match(script, /install\.py/);
-  assert.match(script, /finally \{\s*\n\s*Remove-Item/);
-  assert.match(script, /downloads must use HTTPS/);
-  assert.doesNotMatch(script, /\bexit\s+\$LASTEXITCODE\b/);
+test("PowerShell installers select only an unambiguous ZIP package", async () => {
+  const fixture = manifest("zai-editor", [
+    asset("windows", "x64", "zai-editor-setup.exe", Buffer.from("exe")),
+    asset("windows", "x64", "zai-editor.msix", Buffer.from("msix")),
+    asset("windows", "x64", "zai-editor.zip", Buffer.from("zip")),
+  ]);
+  const selected = fixture.release.assets.find((entry) =>
+    entry.platform === "windows" && entry.architecture === "x64" && /\.zip$/i.test(entry.file));
+  assert.equal(selected.file, "zai-editor.zip");
+  const ambiguous = [
+    ...fixture.release.assets,
+    asset("windows", "x64", "zai-editor-portable.zip", Buffer.from("portable")),
+  ].filter((entry) =>
+    entry.platform === "windows" && entry.architecture === "x64" && /\.zip$/i.test(entry.file));
+  assert.equal(ambiguous.length, 2);
+
+  const script = await readFile(installerPath("zai-editor.ps1"), "utf8");
+  assert.match(script,
+    /\$_\.platform -eq 'windows'[\s\S]*\$_\.architecture -eq \$architecture[\s\S]*\(\[string\] \$_\.file\) -match '\\\.zip\$'/);
+  assert.match(script, /\$assets\.Count -gt 1[\s\S]*multiple ZIP packages/);
+  const selection = script.slice(script.indexOf("$assets ="), script.indexOf("$asset = $assets[0]"));
+  assert.doesNotMatch(selection, /Select-Object -First 1/);
 });
 
-test("a truncated PowerShell installer does nothing", { skip: powershellMissing }, async () => {
-  const script = await readFile(powershellInstaller, "utf8");
-  const directory = await scratch("truncated-ps");
-  try {
-    const truncated = join(directory, "truncated.ps1");
-    await writeFile(truncated, script.slice(0, script.lastIndexOf("Install-ZaiCli @args")), "utf8");
-    const result = await run("pwsh", ["-NoProfile", "-File", truncated], { cwd: directory });
+test("a checksum mismatch is rejected and nothing is installed", async () => {
+  const bytes = createZip({ "zai-gitter": "#!/bin/sh\nexit 0\n" });
+  const file = "zai-gitter-0.1.0-linux-x64.zip";
+  const tampered = manifest("zai-gitter", [asset("linux", "x64", file, bytes)]);
+  tampered.release.assets[0].sha256 = "0".repeat(64);
+  const files = new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(tampered, null, 2))],
+    [`/${file}`, bytes],
+  ]);
+  await withServer(files, (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    const result = await runInstaller("zai-gitter.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /SHA-256 verification failed/);
+    assert.match(result.stderr, /nothing was installed/i);
+    await assert.rejects(stat(join(installDir, "zai-gitter")), /ENOENT/);
+  }));
+});
+
+test("a declared byte count that does not match the download is rejected", async () => {
+  const bytes = createZip({ "zai-gitter": "#!/bin/sh\nexit 0\n" });
+  const file = "zai-gitter-0.1.0-linux-x64.zip";
+  const wrong = manifest("zai-gitter", [asset("linux", "x64", file, bytes)]);
+  wrong.release.assets[0].bytes = bytes.length + 10;
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(wrong, null, 2))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-gitter.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /bytes but the manifest declares/);
+  }));
+});
+
+test("an unpublished release explains itself and exits non-zero", async () => {
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify({ schemaVersion: 1, appId: "zai-gitter", release: null }, null, 2))],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-gitter.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });
+    assert.notEqual(result.code, 0);
+    assert.match(result.stderr, /No public release of zai-gitter has been published yet/);
     assert.equal(result.stdout, "");
-    assert.equal(result.stderr, "");
-    assert.deepEqual(await readdir(directory), ["truncated.ps1"]);
+  }));
+});
+
+test("a release without a package for this machine names the pages that list what exists", async () => {
+  const bytes = createZip({ "zai-gitter": "#!/bin/sh\nexit 0\n" });
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(
+      manifest("zai-gitter", [asset("windows", "arm64", "zai-gitter-0.1.0-windows-arm64.zip", bytes)]), null, 2))],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-gitter.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /no package for linux\/x64/);
+  }));
+});
+
+test("an unreachable manifest fails instead of installing a stale or partial build", async () => {
+  await withServer(new Map(), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/missing.json`, home, installDir: join(home, "installed") });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /download failed/);
+  }));
+});
+
+test("the zai installer runs install.py from the archive root and forwards arguments", async () => {
+  const bytes = createZip({
+    // The published archive keeps its entry point at the root, beside the
+    // library it imports, and ships other Python files that must not be run.
+    "install.py":
+      "import sys, pathlib\n" +
+      "pathlib.Path(sys.argv[1]).write_text(' '.join(sys.argv[2:]))\n" +
+      "print('installed: fixture')\n",
+    "_installer.py": "# bundled library\n",
+    "install_path.py": "raise SystemExit('the wrong script ran')\n",
+    ".copilot/scripts/install.py": "raise SystemExit('the wrong script ran')\n",
+  });
+  const file = "zai-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)]), null, 2))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const receipt = join(home, "receipt.txt");
+    const result = await runInstaller("zai-cli.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, args: [receipt, "--install-copilot", "no"],
+    });
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /installed: fixture/);
+    assert.equal(await readFile(receipt, "utf8"), "--install-copilot no");
+  }));
+});
+
+test("the zai installer refuses an archive without install.py at its root", async () => {
+  const bytes = createZip({ "zai-0.1.0-linux-x64/install.py": "print('nested')\n" });
+  const file = "zai-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)]), null, 2))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /did not contain 'install\.py' at its root/);
+  }));
+});
+
+test("installer metadata overrides reject non-loopback HTTP and plaintext redirects", async () => {
+  await withServer(new Map([
+    ["/redirect", { redirect: "/manifest.json" }],
+    ["/manifest.json", Buffer.from("{}")],
+  ]), (origin) => withHome(async (home) => {
+    for (const manifestUrl of [
+      origin.replace("127.0.0.1", "localhost") + "/manifest.json",
+      origin.replace("127.0.0.1", "127.0.0.1@127.0.0.1") + "/manifest.json",
+    ]) {
+      const result = await runInstaller("zai-editor.sh", { manifestUrl, home });
+      assert.equal(result.code, 1);
+      assert.match(result.stderr, /refusing to download over a non-HTTPS URL/);
+    }
+    const result = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/redirect`, home });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /download failed/);
+  }));
+  for (const { appId } of INSTALLERS) {
+    const shell = await readFile(installerPath(`${appId}.sh`), "utf8");
+    const ps = await readFile(installerPath(`${appId}.ps1`), "utf8");
+    assert.match(shell, /--proto '=https' --proto-redir '=https'/);
+    assert.match(shell, /wget -q --https-only/);
+    assert.match(ps, /-MaximumRedirection 0 -PassThru/);
+    assert.match(ps, /127\\\.0\\\.0\\\.1/);
+    assert.match(ps, /refusing to follow a plaintext redirect/);
+  }
+});
+
+test("fixture archives round-trip through the extraction tools the installer uses", async () => {
+  const bytes = createZip({ "a.txt": "alpha", "nested/b.txt": "beta" });
+  const directory = await mkdtemp(join(tmpdir(), "zai-zip-"));
+  try {
+    const archive = join(directory, "fixture.zip");
+    await writeFile(archive, bytes);
+    await run("python3", ["-m", "zipfile", "-e", archive, join(directory, "out")]);
+    assert.equal(await readFile(join(directory, "out/nested/b.txt"), "utf8"), "beta");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
-});
-
-const windowsManifest = ({ archive, sha256 }) =>
-  manifestFor(archive.split("/").pop(), sha256, { asset: { platform: "windows", architecture: "x64", name: "zai CLI Windows x64" } });
-
-test("the PowerShell installer verifies, installs, and cleans up", { skip: powershellMissing }, async (t) => {
-  for (const shell of ["pwsh", "pwsh-iex"]) {
-    await t.test(shell, async () => {
-      const args = shell === "pwsh" ? ["--on-conflict", "keep"] : [];
-      const result = await installWith({ manifest: windowsManifest, args, shell });
-      assert.equal(result.code, 0, result.stderr);
-      assert.deepEqual(result.record.arguments, args);
-      assert.deepEqual(result.staging, []);
-      assert.deepEqual(result.workingDirectory, []);
-    });
-  }
-});
-
-test("the PowerShell installer stops on metadata and checksum problems", { skip: powershellMissing }, async (t) => {
-  const cases = [
-    ["a package whose bytes changed", ({ archive }) => manifestFor(archive.split("/").pop(), "b".repeat(64), { asset: { platform: "windows", architecture: "x64" } }), /checksum mismatch/i],
-    ["an unpublished app", () => ({ schemaVersion: 1, appId: APP_ID, release: null }), /no public release has been published yet/i],
-    ["another host", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256, { asset: { platform: "windows", architecture: "x64", url: "https://example.com/zai.zip" } }), /public release downloads/i],
-    ["a mismatched filename", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256, { asset: { platform: "windows", architecture: "x64", url: "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v1.2.3/other.zip" } }), /does not match this package/i],
-    ["another application", ({ archive, sha256 }) => ({ ...manifestFor(archive.split("/").pop(), sha256, { asset: { platform: "windows", architecture: "x64" } }), appId: "bplayer" }), /another application/i],
-    ["a package for another machine", ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256), /no published package for windows x64/i],
-  ];
-  for (const [name, manifest, message] of cases) {
-    await t.test(name, async () => {
-      const result = await installWith({ manifest, shell: "pwsh" });
-      assert.notEqual(result.code, 0);
-      assert.match(result.stderr, message);
-      assert.equal(result.record, null);
-      assert.deepEqual(result.staging, []);
-      assert.deepEqual(result.workingDirectory, []);
-    });
-  }
-});
-
-test("the PowerShell installer rejects non-loopback HTTP metadata overrides", { skip: powershellMissing }, async () => {
-  const result = await installWith({
-    manifest: windowsManifest, shell: "pwsh",
-    env: { ZAI_RELEASE_METADATA_URL: "http://example.com/releases/zai-cli/latest/manifest.json" },
-  });
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /downloads must use HTTPS/);
-  assert.equal(result.record, null);
-});
-
-test("the PowerShell installer rejects unsafe redirects before requesting their target", { skip: powershellMissing }, async (t) => {
-  for (const [name, route, location, message] of [
-    ["manifest HTTP redirect", "/releases/zai-cli/latest/manifest.json", "http://127.0.0.1:1/manifest.json", /downloads must use HTTPS/],
-    ["manifest foreign host", "/releases/zai-cli/latest/manifest.json", "https://example.com/manifest.json", /untrusted host/],
-    ["archive HTTP redirect", "/releases/zai-cli/latest/zai-cli-1.2.3-linux-amd64.zip", "http://127.0.0.1:1/package.zip", /downloads must use HTTPS/],
-    ["archive foreign host", "/releases/zai-cli/latest/zai-cli-1.2.3-linux-amd64.zip", "https://example.com/package.zip", /untrusted host/],
-  ]) {
-    await t.test(name, async () => {
-      const result = await installWith({
-        manifest: windowsManifest, shell: "pwsh",
-        configureRoutes: (routes) => { routes[route] = { status: 302, location }; },
-      });
-      assert.notEqual(result.code, 0);
-      assert.match(result.stderr, message);
-      assert.equal(result.record, null);
-      assert.deepEqual(result.staging, []);
-    });
-  }
-});
-
-test("the PowerShell installer forwards the requested install directory", { skip: powershellMissing }, async (t) => {
-  await t.test("from the environment", async () => {
-    const result = await installWith({ manifest: windowsManifest, env: { ZAI_INSTALL_DIR: "C:\\zai" }, shell: "pwsh" });
-    assert.equal(result.code, 0, result.stderr);
-    assert.deepEqual(result.record.arguments, ["--install-dir", "C:\\zai"]);
-  });
-  await t.test("without overriding an explicit argument", async () => {
-    const result = await installWith({ manifest: windowsManifest, env: { ZAI_INSTALL_DIR: "C:\\zai" }, args: ["--install-dir", "C:\\chosen"], shell: "pwsh" });
-    assert.equal(result.code, 0, result.stderr);
-    assert.deepEqual(result.record.arguments, ["--install-dir", "C:\\chosen"]);
-  });
-  await t.test("splitting a joined option so PowerShell cannot swallow it", async () => {
-    const result = await installWith({ manifest: windowsManifest, args: ["--on-conflict=keep"], shell: "pwsh" });
-    assert.equal(result.code, 0, result.stderr);
-    assert.deepEqual(result.record.arguments, ["--on-conflict", "keep"]);
-  });
-});
-
-test("a failing package installer is reported, not swallowed", { skip: shellTools.length ? `missing ${shellTools}` : false }, async (t) => {
-  await t.test("sh", async () => {
-    const result = await installWith({ manifest: ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256), archiveExit: 42 });
-    assert.equal(result.code, 42);
-    assert.deepEqual(result.staging, []);
-  });
-  await t.test("pwsh", { skip: powershellMissing }, async () => {
-    const result = await installWith({ manifest: windowsManifest, archiveExit: 42, shell: "pwsh" });
-    assert.notEqual(result.code, 0);
-    assert.match(result.stderr, /exited with code 42/);
-    assert.deepEqual(result.staging, []);
-  });
 });

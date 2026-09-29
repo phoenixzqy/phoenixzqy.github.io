@@ -57,42 +57,614 @@
     {
       "id": "zai-cli",
       "name": "zai",
-      "category": { "en": "DEVELOPER TOOLS", "zh-CN": "开发者工具" },
-      "tagline": { "en": "A terminal workspace for coding agents.", "zh-CN": "面向编码智能体的终端工作区。" },
+      "category": {
+        "en": "DEVELOPER TOOLS",
+        "zh-CN": "开发者工具"
+      },
+      "tagline": {
+        "en": "An AI-first workspace in your terminal.",
+        "zh-CN": "终端里的 AI 优先工作空间。"
+      },
       "summary": {
-        "en": "A terminal user interface that runs coding agents, Git worktrees, a code editor, and diff review in one place, with background services that carry work items through to pull requests.",
-        "zh-CN": "一个终端界面，把编码智能体、Git 工作树、代码编辑器和差异审阅集中在一处，并由后台服务把工作项推进到拉取请求。"
+        "en": "A terminal workspace for coding agents. Agents, worktrees, an editor with language servers, and diff review share one TUI, and background services carry GitHub and Azure DevOps work items through to merged pull requests.",
+        "zh-CN": "面向编码代理的终端工作空间。代理会话、工作树、带语言服务器的编辑器与差异审阅共处同一个 TUI；后台服务可以把 GitHub 与 Azure DevOps 工作项一路推进到已合并的拉取请求。"
       },
       "description": [
-        { "en": "zai is a terminal-native workspace. The whole interface is text, so it runs over plain SSH, inside a terminal multiplexer, and on headless machines without a desktop client. Projects open as tabs and split panes holding coding-agent sessions, shells, the bundled editor, and the bundled Git diff viewer.", "zh-CN": "zai 是一个原生运行于终端的工作区。整个界面都是文本，因此可以通过普通 SSH、在终端复用器中以及在无图形界面的机器上运行，无需桌面客户端。项目以标签页和分屏的形式打开，其中可以承载编码智能体会话、shell、内置编辑器和内置 Git 差异查看器。" },
-        { "en": "Every agent session reports whether it is running, waiting for you, or done, and that state rolls up to its tab, worktree, and project, so you can run many sessions at once and still see which one needs attention.", "zh-CN": "每个智能体会话都会报告自身处于运行中、等待你的输入还是已完成，并逐级汇总到所属标签页、工作树和项目，因此你可以同时运行多个会话，并随时看出哪一个需要你处理。" },
-        { "en": "Optional background services pair a deterministic poller with a coding agent so labeled issues and work items become implemented, reviewed, and merged pull requests on GitHub and Azure DevOps. Each repository chooses its own scope, filters, and model, and run data stays on your machine.", "zh-CN": "可选的后台服务将确定性轮询器与编码智能体配对，使带标签的议题和工作项在 GitHub 与 Azure DevOps 上被实现、审阅并合并为拉取请求。每个仓库都可以设置自己的范围、筛选条件和模型，运行数据保存在本机。" }
+        {
+          "en": "The whole workspace is a terminal UI, so it runs over plain SSH, inside tmux, and on headless machines without a desktop client. Projects hold tabs and split panes for coding agents, shells, the bundled editor, and the bundled Git viewer.",
+          "zh-CN": "整个工作空间都是终端界面，因此可以直接在 SSH、tmux 和无图形界面的机器上运行，无需桌面客户端。项目内可以打开标签页和分屏，用于编码代理、终端、内置编辑器和内置 Git 查看器。"
+        },
+        {
+          "en": "Every agent session shows a live status mark — running, waiting for you, or done — that rolls up from the pane to the tab, worktree, and project, so one waiting agent in a background project still flags that project. Updates are event-driven rather than polled.",
+          "zh-CN": "每个代理会话都会显示实时状态标记：运行中、等待输入或已完成。标记会从分屏逐级汇总到标签页、工作树和项目，因此后台项目中只要有一个代理在等待，该项目就会被标记出来。状态更新由事件驱动，而非轮询。"
+        },
+        {
+          "en": "Four background services pair a deterministic poller with a coding agent: dev implements a labeled issue and opens a linked pull request, review posts structured reviews, pr-babysitter fixes checks and conflicts until a pull request can merge, and housekeep runs local maintenance. Labels drive the lifecycle and run data stays local.",
+          "zh-CN": "四项后台服务各自由一个确定性轮询器搭配一个编码代理：dev 负责实现带标签的工作项并提交关联的拉取请求，review 发布结构化评审，pr-babysitter 修复检查与冲突直至可以合并，housekeep 执行本地维护。标签驱动整个生命周期，运行数据保存在本地。"
+        },
+        {
+          "en": "zai is a preview release. It needs Python 3.10+, Git, Node.js/npm, and a supported coding-agent CLI on your machine; it does not replace them. Published measurements were taken on one Linux machine and are not a general benchmark.",
+          "zh-CN": "zai 目前是预览版本。它需要你的机器上已安装 Python 3.10+、Git、Node.js/npm 以及受支持的编码代理 CLI，并不会替代它们。README 中的性能数据仅在一台 Linux 机器上测得，不代表通用基准。"
+        }
       ],
-      "stage": { "en": "Public preview", "zh-CN": "公开预览版" },
+      "stage": {
+        "en": "Preview release",
+        "zh-CN": "预览版本"
+      },
+      "artwork": {
+        "src": "/apps/media/zai-cli/zai-logo.png",
+        "alt": {
+          "en": "The zai wordmark: the Latin letters z, a, i beside the Chinese character 宰.",
+          "zh-CN": "zai 标识：拉丁字母 z、a、i 与汉字“宰”并排。"
+        },
+        "width": 414,
+        "height": 164
+      },
       "platforms": [
-        { "id": "linux", "name": "Linux", "status": { "en": "Supported. Requires Python 3.10 or newer, Node.js 22 with npm, plus curl and unzip for the one-line installer.", "zh-CN": "受支持。需要 Python 3.10 及以上版本、带 npm 的 Node.js 22，一行安装命令还需要 curl 和 unzip。" } },
-        { "id": "macos", "name": "macOS", "status": { "en": "Supported. Requires Python 3.10 or newer, Node.js 22 with npm, plus curl and unzip for the one-line installer. Packages are unsigned and not notarized.", "zh-CN": "受支持。需要 Python 3.10 及以上版本、带 npm 的 Node.js 22，一行安装命令还需要 curl 和 unzip。安装包未签名，也未经过公证。" } },
-        { "id": "windows", "name": "Windows", "status": { "en": "Supported. Requires Python 3.10 or newer and Node.js 22 with npm; install from PowerShell. Packages are unsigned.", "zh-CN": "受支持。需要 Python 3.10 及以上版本和带 npm 的 Node.js 22；请在 PowerShell 中安装。安装包未签名。" } }
+        {
+          "id": "linux",
+          "name": "Linux",
+          "status": {
+            "en": "x64 and arm64 archives. Needs Python 3.10+, Git, Node.js/npm, and a supported coding-agent CLI already installed. Tested most on Linux terminals.",
+            "zh-CN": "提供 x64 与 arm64 压缩包。需要事先安装 Python 3.10+、Git、Node.js/npm 以及受支持的编码代理 CLI。在 Linux 终端上测试最充分。"
+          }
+        },
+        {
+          "id": "macos",
+          "name": "macOS",
+          "status": {
+            "en": "x64 and arm64 archives, unsigned and not notarized. macOS quarantines unsigned downloads; you must approve them yourself. Same runtime requirements as Linux.",
+            "zh-CN": "提供 x64 与 arm64 压缩包，未签名且未公证。macOS 会隔离未签名的下载文件，需要你自行确认放行。运行环境要求与 Linux 相同。"
+          }
+        },
+        {
+          "id": "windows",
+          "name": "Windows",
+          "status": {
+            "en": "x64 and arm64 archives, unsigned. SmartScreen warns about unsigned executables. Use Windows Terminal or another terminal with full ANSI support; WSL also works.",
+            "zh-CN": "提供 x64 与 arm64 压缩包，未签名。SmartScreen 会对未签名的可执行文件发出警告。请使用 Windows Terminal 等完整支持 ANSI 的终端；WSL 同样可用。"
+          }
+        }
       ],
       "features": [
-        { "title": { "en": "Agents, side by side", "zh-CN": "并排运行的智能体" }, "description": { "en": "A project-based multiplexer with tabs and split panes for coding-agent sessions, shells, the editor, and the Git viewer, including earlier sessions you can resume.", "zh-CN": "基于项目的多路复用界面，提供标签页和分屏，用于编码智能体会话、shell、编辑器和 Git 查看器，并可恢复此前的会话。" } },
-        { "title": { "en": "Status you can see", "zh-CN": "一目了然的状态" }, "description": { "en": "Running, waiting, and done marks appear on the pane, then roll up to the tab, worktree, and project, so a single waiting agent still stands out.", "zh-CN": "运行中、等待中和已完成的标记显示在面板上，并逐级汇总到标签页、工作树和项目，即使只有一个智能体在等待也会突出显示。" } },
-        { "title": { "en": "Worktrees for parallel work", "zh-CN": "支持并行的工作树" }, "description": { "en": "People and agents claim and release Git worktrees through one shared registry, so each parallel session works in its own checkout.", "zh-CN": "人和智能体通过同一个共享登记表申领和释放 Git 工作树，使每个并行会话都在各自的检出目录中工作。" } },
-        { "title": { "en": "Editor with language servers", "zh-CN": "带语言服务器的编辑器" }, "description": { "en": "The bundled terminal editor offers familiar editing keys, multiple cursors, optional language-server completion and go-to-definition, Git blame and history, and previews.", "zh-CN": "内置的终端编辑器提供熟悉的编辑快捷键、多光标、可选的语言服务器补全与跳转定义、Git 追溯与历史记录，以及预览功能。" } },
-        { "title": { "en": "Diff review in the terminal", "zh-CN": "终端中的差异审阅" }, "description": { "en": "The bundled Git viewer shows inline or side-by-side diffs, and line comments can be sent straight to a live agent session.", "zh-CN": "内置的 Git 查看器支持行内或并排差异视图，逐行评论可直接发送给正在运行的智能体会话。" } },
-        { "title": { "en": "Delivery services", "zh-CN": "交付服务" }, "description": { "en": "Optional per-repository services implement labeled items, review pull requests, fix failing checks and conflicts, and perform local maintenance on GitHub and Azure DevOps.", "zh-CN": "可选的仓库级服务可以实现带标签的工作项、审阅拉取请求、修复失败的检查与冲突，并在 GitHub 和 Azure DevOps 上执行本地维护。" } },
-        { "title": { "en": "Shared themes", "zh-CN": "统一主题" }, "description": { "en": "The console, the editor, and the diff viewer read one theme file, and saved changes apply to running apps immediately.", "zh-CN": "控制台、编辑器和差异查看器读取同一个主题文件，保存的更改会立即应用到正在运行的应用。" } },
-        { "title": { "en": "English & Simplified Chinese", "zh-CN": "英语与简体中文" }, "description": { "en": "This app page and the download page are available in both languages; the application's own interface is in English.", "zh-CN": "本应用页面和下载页面提供两种语言；应用自身的界面为英语。" } }
+        {
+          "title": {
+            "en": "One terminal, many agents",
+            "zh-CN": "一个终端，多个代理"
+          },
+          "description": {
+            "en": "Project-based tabs and split panes host coding-agent sessions, shells, the editor, and the Git viewer side by side, with earlier sessions resumable.",
+            "zh-CN": "基于项目的标签页与分屏可以并排承载编码代理会话、终端、编辑器和 Git 查看器，并且可以恢复此前的会话。"
+          }
+        },
+        {
+          "title": {
+            "en": "Status you can see at a glance",
+            "zh-CN": "一眼看清谁在等你"
+          },
+          "description": {
+            "en": "Running, waiting, and done marks roll up from pane to tab, worktree, and project. Waiting outranks running, so the agent that needs you surfaces first.",
+            "zh-CN": "运行中、等待输入和已完成三种标记会从分屏逐级汇总到标签页、工作树和项目。等待优先于运行，需要你介入的代理会最先浮现。"
+          }
+        },
+        {
+          "title": {
+            "en": "Delivery services",
+            "zh-CN": "交付服务"
+          },
+          "description": {
+            "en": "dev, review, pr-babysitter, and housekeep each pair a deterministic poller with an agent. Every repository picks its own scope, filters, and model.",
+            "zh-CN": "dev、review、pr-babysitter 与 housekeep 各自由确定性轮询器搭配代理。每个仓库可以自行选择范围、过滤条件和模型。"
+          }
+        },
+        {
+          "title": {
+            "en": "Shared worktree registry",
+            "zh-CN": "共享工作树登记表"
+          },
+          "description": {
+            "en": "People and agents claim and release checkouts through one registry, so parallel agents never edit the same working tree.",
+            "zh-CN": "人和代理通过同一份登记表申领与释放检出目录，并行的代理不会改动同一个工作区。"
+          }
+        },
+        {
+          "title": {
+            "en": "Editor and diff review, built in",
+            "zh-CN": "内置编辑器与差异审阅"
+          },
+          "description": {
+            "en": "The bundled zai-editor and zai-gitter run as rails, tabs, or standalone apps, sharing one theme file with the console.",
+            "zh-CN": "内置的 zai-editor 与 zai-gitter 可作为侧栏、标签页或独立应用运行，并与控制台共用同一份主题配置。"
+          }
+        },
+        {
+          "title": {
+            "en": "Automations and team packages",
+            "zh-CN": "自动化与团队软件包"
+          },
+          "description": {
+            "en": "Schedule background runs hourly, daily, weekly, or by cron, and export your configs, agents, and skills as a package others can install.",
+            "zh-CN": "可以按小时、按天、按周或以 cron 表达式安排后台任务，并把配置、代理与技能导出为他人可安装的软件包。"
+          }
+        }
       ],
-      "notice": { "en": "Preview software distributed as unsigned packages. It runs coding agents that read and modify your repositories and can open, update, and merge pull requests, so review its configuration before enabling background services and follow your device and organization policies. You supply and pay for your own coding-agent CLI and model access.", "zh-CN": "预览版软件，以未签名安装包形式分发。它会运行编码智能体来读取和修改你的仓库，并可能创建、更新和合并拉取请求，因此在启用后台服务前请先检查其配置，并遵守设备与组织的安全策略。编码智能体 CLI 及模型使用需由你自行提供并承担费用。" },
+      "documentation": true,
+      "notice": {
+        "en": "Preview software that runs coding agents against your repositories and forge accounts. Review what an agent proposes before merging it, keep credentials in your own tools, and follow your organization's policies for automated commits, reviews, and merges.",
+        "zh-CN": "这是会针对你的仓库和代码托管账号运行编码代理的预览版软件。合并前请先审阅代理提交的内容，凭据请保存在你自己的工具中，并遵守所在组织关于自动提交、评审与合并的规定。"
+      },
+      "installCommands": [
+        {
+          "label": {
+            "en": "macOS and Linux",
+            "zh-CN": "macOS 与 Linux"
+          },
+          "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh"
+        },
+        {
+          "label": {
+            "en": "Windows PowerShell",
+            "zh-CN": "Windows PowerShell"
+          },
+          "command": "irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex"
+        }
+      ],
       "installation": [
-        { "en": "Install Python 3.10 or newer and Node.js 22 with npm first, and a supported coding-agent CLI. On macOS and Linux the one-line installer also needs curl and unzip.", "zh-CN": "请先安装 Python 3.10 及以上版本、带 npm 的 Node.js 22，以及受支持的编码智能体 CLI。在 macOS 和 Linux 上，一行安装命令还需要 curl 和 unzip。" },
-        { "en": "On macOS or Linux, run: curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh", "zh-CN": "在 macOS 或 Linux 上运行：curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh" },
-        { "en": "In Windows PowerShell, run: irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex", "zh-CN": "在 Windows PowerShell 中运行：irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex" },
-        { "en": "The installer reads the published release manifest, downloads the archive for your platform and architecture into the system temporary directory, verifies its SHA-256 before using it, runs the bundled package installer, and removes its downloads afterwards. Set ZAI_INSTALL_DIR to install somewhere other than the default location.", "zh-CN": "安装程序会读取已发布的版本清单，将适用于你的平台和架构的压缩包下载到系统临时目录，先校验其 SHA-256 再使用，然后运行随包提供的安装脚本，并在结束后删除下载内容。设置 ZAI_INSTALL_DIR 可安装到默认位置以外的目录。" },
-        { "en": "To install manually, download the archive for your platform from this page, verify its SHA-256 against the value shown here, extract the whole archive, and run the bundled install script from the extracted folder.", "zh-CN": "如需手动安装，请在本页下载适用于你平台的压缩包，核对此处显示的 SHA-256 校验值，完整解压后在解压目录运行随包提供的安装脚本。" },
-        { "en": "Packages are unsigned. Do not disable operating-system or organization security policies to run one; a checksum detects file changes but does not establish publisher identity.", "zh-CN": "安装包未签名。请勿为运行安装包而关闭操作系统或组织的安全策略；校验值只能发现文件被改动，并不能证明发布者身份。" },
-        { "en": "Open a new terminal after installing to pick up the updated PATH, then run the tool from any folder.", "zh-CN": "安装完成后请打开新的终端以使更新后的 PATH 生效，然后即可在任意目录运行该工具。" }
+        {
+          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, and then runs the bundled Python package installer.",
+          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验其 SHA-256 值，然后运行压缩包内附带的 Python 安装程序。"
+        },
+        {
+          "en": "Install Python 3.10 or newer, Git, Node.js with npm, and your coding-agent CLI first. The installer needs python3 (py -3 or python on Windows) on PATH and will stop with a message if it is missing.",
+          "zh-CN": "请先安装 Python 3.10 或更高版本、Git、带 npm 的 Node.js 以及你的编码代理 CLI。安装脚本需要 PATH 中存在 python3（Windows 上为 py -3 或 python），否则会给出提示并停止。"
+        },
+        {
+          "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",
+          "zh-CN": "想先看清楚再执行？可以在浏览器中打开安装脚本地址，或从下载页取得压缩包，自行核对已公布的 SHA-256 值后再解压。"
+        },
+        {
+          "en": "Packages are unsigned. macOS quarantines unsigned downloads and Windows SmartScreen warns about them. Do not disable operating-system or organization security policies to run a preview build.",
+          "zh-CN": "安装包未签名。macOS 会隔离未签名的下载文件，Windows SmartScreen 也会发出警告。请不要为了运行预览版本而关闭操作系统或组织的安全策略。"
+        },
+        {
+          "en": "Open a new terminal after installing so the updated PATH applies, then run zai from any folder. To start the services in a repository, run zai config init and then zai start all.",
+          "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意目录运行 zai。若要在某个仓库中启动服务，请先运行 zai config init，再运行 zai start all。"
+        }
+      ]
+    },
+    {
+      "id": "zai-editor",
+      "name": "zai-editor",
+      "category": {
+        "en": "DEVELOPER TOOLS",
+        "zh-CN": "开发者工具"
+      },
+      "tagline": {
+        "en": "Your terminal. Your code. More than text.",
+        "zh-CN": "你的终端，你的代码，不只是文本。"
+      },
+      "summary": {
+        "en": "A terminal editor for writing code, understanding its history, and seeing what you are building. Familiar shortcuts, mouse support, multi-cursor editing, browser previews, and live theme selection, in one native executable.",
+        "zh-CN": "一款终端编辑器，用来写代码、理解代码的来龙去脉，并直观地看到成果。熟悉的快捷键、鼠标支持、多光标编辑、浏览器预览和实时主题切换，全部集成在一个原生可执行文件中。"
+      },
+      "description": [
+        {
+          "en": "Core editing needs no external editor, Node.js runtime, language server, or coding agent. Editing and workspace search run in Go, so there is no separate search tool to install. Git is optional and powers history; a browser displays previews.",
+          "zh-CN": "核心编辑功能不依赖外部编辑器、Node.js 运行时、语言服务器或编码代理。编辑与工作区搜索均由 Go 实现，无需另行安装搜索工具。Git 是可选项，用于提供历史记录；浏览器用于显示预览。"
+        },
+        {
+          "en": "Add carets or select the next occurrence, edit every cursor together, and undo the whole change in one step. Quick Open, literal workspace search, in-buffer Find, a lazy file tree, transient browsing tabs, and back/forward cursor history keep files and locations within reach.",
+          "zh-CN": "可以添加光标或选中下一处匹配，同时编辑所有光标，并一步撤销整次修改。快速打开、工作区字面量搜索、缓冲区内查找、惰性加载的文件树、临时浏览标签页以及光标前进/后退历史，让文件和位置始终触手可及。"
+        },
+        {
+          "en": "Git blame reads the unsaved buffer instead of stale line numbers on disk, and file history is rename-aware. Saves check for external changes and refuse detected conflicts: clean buffers reload supported text, while dirty buffers keep your edits and show the conflict.",
+          "zh-CN": "Git blame 读取的是尚未保存的缓冲区内容，而不是磁盘上已过时的行号；文件历史可识别重命名。保存前会检查外部改动，发现冲突即拒绝写入：干净的缓冲区会重新加载受支持的文本，含有未保存修改的缓冲区则保留你的编辑并显示冲突。"
+        },
+        {
+          "en": "It is a focused text editor, not a full IDE or a large-file viewer. Editing is limited to UTF-8 text files up to 1 MiB each, with consistent LF or CRLF line endings and no NUL bytes. Keyboard shortcuts and clipboard operations depend on terminal support; the command palette provides alternatives for intercepted shortcuts.",
+          "zh-CN": "它是一款专注的文本编辑器，而非完整 IDE 或大文件查看器。可编辑的文件限于单个不超过 1 MiB 的 UTF-8 文本，行尾必须统一为 LF 或 CRLF，且不能包含 NUL 字节。快捷键与剪贴板操作取决于终端支持情况；对于被终端拦截的快捷键，命令面板提供了替代入口。"
+        }
+      ],
+      "stage": {
+        "en": "Preview release",
+        "zh-CN": "预览版本"
+      },
+      "artwork": {
+        "src": "/apps/media/zai-editor/zai-logo.png",
+        "alt": {
+          "en": "The zai wordmark: the Latin letters z, a, i beside the Chinese character 宰.",
+          "zh-CN": "zai 标识：拉丁字母 z、a、i 与汉字“宰”并排。"
+        },
+        "width": 414,
+        "height": 164
+      },
+      "videos": [
+        {
+          "src": "/apps/media/zai-editor/multi-cursor.mp4",
+          "poster": "/apps/media/zai-editor/multi-cursor-poster.webp",
+          "width": 1280,
+          "height": 768,
+          "muted": true,
+          "title": {
+            "en": "Edit in more than one place",
+            "zh-CN": "在多个位置同时编辑"
+          },
+          "caption": {
+            "en": "Navigate, select, and make changes in the terminal: add carets, edit every cursor together, and undo the whole change in one step.",
+            "zh-CN": "在终端中导航、选择并修改：添加光标、同时编辑所有光标，并一步撤销整次修改。"
+          }
+        },
+        {
+          "src": "/apps/media/zai-editor/browser-preview.mp4",
+          "poster": "/apps/media/zai-editor/browser-preview-poster.webp",
+          "width": 1280,
+          "height": 768,
+          "muted": true,
+          "title": {
+            "en": "From source to preview",
+            "zh-CN": "从源码到预览"
+          },
+          "caption": {
+            "en": "Read Markdown, render Mermaid diagrams, and preview HTML in the browser. Markdown previews capture unsaved edits; HTML reads saved files, so preview trusted content only.",
+            "zh-CN": "阅读 Markdown、渲染 Mermaid 图表，并在浏览器中预览 HTML。Markdown 预览包含未保存的修改；HTML 读取的是已保存的文件，因此请只预览可信内容。"
+          }
+        },
+        {
+          "src": "/apps/media/zai-editor/blame-history.mp4",
+          "poster": "/apps/media/zai-editor/blame-history-poster.webp",
+          "width": 1280,
+          "height": 768,
+          "muted": true,
+          "title": {
+            "en": "Find the story behind a line",
+            "zh-CN": "找出一行代码的来龙去脉"
+          },
+          "caption": {
+            "en": "See blame for the buffer you are actually editing and browse rename-aware file history. The panel sits beside your source when space allows, and uses an overlay in narrow layouts.",
+            "zh-CN": "查看你正在编辑的缓冲区对应的 blame，并浏览可识别重命名的文件历史。空间足够时面板会停靠在源码旁，窗口较窄时则以浮层显示。"
+          }
+        },
+        {
+          "src": "/apps/media/zai-editor/theme-picker.mp4",
+          "poster": "/apps/media/zai-editor/theme-picker-poster.webp",
+          "width": 1280,
+          "height": 768,
+          "muted": true,
+          "title": {
+            "en": "Make the editor yours",
+            "zh-CN": "把编辑器变成你的样子"
+          },
+          "caption": {
+            "en": "Browse themes and watch the editor change before you save your choice. Standalone and zai-hosted editors share the same per-app theme setting.",
+            "zh-CN": "浏览主题并实时看到编辑器的变化，确认后再保存选择。独立运行和由 zai 承载的编辑器共用同一份按应用保存的主题设置。"
+          }
+        }
+      ],
+      "platforms": [
+        {
+          "id": "linux",
+          "name": "Linux",
+          "status": {
+            "en": "x64 and arm64. A single static executable with no runtime to install. Git enables history, a browser enables previews, and language servers are optional.",
+            "zh-CN": "提供 x64 与 arm64 版本。单个静态可执行文件，无需安装运行时。Git 用于启用历史记录，浏览器用于预览，语言服务器为可选项。"
+          }
+        },
+        {
+          "id": "macos",
+          "name": "macOS",
+          "status": {
+            "en": "x64 and arm64, unsigned and not notarized. macOS quarantines unsigned downloads; you must approve them yourself before the executable runs.",
+            "zh-CN": "提供 x64 与 arm64 版本，未签名且未公证。macOS 会隔离未签名的下载文件，需要你自行确认放行后才能运行。"
+          }
+        },
+        {
+          "id": "windows",
+          "name": "Windows",
+          "status": {
+            "en": "x64 and arm64, unsigned. Use Windows Terminal or another terminal with full ANSI and mouse support; WSL also works. SmartScreen warns about unsigned executables.",
+            "zh-CN": "提供 x64 与 arm64 版本，未签名。请使用 Windows Terminal 等完整支持 ANSI 与鼠标的终端；WSL 同样可用。SmartScreen 会对未签名的可执行文件发出警告。"
+          }
+        }
+      ],
+      "features": [
+        {
+          "title": {
+            "en": "Multi-cursor editing",
+            "zh-CN": "多光标编辑"
+          },
+          "description": {
+            "en": "Add carets or select the next occurrence, edit them together, and undo the whole change in one step. Paste one line per cursor to distribute edits.",
+            "zh-CN": "添加光标或选中下一处匹配，同时编辑并一步撤销整次修改。粘贴时可按行分配到各个光标。"
+          }
+        },
+        {
+          "title": {
+            "en": "History that follows your code",
+            "zh-CN": "紧跟代码的历史记录"
+          },
+          "description": {
+            "en": "Blame uses the unsaved buffer, not stale disk line numbers. Browse rename-aware file history and look up associated pull requests with your existing authentication.",
+            "zh-CN": "Blame 基于未保存的缓冲区，而非磁盘上已过时的行号。可浏览识别重命名的文件历史，并使用你已有的登录凭据查询相关拉取请求。"
+          }
+        },
+        {
+          "title": {
+            "en": "Markdown, Mermaid, and HTML previews",
+            "zh-CN": "Markdown、Mermaid 与 HTML 预览"
+          },
+          "description": {
+            "en": "Open a browser preview without a frontend toolchain. Markdown includes unsaved edits; diagram and renderer assets are bundled for offline use.",
+            "zh-CN": "无需前端工具链即可打开浏览器预览。Markdown 预览包含未保存的修改；图表与渲染资源已内置，可离线使用。"
+          }
+        },
+        {
+          "title": {
+            "en": "Code context for your agent",
+            "zh-CN": "为代理准备好上下文"
+          },
+          "description": {
+            "en": "Add inline comments without changing the file. Ask AI assembles your question, captured excerpts, and selection into a request you can copy to a coding agent.",
+            "zh-CN": "可以在不修改文件的前提下添加行内注释。Ask AI 会把你的问题、抓取的代码片段与当前选区组装成可复制给编码代理的请求。"
+          }
+        },
+        {
+          "title": {
+            "en": "Themes you can see before choosing",
+            "zh-CN": "先看效果再选主题"
+          },
+          "description": {
+            "en": "Preview themes live in Settings and save your choice. Standalone and zai-hosted editors share the same per-app theme setting.",
+            "zh-CN": "在设置中实时预览主题并保存选择。独立运行和由 zai 承载的编辑器共用同一份按应用保存的主题设置。"
+          }
+        },
+        {
+          "title": {
+            "en": "Language tools on your terms",
+            "zh-CN": "按需启用语言工具"
+          },
+          "description": {
+            "en": "Syntax highlighting works without a language server. Install and enable supported servers explicitly for completion and go-to-definition when you need them.",
+            "zh-CN": "语法高亮无需语言服务器即可工作。需要补全和跳转到定义时，再显式安装并启用受支持的语言服务器。"
+          }
+        }
+      ],
+      "documentation": true,
+      "notice": {
+        "en": "Preview software distributed as unsigned packages. Preview only content you trust: HTML previews can run scripts on the shared preview origin. Follow your device and organization security policies, and keep your own backups of files you edit.",
+        "zh-CN": "这是以未签名安装包形式分发的预览版软件。请只预览你信任的内容：HTML 预览可能在共享的预览来源上执行脚本。请遵守设备与组织的安全策略，并为你编辑的文件自行保留备份。"
+      },
+      "installCommands": [
+        {
+          "label": {
+            "en": "macOS and Linux",
+            "zh-CN": "macOS 与 Linux"
+          },
+          "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-editor.sh | sh"
+        },
+        {
+          "label": {
+            "en": "Windows PowerShell",
+            "zh-CN": "Windows PowerShell"
+          },
+          "command": "irm https://phoenixzqy.github.io/install/zai-editor.ps1 | iex"
+        }
+      ],
+      "installation": [
+        {
+          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and adds that folder to your user PATH.",
+          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并将该文件夹加入用户 PATH。"
+        },
+        {
+          "en": "The macOS/Linux one-line installer requires Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai. Git and language servers stay optional and are never installed for you.",
+          "zh-CN": "macOS/Linux 的一键安装脚本需要 Python 3 来读取发布清单；安装后的可执行文件不需要 Python、Go 工具链、Node.js 运行时或 zai。Git 与语言服务器始终是可选项，安装脚本不会替你安装它们。"
+        },
+        {
+          "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",
+          "zh-CN": "想先看清楚再执行？可以在浏览器中打开安装脚本地址，或从下载页取得压缩包，自行核对已公布的 SHA-256 值后再解压。"
+        },
+        {
+          "en": "Packages are unsigned. macOS quarantines unsigned downloads and Windows SmartScreen warns about them. Do not disable operating-system or organization security policies to run a preview build.",
+          "zh-CN": "安装包未签名。macOS 会隔离未签名的下载文件，Windows SmartScreen 也会发出警告。请不要为了运行预览版本而关闭操作系统或组织的安全策略。"
+        },
+        {
+          "en": "Open a new terminal after installing so the updated PATH applies, then run zai-editor from any folder.",
+          "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意目录运行 zai-editor。"
+        }
+      ]
+    },
+    {
+      "id": "zai-gitter",
+      "name": "zai-gitter",
+      "category": {
+        "en": "DEVELOPER TOOLS",
+        "zh-CN": "开发者工具"
+      },
+      "tagline": {
+        "en": "Review Git changes like a pull request.",
+        "zh-CN": "像审阅拉取请求一样审阅本地改动。"
+      },
+      "summary": {
+        "en": "A fast, read-only Git diff reviewer for your terminal. Side-by-side diffs, line-anchored review comments, one-key Ask AI export, and 25 built-in themes in a single small binary with no runtime to install.",
+        "zh-CN": "一款快速、只读的终端 Git 差异审阅工具。并排差异、可锚定到行的审阅批注、一键 Ask AI 导出以及 25 款内置主题，全部集成在一个体积很小的二进制文件中，无需安装运行时。"
+      },
+      "description": [
+        {
+          "en": "Browse net working-tree changes — staged, unstaged, and untracked — or any commit, file by file, with added and deleted line totals for the workspace, folder, or file. Diffs are inline on narrow terminals and switch to side-by-side automatically once the terminal is wide enough.",
+          "zh-CN": "逐个文件浏览工作区的净改动（已暂存、未暂存与未跟踪），或浏览任意一次提交，并查看工作区、目录或文件层面的新增与删除行数统计。终端较窄时使用行内差异，宽度足够时会自动切换为并排差异。"
+        },
+        {
+          "en": "Leave comments on lines or selections. Drafts keep their anchors across refreshes, and anchors that may be stale are flagged instead of silently moved. One key exports your question, your comments with file, range, and revision, and the current selection as a bounded, copy-ready prompt in which repository text is marked as untrusted data.",
+          "zh-CN": "可以针对某一行或某段选区留下批注。草稿在刷新后仍保留锚点；可能已失效的锚点会被标记出来，而不会被悄悄移动。一键即可把你的问题、带文件/范围/版本信息的批注以及当前选区，导出为有边界、可直接复制的提示词，其中仓库文本会被标注为不可信数据。"
+        },
+        {
+          "en": "Viewing never writes the index or working tree and never runs external diff or textconv commands. Git actions stay behind an explicit command palette, with confirmation before anything destructive. Searchable branch and commit panels, guarded branch switching, and an all-ref graph view live in one sidebar.",
+          "zh-CN": "浏览过程绝不会写入索引或工作区，也不会调用外部 diff 或 textconv 命令。Git 操作全部收拢在显式的命令面板中，执行破坏性操作前会要求确认。可搜索的分支与提交面板、带保护的分支切换，以及包含全部引用的图形视图，都集中在同一个侧栏中。"
+        },
+        {
+          "en": "It runs anywhere Git does — Windows, Linux, macOS, WSL, and SSH sessions — and needs no forge account, server, or AI agent. Comparison figures in the project README were measured on one Linux machine; other tools were not independently assessed.",
+          "zh-CN": "只要能运行 Git 的地方它都能运行：Windows、Linux、macOS、WSL 以及 SSH 会话，且不需要代码托管账号、服务器或 AI 代理。项目 README 中的对比数据仅在一台 Linux 机器上测得，其他工具未经独立评估。"
+        }
+      ],
+      "stage": {
+        "en": "Preview release",
+        "zh-CN": "预览版本"
+      },
+      "artwork": {
+        "src": "/apps/media/zai-gitter/zai-logo.png",
+        "alt": {
+          "en": "The zai wordmark: the Latin letters z, a, i beside the Chinese character 宰.",
+          "zh-CN": "zai 标识：拉丁字母 z、a、i 与汉字“宰”并排。"
+        },
+        "width": 414,
+        "height": 164
+      },
+      "videos": [
+        {
+          "src": "/apps/media/zai-gitter/review-demo.mp4",
+          "poster": "/apps/media/zai-gitter/review-demo-poster.webp",
+          "width": 1280,
+          "height": 768,
+          "muted": true,
+          "title": {
+            "en": "A full review pass",
+            "zh-CN": "一次完整的审阅"
+          },
+          "caption": {
+            "en": "Reviewing changes file by file, dragging panel borders and following commit quick links, and switching themes live without leaving the viewer.",
+            "zh-CN": "逐个文件审阅改动、拖拽面板边框、跟随提交快捷链接，并在不离开查看器的情况下实时切换主题。"
+          }
+        }
+      ],
+      "platforms": [
+        {
+          "id": "linux",
+          "name": "Linux",
+          "status": {
+            "en": "x64 and arm64. A single static executable of about 9 MB with no runtime to install. Git must be on PATH.",
+            "zh-CN": "提供 x64 与 arm64 版本。单个约 9 MB 的静态可执行文件，无需安装运行时。PATH 中必须能找到 Git。"
+          }
+        },
+        {
+          "id": "macos",
+          "name": "macOS",
+          "status": {
+            "en": "x64 and arm64, unsigned and not notarized. macOS quarantines unsigned downloads; you must approve them yourself before the executable runs. Git must be on PATH.",
+            "zh-CN": "提供 x64 与 arm64 版本，未签名且未公证。macOS 会隔离未签名的下载文件，需要你自行确认放行后才能运行。PATH 中必须能找到 Git。"
+          }
+        },
+        {
+          "id": "windows",
+          "name": "Windows",
+          "status": {
+            "en": "x64 and arm64, unsigned. Use Windows Terminal or another terminal with full ANSI and mouse support; WSL also works, including commit quick links. SmartScreen warns about unsigned executables.",
+            "zh-CN": "提供 x64 与 arm64 版本，未签名。请使用 Windows Terminal 等完整支持 ANSI 与鼠标的终端；WSL 同样可用，包括提交快捷链接。SmartScreen 会对未签名的可执行文件发出警告。"
+          }
+        }
+      ],
+      "features": [
+        {
+          "title": {
+            "en": "Pull-request review before you commit",
+            "zh-CN": "提交前的拉取请求式审阅"
+          },
+          "description": {
+            "en": "Browse net working-tree changes or any commit, file by file, with added and deleted totals for the workspace, folder, or file.",
+            "zh-CN": "逐个文件浏览工作区净改动或任意提交，并查看工作区、目录或文件的新增与删除行数统计。"
+          }
+        },
+        {
+          "title": {
+            "en": "Line-anchored review comments",
+            "zh-CN": "锚定到行的审阅批注"
+          },
+          "description": {
+            "en": "Comment on lines or selections. Drafts keep their anchors across refreshes, and anchors that may be stale are flagged rather than silently moved.",
+            "zh-CN": "针对行或选区留下批注。草稿在刷新后保留锚点，可能失效的锚点会被标记而不是被悄悄移动。"
+          }
+        },
+        {
+          "title": {
+            "en": "Ask AI with the right context",
+            "zh-CN": "带着上下文询问 AI"
+          },
+          "description": {
+            "en": "One key exports your question, your comments with file, range, and revision, and the current selection as a bounded prompt. Repository text is marked as untrusted data.",
+            "zh-CN": "一键即可把问题、带文件/范围/版本的批注与当前选区导出为有边界的提示词，其中仓库文本被标注为不可信数据。"
+          }
+        },
+        {
+          "title": {
+            "en": "Diffs that fit your terminal",
+            "zh-CN": "适配终端的差异视图"
+          },
+          "description": {
+            "en": "Inline on narrow terminals and side-by-side once the terminal is wide enough. Full-file view and word wrap are one key away.",
+            "zh-CN": "终端较窄时使用行内差异，宽度足够时切换为并排。整文件视图与自动换行都只需一个按键。"
+          }
+        },
+        {
+          "title": {
+            "en": "Safe by default",
+            "zh-CN": "默认安全"
+          },
+          "description": {
+            "en": "Viewing never writes the index or working tree and never runs external diff or textconv. Git actions stay behind a command palette with confirmation before destructive steps.",
+            "zh-CN": "浏览不会写入索引或工作区，也不会运行外部 diff 或 textconv。Git 操作收拢在命令面板中，破坏性步骤前会要求确认。"
+          }
+        },
+        {
+          "title": {
+            "en": "25 themes with live preview",
+            "zh-CN": "25 款主题，实时预览"
+          },
+          "description": {
+            "en": "One Dark, Tokyo Night, Catppuccin, Kanagawa, Rosé Pine, Gruvbox, Nord, Dracula, Everforest, and more. The viewer follows your terminal's light or dark background.",
+            "zh-CN": "包含 One Dark、Tokyo Night、Catppuccin、Kanagawa、Rosé Pine、Gruvbox、Nord、Dracula、Everforest 等。查看器会跟随终端的明暗背景。"
+          }
+        }
+      ],
+      "documentation": true,
+      "notice": {
+        "en": "Preview software distributed as unsigned packages. Review comments and exported prompts contain your repository's code; check what you are sending before pasting it into an AI assistant, and follow your device and organization security policies.",
+        "zh-CN": "这是以未签名安装包形式分发的预览版软件。审阅批注与导出的提示词包含你仓库中的代码，粘贴给 AI 助手之前请先确认发送内容，并遵守设备与组织的安全策略。"
+      },
+      "installCommands": [
+        {
+          "label": {
+            "en": "macOS and Linux",
+            "zh-CN": "macOS 与 Linux"
+          },
+          "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh"
+        },
+        {
+          "label": {
+            "en": "Windows PowerShell",
+            "zh-CN": "Windows PowerShell"
+          },
+          "command": "irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex"
+        }
+      ],
+      "installation": [
+        {
+          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and adds that folder to your user PATH.",
+          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并将该文件夹加入用户 PATH。"
+        },
+        {
+          "en": "Git must already be installed and on PATH; the installer does not install it. The macOS/Linux one-line installer needs Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai.",
+          "zh-CN": "Git 必须已经安装并位于 PATH 中，安装脚本不会替你安装它。macOS/Linux 的一键安装脚本需要 Python 3 来读取发布清单；安装后的可执行文件不需要 Python、Go 工具链、Node.js 运行时或 zai。"
+        },
+        {
+          "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",
+          "zh-CN": "想先看清楚再执行？可以在浏览器中打开安装脚本地址，或从下载页取得压缩包，自行核对已公布的 SHA-256 值后再解压。"
+        },
+        {
+          "en": "Packages are unsigned. macOS quarantines unsigned downloads and Windows SmartScreen warns about them. Do not disable operating-system or organization security policies to run a preview build.",
+          "zh-CN": "安装包未签名。macOS 会隔离未签名的下载文件，Windows SmartScreen 也会发出警告。请不要为了运行预览版本而关闭操作系统或组织的安全策略。"
+        },
+        {
+          "en": "Open a new terminal after installing so the updated PATH applies, then run zai-gitter in any repository. Press F1 for commands, F2 for settings, and Ctrl+Q to quit.",
+          "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意仓库中运行 zai-gitter。按 F1 打开命令面板，F2 打开设置，Ctrl+Q 退出。"
+        }
       ]
     }
   ]

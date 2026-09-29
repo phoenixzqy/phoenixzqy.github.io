@@ -158,24 +158,3 @@ test("apps explain the JavaScript requirement without hiding fallback navigation
   await expect(page.getByRole("link", { name: "Return to the résumé." })).toBeVisible();
   await context.close();
 });
-
-test("the zai-cli entry documents its public install commands and awaits its first build", async ({ page, baseURL }) => {
-  await page.goto("/apps/app/?id=zai-cli");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("zai");
-  await expect(page.getByText("curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh")).toBeVisible();
-  await expect(page.getByText("irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex")).toBeVisible();
-  for (const platform of ["Linux", "macOS", "Windows"]) {
-    await expect(page.getByRole("heading", { name: platform, exact: true })).toBeVisible();
-  }
-  await page.getByRole("link", { name: "View releases & downloads" }).click();
-  await expect(page).toHaveURL(/\/apps\/releases\/\?id=zai-cli&lang=en$/);
-  await expect(page.getByRole("heading", { name: "Not released here. Yet.", exact: true })).toBeVisible();
-  await expect(page.locator(".download-link")).toHaveCount(0);
-
-  // The one-line installers are published by this site, so they must be served.
-  for (const [path, ending] of [["/install/zai-cli.sh", 'zai_cli_install "$@"'], ["/install/zai-cli.ps1", "Install-ZaiCli @args"]]) {
-    const response = await page.request.get(`${baseURL}${path}`);
-    expect(response.status()).toBe(200);
-    expect((await response.text()).trimEnd().endsWith(ending)).toBe(true);
-  }
-});
