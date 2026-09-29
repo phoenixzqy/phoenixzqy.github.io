@@ -3,22 +3,25 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
+  mkdtempSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")));
 
 function git(repo, ...args) {
-  return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8" }).trim();
+  return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8", env: gitEnv }).trim();
 }
 
 function fixture() {
-  const fixtureRoot = join(root, `.test-sync-app-docs-${process.pid}-${Date.now()}`);
+  const fixtureRoot = mkdtempSync(join(tmpdir(), "zai-docs-sync-"));
   const site = join(fixtureRoot, "site");
   const source = join(fixtureRoot, "source");
   mkdirSync(join(site, "scripts"), { recursive: true });
@@ -70,7 +73,7 @@ function sync(site, source, ...args) {
     join(site, "scripts/sync-app-docs.mjs"),
     ...args,
     "--repo", `sample=${source}`,
-  ], { cwd: site, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  ], { cwd: site, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: gitEnv });
 }
 
 test("documentation sync rewrites Markdown links but leaves code untouched", () => {
