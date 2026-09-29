@@ -125,16 +125,19 @@ try {
         exit 2
     }
 
-    $asset = $manifest.release.assets |
+    $assets = @($manifest.release.assets |
         Where-Object {
             $_.platform -eq 'windows' -and
             $_.architecture -eq $architecture -and
             ([string] $_.file) -match '\.zip$'
-        } |
-        Select-Object -First 1
-    if ($null -eq $asset) {
+        })
+    if ($assets.Count -eq 0) {
         Stop-Install "the published release has no package for windows/$architecture. See $site/apps/releases/?id=$appId for the packages that are available."
     }
+    if ($assets.Count -gt 1) {
+        Stop-Install "the release manifest contains multiple ZIP packages for windows/$architecture. Refusing to choose one ambiguously."
+    }
+    $asset = $assets[0]
     if ($asset.file -match '[\\/]' -or $asset.file -match '\.\.') {
         Stop-Install "the manifest package name is not a plain filename: $($asset.file)"
     }

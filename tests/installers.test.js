@@ -104,6 +104,7 @@ test("shell installers are self-contained, fail-safe, and honour the documented 
     assert.match(script, /ZAI_RELEASE_MANIFEST_URL/, label);
     assert.match(script, /sha256sum[\s\S]*shasum -a 256/, label);
     assert.match(script, /unzip[\s\S]*bsdtar[\s\S]*python3 -m zipfile/, label);
+    assert.match(script, /python3 - "\$MANIFEST"[\s\S]*json\.load\(manifest_file\)/, label);
     assert.match(script, /x86_64 \| amd64[\s\S]*aarch64 \| arm64/, label);
     // A piped installer cannot read sibling files, and bash-only syntax breaks dash.
     assert.doesNotMatch(script, /^\s*(?:\.|source)\s+\S*templates/m, label);
@@ -186,6 +187,10 @@ test("the shell installer parses minified manifests with localized asset text", 
       ...asset("linux", "x64", file, bytes),
       name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
       installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
+      metadata: {
+        assets: [{ file: "not-the-release-asset.zip" }],
+        escaped: "quote: \" slash: \\ unicode: \u2603",
+      },
     },
   ]);
   await withServer(new Map([
@@ -198,6 +203,21 @@ test("the shell installer parses minified manifests with localized asset text", 
     });
     assert.equal(result.code, 0, result.stderr);
     assert.match(await readFile(join(installDir, "zai-editor"), "utf8"), /localized fixture/);
+  }));
+});
+
+test("the shell installer rejects malformed JSON rather than partially parsing it", async () => {
+  const malformed = Buffer.from(
+    '{"schemaVersion":1,"appId":"zai-editor","release":{"assets":[' +
+    '{"platform":"linux","architecture":"x64","file":"package.zip",' +
+    '"sha256":"' + "0".repeat(64) + '"}',
+  );
+  await withServer(new Map([["/manifest.json", malformed]]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed"),
+    });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /could not be read as valid JSON/);
   }));
 });
 
@@ -227,7 +247,7 @@ test("the shell installer quotes metacharacters before updating startup PATH", a
   }));
 });
 
-test("PowerShell installers select ZIP from mixed Windows package fixtures", async () => {
+test("PowerShell installers select only an unambiguous ZIP package", async () => {
   const fixture = manifest("zai-editor", [
     asset("windows", "x64", "zai-editor-setup.exe", Buffer.from("exe")),
     asset("windows", "x64", "zai-editor.msix", Buffer.from("msix")),
@@ -236,10 +256,19 @@ test("PowerShell installers select ZIP from mixed Windows package fixtures", asy
   const selected = fixture.release.assets.find((entry) =>
     entry.platform === "windows" && entry.architecture === "x64" && /\.zip$/i.test(entry.file));
   assert.equal(selected.file, "zai-editor.zip");
+  const ambiguous = [
+    ...fixture.release.assets,
+    asset("windows", "x64", "zai-editor-portable.zip", Buffer.from("portable")),
+  ].filter((entry) =>
+    entry.platform === "windows" && entry.architecture === "x64" && /\.zip$/i.test(entry.file));
+  assert.equal(ambiguous.length, 2);
 
   const script = await readFile(installerPath("zai-editor.ps1"), "utf8");
   assert.match(script,
     /\$_\.platform -eq 'windows'[\s\S]*\$_\.architecture -eq \$architecture[\s\S]*\(\[string\] \$_\.file\) -match '\\\.zip\$'/);
+  assert.match(script, /\$assets\.Count -gt 1[\s\S]*multiple ZIP packages/);
+  const selection = script.slice(script.indexOf("$assets ="), script.indexOf("$asset = $assets[0]"));
+  assert.doesNotMatch(selection, /Select-Object -First 1/);
 });
 
 test("a checksum mismatch is rejected and nothing is installed", async () => {

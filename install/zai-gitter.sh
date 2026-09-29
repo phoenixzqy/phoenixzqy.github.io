@@ -134,116 +134,44 @@ if grep -Eq '"release"[[:space:]]*:[[:space:]]*null' "$MANIFEST"; then
   exit 2
 fi
 
-ASSET="$(awk -v want_platform="$PLATFORM" -v want_arch="$ARCHITECTURE" '
-  function next_token(    c, escape, start) {
-    while (position <= length(json) && substr(json, position, 1) ~ /[ \t\r\n]/) position++
-    if (position > length(json)) return 0
-    c = substr(json, position, 1)
-    if (c == "\"") {
-      position++
-      token_value = ""
-      while (position <= length(json)) {
-        c = substr(json, position++, 1)
-        if (c == "\"") {
-          token_type = "string"
-          return 1
-        }
-        if (c != "\\") {
-          token_value = token_value c
-          continue
-        }
-        escape = substr(json, position++, 1)
-        if (escape == "b") token_value = token_value sprintf("%c", 8)
-        else if (escape == "f") token_value = token_value sprintf("%c", 12)
-        else if (escape == "n") token_value = token_value "\n"
-        else if (escape == "r") token_value = token_value "\r"
-        else if (escape == "t") token_value = token_value "\t"
-        else if (escape == "u") {
-          token_value = token_value "\\u" substr(json, position, 4)
-          position += 4
-        } else token_value = token_value escape
-      }
-      return 0
-    }
-    if (c ~ /[][{}:,]/) {
-      token_type = c
-      token_value = c
-      position++
-      return 1
-    }
-    start = position
-    while (position <= length(json) && substr(json, position, 1) !~ /[][{}:, \t\r\n]/) position++
-    token_type = "atom"
-    token_value = substr(json, start, position - start)
-    return 1
-  }
-  function reset_asset() {
-    platform = ""; arch = ""; file = ""; url = ""; sha = ""; bytes = ""
-  }
-  function save_value(key, value) {
-    if (key == "platform") platform = value
-    else if (key == "architecture") arch = value
-    else if (key == "file") file = value
-    else if (key == "url") url = value
-    else if (key == "sha256") sha = value
-    else if (key == "bytes") bytes = value
-  }
-  {
-    json = json $0 "\n"
-  }
-  END {
-    position = 1
-    reset_asset()
-    while (!found && next_token()) {
-      if (token_type == "{") {
-        brace_depth++
-        if (assets_depth && bracket_depth == assets_depth && !asset_depth) {
-          asset_depth = brace_depth
-          reset_asset()
-        }
-        pending_value = ""
-        possible_key = ""
-      } else if (token_type == "}") {
-        if (asset_depth == brace_depth) {
-          if (platform == want_platform && arch == want_arch && file != "" && sha != "") {
-            print file; print url; print sha; print bytes
-            found = 1
-          }
-          asset_depth = 0
-        }
-        brace_depth--
-        pending_value = ""
-        possible_key = ""
-      } else if (token_type == "[") {
-        bracket_depth++
-        if (awaiting_assets) assets_depth = bracket_depth
-        awaiting_assets = 0
-        pending_value = ""
-        possible_key = ""
-      } else if (token_type == "]") {
-        if (assets_depth == bracket_depth) assets_depth = 0
-        bracket_depth--
-        pending_value = ""
-        possible_key = ""
-      } else if (token_type == ":") {
-        if (possible_key == "assets") awaiting_assets = 1
-        if (asset_depth && brace_depth == asset_depth) pending_value = possible_key
-        possible_key = ""
-      } else if (token_type == ",") {
-        pending_value = ""
-        possible_key = ""
-      } else if (pending_value && asset_depth && brace_depth == asset_depth) {
-        save_value(pending_value, token_value)
-        pending_value = ""
-        possible_key = ""
-      } else if (token_type == "string") {
-        possible_key = token_value
-      } else {
-        possible_key = ""
-      }
-    }
-  }
-' "$MANIFEST")"
+command -v python3 >/dev/null 2>&1 ||
+  fail 'python3 is required to read release metadata safely. Install Python 3 and run the command again.'
+if ! ASSET="$(python3 - "$MANIFEST" "$PLATFORM" "$ARCHITECTURE" <<'PY'
+import json
+import sys
+
+try:
+    with open(sys.argv[1], encoding="utf-8") as manifest_file:
+        manifest = json.load(manifest_file)
+    assets = manifest["release"]["assets"]
+    if not isinstance(assets, list):
+        raise TypeError
+    asset = next(
+        (
+            candidate
+            for candidate in assets
+            if isinstance(candidate, dict)
+            and candidate.get("platform") == sys.argv[2]
+            and candidate.get("architecture") == sys.argv[3]
+        ),
+        None,
+    )
+    if asset is not None:
+        file = asset["file"]
+        url = asset.get("url", "")
+        sha256 = asset["sha256"]
+        byte_count = asset.get("bytes", "")
+        if not all(isinstance(value, str) for value in (file, url, sha256)):
+            raise TypeError
+        if byte_count != "" and (not isinstance(byte_count, int) or isinstance(byte_count, bool)):
+            raise TypeError
+        print(file, url, sha256, byte_count, sep="\n")
+except (KeyError, OSError, TypeError, json.JSONDecodeError):
+    raise SystemExit(1)
+PY
+)"; then
+  fail "the release manifest at $MANIFEST_URL could not be read as valid JSON."
+fi
 
 [ -n "$ASSET" ] ||
   fail "the published release has no package for $PLATFORM/$ARCHITECTURE. See $SITE/apps/releases/?id=$APP_ID for the packages that are available."
