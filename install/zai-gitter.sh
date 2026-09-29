@@ -100,7 +100,8 @@ extract() {
 
 ensure_on_path() {
   marker='# Added by zai installer'
-  line="export PATH=\"$1:\$PATH\"  $marker"
+  quoted_dir="$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
+  line="export PATH='$quoted_dir':\"\$PATH\"  $marker"
   profiles="$HOME/.profile"
   case "${SHELL:-}" in
     *zsh*) profiles="$profiles $HOME/.zshrc" ;;
@@ -133,31 +134,114 @@ if grep -Eq '"release"[[:space:]]*:[[:space:]]*null' "$MANIFEST"; then
   exit 2
 fi
 
-# The publishing contract stores one manifest field per line, so a line-based
-# reader keeps this script free of any JSON dependency.
 ASSET="$(awk -v want_platform="$PLATFORM" -v want_arch="$ARCHITECTURE" '
-  function value(line) {
-    sub(/^[^:]*:[ \t]*/, "", line)
-    sub(/,[ \t]*$/, "", line)
-    gsub(/^"|"$/, "", line)
-    return line
-  }
-  function reset() { platform = ""; arch = ""; file = ""; url = ""; sha = ""; bytes = "" }
-  BEGIN { reset(); found = 0 }
-  found { next }
-  /^[ \t]*\{[ \t]*$/ { reset(); next }
-  /^[ \t]*"platform"[ \t]*:/ { platform = value($0); next }
-  /^[ \t]*"architecture"[ \t]*:/ { arch = value($0); next }
-  /^[ \t]*"file"[ \t]*:/ { file = value($0); next }
-  /^[ \t]*"url"[ \t]*:/ { url = value($0); next }
-  /^[ \t]*"sha256"[ \t]*:/ { sha = value($0); next }
-  /^[ \t]*"bytes"[ \t]*:/ { bytes = value($0); next }
-  /^[ \t]*\}[ \t]*,?[ \t]*$/ {
-    if (platform == want_platform && arch == want_arch && file != "" && sha != "") {
-      print file; print url; print sha; print bytes
-      found = 1
+  function next_token(    c, escape, start) {
+    while (position <= length(json) && substr(json, position, 1) ~ /[ \t\r\n]/) position++
+    if (position > length(json)) return 0
+    c = substr(json, position, 1)
+    if (c == "\"") {
+      position++
+      token_value = ""
+      while (position <= length(json)) {
+        c = substr(json, position++, 1)
+        if (c == "\"") {
+          token_type = "string"
+          return 1
+        }
+        if (c != "\\") {
+          token_value = token_value c
+          continue
+        }
+        escape = substr(json, position++, 1)
+        if (escape == "b") token_value = token_value sprintf("%c", 8)
+        else if (escape == "f") token_value = token_value sprintf("%c", 12)
+        else if (escape == "n") token_value = token_value "\n"
+        else if (escape == "r") token_value = token_value "\r"
+        else if (escape == "t") token_value = token_value "\t"
+        else if (escape == "u") {
+          token_value = token_value "\\u" substr(json, position, 4)
+          position += 4
+        } else token_value = token_value escape
+      }
+      return 0
     }
-    reset()
+    if (c ~ /[][{}:,]/) {
+      token_type = c
+      token_value = c
+      position++
+      return 1
+    }
+    start = position
+    while (position <= length(json) && substr(json, position, 1) !~ /[][{}:, \t\r\n]/) position++
+    token_type = "atom"
+    token_value = substr(json, start, position - start)
+    return 1
+  }
+  function reset_asset() {
+    platform = ""; arch = ""; file = ""; url = ""; sha = ""; bytes = ""
+  }
+  function save_value(key, value) {
+    if (key == "platform") platform = value
+    else if (key == "architecture") arch = value
+    else if (key == "file") file = value
+    else if (key == "url") url = value
+    else if (key == "sha256") sha = value
+    else if (key == "bytes") bytes = value
+  }
+  {
+    json = json $0 "\n"
+  }
+  END {
+    position = 1
+    reset_asset()
+    while (!found && next_token()) {
+      if (token_type == "{") {
+        brace_depth++
+        if (assets_depth && bracket_depth == assets_depth && !asset_depth) {
+          asset_depth = brace_depth
+          reset_asset()
+        }
+        pending_value = ""
+        possible_key = ""
+      } else if (token_type == "}") {
+        if (asset_depth == brace_depth) {
+          if (platform == want_platform && arch == want_arch && file != "" && sha != "") {
+            print file; print url; print sha; print bytes
+            found = 1
+          }
+          asset_depth = 0
+        }
+        brace_depth--
+        pending_value = ""
+        possible_key = ""
+      } else if (token_type == "[") {
+        bracket_depth++
+        if (awaiting_assets) assets_depth = bracket_depth
+        awaiting_assets = 0
+        pending_value = ""
+        possible_key = ""
+      } else if (token_type == "]") {
+        if (assets_depth == bracket_depth) assets_depth = 0
+        bracket_depth--
+        pending_value = ""
+        possible_key = ""
+      } else if (token_type == ":") {
+        if (possible_key == "assets") awaiting_assets = 1
+        if (asset_depth && brace_depth == asset_depth) pending_value = possible_key
+        possible_key = ""
+      } else if (token_type == ",") {
+        pending_value = ""
+        possible_key = ""
+      } else if (pending_value && asset_depth && brace_depth == asset_depth) {
+        save_value(pending_value, token_value)
+        pending_value = ""
+        possible_key = ""
+      } else if (token_type == "string") {
+        possible_key = token_value
+      } else {
+        possible_key = ""
+      }
+    }
   }
 ' "$MANIFEST")"
 

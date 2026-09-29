@@ -164,13 +164,82 @@ test("the shell installer verifies, extracts, and installs a published package",
     assert.match(await readFile(join(installDir, "licenses/zai-editor/LICENSE"), "utf8"), /Apache License/);
 
     const profile = join(home, ".profile");
-    const line = `export PATH="${installDir}:$PATH"  # Added by zai installer`;
+    const line = `export PATH='${installDir}':"$PATH"  # Added by zai installer`;
     assert.equal((await readFile(profile, "utf8")).split("\n").filter((entry) => entry === line).length, 1);
     const second = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
     assert.equal(second.code, 0, second.stderr);
     assert.equal((await readFile(profile, "utf8")).split("\n").filter((entry) => entry === line).length, 1,
       "the PATH update must be idempotent");
   }));
+});
+
+test("the shell installer parses minified manifests with localized asset text", async () => {
+  const bytes = createZip({ "zai-editor": "#!/bin/sh\necho localized fixture\n" });
+  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const localized = manifest("zai-editor", [
+    {
+      ...asset("linux", "arm64", "zai-editor-0.1.0-linux-arm64.zip", Buffer.from("other")),
+      name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
+      installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
+    },
+    {
+      ...asset("linux", "x64", file, bytes),
+      name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
+      installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
+    },
+  ]);
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(localized))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir,
+    });
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(await readFile(join(installDir, "zai-editor"), "utf8"), /localized fixture/);
+  }));
+});
+
+test("the shell installer quotes metacharacters before updating startup PATH", async () => {
+  const bytes = createZip({ "zai-editor": "#!/bin/sh\nexit 0\n" });
+  const file = "zai-editor-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [
+      asset("linux", "x64", file, bytes),
+    ])))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed-$(touch${IFS}pwned)-'quoted'");
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir,
+    });
+    assert.equal(result.code, 0, result.stderr);
+
+    const profile = join(home, ".profile");
+    const { stdout: updatedPath } = await run("sh", ["-c", '. "$1"; printf %s "$PATH"', "sh", profile], {
+      cwd: home,
+      env: { PATH: process.env.PATH, HOME: home },
+    });
+    assert.equal(updatedPath.split(":")[0], installDir);
+    await assert.rejects(stat(join(home, "pwned")), /ENOENT/,
+      "sourcing the generated profile must not execute install-path metacharacters");
+  }));
+});
+
+test("PowerShell installers select ZIP from mixed Windows package fixtures", async () => {
+  const fixture = manifest("zai-editor", [
+    asset("windows", "x64", "zai-editor-setup.exe", Buffer.from("exe")),
+    asset("windows", "x64", "zai-editor.msix", Buffer.from("msix")),
+    asset("windows", "x64", "zai-editor.zip", Buffer.from("zip")),
+  ]);
+  const selected = fixture.release.assets.find((entry) =>
+    entry.platform === "windows" && entry.architecture === "x64" && /\.zip$/i.test(entry.file));
+  assert.equal(selected.file, "zai-editor.zip");
+
+  const script = await readFile(installerPath("zai-editor.ps1"), "utf8");
+  assert.match(script,
+    /\$_\.platform -eq 'windows'[\s\S]*\$_\.architecture -eq \$architecture[\s\S]*\(\[string\] \$_\.file\) -match '\\\.zip\$'/);
 });
 
 test("a checksum mismatch is rejected and nothing is installed", async () => {

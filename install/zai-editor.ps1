@@ -126,7 +126,11 @@ try {
     }
 
     $asset = $manifest.release.assets |
-        Where-Object { $_.platform -eq 'windows' -and $_.architecture -eq $architecture } |
+        Where-Object {
+            $_.platform -eq 'windows' -and
+            $_.architecture -eq $architecture -and
+            ([string] $_.file) -match '\.zip$'
+        } |
         Select-Object -First 1
     if ($null -eq $asset) {
         Stop-Install "the published release has no package for windows/$architecture. See $site/apps/releases/?id=$appId for the packages that are available."
