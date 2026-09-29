@@ -19,14 +19,6 @@ zai_cli_install() {
 
     zai_cli_app_id='zai-cli'
     zai_cli_manifest_url="${ZAI_RELEASE_METADATA_URL:-https://phoenixzqy.github.io/releases/zai-cli/latest/manifest.json}"
-    # The published site is HTTPS-only. A caller that deliberately points
-    # ZAI_RELEASE_METADATA_URL at a local test server may use plain HTTP, but a
-    # redirect can never downgrade the transfer.
-    zai_cli_protocols='=https'
-    if [ -n "${ZAI_RELEASE_METADATA_URL:-}" ]; then
-        zai_cli_protocols='=https,http'
-    fi
-
     for zai_cli_tool in curl unzip; do
         if ! command -v "$zai_cli_tool" >/dev/null 2>&1; then
             echo "zai installer: '$zai_cli_tool' is required but was not found." >&2
@@ -44,6 +36,21 @@ zai_cli_install() {
         echo "zai installer: Python 3.10 or newer is required but was not found." >&2
         return 1
     fi
+    # Only a literal loopback test fixture may use HTTP; redirects stay HTTPS.
+    zai_cli_protocols="$("$zai_cli_python" -c '
+import sys
+from urllib.parse import urlsplit
+url = urlsplit(sys.argv[1])
+try:
+    _ = url.port
+except ValueError:
+    sys.exit("zai installer: invalid manifest URL port.")
+if url.scheme not in ("https", "http") or not url.hostname or url.username or url.password:
+    sys.exit("zai installer: downloads must use HTTPS (except loopback test fixtures).")
+if url.scheme == "http" and url.hostname != "127.0.0.1":
+    sys.exit("zai installer: downloads must use HTTPS (except loopback test fixtures).")
+print("=https,http" if url.scheme == "http" else "=https")
+' "$zai_cli_manifest_url")" || return 1
 
     zai_cli_work="$(mktemp -d "${TMPDIR:-/tmp}/zai-cli-install.XXXXXX")"
     # Remove the staging directory however this shell leaves the installer.

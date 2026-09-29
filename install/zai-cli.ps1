@@ -30,8 +30,6 @@ function Install-ZaiCli {
     $releasePrefix = 'https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/'
     $defaultManifest = 'https://phoenixzqy.github.io/releases/zai-cli/latest/manifest.json'
     $manifestUrl = if ($env:ZAI_RELEASE_METADATA_URL) { $env:ZAI_RELEASE_METADATA_URL } else { $defaultManifest }
-    # The published site is HTTPS-only. A caller that deliberately points
-    # ZAI_RELEASE_METADATA_URL at a local test server may use plain HTTP.
     $allowPlainHttp = [bool] $env:ZAI_RELEASE_METADATA_URL
 
     # Windows PowerShell 5.1 still negotiates TLS 1.0 by default, which the
@@ -57,11 +55,40 @@ function Install-ZaiCli {
         if (-not [Uri]::TryCreate($Url, [UriKind]::Absolute, [ref] $parsed)) {
             throw "zai installer: not a usable download address: $Url"
         }
-        $allowed = if ($AllowPlainHttp) { @('https', 'http') } else { @('https') }
-        if ($allowed -notcontains $parsed.Scheme) {
+        if ($parsed.Scheme -ne 'https' -and
+            ($parsed.Scheme -ne 'http' -or -not $AllowPlainHttp -or $parsed.Host -ne '127.0.0.1') -or
+            $parsed.UserInfo) {
             throw "zai installer: downloads must use HTTPS: $Url"
         }
         return $parsed
+    }
+
+    function Get-ZaiCliDownload {
+        param([Uri] $Uri, [string] $Path, [bool] $AllowPlainHttp, [string[]] $AllowedHosts)
+        for ($hop = 0; $hop -le 10; $hop++) {
+            $Uri = Assert-ZaiCliUrl -Url $Uri.AbsoluteUri -AllowPlainHttp $AllowPlainHttp
+            if ($AllowedHosts -notcontains $Uri.Host) {
+                throw "zai installer: download redirected to an untrusted host: $Uri"
+            }
+            try {
+                Invoke-WebRequest -Uri $Uri -OutFile $Path -UseBasicParsing -MaximumRedirection 0 -ErrorAction Stop | Out-Null
+                return
+            } catch {
+                $response = $_.Exception.Response
+                if (-not $response -or [int] $response.StatusCode -lt 300 -or [int] $response.StatusCode -ge 400) {
+                    throw
+                }
+                $location = if ($response.Headers -is [System.Net.WebHeaderCollection]) {
+                    $response.Headers['Location']
+                } else {
+                    $response.Headers.Location
+                }
+                if (-not $location) { throw 'zai installer: download redirect has no location.' }
+                $Uri = [Uri]::new($Uri, [string] $location)
+                $AllowPlainHttp = $false
+            }
+        }
+        throw 'zai installer: too many download redirects.'
     }
 
     function Get-ZaiCliAsset {
@@ -121,7 +148,8 @@ function Install-ZaiCli {
         $manifestUri = Assert-ZaiCliUrl -Url $manifestUrl -AllowPlainHttp $allowPlainHttp
         Write-Host "Reading $manifestUrl"
         $manifestPath = Join-Path $work 'manifest.json'
-        Invoke-WebRequest -Uri $manifestUri -OutFile $manifestPath -UseBasicParsing
+        Get-ZaiCliDownload -Uri $manifestUri -Path $manifestPath -AllowPlainHttp $allowPlainHttp `
+            -AllowedHosts @($manifestUri.Host)
         $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 
         $selected = Get-ZaiCliAsset -Manifest $manifest -AppId $appId -Platform 'windows' `
@@ -130,7 +158,11 @@ function Install-ZaiCli {
 
         Write-Host "Downloading $appId $($selected.Version) ($($selected.File))"
         $archive = Join-Path $work $selected.File
-        Invoke-WebRequest -Uri $downloadUri -OutFile $archive -UseBasicParsing
+        $assetHosts = if ($downloadUri.Host -eq 'github.com') {
+            @('github.com', 'release-assets.githubusercontent.com', 'objects.githubusercontent.com')
+        } else { @($downloadUri.Host) }
+        Get-ZaiCliDownload -Uri $downloadUri -Path $archive -AllowPlainHttp $allowPlainHttp `
+            -AllowedHosts $assetHosts
 
         $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($actual -ne $selected.Sha256) {

@@ -114,6 +114,9 @@ user's privileges, so they are held to the same rules as a published package:
   public GitHub Release URL of this repository, exactly as
   [large packages](#large-packages-public-github-releases) defines it. Reject
   any other host, and never let a redirect downgrade the transfer to HTTP.
+  The metadata URL override permits plaintext only for local tests on literal
+  `127.0.0.1`; redirects must use HTTPS. PowerShell checks every redirect before
+  following it, limiting release-asset redirects to GitHub and its asset hosts.
 - **Leave the user's directories alone.** Stage downloads in the system
   temporary directory and remove them on success and on failure. Never write to
   the current working directory.

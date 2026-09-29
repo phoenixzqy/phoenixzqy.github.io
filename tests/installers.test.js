@@ -83,7 +83,11 @@ async function serve(routes) {
       response.writeHead(404).end("not found");
       return;
     }
-    response.writeHead(200).end(body);
+    if (typeof body === "object" && !Buffer.isBuffer(body)) {
+      response.writeHead(body.status, { Location: body.location }).end();
+    } else {
+      response.writeHead(200).end(body);
+    }
   });
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const { port } = server.address();
@@ -110,7 +114,7 @@ function plain(text) {
     .replace(/[ \t]+/g, " ");
 }
 
-async function installWith({ manifest, archive, archiveExit = 0, system = "Linux", machine = "x86_64", args = [], env = {}, shell = "sh" }) {
+async function installWith({ manifest, archive, archiveExit = 0, system = "Linux", machine = "x86_64", args = [], env = {}, shell = "sh", configureRoutes }) {
   const directory = await scratch("install");
   try {
     const built = await buildArchive(directory, archive ?? `${APP_ID}-${VERSION}-linux-amd64.zip`, { exitCode: archiveExit });
@@ -121,6 +125,7 @@ async function installWith({ manifest, archive, archiveExit = 0, system = "Linux
       "/downloads/package.zip": built.bytes,
     };
     const site = await serve(routes);
+    configureRoutes?.(routes, site);
     const staging = join(directory, "staging");
     const cwd = join(directory, "cwd");
     const record = join(directory, "record.json");
@@ -224,6 +229,17 @@ test("the shell installer refuses a package whose bytes changed", { skip: shellT
   assert.deepEqual(result.staging, []);
 });
 
+test("the shell installer rejects non-loopback HTTP metadata overrides", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
+  const result = await installWith({
+    manifest: ({ archive, sha256 }) => manifestFor(archive.split("/").pop(), sha256),
+    env: { ZAI_RELEASE_METADATA_URL: "http://example.com/releases/zai-cli/latest/manifest.json" },
+  });
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /downloads must use HTTPS/);
+  assert.equal(result.record, null);
+  assert.deepEqual(result.staging, []);
+});
+
 test("the shell installer reports an unpublished app instead of installing nothing quietly", { skip: shellTools.length ? `missing ${shellTools}` : false }, async () => {
   const result = await installWith({
     manifest: () => ({ schemaVersion: 1, appId: APP_ID, release: null }),
@@ -299,6 +315,21 @@ test("the PowerShell installer keeps the same contract for Windows", async () =>
   assert.doesNotMatch(script, /\bexit\s+\$LASTEXITCODE\b/);
 });
 
+test("a truncated PowerShell installer does nothing", { skip: powershellMissing }, async () => {
+  const script = await readFile(powershellInstaller, "utf8");
+  const directory = await scratch("truncated-ps");
+  try {
+    const truncated = join(directory, "truncated.ps1");
+    await writeFile(truncated, script.slice(0, script.lastIndexOf("Install-ZaiCli @args")), "utf8");
+    const result = await run("pwsh", ["-NoProfile", "-File", truncated], { cwd: directory });
+    assert.equal(result.stdout, "");
+    assert.equal(result.stderr, "");
+    assert.deepEqual(await readdir(directory), ["truncated.ps1"]);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 const windowsManifest = ({ archive, sha256 }) =>
   manifestFor(archive.split("/").pop(), sha256, { asset: { platform: "windows", architecture: "x64", name: "zai CLI Windows x64" } });
 
@@ -332,6 +363,36 @@ test("the PowerShell installer stops on metadata and checksum problems", { skip:
       assert.equal(result.record, null);
       assert.deepEqual(result.staging, []);
       assert.deepEqual(result.workingDirectory, []);
+    });
+  }
+});
+
+test("the PowerShell installer rejects non-loopback HTTP metadata overrides", { skip: powershellMissing }, async () => {
+  const result = await installWith({
+    manifest: windowsManifest, shell: "pwsh",
+    env: { ZAI_RELEASE_METADATA_URL: "http://example.com/releases/zai-cli/latest/manifest.json" },
+  });
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /downloads must use HTTPS/);
+  assert.equal(result.record, null);
+});
+
+test("the PowerShell installer rejects unsafe redirects before requesting their target", { skip: powershellMissing }, async (t) => {
+  for (const [name, route, location, message] of [
+    ["manifest HTTP redirect", "/releases/zai-cli/latest/manifest.json", "http://127.0.0.1:1/manifest.json", /downloads must use HTTPS/],
+    ["manifest foreign host", "/releases/zai-cli/latest/manifest.json", "https://example.com/manifest.json", /untrusted host/],
+    ["archive HTTP redirect", "/releases/zai-cli/latest/zai-cli-1.2.3-linux-amd64.zip", "http://127.0.0.1:1/package.zip", /downloads must use HTTPS/],
+    ["archive foreign host", "/releases/zai-cli/latest/zai-cli-1.2.3-linux-amd64.zip", "https://example.com/package.zip", /untrusted host/],
+  ]) {
+    await t.test(name, async () => {
+      const result = await installWith({
+        manifest: windowsManifest, shell: "pwsh",
+        configureRoutes: (routes) => { routes[route] = { status: 302, location }; },
+      });
+      assert.notEqual(result.code, 0);
+      assert.match(result.stderr, message);
+      assert.equal(result.record, null);
+      assert.deepEqual(result.staging, []);
     });
   }
 });
