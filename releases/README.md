@@ -14,6 +14,8 @@ Review the contents of each package, not just its filename.
   notes, signing status, and SHA-256 checksums.
 - `/releases/bplayer/latest/manifest.json` — release metadata.
 - `/releases/bplayer/latest/<package-filename>` — locally hosted package.
+- `/install/<app-id>.sh` and `/install/<app-id>.ps1` — optional one-line
+  installers for an app that ships a command-line package.
 
 The detail and download pages are shared by every app. Add an entry to
 `apps/catalog.json` and a `releases/<id>/latest/manifest.json`; no new HTML or
@@ -21,6 +23,11 @@ JavaScript is needed for an additional project. IDs must be lowercase,
 hyphen-separated slugs, such as `bplayer` or `another-app`. Follow BPlayer's
 catalog fields for the introduction, features, platform notes, and installation
 instructions. The catalog order is the display order.
+
+`npm run validate:apps` walks the catalog, so a manifest for an app that is not
+listed there is never validated and would publish unchecked. Land the catalog
+entry before the app's first manifest, and keep its platform IDs in step with
+the `platform` values the app's pipeline writes into its manifest.
 
 Every app must have a manifest. Before its first public build:
 
@@ -74,6 +81,54 @@ signing states. One manifest describes the same packages in both languages.
 Refresh translations with each release; do not carry old release notes into
 a new version merely to populate a locale.
 
+## One-line installers
+
+An app whose packages are command-line tools may publish an installer script at
+`/install/<app-id>.sh` (macOS and Linux) and `/install/<app-id>.ps1` (Windows),
+so a user can install it with a single command:
+
+```sh
+curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh
+```
+
+```powershell
+irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex
+```
+
+These scripts are owned by this repository, not by the app's pipeline. They are
+ordinary static files, reviewed here, and they run on a user's machine with that
+user's privileges, so they are held to the same rules as a published package:
+
+- **Be inert until complete.** A piped shell and `iex` cannot observe a failed
+  or truncated transfer, so all work lives in a function that is invoked only on
+  the script's final line. Any earlier prefix of the file must do nothing. The
+  PowerShell script must also leave the caller's variables and preferences
+  unchanged, because `iex` runs it in the caller's scope.
+- **Read the published manifest, not a hardcoded version.** Resolve the package
+  from `/releases/<app-id>/latest/manifest.json` and select it by the manifest's
+  own `platform` and `architecture` values. An unpublished (`release: null`)
+  manifest is an explicit error, never a silent success.
+- **Verify before use.** Compare the download's SHA-256 with the manifest value
+  and stop on any mismatch, before extracting or executing anything from it.
+- **Download only from this site.** Accept a locally hosted package path or a
+  public GitHub Release URL of this repository, exactly as
+  [large packages](#large-packages-public-github-releases) defines it. Reject
+  any other host, and never let a redirect downgrade the transfer to HTTP.
+- **Leave the user's directories alone.** Stage downloads in the system
+  temporary directory and remove them on success and on failure. Never write to
+  the current working directory.
+- **Stay reviewable.** No obfuscation, no credentials, no telemetry, and no
+  privilege escalation. The script's only job is to fetch, verify, extract, and
+  hand over to the package's own installer.
+
+Extra arguments are forwarded to the package's own installer. Pass an option and
+its value as separate arguments on Windows: PowerShell's command line parser
+reads `-name:value` as parameter binding and splits a joined argument at its
+colon before the script runs.
+
+`tests/installers.test.js` exercises these rules with `npm run test:unit`, using
+a local stand-in for this site. Update those tests with the scripts.
+
 ## Pipeline contract
 
 After building and approving packages in the private app pipeline:
@@ -98,7 +153,7 @@ After building and approving packages in the private app pipeline:
    rejects unlisted files/symlinks, and verifies the size and checksum of every
    locally stored package.
 5. Review and commit **only the intended catalog/manifest/package changes**,
-   then push to `master` to trigger the existing GitHub Pages deployment.
+   then push to `main` to trigger the existing GitHub Pages deployment.
    Wait for `pages-build-deployment` to succeed before announcing the release.
    Serialize website publishing across app pipelines or fetch/rebase and
    revalidate on push conflicts; do not force-push.

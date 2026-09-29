@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, rm, symlink } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { validateCatalog, validateManifest, assetHref, MAX_LOCAL_BYTES } from "../apps/schema.js";
@@ -90,7 +90,7 @@ async function withSite(run) {
     await mkdir(join(root, "apps"), { recursive: true });
     await mkdir(folder, { recursive: true });
     const manifest = releaseFixture();
-    await writeFile(join(root, "apps/catalog.json"), JSON.stringify(catalog));
+    await writeFile(join(root, "apps/catalog.json"), JSON.stringify({ ...catalog, apps: [app] }));
     await writeFile(join(folder, "manifest.json"), JSON.stringify(manifest));
     await writeFile(join(folder, manifest.release.assets[0].file), packageBytes);
     await run(root, folder, manifest);
@@ -128,3 +128,22 @@ test("unpublished folders cannot silently publish stray packages", async () => {
     await assert.rejects(validateSite(root), /unlisted files/);
   });
 });
+
+test("every catalogued app has a manifest and a catalogued platform for each installer identifier", async () => {
+  const site = new URL("../", import.meta.url);
+  for (const entry of catalog.apps) {
+    const manifest = JSON.parse(await readFile(new URL(`releases/${entry.id}/latest/manifest.json`, site), "utf8"));
+    assert.equal(validateManifest(manifest, entry).appId, entry.id);
+  }
+  // The published installers select a package by these identifiers, so the
+  // catalog has to carry the platforms the release pipeline writes.
+  const zai = catalog.apps.find(({ id }) => id === "zai-cli");
+  assert.ok(zai, "the catalog must describe zai-cli so its manifest is validated before publishing.");
+  assert.deepEqual(zai.platforms.map(({ id }) => id).sort(), ["linux", "macos", "windows"]);
+  const shell = await readFile(new URL("install/zai-cli.sh", site), "utf8");
+  const powershell = await readFile(new URL("install/zai-cli.ps1", site), "utf8");
+  for (const platform of zai.platforms.map(({ id }) => id)) {
+    assert.ok(`${shell}${powershell}`.includes(`'${platform}'`) || `${shell}${powershell}`.includes(`"${platform}"`),
+      `neither installer selects the ${platform} package.`);
+  }
+})

@@ -53,6 +53,47 @@
         { "en": "Do not disable operating-system or company security policies to run a package. Ad-hoc and self-signed development builds are not publicly trusted releases.", "zh-CN": "不要为了运行安装包而关闭操作系统或公司的安全策略。临时签名和自签名开发版本并非获得公开信任的正式版本。" },
         { "en": "Import your own audio or video to listen without a provider account. Local imports reference the original files, so moving those files makes them unavailable.", "zh-CN": "导入自有音频或视频后，无需内容提供方账号即可聆听。本地导入引用的是原始文件，移动这些文件会使它们无法播放。" }
       ]
+    },
+    {
+      "id": "zai-cli",
+      "name": "zai",
+      "category": { "en": "DEVELOPER TOOLS", "zh-CN": "开发者工具" },
+      "tagline": { "en": "A terminal workspace for coding agents.", "zh-CN": "面向编码智能体的终端工作区。" },
+      "summary": {
+        "en": "A terminal user interface that runs coding agents, Git worktrees, a code editor, and diff review in one place, with background services that carry work items through to pull requests.",
+        "zh-CN": "一个终端界面，把编码智能体、Git 工作树、代码编辑器和差异审阅集中在一处，并由后台服务把工作项推进到拉取请求。"
+      },
+      "description": [
+        { "en": "zai is a terminal-native workspace. The whole interface is text, so it runs over plain SSH, inside a terminal multiplexer, and on headless machines without a desktop client. Projects open as tabs and split panes holding coding-agent sessions, shells, the bundled editor, and the bundled Git diff viewer.", "zh-CN": "zai 是一个原生运行于终端的工作区。整个界面都是文本，因此可以通过普通 SSH、在终端复用器中以及在无图形界面的机器上运行，无需桌面客户端。项目以标签页和分屏的形式打开，其中可以承载编码智能体会话、shell、内置编辑器和内置 Git 差异查看器。" },
+        { "en": "Every agent session reports whether it is running, waiting for you, or done, and that state rolls up to its tab, worktree, and project, so you can run many sessions at once and still see which one needs attention.", "zh-CN": "每个智能体会话都会报告自身处于运行中、等待你的输入还是已完成，并逐级汇总到所属标签页、工作树和项目，因此你可以同时运行多个会话，并随时看出哪一个需要你处理。" },
+        { "en": "Optional background services pair a deterministic poller with a coding agent so labeled issues and work items become implemented, reviewed, and merged pull requests on GitHub and Azure DevOps. Each repository chooses its own scope, filters, and model, and run data stays on your machine.", "zh-CN": "可选的后台服务将确定性轮询器与编码智能体配对，使带标签的议题和工作项在 GitHub 与 Azure DevOps 上被实现、审阅并合并为拉取请求。每个仓库都可以设置自己的范围、筛选条件和模型，运行数据保存在本机。" }
+      ],
+      "stage": { "en": "Public preview", "zh-CN": "公开预览版" },
+      "platforms": [
+        { "id": "linux", "name": "Linux", "status": { "en": "Supported. Requires Python 3.10 or newer, Node.js 22 with npm, plus curl and unzip for the one-line installer.", "zh-CN": "受支持。需要 Python 3.10 及以上版本、带 npm 的 Node.js 22，一行安装命令还需要 curl 和 unzip。" } },
+        { "id": "macos", "name": "macOS", "status": { "en": "Supported. Requires Python 3.10 or newer, Node.js 22 with npm, plus curl and unzip for the one-line installer. Packages are unsigned and not notarized.", "zh-CN": "受支持。需要 Python 3.10 及以上版本、带 npm 的 Node.js 22，一行安装命令还需要 curl 和 unzip。安装包未签名，也未经过公证。" } },
+        { "id": "windows", "name": "Windows", "status": { "en": "Supported. Requires Python 3.10 or newer and Node.js 22 with npm; install from PowerShell. Packages are unsigned.", "zh-CN": "受支持。需要 Python 3.10 及以上版本和带 npm 的 Node.js 22；请在 PowerShell 中安装。安装包未签名。" } }
+      ],
+      "features": [
+        { "title": { "en": "Agents, side by side", "zh-CN": "并排运行的智能体" }, "description": { "en": "A project-based multiplexer with tabs and split panes for coding-agent sessions, shells, the editor, and the Git viewer, including earlier sessions you can resume.", "zh-CN": "基于项目的多路复用界面，提供标签页和分屏，用于编码智能体会话、shell、编辑器和 Git 查看器，并可恢复此前的会话。" } },
+        { "title": { "en": "Status you can see", "zh-CN": "一目了然的状态" }, "description": { "en": "Running, waiting, and done marks appear on the pane, then roll up to the tab, worktree, and project, so a single waiting agent still stands out.", "zh-CN": "运行中、等待中和已完成的标记显示在面板上，并逐级汇总到标签页、工作树和项目，即使只有一个智能体在等待也会突出显示。" } },
+        { "title": { "en": "Worktrees for parallel work", "zh-CN": "支持并行的工作树" }, "description": { "en": "People and agents claim and release Git worktrees through one shared registry, so each parallel session works in its own checkout.", "zh-CN": "人和智能体通过同一个共享登记表申领和释放 Git 工作树，使每个并行会话都在各自的检出目录中工作。" } },
+        { "title": { "en": "Editor with language servers", "zh-CN": "带语言服务器的编辑器" }, "description": { "en": "The bundled terminal editor offers familiar editing keys, multiple cursors, optional language-server completion and go-to-definition, Git blame and history, and previews.", "zh-CN": "内置的终端编辑器提供熟悉的编辑快捷键、多光标、可选的语言服务器补全与跳转定义、Git 追溯与历史记录，以及预览功能。" } },
+        { "title": { "en": "Diff review in the terminal", "zh-CN": "终端中的差异审阅" }, "description": { "en": "The bundled Git viewer shows inline or side-by-side diffs, and line comments can be sent straight to a live agent session.", "zh-CN": "内置的 Git 查看器支持行内或并排差异视图，逐行评论可直接发送给正在运行的智能体会话。" } },
+        { "title": { "en": "Delivery services", "zh-CN": "交付服务" }, "description": { "en": "Optional per-repository services implement labeled items, review pull requests, fix failing checks and conflicts, and perform local maintenance on GitHub and Azure DevOps.", "zh-CN": "可选的仓库级服务可以实现带标签的工作项、审阅拉取请求、修复失败的检查与冲突，并在 GitHub 和 Azure DevOps 上执行本地维护。" } },
+        { "title": { "en": "Shared themes", "zh-CN": "统一主题" }, "description": { "en": "The console, the editor, and the diff viewer read one theme file, and saved changes apply to running apps immediately.", "zh-CN": "控制台、编辑器和差异查看器读取同一个主题文件，保存的更改会立即应用到正在运行的应用。" } },
+        { "title": { "en": "English & Simplified Chinese", "zh-CN": "英语与简体中文" }, "description": { "en": "This app page and the download page are available in both languages; the application's own interface is in English.", "zh-CN": "本应用页面和下载页面提供两种语言；应用自身的界面为英语。" } }
+      ],
+      "notice": { "en": "Preview software distributed as unsigned packages. It runs coding agents that read and modify your repositories and can open, update, and merge pull requests, so review its configuration before enabling background services and follow your device and organization policies. You supply and pay for your own coding-agent CLI and model access.", "zh-CN": "预览版软件，以未签名安装包形式分发。它会运行编码智能体来读取和修改你的仓库，并可能创建、更新和合并拉取请求，因此在启用后台服务前请先检查其配置，并遵守设备与组织的安全策略。编码智能体 CLI 及模型使用需由你自行提供并承担费用。" },
+      "installation": [
+        { "en": "Install Python 3.10 or newer and Node.js 22 with npm first, and a supported coding-agent CLI. On macOS and Linux the one-line installer also needs curl and unzip.", "zh-CN": "请先安装 Python 3.10 及以上版本、带 npm 的 Node.js 22，以及受支持的编码智能体 CLI。在 macOS 和 Linux 上，一行安装命令还需要 curl 和 unzip。" },
+        { "en": "On macOS or Linux, run: curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh", "zh-CN": "在 macOS 或 Linux 上运行：curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh" },
+        { "en": "In Windows PowerShell, run: irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex", "zh-CN": "在 Windows PowerShell 中运行：irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex" },
+        { "en": "The installer reads the published release manifest, downloads the archive for your platform and architecture into the system temporary directory, verifies its SHA-256 before using it, runs the bundled package installer, and removes its downloads afterwards. Set ZAI_INSTALL_DIR to install somewhere other than the default location.", "zh-CN": "安装程序会读取已发布的版本清单，将适用于你的平台和架构的压缩包下载到系统临时目录，先校验其 SHA-256 再使用，然后运行随包提供的安装脚本，并在结束后删除下载内容。设置 ZAI_INSTALL_DIR 可安装到默认位置以外的目录。" },
+        { "en": "To install manually, download the archive for your platform from this page, verify its SHA-256 against the value shown here, extract the whole archive, and run the bundled install script from the extracted folder.", "zh-CN": "如需手动安装，请在本页下载适用于你平台的压缩包，核对此处显示的 SHA-256 校验值，完整解压后在解压目录运行随包提供的安装脚本。" },
+        { "en": "Packages are unsigned. Do not disable operating-system or organization security policies to run one; a checksum detects file changes but does not establish publisher identity.", "zh-CN": "安装包未签名。请勿为运行安装包而关闭操作系统或组织的安全策略；校验值只能发现文件被改动，并不能证明发布者身份。" },
+        { "en": "Open a new terminal after installing to pick up the updated PATH, then run the tool from any folder.", "zh-CN": "安装完成后请打开新的终端以使更新后的 PATH 生效，然后即可在任意目录运行该工具。" }
+      ]
     }
   ]
 }

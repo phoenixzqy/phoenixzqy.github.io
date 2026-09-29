@@ -15,6 +15,9 @@ the files as-is.
   strings. App-specific release metadata lives at
   `releases/<id>/latest/manifest.json`. Keep localized display text separate
   from identifiers, URLs, checksums, sizes, and signing states.
+- `install/` holds the published one-line installer scripts an app's users pipe
+  into `sh` or `iex`. Treat them as a distribution surface, not convenience
+  glue: follow [one-line installers](releases/README.md#one-line-installers).
 - `pwa-sw.js` is a *retired game's uninstall worker*, not an offline feature.
   Keep it at its old URL so returning browsers can remove only the old game's
   caches. `pwa-retired.html` is the same-origin redirect for old controlled

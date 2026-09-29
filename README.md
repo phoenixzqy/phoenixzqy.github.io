@@ -42,8 +42,17 @@ and download pages read `apps/catalog.json` and each app's
 `releases/<id>/latest/manifest.json`. BPlayer is the first entry, with a
 local-first audiobook-player introduction and explicit platform-readiness
 notes. Its descriptions are paraphrased from the authorized local product
-documentation; no private source or builds were copied. No package is offered
-until a release is published.
+documentation; no private source or builds were copied. `zai-cli` is the second
+entry, a terminal workspace for coding agents whose packages are published as
+public GitHub Release assets of this repository. No package is offered until a
+release is published.
+
+`install/` holds the published one-line installers, `install/zai-cli.sh` for
+macOS and Linux and `install/zai-cli.ps1` for Windows. They are static files
+served from this site: each one reads the app's release manifest, downloads only
+the package built for the running platform, verifies its SHA-256 before using
+it, and removes its downloads afterwards. See
+[one-line installers](releases/README.md#one-line-installers).
 
 See [the publishing contract](releases/README.md) for folder layout, manifest
 fields, checksum/size validation, safe pipeline handoff, signing notices, and
