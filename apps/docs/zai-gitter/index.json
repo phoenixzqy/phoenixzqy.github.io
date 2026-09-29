@@ -3,7 +3,7 @@
   "appId": "zai-gitter",
   "repository": "phoenixzqy/zai-gitter",
   "ref": "origin/main",
-  "commit": "010a9622fcb2ca11023e7d0b220838788972e658",
+  "commit": "30a572ecfd8062a41285cfbba426d5f2e50f3df7",
   "documents": [
     {
       "slug": "docs--user-guide",
@@ -17,7 +17,7 @@
       "title": "Packages and distribution",
       "source": "docs/packages-and-distribution.md",
       "file": "docs--packages-and-distribution.md",
-      "bytes": 5352
+      "bytes": 6611
     }
   ],
   "assets": []

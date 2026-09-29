@@ -1,6 +1,8 @@
 # --- Install --------------------------------------------------------------
-# zai ships a Python package installer inside the archive. It performs the
-# real installation (executable, agent homes, PATH) and reports its own result.
+# zai ships a Python package installer at the root of the archive. It performs
+# the real installation (executable, agent homes, PATH) and reports its own
+# result. The entry point is exactly 'install.py' beside its '_installer.py'
+# library; the archive carries other .py files that must never be run instead.
 PYTHON=''
 for candidate in python3 python; do
   if command -v "$candidate" >/dev/null 2>&1; then
@@ -11,9 +13,9 @@ done
 [ -n "$PYTHON" ] ||
   fail "Python 3.10 or newer is required but no 'python3' was found on PATH. Install Python, then run the command again."
 
-PACKAGE_INSTALLER="$(find "$EXTRACT" -type f -name 'package_installer.py' -print 2>/dev/null | sed -n 1p)"
-[ -n "$PACKAGE_INSTALLER" ] ||
-  fail "the package did not contain 'package_installer.py'. Nothing was installed."
+PACKAGE_INSTALLER="$EXTRACT/install.py"
+[ -f "$PACKAGE_INSTALLER" ] ||
+  fail "the package did not contain 'install.py' at its root. Nothing was installed."
 
 if [ -n "${ZAI_INSTALL_DIR:-}" ]; then
   set -- --install-dir "$INSTALL_DIR" "$@"

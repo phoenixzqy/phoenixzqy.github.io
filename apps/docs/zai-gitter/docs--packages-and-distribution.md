@@ -1,7 +1,10 @@
 # Packages and distribution
 
 This repository publishes Go modules directly through Git commits; no package
-server, release tag, or release pipeline is required.
+server or release tag is required for a consumer to depend on a pushed commit.
+Public binary distribution is a separate, manually dispatched pipeline that
+publishes unsigned archives and a release manifest to the public download site.
+See releases.
 
 ## Reusable packages
 
@@ -66,6 +69,28 @@ material and the guides' tooling commands, such as local validation and
 packaging, work only in a clone.
 Extract a binary archive into a directory on PATH; no registry, zai install,
 or sibling clone is required.
+
+## Public release archives
+
+`scripts/release_build.py` is the release entry point shared by the Release
+workflow and a manual release. It reuses `pack_binary` from `package.py`, so a
+release archive is byte identical to a locally packaged one:
+
+```text
+python scripts/release_build.py --version 0.1.0 --output /tmp/zai-release/zai-gitter
+```
+
+It builds all six published targets — `linux`, `darwin` and `windows` on
+`amd64` and `arm64` — as `zai-gitter-<version>-<goos>-<goarch>.zip`, and
+replaces `package.py`'s per-archive checksum sidecars with one `SHA256SUMS`
+list. Release versions are plain `MAJOR.MINOR.PATCH`; the `v`-prefixed Go module
+versions used above are a different namespace.
+
+`scripts/release_manifest.py` turns that directory into the download site's
+`releases/zai-gitter/latest/manifest.json`, recording each archive's byte count,
+lowercase SHA-256, public release URL, and bilingual display name and
+installation notes. It does not upload anything. Releases
+describes the workflow, credentials, version allocation, and publication steps.
 
 ## Consume from Git
 

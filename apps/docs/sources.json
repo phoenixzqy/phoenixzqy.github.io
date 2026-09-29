@@ -129,8 +129,8 @@
       "appId": "zai-gitter",
       "repository": "phoenixzqy/zai-gitter",
       "ref": "origin/main",
-      "commit": "010a9622fcb2ca11023e7d0b220838788972e658",
-      "syncedAt": "2026-09-29T01:09:49Z",
+      "commit": "30a572ecfd8062a41285cfbba426d5f2e50f3df7",
+      "syncedAt": "2026-09-29T01:18:31Z",
       "include": [
         "docs/user-guide.md",
         "docs/packages-and-distribution.md"

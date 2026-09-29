@@ -238,12 +238,17 @@ test("an unreachable manifest fails instead of installing a stale or partial bui
   }));
 });
 
-test("the zai installer runs the bundled package installer and forwards arguments", async () => {
+test("the zai installer runs install.py from the archive root and forwards arguments", async () => {
   const bytes = createZip({
-    "zai-0.1.0-linux-x64/package_installer.py":
+    // The published archive keeps its entry point at the root, beside the
+    // library it imports, and ships other Python files that must not be run.
+    "install.py":
       "import sys, pathlib\n" +
       "pathlib.Path(sys.argv[1]).write_text(' '.join(sys.argv[2:]))\n" +
       "print('installed: fixture')\n",
+    "_installer.py": "# bundled library\n",
+    "install_path.py": "raise SystemExit('the wrong script ran')\n",
+    ".copilot/scripts/install.py": "raise SystemExit('the wrong script ran')\n",
   });
   const file = "zai-0.1.0-linux-x64.zip";
   await withServer(new Map([
@@ -257,6 +262,19 @@ test("the zai installer runs the bundled package installer and forwards argument
     assert.equal(result.code, 0, result.stderr);
     assert.match(result.stdout, /installed: fixture/);
     assert.equal(await readFile(receipt, "utf8"), "--install-copilot no");
+  }));
+});
+
+test("the zai installer refuses an archive without install.py at its root", async () => {
+  const bytes = createZip({ "zai-0.1.0-linux-x64/install.py": "print('nested')\n" });
+  const file = "zai-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)]), null, 2))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /did not contain 'install\.py' at its root/);
   }));
 });
 

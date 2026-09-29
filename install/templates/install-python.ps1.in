@@ -1,6 +1,9 @@
     # --- Install ----------------------------------------------------------
-    # zai ships a Python package installer inside the archive. It performs the
-    # real installation (executable, agent homes, PATH) and reports its result.
+    # zai ships a Python package installer at the root of the archive. It
+    # performs the real installation (executable, agent homes, PATH) and reports
+    # its result. The entry point is exactly 'install.py' beside its
+    # '_installer.py' library; the archive carries other .py files that must
+    # never be run instead.
     $python = $null
     $pythonArgs = @()
     if (Get-Command 'py' -ErrorAction SilentlyContinue) {
@@ -15,10 +18,9 @@
         Stop-Install "Python 3.10 or newer is required but no Python launcher was found on PATH. Install Python, then run the command again."
     }
 
-    $packageInstaller = Get-ChildItem -Path $extract -Filter 'package_installer.py' -Recurse -File |
-        Select-Object -First 1
-    if ($null -eq $packageInstaller) {
-        Stop-Install "the package did not contain 'package_installer.py'. Nothing was installed."
+    $packageInstaller = Join-Path $extract 'install.py'
+    if (-not (Test-Path -LiteralPath $packageInstaller -PathType Leaf)) {
+        Stop-Install "the package did not contain 'install.py' at its root. Nothing was installed."
     }
 
     $forwarded = @()
@@ -27,7 +29,7 @@
     if ($extraArgs) { $forwarded += @($extraArgs -split '\s+' | Where-Object { $_ }) }
 
     Write-Host "Running the bundled package installer with $python..."
-    & $python @pythonArgs $packageInstaller.FullName @forwarded
+    & $python @pythonArgs $packageInstaller @forwarded
     if ($LASTEXITCODE -ne 0) {
         Stop-Install "the bundled package installer exited with code $LASTEXITCODE." $LASTEXITCODE
     }
