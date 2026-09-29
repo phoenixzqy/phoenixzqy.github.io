@@ -109,6 +109,13 @@ function resolveCommit(repoDir, ref, useWorktree) {
   return git(repoDir, ["rev-parse", target]).toString("utf8").trim();
 }
 
+function resolveCommitTime(repoDir, commit) {
+  const timestamp = git(repoDir, ["show", "-s", "--format=%cI", commit])
+    .toString("utf8")
+    .trim();
+  return new Date(timestamp).toISOString().replace(/\.\d{3}Z$/, "Z");
+}
+
 // Documents are flattened onto a stable slug so the mirror never depends on the
 // source repository's directory layout and the viewer can address every page
 // with a single query parameter.
@@ -144,45 +151,260 @@ function isExternal(target) {
   return /^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("//");
 }
 
+function maskCode(markdown) {
+  const masked = [...markdown];
+  let fenced = null;
+  let offset = 0;
+  for (const line of markdown.split(/(?<=\n)/)) {
+    const content = line.endsWith("\n") ? line.slice(0, -1) : line;
+    const fence = content.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (fenced) {
+      for (let i = offset; i < offset + content.length; i += 1) masked[i] = " ";
+      if (fence && fence[1][0] === fenced.char && fence[1].length >= fenced.length) fenced = null;
+      offset += line.length;
+      continue;
+    }
+    if (fence) {
+      fenced = { char: fence[1][0], length: fence[1].length };
+      for (let i = offset; i < offset + content.length; i += 1) masked[i] = " ";
+      offset += line.length;
+      continue;
+    }
+    let cursor = 0;
+    while (cursor < content.length) {
+      if (content[cursor] !== "`") {
+        cursor += 1;
+        continue;
+      }
+      let run = 1;
+      while (content[cursor + run] === "`") run += 1;
+      const closing = content.indexOf("`".repeat(run), cursor + run);
+      if (closing < 0) {
+        cursor += run;
+        continue;
+      }
+      for (let i = offset + cursor; i < offset + closing + run; i += 1) masked[i] = " ";
+      cursor = closing + run;
+    }
+    offset += line.length;
+  }
+  return masked.join("");
+}
+
+function normalizeLabel(label) {
+  return label.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function parseDestination(text, start) {
+  let cursor = start;
+  while (text[cursor] === " " || text[cursor] === "\t") cursor += 1;
+  if (text[cursor] === "<") {
+    const end = text.indexOf(">", cursor + 1);
+    if (end < 0 || text.slice(cursor + 1, end).includes("\n")) return null;
+    return { target: text.slice(cursor + 1, end), start: cursor, end: end + 1 };
+  }
+  const targetStart = cursor;
+  let depth = 0;
+  while (cursor < text.length) {
+    const char = text[cursor];
+    if (char === "\\" && cursor + 1 < text.length) {
+      cursor += 2;
+      continue;
+    }
+    if (char === "(") depth += 1;
+    else if (char === ")") {
+      if (depth === 0) break;
+      depth -= 1;
+    } else if ((char === " " || char === "\t" || char === "\n") && depth === 0) {
+      break;
+    }
+    cursor += 1;
+  }
+  if (cursor === targetStart || depth !== 0) return null;
+  return { target: text.slice(targetStart, cursor), start: targetStart, end: cursor };
+}
+
+function findClosingBracket(text, start) {
+  let depth = 1;
+  for (let cursor = start; cursor < text.length; cursor += 1) {
+    if (text[cursor] === "\\" && cursor + 1 < text.length) {
+      cursor += 1;
+    } else if (text[cursor] === "[") {
+      depth += 1;
+    } else if (text[cursor] === "]" && --depth === 0) {
+      return cursor;
+    }
+  }
+  return -1;
+}
+
+function findInlineLinkEnd(text, start) {
+  let quote = null;
+  for (let cursor = start; cursor < text.length; cursor += 1) {
+    const char = text[cursor];
+    if (char === "\\" && cursor + 1 < text.length) {
+      cursor += 1;
+    } else if (quote) {
+      if (char === quote) quote = null;
+    } else if (char === `"` || char === `'`) {
+      quote = char;
+    } else if (char === ")") {
+      return cursor;
+    } else if (char === "\n") {
+      return -1;
+    }
+  }
+  return -1;
+}
+
+function parseMarkdownReferences(markdown) {
+  const masked = maskCode(markdown);
+  const definitions = new Map();
+  const definitionRanges = [];
+  const definitionPattern = /^ {0,3}\[([^\]\n]+)\]:[ \t]*/gm;
+  let match;
+  while ((match = definitionPattern.exec(masked)) !== null) {
+    const destination = parseDestination(masked, definitionPattern.lastIndex);
+    if (!destination || destination.target.includes("\n")) continue;
+    const lineEnd = masked.indexOf("\n", destination.end);
+    const label = normalizeLabel(match[1]);
+    definitions.set(label, {
+      label,
+      target: destination.target,
+      targetStart: destination.start,
+      targetEnd: destination.end,
+      start: match.index,
+      end: lineEnd < 0 ? masked.length : lineEnd + 1,
+    });
+    definitionRanges.push([match.index, lineEnd < 0 ? masked.length : lineEnd]);
+  }
+
+  const references = [];
+  for (let cursor = 0; cursor < masked.length; cursor += 1) {
+    const image = masked[cursor] === "!" && masked[cursor + 1] === "[";
+    const opening = image ? cursor + 1 : cursor;
+    if (masked[opening] !== "[") continue;
+    if (definitionRanges.some(([start, end]) => cursor >= start && cursor < end)) continue;
+    const closing = findClosingBracket(masked, opening + 1);
+    if (closing < 0) continue;
+    const text = markdown.slice(opening + 1, closing);
+    let end = closing + 1;
+    let target;
+    let targetStart;
+    let targetEnd;
+    let definition;
+    if (masked[end] === "(") {
+      const destination = parseDestination(masked, end + 1);
+      if (!destination) continue;
+      const linkEnd = findInlineLinkEnd(masked, destination.end);
+      if (linkEnd < 0) continue;
+      ({ target, start: targetStart, end: targetEnd } = destination);
+      end = linkEnd + 1;
+    } else {
+      let label = text;
+      if (masked[end] === "[") {
+        const labelEnd = findClosingBracket(masked, end + 1);
+        if (labelEnd < 0) continue;
+        label = markdown.slice(end + 1, labelEnd) || text;
+        end = labelEnd + 1;
+      }
+      definition = definitions.get(normalizeLabel(label));
+      if (!definition) continue;
+      target = definition.target;
+    }
+    references.push({
+      image,
+      text,
+      target,
+      start: cursor,
+      end,
+      targetStart,
+      targetEnd,
+      definition,
+    });
+    cursor = end - 1;
+  }
+  return { definitions, references };
+}
+
+function rewrittenTarget(target, context, image) {
+  if (!target || isExternal(target) || target.startsWith("#")) return { target };
+  const [pathPart, hash] = splitTarget(target);
+  if (!pathPart) return { target };
+  const resolved = posixJoin(context.filePath, pathPart);
+  if (image) {
+    const asset = context.assetByPath.get(resolved);
+    if (asset) return { target: asset };
+    context.unresolved.push({ filePath: context.filePath, target, kind: "image" });
+    return { unresolved: true };
+  }
+  const slug = context.slugByPath.get(resolved);
+  if (slug) {
+    return {
+      target: `?id=${encodeURIComponent(context.appId)}&doc=${encodeURIComponent(slug)}${hash}`,
+    };
+  }
+  context.unresolved.push({ filePath: context.filePath, target, kind: "link" });
+  return { unresolved: true };
+}
+
 // Rewrites links and images inside a mirrored document. Links to other mirrored
 // documents become viewer links, links to files that were deliberately not
 // mirrored lose their link (the text survives), and images are pointed at the
 // copies that live beside the document.
 function rewriteReferences(markdown, context) {
-  const { filePath, appId, slugByPath, assetByPath, unresolved } = context;
-  return markdown.replace(
-    /(!?)\[([^\]]*)\]\(\s*(<[^>]*>|[^\s)]+)((?:\s+(?:"[^"]*"|'[^']*'))?)\s*\)/g,
-    (match, bang, text, rawTarget, title) => {
-      const target = rawTarget.startsWith("<") ? rawTarget.slice(1, -1) : rawTarget;
-      if (!target || isExternal(target) || target.startsWith("#")) {
-        return match;
+  const { references } = parseMarkdownReferences(markdown);
+  const replacements = [];
+  const rewrittenDefinitions = new Set();
+  const removedDefinitions = new Set();
+  for (const reference of references) {
+    const rewritten = rewrittenTarget(reference.target, context, reference.image);
+    if (rewritten.unresolved) {
+      replacements.push({
+        start: reference.start,
+        end: reference.end,
+        value: reference.image ? (reference.text ? `*${reference.text}*` : "") : reference.text,
+      });
+      if (reference.definition && !removedDefinitions.has(reference.definition.label)) {
+        replacements.push({
+          start: reference.definition.start,
+          end: reference.definition.end,
+          value: "",
+        });
+        removedDefinitions.add(reference.definition.label);
       }
-      const [pathPart, hash] = splitTarget(target);
-      if (!pathPart) return match;
-      const resolved = posixJoin(filePath, pathPart);
-      if (bang === "!") {
-        const asset = assetByPath.get(resolved);
-        if (asset) return `![${text}](${asset})`;
-        unresolved.push({ filePath, target, kind: "image" });
-        return text ? `*${text}*` : "";
+      continue;
+    }
+    if (rewritten.target === reference.target) continue;
+    if (reference.definition) {
+      if (!rewrittenDefinitions.has(reference.definition.label)) {
+        replacements.push({
+          start: reference.definition.targetStart,
+          end: reference.definition.targetEnd,
+          value: rewritten.target,
+        });
+        rewrittenDefinitions.add(reference.definition.label);
       }
-      const slug = slugByPath.get(resolved);
-      if (slug) {
-        return `[${text}](?id=${encodeURIComponent(appId)}&doc=${encodeURIComponent(slug)}${hash})`;
-      }
-      unresolved.push({ filePath, target, kind: "link" });
-      return text;
-    },
-  );
+    } else {
+      replacements.push({
+        start: reference.targetStart,
+        end: reference.targetEnd,
+        value: rewritten.target,
+      });
+    }
+  }
+  return replacements
+    .sort((a, b) => b.start - a.start)
+    .reduce((text, replacement) => (
+      `${text.slice(0, replacement.start)}${replacement.value}${text.slice(replacement.end)}`
+    ), markdown);
 }
 
 function collectImages(markdown) {
   const targets = [];
-  const pattern = /!\[[^\]]*\]\(\s*(<[^>]*>|[^\s)]+)/g;
-  let match;
-  while ((match = pattern.exec(markdown)) !== null) {
-    const raw = match[1].startsWith("<") ? match[1].slice(1, -1) : match[1];
-    const [pathPart] = splitTarget(raw);
+  for (const reference of parseMarkdownReferences(markdown).references) {
+    if (!reference.image) continue;
+    const [pathPart] = splitTarget(reference.target);
     if (pathPart && !isExternal(pathPart) && IMAGE.test(pathPart)) {
       targets.push(pathPart);
     }
@@ -222,6 +444,9 @@ function syncApp(app, options) {
   }
   const ref = options.refs.get(app.appId) ?? app.ref;
   const commit = resolveCommit(repoDir, ref, options.worktree);
+  const syncedAt = app.commit === commit && app.syncedAt
+    ? app.syncedAt
+    : resolveCommitTime(repoDir, commit);
   const tree = listTree(repoDir, ref, options.worktree);
 
   const slugByPath = new Map();
@@ -291,7 +516,7 @@ function syncApp(app, options) {
     Buffer.from(`${JSON.stringify(index, null, 2)}\n`, "utf8"),
   );
 
-  return { commit, outputs, unresolved, privacy, documents };
+  return { commit, syncedAt, outputs, unresolved, privacy, documents };
 }
 
 function applyOutputs(appDir, outputs, check) {
@@ -370,12 +595,14 @@ function main() {
   for (const { app, result } of prepared) {
     changes.push(...applyOutputs(path.join(DOCS_ROOT, app.appId), result.outputs, options.check));
     app.commit = result.commit;
-    app.syncedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+    app.syncedAt = result.syncedAt;
     console.log(`${app.appId}: ${result.documents.length} document(s) at ${result.commit.slice(0, 12)}`);
   }
 
-  if (!options.check) {
-    fs.writeFileSync(SOURCES_FILE, `${JSON.stringify(sources, null, 2)}\n`);
+  const expectedSources = Buffer.from(`${JSON.stringify(sources, null, 2)}\n`);
+  if (!fs.readFileSync(SOURCES_FILE).equals(expectedSources)) {
+    changes.push(`update ${path.relative(ROOT, SOURCES_FILE)}`);
+    if (!options.check) fs.writeFileSync(SOURCES_FILE, expectedSources);
   }
 
   if (changes.length === 0) {

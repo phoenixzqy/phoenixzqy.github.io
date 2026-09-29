@@ -72,7 +72,7 @@ Terraform, Markdown, LaTeX/BibTeX and Nix. `lsp list` supplies their upstream se
 links, and F1 displays their manual instructions. Asking `lsp install` for these
 IDs fails explicitly; there is no pretend-success fallback. Their SDK/platform
 requirements differ, and some cannot run on every OS (for example iOS tooling
-requires macOS/Xcode). See the [coverage matrix](?id=zai-editor&doc=docs--language-support).
+requires macOS/Xcode). See the coverage matrix.
 
 ## Storage, configuration and disabling
 
@@ -114,7 +114,7 @@ command stops at the first failure.
 | No completion after installation | Restart the editor with the same `ZAI_EDITOR_LSP_HOME`; opt in with `--lsp` or F1 in a trusted workspace. Check the status line after Ctrl+Space, the file type, runtime PATH and project dependencies. Unsupported completion snippets are not inserted. |
 | `.install.lock` exists | Another install may be running. After a crash, verify that it has stopped before removing that exact lock file and retrying. Never delete an active installer's lock. |
 | Incomplete installation directory | Close editors using it, move the specifically reported directory aside, and rerun install. Existing user configuration is not silently discarded. |
-| Your language is manual-only | Follow its upstream link from `lsp list`, then use PATH or an explicit [configuration](?id=zai-editor&doc=docs--language-support#configuration-and-platform-requirements). |
+| Your language is manual-only | Follow its upstream link from `lsp list`, then use PATH or an explicit configuration. |
 
 Ctrl+C cancels the command and its owned process tree. An installation is limited
 to 15 minutes per server. No automatic downloads occur while editing, and no

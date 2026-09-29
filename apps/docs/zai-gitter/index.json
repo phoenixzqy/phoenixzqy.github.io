@@ -10,14 +10,7 @@
       "title": "User guide",
       "source": "docs/user-guide.md",
       "file": "docs--user-guide.md",
-      "bytes": 11510
-    },
-    {
-      "slug": "docs--packages-and-distribution",
-      "title": "Packages and distribution",
-      "source": "docs/packages-and-distribution.md",
-      "file": "docs--packages-and-distribution.md",
-      "bytes": 6611
+      "bytes": 11387
     }
   ],
   "assets": []

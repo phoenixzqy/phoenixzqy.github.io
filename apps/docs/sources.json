@@ -11,16 +11,22 @@
       "include": [
         "docs/services-and-pollers.md",
         "docs/config.md",
-        "docs/config/discovery-and-management.md",
         "docs/config/migration-and-backward-compatibility.md",
         "docs/config/poller-filters-and-presets.md",
         "docs/config/project-registry.md",
         "docs/config/samples.md",
         "docs/config/validation-and-boundaries.md",
-        "docs/teams-notifications.md",
-        "docs/benchmarks.md"
+        "docs/teams-notifications.md"
       ],
       "excluded": [
+        {
+          "path": "docs/config/discovery-and-management.md",
+          "reason": "Mixes user configuration with private source-layout and implementation guidance. Publish after upstream separates the user-facing material."
+        },
+        {
+          "path": "docs/benchmarks.md",
+          "reason": "Contains contributor-only build and profiling commands, including private repository skill paths."
+        },
         {
           "path": "docs/README.md",
           "reason": "An index of the private docs tree: most of the documents it links to are contributor material that is not mirrored, so the site's own document list replaces it."
@@ -86,11 +92,17 @@
       "commit": "837dd962baabab318b97ac742d7aa915ba5c3c71",
       "syncedAt": "2026-09-29T01:09:49Z",
       "include": [
-        "docs/reference.md",
-        "docs/language-support.md",
         "docs/lsp-setup.md"
       ],
       "excluded": [
+        {
+          "path": "docs/reference.md",
+          "reason": "Mixes user reference material with private contributor, agent, security, packaging, and repository-integration guidance."
+        },
+        {
+          "path": "docs/language-support.md",
+          "reason": "Ends with private contributor maintenance and test-evidence instructions. Publish after upstream separates the user-facing matrix."
+        },
         {
           "path": "docs/architecture.md",
           "reason": "Package ownership and implementation internals."
@@ -132,10 +144,13 @@
       "commit": "30a572ecfd8062a41285cfbba426d5f2e50f3df7",
       "syncedAt": "2026-09-29T01:18:31Z",
       "include": [
-        "docs/user-guide.md",
-        "docs/packages-and-distribution.md"
+        "docs/user-guide.md"
       ],
       "excluded": [
+        {
+          "path": "docs/packages-and-distribution.md",
+          "reason": "Contains private-repository access, contributor packaging, and release-engineering guidance rather than only public usage."
+        },
         {
           "path": "docs/architecture.md",
           "reason": "Package ownership and implementation internals."

@@ -10,21 +10,14 @@
       "title": "Services, pollers, and labels",
       "source": "docs/services-and-pollers.md",
       "file": "docs--services-and-pollers.md",
-      "bytes": 4659
+      "bytes": 4601
     },
     {
       "slug": "docs--config",
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 4754
-    },
-    {
-      "slug": "docs--config--discovery-and-management",
-      "title": "Configuration discovery and management",
-      "source": "docs/config/discovery-and-management.md",
-      "file": "docs--config--discovery-and-management.md",
-      "bytes": 8815
+      "bytes": 4696
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
@@ -67,13 +60,6 @@
       "source": "docs/teams-notifications.md",
       "file": "docs--teams-notifications.md",
       "bytes": 7654
-    },
-    {
-      "slug": "docs--benchmarks",
-      "title": "Benchmarks",
-      "source": "docs/benchmarks.md",
-      "file": "docs--benchmarks.md",
-      "bytes": 3853
     }
   ],
   "assets": []

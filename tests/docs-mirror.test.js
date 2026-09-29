@@ -62,9 +62,26 @@ test("every mirrored app is allowlisted and records the commit it came from", ()
 });
 
 test("mirrored documents carry no private infrastructure references", () => {
-  const forbidden = [/shared-internal-tools/i, /epi-platform/i, /ghp_[A-Za-z0-9]{16,}/, /https?:\/\/[^\s)"']*\.visualstudio\.com/i];
+  const forbidden = [
+    /shared-internal-tools/i,
+    /epi-platform/i,
+    /ghp_[A-Za-z0-9]{16,}/,
+    /https?:\/\/[^\s)"']*\.visualstudio\.com/i,
+    /\b(?:AGENTS|CLAUDE|GEMINI)\.md\b/i,
+    /\.github\/(?:skills|instructions)\//i,
+    /copilot-instructions\.md/i,
+    /security\.instructions\.md/i,
+    /\bGOPRIVATE\b/,
+    /\bprivate repository\b/i,
+    /\bsrc\/(?:zai|scripts)\//i,
+  ];
   for (const source of sources.apps) {
     const mirror = JSON.parse(readFileSync(join(root, "apps/docs", source.appId, "index.json"), "utf8"));
+    assert.deepEqual(
+      mirror.documents.map((document_) => document_.source),
+      source.include,
+      `${source.appId} only publishes its reviewed allowlist`,
+    );
     for (const document_ of mirror.documents) {
       const text = readFileSync(join(root, "apps/docs", source.appId, document_.file), "utf8");
       for (const pattern of forbidden) {
@@ -95,7 +112,12 @@ test("mirrored links point at the viewer or lose their link entirely", () => {
 // Only runs where the private checkout is available; the mirror itself is
 // committed, so other environments still validate it through validateSite.
 const gitterCheckout = join(process.env.HOME ?? "", "workspace/zai-gitter");
-test("the committed mirror matches what the sync script produces", { skip: existsSync(join(gitterCheckout, ".git")) ? false : "zai-gitter checkout is not available" }, () => {
+const privateSyncEnabled = process.env.RUN_PRIVATE_DOC_SYNC === "1";
+test("the committed mirror matches what the sync script produces", {
+  skip: privateSyncEnabled && existsSync(join(gitterCheckout, ".git"))
+    ? false
+    : "requires explicit opt-in and a private source checkout",
+}, () => {
   const output = execFileSync(process.execPath, [
     join(root, "scripts/sync-app-docs.mjs"),
     "--check",

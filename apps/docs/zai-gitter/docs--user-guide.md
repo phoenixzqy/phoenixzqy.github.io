@@ -2,7 +2,7 @@
 
 This guide covers building, running, and using the standalone `zai-gitter`
 app. For embedding the viewer or producing archives, see
-[packages and distribution](?id=zai-gitter&doc=docs--packages-and-distribution).
+packages and distribution.
 
 ## Build and run
 
@@ -18,7 +18,7 @@ go build -o zai-gitter ./cmd/zai-gitter
 On Windows, use `-o zai-gitter.exe`. Put the executable on PATH to run
 `zai-gitter [--theme <theme>] [directory]` from any Git workspace. Git must
 be on PATH. Alternatively, extract a binary archive produced by the
-[packaging script](?id=zai-gitter&doc=docs--packages-and-distribution#build-archives).
+packaging script.
 
 Standalone use requires Git and a local working tree, not a forge remote,
 zai config, or coding agent. Redirected output produces one 100x30 plaintext

@@ -70,7 +70,7 @@ reload. See the field reference.
 The complete configuration reference consists of this landing page and every
 chapter below. Together, in this order, they are authoritative:
 
-1. [Configuration discovery and management](?id=zai-cli&doc=docs--config--discovery-and-management)
+1. Configuration discovery and management
 2. Configuration field reference
 3. [Project registry and local project config](?id=zai-cli&doc=docs--config--project-registry)
 4. [Poller filters and presets](?id=zai-cli&doc=docs--config--poller-filters-and-presets)

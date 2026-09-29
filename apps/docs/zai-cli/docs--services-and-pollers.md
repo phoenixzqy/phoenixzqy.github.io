@@ -68,7 +68,7 @@ A repository needs a config before services start. `zai config init` creates
 one and `zai config update` edits it. Named profiles are managed with
 `zai config profile add/use/delete/edit`. Configs live under
 `~/.zai/configs/<repo-slug>/`. See the [configuration reference](?id=zai-cli&doc=docs--config),
-[discovery and management](?id=zai-cli&doc=docs--config--discovery-and-management), and
+discovery and management, and
 [samples](?id=zai-cli&doc=docs--config--samples).
 
 ## Local run data

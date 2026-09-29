@@ -6,25 +6,11 @@
   "commit": "837dd962baabab318b97ac742d7aa915ba5c3c71",
   "documents": [
     {
-      "slug": "docs--reference",
-      "title": "Editor and integration reference",
-      "source": "docs/reference.md",
-      "file": "docs--reference.md",
-      "bytes": 35631
-    },
-    {
-      "slug": "docs--language-support",
-      "title": "Built-in language and framework integrations",
-      "source": "docs/language-support.md",
-      "file": "docs--language-support.md",
-      "bytes": 13558
-    },
-    {
       "slug": "docs--lsp-setup",
       "title": "Set up code completion",
       "source": "docs/lsp-setup.md",
       "file": "docs--lsp-setup.md",
-      "bytes": 8053
+      "bytes": 7923
     }
   ],
   "assets": []
