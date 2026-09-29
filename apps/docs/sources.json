@@ -5,12 +5,13 @@
     {
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
-      "ref": "f0651931d276ea7c9490b4f8d43b5102c6f0ccd3",
-      "commit": "f0651931d276ea7c9490b4f8d43b5102c6f0ccd3",
-      "syncedAt": "2026-09-29T17:54:35Z",
+      "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "syncedAt": "2026-09-29T17:22:06Z",
       "include": [
         "docs/install-and-config.md",
         "docs/getting-started.md",
+        "docs/claude-code.md",
         "docs/services-and-pollers.md",
         "docs/config.md",
         "docs/config/migration-and-backward-compatibility.md",
@@ -21,10 +22,6 @@
         "docs/teams-notifications.md"
       ],
       "excluded": [
-        {
-          "path": "docs/codex.md",
-          "reason": "Combines the Codex setup guide with agent-instruction discovery and lifecycle internals; the public app catalog covers the integration preview."
-        },
         {
           "path": "docs/config/discovery-and-management.md",
           "reason": "Mixes user configuration with private source-layout and implementation guidance. Publish after upstream separates the user-facing material."

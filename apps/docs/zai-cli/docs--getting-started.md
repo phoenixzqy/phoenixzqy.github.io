@@ -123,18 +123,19 @@ The command always uses the published release source without a source-selection 
 
 ## The two run modes
 
-Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI sessions as tabs and split panes on the packaged zai home.
+Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Claude Code, and Pi sessions as tabs and split panes on their managed zai homes.
 
 | | **Service mode** | **Interactive console mode** |
 |---|---|---|
-| Command | `zai start <all\|service>` | `zai`, `zai copilot`, or `zai pi` from any folder; Pi opens the same console on a Pi first tab |
+| Command | `zai start <all\|service>` | `zai`, `zai copilot`, `zai claude`, or `zai pi` from any folder; each agent verb selects the first tab |
 | Who drives | A repo-scoped daemon runs the selected deterministic service pollers; matching service agents act on selected items within configured limits | A human, live inside the console TUI multiplexer |
 | Copilot home | `~/.zai/.copilot` | `~/.zai/.copilot` (the same home) |
 | Pi home | `~/.zai/.pi`, launched with `--no-extensions` | `~/.zai/.pi` (the same home), loading the extensions of the Pi packages inherited from `~/.pi/agent` |
+| Claude home | `~/.zai/.claude`, unattended print mode | `~/.zai/.claude` (the same home), normal interactive approvals unless console YOLO is enabled |
 | Copilot agent | launched per selected item with `--agent <service>-agent --autopilot --yolo -p <prompt>` | plain/default interactive copilot in each TUI tab or split pane (no service agent auto-launched) |
 | Scope | every packaged agent and skill | every packaged agent and skill |
 
-The shared home carries the packaged agents, schemas, skills, and tools, so console mode exposes the harness agents and skills to you, including a few `zai-`-prefixed operator-facing skills that describe and drive zai itself. Both homes stay separate from your own `~/.copilot` and `~/.pi`, so nothing zai installs reaches a Copilot or Pi session you start outside zai. Service sessions also appear in the console's resume list.
+The managed homes carry the packaged agents, schemas, skills, and tools, so console mode exposes the harness agents and skills to you, including a few `zai-`-prefixed operator-facing skills that describe and drive zai itself. These homes stay separate from your own `~/.copilot`, `~/.claude`, and `~/.pi`. Service sessions also appear in the console's resume list. See [Claude Code](?id=zai-cli&doc=docs--claude-code) for installation, separate managed-home authentication, resource compatibility, and native differences.
 
 Which mode do I want? Use **service mode** when you want zai to run automated poller+agent loops for the current repository. Use **interactive console mode** when you want a hands-on Copilot CLI session — in a project-based TUI multiplexer with tabs and split panes — with the packaged harness agents and skills available inside the session.
 
@@ -164,6 +165,8 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai` | Open the project-based console TUI from any folder on a quiet Welcome tab, without launching an agent. `ctrl+\ n` opens an app. |
 | `zai copilot` | Open the console with Copilot CLI in the first tab (or the config editor when the startup forge project has no config). |
 | `zai pi` | Open the same console with Pi in the first tab; a missing Pi CLI is installed first. |
+| `zai claude` / `zai cc` | Open Claude Code in the same console; install a missing CLI first. |
+| `zai claude install` / `zai claude auth <login\|status\|logout>` | Install Claude Code or manage authentication in its isolated home. |
 | `zai pi install` / `zai pi session` | Install Pi and its default packages, or open one Pi session with managed-worktree liveness. |
 | `zai start <all\|service\|list>` | Start one repo-scoped background daemon that runs `dev`, `review`, `pr-babysitter`, and `housekeep` (`all`), one service, or a comma-separated subset. |
 | `zai stop` / `zai restart` / `zai status` | Stop, restart with the same services, or show this repository's daemon. |
