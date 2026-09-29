@@ -33,8 +33,8 @@
         "sha256": "c30b40d5451c7593286c304395b026c2231f7fe9c5a659e1876fd0b902caeb7f",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned single-binary archive. Install it with `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh`, or extract the ZIP and put `zai-gitter` on your PATH. Git must be available on PATH. Keep the bundled LICENSE and licenses/ notices with the executable.",
-          "zh-CN": "未签名的单可执行文件压缩包。可使用 `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh` 安装，也可解压后将 `zai-gitter` 放入 PATH。运行需要 PATH 中存在 Git。请随可执行文件保留 LICENSE 与 licenses/ 声明。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。"
         }
       },
       {
@@ -50,8 +50,8 @@
         "sha256": "457d35dbff999f691942418cc7e3c3c87b6f60e3800cdadc4ad7f0ebc7577537",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned single-binary archive. Install it with `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh`, or extract the ZIP and put `zai-gitter` on your PATH. Git must be available on PATH. Keep the bundled LICENSE and licenses/ notices with the executable.",
-          "zh-CN": "未签名的单可执行文件压缩包。可使用 `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh` 安装，也可解压后将 `zai-gitter` 放入 PATH。运行需要 PATH 中存在 Git。请随可执行文件保留 LICENSE 与 licenses/ 声明。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。"
         }
       },
       {
@@ -67,8 +67,8 @@
         "sha256": "21df59a5eb330b51ec6ab32e9f4d52bf8f3a239f7f0d7a29dc570297141a4f8c",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned and not notarized. Install it with `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh`, or extract the ZIP and put `zai-gitter` on your PATH. macOS Gatekeeper blocks unsigned downloads until you clear the quarantine attribute; follow your organization's security policy. Git must be available on PATH.",
-          "zh-CN": "未签名且未经过公证。可使用 `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh` 安装，也可解压后将 `zai-gitter` 放入 PATH。macOS Gatekeeper 会拦截未签名的下载，需先清除隔离属性，并遵循所在组织的安全策略。运行需要 PATH 中存在 Git。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -84,8 +84,8 @@
         "sha256": "4089a60c7bc7fbde536ac5c079a65d28dd24df1d2404ad7b4bffadcf97082364",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned and not notarized. Install it with `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh`, or extract the ZIP and put `zai-gitter` on your PATH. macOS Gatekeeper blocks unsigned downloads until you clear the quarantine attribute; follow your organization's security policy. Git must be available on PATH.",
-          "zh-CN": "未签名且未经过公证。可使用 `curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh` 安装，也可解压后将 `zai-gitter` 放入 PATH。macOS Gatekeeper 会拦截未签名的下载，需先清除隔离属性，并遵循所在组织的安全策略。运行需要 PATH 中存在 Git。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -101,8 +101,8 @@
         "sha256": "a38d9fbacfdd1794aeff98bb6c2534adcb5cd878b1805309b1b273c515141fae",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned executable. Install it with `irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex` in PowerShell, or extract the ZIP and put `zai-gitter.exe` on your PATH. SmartScreen warns about unsigned downloads; follow your organization's security policy. Git must be available on PATH.",
-          "zh-CN": "未签名的可执行文件。可在 PowerShell 中使用 `irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex` 安装，也可解压后将 `zai-gitter.exe` 放入 PATH。SmartScreen 会对未签名的下载发出警告，请遵循所在组织的安全策略。运行需要 PATH 中存在 Git。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       },
       {
@@ -118,8 +118,8 @@
         "sha256": "854cb93a48af3ad1e88044234597e357c6c4ea204cf13854f131eeac7248747a",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned executable. Install it with `irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex` in PowerShell, or extract the ZIP and put `zai-gitter.exe` on your PATH. SmartScreen warns about unsigned downloads; follow your organization's security policy. Git must be available on PATH.",
-          "zh-CN": "未签名的可执行文件。可在 PowerShell 中使用 `irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex` 安装，也可解压后将 `zai-gitter.exe` 放入 PATH。SmartScreen 会对未签名的下载发出警告，请遵循所在组织的安全策略。运行需要 PATH 中存在 Git。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-gitter under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-gitter in a Git workspace. Git must already be on PATH. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-gitter 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后在 Git 工作区运行 zai-gitter。PATH 中必须已存在 Git。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       }
     ]

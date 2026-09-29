@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "appId": "zai-gitter",
   "repository": "phoenixzqy/zai-gitter",
-  "ref": "origin/main",
-  "commit": "30a572ecfd8062a41285cfbba426d5f2e50f3df7",
+  "ref": "0ae912081685c56df9727396b841de0dc8436195",
+  "commit": "0ae912081685c56df9727396b841de0dc8436195",
   "documents": [
     {
       "slug": "docs--user-guide",
       "title": "User guide",
       "source": "docs/user-guide.md",
       "file": "docs--user-guide.md",
-      "bytes": 11387
+      "bytes": 12178
     }
   ],
   "assets": []

@@ -33,8 +33,8 @@
         "sha256": "4383c87870c9c66f5fd06c59ffee909e83d7fcae7b49cf35682514bad39d05ae",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名，请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。"
         }
       },
       {
@@ -50,8 +50,8 @@
         "sha256": "ddf70ebf21b81a65fe8c1f724fef59ec502883850b1ec3ae651ea6ecfa90cab7",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名，请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。"
         }
       },
       {
@@ -67,8 +67,8 @@
         "sha256": "d35fd9ac0f1d7aaa04db199f63a836488e2cf992e2fba32860f348dcefba46f9",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名且未经公证，macOS Gatekeeper 需要手动放行；请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -84,8 +84,8 @@
         "sha256": "622d846381c3c7daca6055cacb7b402fb17bc88c39b8e145b9b23d1df3815c91",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名且未经公证，macOS Gatekeeper 需要手动放行；请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -101,8 +101,8 @@
         "sha256": "26f0b5ea35330f3909cdc2b807b73937fce90e22dc5ac13ea86cc4c6b6f1fff4",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor.exe` 加入 PATH。该构建未签名，SmartScreen 需要手动放行；请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       },
       {
@@ -118,8 +118,8 @@
         "sha256": "d97f6f85fefcb6045901880fc676ea46f1f29e01aa8a3df9735edc49cf396c28",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",
-          "zh-CN": "解压后将 `zai-editor.exe` 加入 PATH。该构建未签名，SmartScreen 需要手动放行；请先校验 SHA-256。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs zai-editor under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai-editor. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai-editor 安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai-editor。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       }
     ]
