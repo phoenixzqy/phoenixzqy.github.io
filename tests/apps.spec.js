@@ -77,7 +77,14 @@ test("release pages distinguish ad-hoc signatures from unsigned packages", async
 });
 
 test("multiple apps reuse detail and download pages without mixing release metadata", async ({ page }) => {
-  const second = { ...structuredClone(catalog.apps[0]), id: "another-player", name: "Another Player", tagline: "A second test app.", screenshots: undefined };
+  const second = {
+    ...structuredClone(catalog.apps[0]),
+    id: "another-player",
+    name: "Another Player",
+    tagline: "A second test app.",
+    screenshots: undefined,
+    artwork: undefined,
+  };
   await page.route("**/apps/catalog.json", (route) => route.fulfill({ json: { schemaVersion: 1, apps: [...catalog.apps, second] } }));
   await page.route("**/releases/another-player/latest/manifest.json", (route) =>
     route.fulfill({ json: { schemaVersion: 1, appId: "another-player", release: null } }));
