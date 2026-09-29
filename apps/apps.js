@@ -246,9 +246,28 @@ function commandBlock(entry) {
   row.append(label, code, copy, status);
   return row;
 }
+function comparisonValue(value, appId) {
+  const fragment = document.createDocumentFragment();
+  const reference = /\[(\d+)\]/g;
+  let offset = 0;
+  for (const match of value.matchAll(reference)) {
+    fragment.append(value.slice(offset, match.index));
+    const number = match[1];
+    const marker = element("sup", "comparison-note-reference");
+    const target = `comparison-${appId}-note-${number}`;
+    const anchor = link(number, `#${target}`, "");
+    anchor.setAttribute("aria-label", `${t("comparisonNote")} ${number}`);
+    marker.append(anchor);
+    fragment.append(marker);
+    offset = match.index + match[0].length;
+  }
+  fragment.append(value.slice(offset));
+  return fragment;
+}
 function comparisonSection(app) {
   if (!app.comparison) return null;
   const section = element("section", "app-section app-comparison");
+  let noteNumber = 1;
   section.append(
     paragraph(t("comparison"), "eyebrow section-index"),
     element("h2", "", t("comparisonHeading")),
@@ -278,7 +297,8 @@ function comparisonSection(app) {
       label.scope = "row";
       tableRow.append(label);
       row.values.forEach((value, index) => {
-        const cell = element("td", index === 0 ? "comparison-product" : "", value);
+        const cell = element("td", index === 0 ? "comparison-product" : "");
+        cell.append(comparisonValue(value, app.id));
         tableRow.append(cell);
       });
       body.append(tableRow);
@@ -287,8 +307,15 @@ function comparisonSection(app) {
     wrap.append(table);
     article.append(wrap);
     if (group.notes?.length) {
+      article.append(paragraph(t("comparisonNotes"), "comparison-notes-heading"));
       const notes = element("ol", "comparison-notes");
-      group.notes.forEach((note) => notes.append(element("li", "", note)));
+      notes.start = noteNumber;
+      group.notes.forEach((note) => {
+        const item = element("li", "", note);
+        item.id = `comparison-${app.id}-note-${noteNumber}`;
+        notes.append(item);
+        noteNumber += 1;
+      });
       article.append(notes);
     }
     section.append(article);

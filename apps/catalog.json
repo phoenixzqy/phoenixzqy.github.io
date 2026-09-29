@@ -418,8 +418,8 @@
                 "label": "Whole UI runs in a terminal (SSH, tmux)",
                 "values": [
                   "✓",
-                  "— 1",
-                  "— 2",
+                  "— [1]",
+                  "— [2]",
                   "✓"
                 ]
               },
@@ -437,7 +437,7 @@
                 "values": [
                   "✓",
                   "✓",
-                  "— 3",
+                  "— [3]",
                   "—"
                 ]
               },
@@ -446,7 +446,7 @@
                 "values": [
                   "✓",
                   "—",
-                  "— 4",
+                  "— [4]",
                   "—"
                 ]
               },
@@ -814,7 +814,7 @@
                 "label": "Whole editor runs in a terminal (SSH, tmux)",
                 "values": [
                   "✓",
-                  "— 1",
+                  "— [1]",
                   "✓",
                   "✓",
                   "✓"
@@ -826,8 +826,8 @@
                   "✓",
                   "✓",
                   "— modal",
-                  "partial 2",
-                  "partial 2"
+                  "partial [2]",
+                  "partial [2]"
                 ]
               },
               {
@@ -835,8 +835,8 @@
                 "values": [
                   "✓",
                   "✓",
-                  "— 3",
-                  "— 3",
+                  "— [3]",
+                  "— [3]",
                   "— menu bar"
                 ]
               },
@@ -855,7 +855,7 @@
                 "values": [
                   "✓",
                   "✓",
-                  "✓ 4",
+                  "✓ [4]",
                   "plugin",
                   "—"
                 ]
@@ -866,7 +866,7 @@
                   "✓",
                   "✓",
                   "plugin",
-                  "— 5",
+                  "— [5]",
                   "—"
                 ]
               },
@@ -875,8 +875,8 @@
                 "values": [
                   "✓",
                   "✓",
-                  "— 6",
-                  "— 6",
+                  "— [6]",
+                  "— [6]",
                   "—"
                 ]
               },
@@ -884,7 +884,7 @@
                 "label": "Markdown, Mermaid, and HTML preview",
                 "values": [
                   "✓",
-                  "✓ 7",
+                  "✓ [7]",
                   "plugin",
                   "—",
                   "—"
@@ -894,7 +894,7 @@
                 "label": "Inline comments and a copyable Ask AI request",
                 "values": [
                   "✓",
-                  "Copilot Chat 8",
+                  "Copilot Chat [8]",
                   "plugin",
                   "—",
                   "—"
@@ -948,7 +948,7 @@
               {
                 "label": "Download",
                 "values": [
-                  "13.6 MiB 9",
+                  "13.6 MiB [10]",
                   "326.0 MiB",
                   "10.9 MiB",
                   "4.9 MiB",
@@ -958,7 +958,7 @@
               {
                 "label": "On disk",
                 "values": [
-                  "26.1 MiB 9",
+                  "26.1 MiB [10]",
                   "961.0 MiB",
                   "34.4 MiB",
                   "12.2 MiB",
@@ -969,7 +969,7 @@
                 "label": "Idle memory (PSS)",
                 "values": [
                   "25.1–25.5 MiB",
-                  "745.9 MiB 10",
+                  "745.9 MiB [11]",
                   "10.9–11.1 MiB",
                   "16.4–16.6 MiB",
                   "0.5–0.6 MiB"
