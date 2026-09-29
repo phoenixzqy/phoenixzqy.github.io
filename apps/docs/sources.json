@@ -5,9 +5,9 @@
     {
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
-      "ref": "809b2e2c90df9bfabd20aaf99cb397719ba4f049",
-      "commit": "809b2e2c90df9bfabd20aaf99cb397719ba4f049",
-      "syncedAt": "2026-09-29T16:13:18Z",
+      "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "syncedAt": "2026-09-29T17:22:06Z",
       "include": [
         "docs/install-and-config.md",
         "docs/getting-started.md",

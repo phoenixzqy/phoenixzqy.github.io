@@ -57,7 +57,8 @@ Service runs are unattended and bypass permission prompts. Console sessions
 retain normal approvals unless the project's resolved console YOLO setting is
 enabled. Automations never ask questions; they bypass permissions only when
 console YOLO is enabled. Without it, a disallowed operation fails rather than
-waiting for a human. Autonomous subagents use the native `opus` model policy.
+waiting for a human. zai does not enforce a Claude subagent model or reasoning
+effort; those choices remain under Claude's native and user configuration.
 
 Completion requires Claude's successful, correlated stream result **and** a
 successful process exit. A zero exit, truncated output, or a success event
@@ -111,12 +112,10 @@ marks; it does not force-release worktrees or delete retained work. Native
 transcripts and captured evidence participate in the existing age-based
 retention policy while live sessions are protected.
 
-Use `zai session:analyze <id> --coding-agent claude` for a read-only native-event
-timeline, token usage, and tool outcomes, including recorded subagents. Add
-`--format json` for structured output or `--claude-home <path>` for another
-managed installation. Claude reports observed data; it does not invent Copilot
-billing units or inferred work-type costs. `--out` must name a new file.
-Copilot plugins, login state, and Copilot-specific billing are not imported.
+The existing `zai session:analyze` tool remains Copilot-only; this integration
+does not add Claude session analysis. Claude session discovery, native resume,
+and service evidence remain available. Copilot plugins, login state, and
+Copilot-specific billing are not imported.
 
 ## Manual acceptance checks
 

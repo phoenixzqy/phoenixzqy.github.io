@@ -171,7 +171,7 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai start <all\|service\|list>` | Start one repo-scoped background daemon that runs `dev`, `review`, `pr-babysitter`, and `housekeep` (`all`), one service, or a comma-separated subset. |
 | `zai stop` / `zai restart` / `zai status` | Stop, restart with the same services, or show this repository's daemon. |
 | `zai service-monitor` | Open the standalone poller and agent monitor TUI. |
-| `zai session:analyze <session-id>` | Build a read-only Copilot timeline and cost breakdown; use `--coding-agent claude` for Claude's observed event/token report. |
+| `zai session:analyze <session-id>` | Build a read-only timeline and cost breakdown for one Copilot session. |
 | `zai config <show\|path\|init\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |
 | `zai notifications teams <setup\|status\|test\|disable>` | Configure private Microsoft Teams notifications. See [Microsoft Teams notifications](?id=zai-cli&doc=docs--teams-notifications). |
 | `zai build-custom-package` | Export a shareable team runtime. See Sharing a custom zai runtime. |
