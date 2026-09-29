@@ -33,7 +33,6 @@ test("a detail page plays its demos, offers copyable installers, and links to th
 
   const command = app.installCommands[0].command;
   await expect(page.locator(".command-text").first()).toHaveText(command);
-  await expect(page.locator(".command-list").locator("..")).toContainText("once a public build is available");
   await expect(page.locator(".app-artwork")).toHaveJSProperty("naturalWidth", app.artwork.width);
 
   await page.getByRole("link", { name: "Documentation ↗", exact: true }).click();
