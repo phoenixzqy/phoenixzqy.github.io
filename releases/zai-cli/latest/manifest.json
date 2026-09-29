@@ -1,5 +1,127 @@
 {
   "schemaVersion": 1,
   "appId": "zai-cli",
-  "release": null
+  "release": {
+    "version": "0.1.112",
+    "channel": "preview",
+    "publishedAt": "2026-09-29T01:24:44Z",
+    "notes": [
+      {
+        "en": "Cross-compiled zai CLI packages built from one pinned source revision.",
+        "zh-CN": "由同一份固定源代码修订版交叉编译出的 zai CLI 安装包。"
+      },
+      {
+        "en": "Release archives are published publicly while the application source stays private.",
+        "zh-CN": "应用源代码保持私有，仅公开发布安装包。"
+      },
+      {
+        "en": "Every archive is unsigned; verify the SHA-256 shown on the download page.",
+        "zh-CN": "所有压缩包均未签名；请核对下载页显示的 SHA-256 校验值。"
+      }
+    ],
+    "assets": [
+      {
+        "name": {
+          "en": "zai CLI Linux x64",
+          "zh-CN": "zai CLI Linux x64"
+        },
+        "platform": "linux",
+        "architecture": "x64",
+        "file": "zai-cli-0.1.112-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-linux-amd64.zip",
+        "bytes": 46735267,
+        "sha256": "5fee124892d8e0e66c228bfb568f30476658b9a9f670e40758726c2454c499bb",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai CLI Linux arm64",
+          "zh-CN": "zai CLI Linux arm64"
+        },
+        "platform": "linux",
+        "architecture": "arm64",
+        "file": "zai-cli-0.1.112-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-linux-arm64.zip",
+        "bytes": 43245602,
+        "sha256": "f7648435f15f12d0451d398ea0380d6ea3dcf1ba0c7bafe0dbd901ea9b1c17c9",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai CLI macOS x64",
+          "zh-CN": "zai CLI macOS x64"
+        },
+        "platform": "macos",
+        "architecture": "x64",
+        "file": "zai-cli-0.1.112-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-darwin-amd64.zip",
+        "bytes": 44700383,
+        "sha256": "81b76a554886bef004869fc622033b91cded7630285c9453008d8661a7464d67",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai CLI macOS arm64",
+          "zh-CN": "zai CLI macOS arm64"
+        },
+        "platform": "macos",
+        "architecture": "arm64",
+        "file": "zai-cli-0.1.112-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-darwin-arm64.zip",
+        "bytes": 42341655,
+        "sha256": "945f35388207392c44cedac645dbecbd8072e34ed9a390c257df6317a5d46315",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai CLI Windows x64",
+          "zh-CN": "zai CLI Windows x64"
+        },
+        "platform": "windows",
+        "architecture": "x64",
+        "file": "zai-cli-0.1.112-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-windows-amd64.zip",
+        "bytes": 47548199,
+        "sha256": "b0ad48b48fb0768bf5da75f7b934697d0b517a54b7f8d95106c4cc7b2cdd7795",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai CLI Windows arm64",
+          "zh-CN": "zai CLI Windows arm64"
+        },
+        "platform": "windows",
+        "architecture": "arm64",
+        "file": "zai-cli-0.1.112-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.112/zai-cli-0.1.112-windows-arm64.zip",
+        "bytes": 43800640,
+        "sha256": "2381cd3d2b46e6d598f4336b6e10bc9f3824e43e50955438d78a155bf5bd80ef",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer, Node.js/npm, and the Copilot CLI are required.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。需要 Python 3.10 及以上、Node.js/npm 和 Copilot CLI。"
+        }
+      }
+    ]
+  }
 }
