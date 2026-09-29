@@ -108,6 +108,14 @@ information has been invented. Both Microsoft roles retain the supplied
 The introduction paraphrases the supplied experience; project artwork is
 conceptual, not an actual Microsoft product interface.
 
+The zai-cli, zai-editor, and zai-gitter descriptions paraphrase the app
+author's supplied README material; the allowlisted user documentation has
+source commit identifiers in `apps/docs/sources.json`. The app author supplied
+the wordmark and demo recordings for this public-site PR. The video captions
+describe the recordings rather than claiming independent product benchmarks;
+no private source, contributor instructions, or unpublished packages belong
+in the public mirror.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online
