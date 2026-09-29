@@ -11,6 +11,8 @@
     "start": "python3 -m http.server 4173 --bind 127.0.0.1",
     "hooks:install": "git config --local core.hooksPath .githooks",
     "validate:apps": "node scripts/validate-apps.mjs",
+    "build:installers": "node scripts/build-installers.mjs",
+    "sync:docs": "node scripts/sync-app-docs.mjs",
     "test:unit": "node --test tests/*.test.js",
     "test": "npm run validate:apps && npm run test:unit && playwright test",
     "test:ui": "playwright test --ui"

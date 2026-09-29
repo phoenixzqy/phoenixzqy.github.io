@@ -16,7 +16,7 @@ test("homepage links to catalog, BPlayer details, and unpublished downloads", as
   await page.goto("/");
   await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Apps", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Small ideas. Real software.");
-  await page.getByRole("link", { name: "Explore app" }).click();
+  await page.locator(".catalog-card").filter({ hasText: "BPlayer" }).getByRole("link", { name: "Explore app" }).click();
   await expect(page).toHaveURL(/\/apps\/app\/\?id=bplayer&lang=en$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("BPlayer");
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
@@ -75,7 +75,7 @@ test("multiple apps reuse detail and download pages without mixing release metad
   await page.route("**/releases/another-player/latest/manifest.json", (route) =>
     route.fulfill({ json: { schemaVersion: 1, appId: "another-player", release: null } }));
   await page.goto("/apps/");
-  await expect(page.locator(".catalog-card")).toHaveCount(2);
+  await expect(page.locator(".catalog-card")).toHaveCount(catalog.apps.length + 1);
   await page.getByRole("link", { name: "Another Player", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Another Player");
   await page.getByRole("link", { name: "View releases & downloads" }).click();

@@ -83,6 +83,27 @@ test("release contract validates dates, versions, and duplicate filenames", () =
   assert.throws(() => validateManifest(fixture, app), /unique/);
 });
 
+test("catalog accepts app-owned videos, artwork, and install commands", () => {
+  const fixture = structuredClone(catalog);
+  const app_ = fixture.apps.find((entry) => entry.videos);
+  assert.ok(app_, "at least one catalog entry ships a video");
+  assert.equal(validateCatalog(fixture).apps.find((entry) => entry.id === app_.id).videos.length, app_.videos.length);
+  const reject = (mutate, pattern, label) => {
+    const broken = structuredClone(catalog);
+    mutate(broken.apps.find((entry) => entry.id === app_.id));
+    assert.throws(() => validateCatalog(broken), pattern, label);
+  };
+  reject((entry) => { entry.videos[0].src = "/apps/media/other-app/demo.mp4"; }, /app-owned mp4 or webm/, "another app's folder");
+  reject((entry) => { entry.videos[0].src = "/apps/media/" + app_.id + "/../../secret.mp4"; }, /app-owned mp4 or webm/, "a parent path");
+  reject((entry) => { entry.videos[0].src = "/apps/media/" + app_.id + "/demo.mov"; }, /app-owned mp4 or webm/, "an unsupported container");
+  reject((entry) => { entry.videos[0].poster = "https://example.invalid/poster.png"; }, /Video poster/, "a remote poster");
+  reject((entry) => { entry.videos.push(structuredClone(entry.videos[0])); }, /unique/, "a duplicate video");
+  reject((entry) => { entry.videos[0].width = 0; }, /dimensions/, "a zero width");
+  reject((entry) => { entry.artwork = { ...entry.artwork, src: "/apps/media/other-app/logo.png" }; }, /app-owned image/, "foreign artwork");
+  reject((entry) => { entry.installCommands[0].command = "curl … | sh"; }, /printable ASCII/, "a non-ASCII command");
+  reject((entry) => { entry.documentation = "yes"; }, /Documentation must be true/, "non-boolean documentation");
+});
+
 async function withSite(run) {
   const root = await mkdtemp(join(tmpdir(), "resume-release-test-"));
   try {
@@ -90,7 +111,13 @@ async function withSite(run) {
     await mkdir(join(root, "apps"), { recursive: true });
     await mkdir(folder, { recursive: true });
     const manifest = releaseFixture();
-    await writeFile(join(root, "apps/catalog.json"), JSON.stringify(catalog));
+    // A temporary site with a single app keeps these checks about the release
+    // contract; media and documentation mirrors have their own tests below.
+    const single = structuredClone(catalog);
+    single.apps = [{ ...single.apps[0], screenshots: undefined, videos: undefined, artwork: undefined, documentation: undefined }];
+    await mkdir(join(root, "apps/docs"), { recursive: true });
+    await writeFile(join(root, "apps/docs/sources.json"), JSON.stringify({ schemaVersion: 1, apps: [] }));
+    await writeFile(join(root, "apps/catalog.json"), JSON.stringify(single));
     await writeFile(join(folder, "manifest.json"), JSON.stringify(manifest));
     await writeFile(join(folder, manifest.release.assets[0].file), packageBytes);
     await run(root, folder, manifest);
@@ -101,7 +128,7 @@ async function withSite(run) {
 
 test("pipeline validator verifies real local bytes and checksums", async () => {
   await withSite(async (root, folder, manifest) => {
-    assert.deepEqual(await validateSite(root), { apps: 1, localBytes: packageBytes.length });
+    assert.deepEqual(await validateSite(root), { apps: 1, localBytes: packageBytes.length, mediaBytes: 0, documents: 0 });
     await writeFile(join(folder, manifest.release.assets[0].file), Buffer.alloc(packageBytes.length));
     await assert.rejects(validateSite(root), /SHA-256/);
     await writeFile(join(folder, manifest.release.assets[0].file), "short");

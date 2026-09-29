@@ -1,0 +1,26 @@
+# --- Install --------------------------------------------------------------
+BIN="$(find "$EXTRACT" -type f -name "$EXECUTABLE" -print 2>/dev/null | sed -n 1p)"
+[ -n "$BIN" ] ||
+  fail "the package did not contain an executable named '$EXECUTABLE'. Nothing was installed."
+
+mkdir -p "$INSTALL_DIR" || fail "the installation directory could not be created: $INSTALL_DIR"
+STAGED="$INSTALL_DIR/.$EXECUTABLE.$$"
+cp "$BIN" "$STAGED" || fail "the executable could not be written to $INSTALL_DIR."
+chmod 0755 "$STAGED"
+# Replace by rename so a running copy is never written in place.
+mv -f "$STAGED" "$INSTALL_DIR/$EXECUTABLE" ||
+  fail "the executable could not be installed into $INSTALL_DIR."
+
+LICENSE_DIR="$INSTALL_DIR/licenses/$APP_ID"
+rm -rf "$LICENSE_DIR"
+mkdir -p "$LICENSE_DIR"
+find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING*' \
+  -o -name 'THIRD-PARTY*' -o -name 'THIRD_PARTY*' \) -exec cp {} "$LICENSE_DIR/" \; 2>/dev/null || true
+
+ensure_on_path "$INSTALL_DIR"
+
+info ''
+info "Installed $DISPLAY_NAME to $INSTALL_DIR/$EXECUTABLE"
+info "Licenses: $LICENSE_DIR"
+info "Open a new terminal so the updated PATH applies, then run '$EXECUTABLE'."
+info "Documentation: $SITE/apps/docs/?id=$APP_ID"

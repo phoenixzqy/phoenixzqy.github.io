@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "appId": "zai-editor",
+  "release": {
+    "version": "0.3.0",
+    "channel": "preview",
+    "publishedAt": "2026-09-29T01:24:44Z",
+    "notes": [
+      {
+        "en": "Standalone terminal editor built from one pinned zai-editor source revision.",
+        "zh-CN": "基于单一固定 zai-editor 源码版本构建的独立终端编辑器。"
+      },
+      {
+        "en": "Linux, macOS and Windows builds for x64 and arm64, each bundling LICENSE and the third-party licence notices under licenses/.",
+        "zh-CN": "提供 Linux、macOS 与 Windows 的 x64 与 arm64 构建，每个包都附带 LICENSE 以及 licenses/ 下的第三方许可声明。"
+      },
+      {
+        "en": "Release assets are published publicly while the application source stays private. Every package is unsigned; check its SHA-256 value after downloading.",
+        "zh-CN": "应用源码保持私有，仅公开发布构建产物。所有包均未签名，下载后请校验 SHA-256。"
+      }
+    ],
+    "assets": [
+      {
+        "name": {
+          "en": "zai-editor for Linux",
+          "zh-CN": "zai-editor Linux 版"
+        },
+        "platform": "linux",
+        "architecture": "x64",
+        "file": "zai-editor-0.3.0-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-linux-amd64.zip",
+        "bytes": 14229744,
+        "sha256": "4383c87870c9c66f5fd06c59ffee909e83d7fcae7b49cf35682514bad39d05ae",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名，请先校验 SHA-256。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai-editor for Linux",
+          "zh-CN": "zai-editor Linux 版"
+        },
+        "platform": "linux",
+        "architecture": "arm64",
+        "file": "zai-editor-0.3.0-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-linux-arm64.zip",
+        "bytes": 13149491,
+        "sha256": "ddf70ebf21b81a65fe8c1f724fef59ec502883850b1ec3ae651ea6ecfa90cab7",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名，请先校验 SHA-256。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai-editor for macOS",
+          "zh-CN": "zai-editor macOS 版"
+        },
+        "platform": "macos",
+        "architecture": "x64",
+        "file": "zai-editor-0.3.0-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-darwin-amd64.zip",
+        "bytes": 14465658,
+        "sha256": "d35fd9ac0f1d7aaa04db199f63a836488e2cf992e2fba32860f348dcefba46f9",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名且未经公证，macOS Gatekeeper 需要手动放行；请先校验 SHA-256。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai-editor for macOS",
+          "zh-CN": "zai-editor macOS 版"
+        },
+        "platform": "macos",
+        "architecture": "arm64",
+        "file": "zai-editor-0.3.0-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-darwin-arm64.zip",
+        "bytes": 13664502,
+        "sha256": "622d846381c3c7daca6055cacb7b402fb17bc88c39b8e145b9b23d1df3815c91",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor` 加入 PATH。该构建未签名且未经公证，macOS Gatekeeper 需要手动放行；请先校验 SHA-256。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai-editor for Windows",
+          "zh-CN": "zai-editor Windows 版"
+        },
+        "platform": "windows",
+        "architecture": "x64",
+        "file": "zai-editor-0.3.0-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-windows-amd64.zip",
+        "bytes": 14434630,
+        "sha256": "26f0b5ea35330f3909cdc2b807b73937fce90e22dc5ac13ea86cc4c6b6f1fff4",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor.exe` 加入 PATH。该构建未签名，SmartScreen 需要手动放行；请先校验 SHA-256。"
+        }
+      },
+      {
+        "name": {
+          "en": "zai-editor for Windows",
+          "zh-CN": "zai-editor Windows 版"
+        },
+        "platform": "windows",
+        "architecture": "arm64",
+        "file": "zai-editor-0.3.0-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.0/zai-editor-0.3.0-windows-arm64.zip",
+        "bytes": 13285870,
+        "sha256": "d97f6f85fefcb6045901880fc676ea46f1f29e01aa8a3df9735edc49cf396c28",
+        "signing": "unsigned",
+        "installNotes": {
+          "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",
+          "zh-CN": "解压后将 `zai-editor.exe` 加入 PATH。该构建未签名，SmartScreen 需要手动放行；请先校验 SHA-256。"
+        }
+      }
+    ]
+  }
+}

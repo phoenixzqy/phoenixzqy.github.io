@@ -14,6 +14,9 @@ Review the contents of each package, not just its filename.
   notes, signing status, and SHA-256 checksums.
 - `/releases/bplayer/latest/manifest.json` — release metadata.
 - `/releases/bplayer/latest/<package-filename>` — locally hosted package.
+- `/apps/docs/?id=bplayer` — mirrored user documentation, when the entry sets
+  `"documentation": true`.
+- `/install/<app-id>.sh` and `/install/<app-id>.ps1` — one-line installers.
 
 The detail and download pages are shared by every app. Add an entry to
 `apps/catalog.json` and a `releases/<id>/latest/manifest.json`; no new HTML or
@@ -59,7 +62,8 @@ This format is supported for these display fields:
 
 - Catalog: app name, category, tagline, summary, stage, notice, each description
   and installation paragraph; platform names/statuses; feature titles and
-  descriptions; screenshot alt text and captions.
+  descriptions; screenshot alt text and captions; artwork alt text; video title
+  and caption; installation command labels.
 - Release: each release note and each asset's `name` and `installNotes`.
 
 Every localized object requires non-empty `en`. `zh-CN` is optional, but must
@@ -73,6 +77,78 @@ dimensions, version/channel values, timestamps, byte counts, checksums, or
 signing states. One manifest describes the same packages in both languages.
 Refresh translations with each release; do not carry old release notes into
 a new version merely to populate a locale.
+
+## App media
+
+Screenshots, demo videos, and artwork live in the app's own folder,
+`apps/media/<app-id>/`. An entry may only reference files in its own folder;
+`npm run validate:apps` rejects anything else and confirms every referenced
+file exists as a regular file in this repository.
+
+```json
+{
+  "artwork": { "src": "/apps/media/zai-gitter/zai-logo.png", "alt": "…", "width": 414, "height": 164 },
+  "videos": [
+    {
+      "src": "/apps/media/zai-gitter/review-demo.mp4",
+      "poster": "/apps/media/zai-gitter/review-demo-poster.webp",
+      "width": 1280,
+      "height": 768,
+      "muted": true,
+      "title": { "en": "…", "zh-CN": "…" },
+      "caption": { "en": "…", "zh-CN": "…" }
+    }
+  ]
+}
+```
+
+Videos must be `.mp4` or `.webm`, posters `.png`, `.webp`, or `.avif`. Each
+video renders as `<video controls preload="none" playsinline poster=…>`: it
+never autoplays or loops, so it costs nothing until a visitor asks for it and
+needs no separate reduced-motion handling. Set `"muted": true` only when the
+file genuinely has no audio, and describe the content in the caption so the
+video is not the only way to learn what the app does. Keep encodes small —
+H.264, `+faststart`, no wider than 1280 px, a few megabytes each — because Pages
+serves them from this repository.
+
+## One-line installers
+
+`install/<app-id>.sh` and `install/<app-id>.ps1` are served as plain static
+files and must stay self-contained: they are consumed as
+`curl -fsSL https://phoenixzqy.github.io/install/<app-id>.sh | sh` and
+`irm https://phoenixzqy.github.io/install/<app-id>.ps1 | iex`. Generate them
+with `npm run build:installers` from `install/templates/`; `npm test` fails if a
+published file drifts from its template.
+
+An installer reads `/releases/<app-id>/latest/manifest.json`, selects the asset
+matching the machine's platform and architecture, downloads it, verifies its
+SHA-256 against the manifest, and installs it. When `release` is `null` it
+explains that nothing is published yet and exits non-zero. `ZAI_INSTALL_DIR`
+and `ZAI_RELEASE_MANIFEST_URL` override the install location and the metadata
+source. Because the installers only trust the manifest, publishing a release is
+a pure data change to `manifest.json`.
+
+An entry may advertise these commands on its detail page:
+
+```json
+{
+  "installCommands": [
+    { "label": { "en": "macOS and Linux", "zh-CN": "macOS 与 Linux" }, "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-cli.sh | sh" }
+  ]
+}
+```
+
+Commands must be plain printable ASCII so they survive copy and paste.
+
+## Mirrored documentation
+
+An entry with `"documentation": true` must have a matching allowlist entry in
+`apps/docs/sources.json` and a generated mirror in `apps/docs/<app-id>/`.
+Mirrors are produced by `scripts/sync-app-docs.mjs` and are never hand-edited;
+`npm run validate:apps` checks that the committed files match the generated
+index and that the recorded source commits agree. See
+[app docs sync](../.github/skills/app-docs-sync/SKILL.md) for the workflow and
+the required privacy review.
 
 ## Pipeline contract
 
@@ -98,7 +174,7 @@ After building and approving packages in the private app pipeline:
    rejects unlisted files/symlinks, and verifies the size and checksum of every
    locally stored package.
 5. Review and commit **only the intended catalog/manifest/package changes**,
-   then push to `master` to trigger the existing GitHub Pages deployment.
+   then push to `main` to trigger the existing GitHub Pages deployment.
    Wait for `pages-build-deployment` to succeed before announcing the release.
    Serialize website publishing across app pipelines or fetch/rebase and
    revalidate on push conflicts; do not force-push.
