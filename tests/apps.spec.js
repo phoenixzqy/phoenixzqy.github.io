@@ -137,7 +137,21 @@ test("zai app comparisons render early with every catalog table", async ({ page,
     await expect(comparison.locator(".comparison-table")).toHaveCount(app.comparison.groups.length);
     await expect(comparison.locator("tbody tr")).toHaveCount(
       app.comparison.groups.reduce((total, group) => total + group.rows.length, 0));
-    await expect(comparison.getByRole("link")).toHaveAttribute("href", app.comparison.source.url);
+    await expect(comparison.locator(".comparison-source a")).toHaveAttribute("href", app.comparison.source.url);
+    const notes = app.comparison.groups.flatMap((group) => group.notes ?? []);
+    await expect(comparison.locator(".comparison-notes li")).toHaveCount(notes.length);
+    for (let number = 1; number <= notes.length; number += 1) {
+      await expect(comparison.locator(`#comparison-${app.id}-note-${number}`)).toHaveText(notes[number - 1]);
+    }
+    const references = app.comparison.groups.flatMap((group) => group.rows)
+      .flatMap((row) => row.values)
+      .flatMap((value) => [...value.matchAll(/\[(\d+)\]/g)].map((match) => match[1]));
+    await expect(comparison.locator(".comparison-note-reference a")).toHaveCount(references.length);
+    for (const number of new Set(references)) {
+      expect(await comparison.locator(
+        `.comparison-note-reference a[href="#comparison-${app.id}-note-${number}"]`,
+      ).count()).toBeGreaterThan(0);
+    }
     const isEarly = await page.locator(".app-comparison").evaluate((node) => {
       const feature = document.querySelector(".feature-grid");
       const media = document.querySelector(".app-gallery, .app-videos");
