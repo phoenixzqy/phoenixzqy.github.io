@@ -110,6 +110,22 @@ test("catalog accepts app-owned videos, artwork, and install commands", () => {
   reject((entry) => { entry.documentation = "yes"; }, /Documentation must be true/, "non-boolean documentation");
 });
 
+test("catalog validates structured comparison tables", () => {
+  const fixture = structuredClone(catalog);
+  const compared = fixture.apps.find((entry) => entry.comparison);
+  assert.ok(compared, "at least one catalog entry has comparison tables");
+  assert.equal(validateCatalog(fixture).apps.find((entry) => entry.id === compared.id).comparison.groups.length,
+    compared.comparison.groups.length);
+
+  const badRow = structuredClone(catalog);
+  badRow.apps.find((entry) => entry.id === compared.id).comparison.groups[0].rows[0].values.pop();
+  assert.throws(() => validateCatalog(badRow), /Comparison row values/);
+
+  const badSource = structuredClone(catalog);
+  badSource.apps.find((entry) => entry.id === compared.id).comparison.source.url = "http://example.com/comparison";
+  assert.throws(() => validateCatalog(badSource), /public HTTPS/);
+});
+
 async function withSite(run) {
   const root = await mkdtemp(join(tmpdir(), "resume-release-test-"));
   try {

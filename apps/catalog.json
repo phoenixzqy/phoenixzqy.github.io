@@ -386,7 +386,151 @@
           "en": "Open a new terminal after installing so the updated PATH applies, then run zai from any folder. To start the services in a repository, run zai config init and then zai start all.",
           "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意目录运行 zai。若要在某个仓库中启动服务，请先运行 zai config init，再运行 zai start all。"
         }
-      ]
+      ],
+      "comparison": {
+        "intro": {
+          "en": "zai combines a terminal-native multi-agent workspace with an editor, language servers, reusable worktrees, diff review, and delivery services. The footprint table reports one Linux test machine, not a universal benchmark.",
+          "zh-CN": "zai 把终端原生的多代理工作空间、编辑器、语言服务器、可复用工作树、差异审阅与交付服务整合在一起。体积与资源数据来自一台 Linux 测试机，并非通用基准。"
+        },
+        "groups": [
+          {
+            "title": {
+              "en": "Workspace capabilities",
+              "zh-CN": "工作空间能力"
+            },
+            "columns": [
+              "zai",
+              "VS Code",
+              "Orca",
+              "herdr"
+            ],
+            "rows": [
+              {
+                "label": "Runtime",
+                "values": [
+                  "Native Go",
+                  "Electron",
+                  "Electron",
+                  "Native Rust"
+                ]
+              },
+              {
+                "label": "Whole UI runs in a terminal (SSH, tmux)",
+                "values": [
+                  "✓",
+                  "— 1",
+                  "— 2",
+                  "✓"
+                ]
+              },
+              {
+                "label": "Built-in code editor",
+                "values": [
+                  "✓",
+                  "✓",
+                  "✓",
+                  "—"
+                ]
+              },
+              {
+                "label": "Language servers in the editor",
+                "values": [
+                  "✓",
+                  "✓",
+                  "— 3",
+                  "—"
+                ]
+              },
+              {
+                "label": "Reusable claimed/released worktree pool with stale-session recovery",
+                "values": [
+                  "✓",
+                  "—",
+                  "— 4",
+                  "—"
+                ]
+              },
+              {
+                "label": "Services that take GitHub and Azure DevOps work items to merged pull requests",
+                "values": [
+                  "✓",
+                  "—",
+                  "—",
+                  "—"
+                ]
+              }
+            ],
+            "notes": [
+              "VS Code Remote - SSH runs the desktop app locally and installs VS Code Server on the remote host.",
+              "Orca's SSH worktrees are driven from its desktop or mobile app.",
+              "Orca's public editor documentation does not describe language-server support.",
+              "Orca documents creating a worktree per task plus archive/delete cleanup; it does not describe returning released checkouts to a shared reusable pool or recovering stale session claims."
+            ]
+          },
+          {
+            "title": {
+              "en": "Measured footprint",
+              "zh-CN": "实测资源占用"
+            },
+            "columns": [
+              "zai",
+              "VS Code",
+              "Orca",
+              "herdr"
+            ],
+            "rows": [
+              {
+                "label": "Installed size (historical pre-stripping build)",
+                "values": [
+                  "89.9 MB",
+                  "1,007.7 MB",
+                  "610.3 MB",
+                  "26.2 MB"
+                ]
+              },
+              {
+                "label": "Idle memory (PSS)",
+                "values": [
+                  "≈ 40 MiB",
+                  "745.9 MiB",
+                  "≈ 543 MiB",
+                  "≈ 23 MiB"
+                ]
+              },
+              {
+                "label": "Idle CPU (one core)",
+                "values": [
+                  "0.07–0.15%",
+                  "≥ 7.1%",
+                  "0.3%",
+                  "0.5–0.6%"
+                ]
+              },
+              {
+                "label": "Idle processes",
+                "values": [
+                  "1",
+                  "13",
+                  "8",
+                  "3"
+                ]
+              }
+            ],
+            "notes": [
+              "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
+              "The zai installed-size value is historical and pre-stripping; current package sizes have not been remeasured. It excludes the coding-agent CLI launched inside zai.",
+              "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services."
+            ]
+          }
+        ],
+        "source": {
+          "label": {
+            "en": "Read the complete comparison and benchmark method on GitHub ↗",
+            "zh-CN": "在 GitHub 阅读完整对比与基准方法 ↗"
+          },
+          "url": "https://github.com/phoenixzqy/zai-cli#how-it-compares"
+        }
+      }
     },
     {
       "id": "zai-editor",
@@ -646,7 +790,218 @@
           "en": "Open a new terminal after installing so the updated PATH applies, then run zai-editor from any folder.",
           "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意目录运行 zai-editor。"
         }
-      ]
+      ],
+      "comparison": {
+        "intro": {
+          "en": "zai-editor aims for familiar desktop-editor workflows inside a native terminal app. The tables include the README’s capability comparison and measured Linux footprint, including the places where smaller editors win.",
+          "zh-CN": "zai-editor 把熟悉的桌面编辑器工作流带进原生终端应用。下表包含 README 中的功能对比和 Linux 实测占用，也如实展示其他轻量编辑器更占优势的项目。"
+        },
+        "groups": [
+          {
+            "title": {
+              "en": "Editing capabilities",
+              "zh-CN": "编辑能力"
+            },
+            "columns": [
+              "zai-editor",
+              "VS Code",
+              "Neovim",
+              "micro",
+              "Microsoft Edit"
+            ],
+            "rows": [
+              {
+                "label": "Whole editor runs in a terminal (SSH, tmux)",
+                "values": [
+                  "✓",
+                  "— 1",
+                  "✓",
+                  "✓",
+                  "✓"
+                ]
+              },
+              {
+                "label": "VS Code-style keys without modes",
+                "values": [
+                  "✓",
+                  "✓",
+                  "— modal",
+                  "partial 2",
+                  "partial 2"
+                ]
+              },
+              {
+                "label": "F1 / Ctrl+Shift+P command palette",
+                "values": [
+                  "✓",
+                  "✓",
+                  "— 3",
+                  "— 3",
+                  "— menu bar"
+                ]
+              },
+              {
+                "label": "Multiple cursors",
+                "values": [
+                  "✓",
+                  "✓",
+                  "—",
+                  "✓",
+                  "—"
+                ]
+              },
+              {
+                "label": "Language servers (completion, go to definition)",
+                "values": [
+                  "✓",
+                  "✓",
+                  "✓ 4",
+                  "plugin",
+                  "—"
+                ]
+              },
+              {
+                "label": "Built-in Git blame and file history",
+                "values": [
+                  "✓",
+                  "✓",
+                  "plugin",
+                  "— 5",
+                  "—"
+                ]
+              },
+              {
+                "label": "Theme picker with live preview",
+                "values": [
+                  "✓",
+                  "✓",
+                  "— 6",
+                  "— 6",
+                  "—"
+                ]
+              },
+              {
+                "label": "Markdown, Mermaid, and HTML preview",
+                "values": [
+                  "✓",
+                  "✓ 7",
+                  "plugin",
+                  "—",
+                  "—"
+                ]
+              },
+              {
+                "label": "Inline comments and a copyable Ask AI request",
+                "values": [
+                  "✓",
+                  "Copilot Chat 8",
+                  "plugin",
+                  "—",
+                  "—"
+                ]
+              },
+              {
+                "label": "Extensions and plugins",
+                "values": [
+                  "coming soon",
+                  "✓",
+                  "✓",
+                  "✓",
+                  "—"
+                ]
+              }
+            ],
+            "notes": [
+              "VS Code Remote - SSH runs the desktop app locally and installs VS Code Server on the remote host.",
+              "micro and Edit use common keys such as Ctrl+S, Ctrl+F, and Ctrl+Z, but do not have Ctrl+P Quick Open.",
+              "Neovim's command line and micro's Ctrl+E prompt take typed commands rather than presenting searchable command lists.",
+              "Neovim ships an LSP client; each language server still needs configuration.",
+              "micro shows changed lines in a diff gutter, not Git blame.",
+              "Neovim and micro include color schemes selected by command or setting rather than a live preview picker.",
+              "VS Code previews inside its own window; zai-editor opens previews in the browser with renderer assets bundled for offline use.",
+              "Copilot Chat can use the editor selection as context and requires a GitHub account."
+            ]
+          },
+          {
+            "title": {
+              "en": "Footprint next to other editors",
+              "zh-CN": "与其他编辑器的资源占用对比"
+            },
+            "columns": [
+              "zai-editor",
+              "VS Code",
+              "Neovim",
+              "micro",
+              "Microsoft Edit"
+            ],
+            "rows": [
+              {
+                "label": "Runtime",
+                "values": [
+                  "Native Go",
+                  "Electron",
+                  "Native C",
+                  "Native Go",
+                  "Native Rust"
+                ]
+              },
+              {
+                "label": "Download",
+                "values": [
+                  "13.6 MiB 9",
+                  "326.0 MiB",
+                  "10.9 MiB",
+                  "4.9 MiB",
+                  "0.14 MiB"
+                ]
+              },
+              {
+                "label": "On disk",
+                "values": [
+                  "26.1 MiB 9",
+                  "961.0 MiB",
+                  "34.4 MiB",
+                  "12.2 MiB",
+                  "0.29 MiB"
+                ]
+              },
+              {
+                "label": "Idle memory (PSS)",
+                "values": [
+                  "25.1–25.5 MiB",
+                  "745.9 MiB 10",
+                  "10.9–11.1 MiB",
+                  "16.4–16.6 MiB",
+                  "0.5–0.6 MiB"
+                ]
+              },
+              {
+                "label": "Idle processes",
+                "values": [
+                  "1",
+                  "13",
+                  "2",
+                  "1",
+                  "1"
+                ]
+              }
+            ],
+            "notes": [
+              "zai-editor is much smaller than VS Code, but Neovim, micro, and Microsoft Edit have smaller downloads and lower idle memory. zai-editor bundles browser previews, Git history, themes, and a language-server client.",
+              "The zai-editor size values are historical pre-stripping measurements; current package sizes have not been remeasured.",
+              "VS Code was measured with a folder open and no file open; each terminal editor had one small file open.",
+              "Measured on one Linux x64 WSL2 machine in September 2026. Other editors retain strengths not captured by these tables, including Neovim’s modal workflow and plugin ecosystem."
+            ]
+          }
+        ],
+        "source": {
+          "label": {
+            "en": "Read the complete comparison, evidence, and method on GitHub ↗",
+            "zh-CN": "在 GitHub 阅读完整对比、证据与方法 ↗"
+          },
+          "url": "https://github.com/phoenixzqy/zai-editor#how-it-compares"
+        }
+      }
     },
     {
       "id": "zai-gitter",
@@ -861,7 +1216,131 @@
           "en": "Open a new terminal after installing so the updated PATH applies, then run zai-gitter in any repository. Press F1 for commands, F2 for settings, and Ctrl+Q to quit.",
           "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意仓库中运行 zai-gitter。按 F1 打开命令面板，F2 打开设置，Ctrl+Q 退出。"
         }
-      ]
+      ],
+      "comparison": {
+        "intro": {
+          "en": "zai-gitter focuses on pull-request-style review in the terminal rather than staging or rebasing. The project README compares its review workflow with terminal Git tools and GitHub Desktop.",
+          "zh-CN": "zai-gitter 专注于终端中的拉取请求式审阅，而不是暂存或变基。项目 README 将其审阅工作流与终端 Git 工具及 GitHub Desktop 进行了对比。"
+        },
+        "groups": [
+          {
+            "title": {
+              "en": "Compared with terminal Git tools",
+              "zh-CN": "与终端 Git 工具对比"
+            },
+            "columns": [
+              "zai-gitter",
+              "lazygit",
+              "gitui",
+              "tig"
+            ],
+            "rows": [
+              {
+                "label": "Line-anchored review comments and drafts",
+                "values": [
+                  "✓",
+                  "—",
+                  "—",
+                  "—"
+                ]
+              },
+              {
+                "label": "One-key Ask AI export with review context",
+                "values": [
+                  "✓",
+                  "—",
+                  "—",
+                  "—"
+                ]
+              },
+              {
+                "label": "Built-in side-by-side diff, automatic by width",
+                "values": [
+                  "✓",
+                  "external diff renderer",
+                  "—",
+                  "—"
+                ]
+              },
+              {
+                "label": "In-app theme picker with live preview",
+                "values": [
+                  "✓ 25 themes",
+                  "config file",
+                  "config file",
+                  "config file"
+                ]
+              },
+              {
+                "label": "Documented Go API for embedding the viewer",
+                "values": [
+                  "✓",
+                  "—",
+                  "—",
+                  "—"
+                ]
+              }
+            ],
+            "notes": [
+              "Compared with lazygit 0.65.1, gitui 0.28.1, and tig 2.6.1 as of September 2026.",
+              "lazygit can render side-by-side diffs through a configured external renderer such as delta.",
+              "Other tools retain strengths not listed here, including interactive staging and rebasing."
+            ]
+          },
+          {
+            "title": {
+              "en": "Compared with desktop Git clients",
+              "zh-CN": "与桌面 Git 客户端对比"
+            },
+            "columns": [
+              "zai-gitter",
+              "GitHub Desktop"
+            ],
+            "rows": [
+              {
+                "label": "Windows x64 package size",
+                "values": [
+                  "~5 MB binary archive",
+                  "~308 MB installer"
+                ]
+              },
+              {
+                "label": "Runtime",
+                "values": [
+                  "Single native binary",
+                  "Electron (Chromium + Node.js)"
+                ]
+              },
+              {
+                "label": "Runs in a terminal, including over SSH",
+                "values": [
+                  "✓",
+                  "—"
+                ]
+              },
+              {
+                "label": "Inline review comments",
+                "values": [
+                  "✓",
+                  "—"
+                ]
+              }
+            ],
+            "notes": [
+              "The published zai-gitter v0.3.0 Windows x64 archive was 5.0 MB with a 9.4 MB executable; current post-stripping packages have not been remeasured.",
+              "GitHub Desktop figures are for its 3.6.6 Windows x64 installer using Electron 44.",
+              "Linux sampling observed about 20 MB RSS and no CPU ticks over 10 idle seconds; this is not a cross-platform performance guarantee."
+            ]
+          }
+        ],
+        "source": {
+          "label": {
+            "en": "Read the complete comparison and evidence on GitHub ↗",
+            "zh-CN": "在 GitHub 阅读完整对比与证据 ↗"
+          },
+          "url": "https://github.com/phoenixzqy/zai-gitter#how-it-compares"
+        }
+      }
     }
   ]
 }

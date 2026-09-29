@@ -126,6 +126,28 @@ test("missing, invalid, and unknown app ids show errors instead of fabricated co
   }
 });
 
+test("zai app comparisons render early with every catalog table", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "zai detail pages include videos that headless WebKit cannot instantiate");
+  for (const app of catalog.apps.filter((entry) => entry.id.startsWith("zai-"))) {
+    await page.goto(`/apps/app/?id=${app.id}&lang=en`);
+    await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");
+    const comparison = page.locator(".app-comparison");
+    await expect(comparison).toBeVisible();
+    await expect(comparison.locator(".comparison-group")).toHaveCount(app.comparison.groups.length);
+    await expect(comparison.locator(".comparison-table")).toHaveCount(app.comparison.groups.length);
+    await expect(comparison.locator("tbody tr")).toHaveCount(
+      app.comparison.groups.reduce((total, group) => total + group.rows.length, 0));
+    await expect(comparison.getByRole("link")).toHaveAttribute("href", app.comparison.source.url);
+    const isEarly = await page.locator(".app-comparison").evaluate((node) => {
+      const feature = document.querySelector(".feature-grid");
+      const media = document.querySelector(".app-gallery, .app-videos");
+      return (!media || Boolean(node.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING)) &&
+        Boolean(node.compareDocumentPosition(feature) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+    expect(isEarly).toBe(true);
+  }
+});
+
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {
   await page.route("**/releases/bplayer/latest/manifest.json", (route) => route.fulfill({ status: 404, body: "Not found" }));
   await page.goto("/apps/releases/?id=bplayer");

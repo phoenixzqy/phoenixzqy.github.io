@@ -10,6 +10,7 @@ const SCREENSHOT = mediaPath("png|webp|avif");
 const VIDEO = mediaPath("mp4|webm");
 const VIDEO_TYPES = { mp4: "video/mp4", webm: "video/webm" };
 const INSTALL_COMMAND = /^[\x20-\x7e]+$/;
+const PUBLIC_HTTPS_URL = /^https:\/\/[^\s]+$/;
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
@@ -126,6 +127,33 @@ export function validateCatalog(catalog) {
       object(feature, "Feature");
       localizedText(feature.title, "Feature title", 120);
       localizedText(feature.description, "Feature description");
+    }
+    if (app.comparison !== undefined) {
+      object(app.comparison, `${app.id}.comparison`);
+      localizedText(app.comparison.intro, "Comparison introduction", 600);
+      list(app.comparison.groups, `${app.id}.comparison.groups`, 1, 4);
+      for (const group of app.comparison.groups) {
+        object(group, "Comparison group");
+        localizedText(group.title, "Comparison group title", 160);
+        list(group.columns, "Comparison columns", 2, 8);
+        group.columns.forEach((column) => localizedText(column, "Comparison column", 120));
+        list(group.rows, "Comparison rows", 1, 20);
+        for (const row of group.rows) {
+          object(row, "Comparison row");
+          localizedText(row.label, "Comparison row label", 240);
+          list(row.values, "Comparison row values", group.columns.length, group.columns.length);
+          row.values.forEach((value) => localizedText(value, "Comparison cell", 240));
+        }
+        if (group.notes !== undefined) {
+          list(group.notes, "Comparison notes", 1, 20);
+          group.notes.forEach((note) => localizedText(note, "Comparison note", 1200));
+        }
+      }
+      object(app.comparison.source, "Comparison source");
+      localizedText(app.comparison.source.label, "Comparison source label", 160);
+      text(app.comparison.source.url, "Comparison source URL", 500);
+      requireValue(PUBLIC_HTTPS_URL.test(app.comparison.source.url),
+        "Comparison source URL must be public HTTPS.");
     }
   }
   unique(catalog.apps.map(({ id }) => id), "App ids");

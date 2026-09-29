@@ -62,8 +62,9 @@ This format is supported for these display fields:
 
 - Catalog: app name, category, tagline, summary, stage, notice, each description
   and installation paragraph; platform names/statuses; feature titles and
-  descriptions; screenshot alt text and captions; artwork alt text; video title
-  and caption; installation command labels.
+  descriptions; comparison introductions, group titles, columns, row labels,
+  cells, notes, and source-link labels; screenshot alt text and captions;
+  artwork alt text; video title and caption; installation command labels.
 - Release: each release note and each asset's `name` and `installNotes`.
 
 Every localized object requires non-empty `en`. `zh-CN` is optional, but must
@@ -143,6 +144,41 @@ An entry may advertise these commands on its detail page:
 ```
 
 Commands must be plain printable ASCII so they survive copy and paste.
+
+## App comparison tables
+
+An app may publish structured comparison tables near the top of its detail
+page with a `comparison` object:
+
+```json
+{
+  "comparison": {
+    "intro": "What this comparison covers.",
+    "groups": [
+      {
+        "title": "Capabilities",
+        "columns": ["This app", "Alternative"],
+        "rows": [
+          {
+            "label": "Runs over SSH",
+            "values": ["✓", "—"]
+          }
+        ],
+        "notes": ["Explain qualifications, versions, and measurement limits."]
+      }
+    ],
+    "source": {
+      "label": "Read the complete evidence on GitHub ↗",
+      "url": "https://github.com/example/app#how-it-compares"
+    }
+  }
+}
+```
+
+The number of values in every row must exactly match the number of columns.
+Keep comparison claims factual, qualified, and traceable to the linked public
+source. Include competitor strengths and measurement limits rather than
+presenting a one-sided scorecard. Source URLs must use public HTTPS.
 
 ## Mirrored documentation
 

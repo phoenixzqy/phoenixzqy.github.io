@@ -246,6 +246,58 @@ function commandBlock(entry) {
   row.append(label, code, copy, status);
   return row;
 }
+function comparisonSection(app) {
+  if (!app.comparison) return null;
+  const section = element("section", "app-section app-comparison");
+  section.append(
+    paragraph(t("comparison"), "eyebrow section-index"),
+    element("h2", "", t("comparisonHeading")),
+    paragraph(app.comparison.intro, "comparison-intro"),
+  );
+  app.comparison.groups.forEach((group) => {
+    const article = element("article", "comparison-group");
+    article.append(element("h3", "", group.title));
+    const wrap = element("div", "comparison-table-wrap");
+    wrap.tabIndex = 0;
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("aria-label", group.title);
+    const table = element("table", "comparison-table");
+    const head = element("thead");
+    const headingRow = element("tr");
+    headingRow.append(element("th", "comparison-row-heading", ""));
+    group.columns.forEach((column) => {
+      const cell = element("th", "", column);
+      cell.scope = "col";
+      headingRow.append(cell);
+    });
+    head.append(headingRow);
+    const body = element("tbody");
+    group.rows.forEach((row) => {
+      const tableRow = element("tr");
+      const label = element("th", "comparison-row-heading", row.label);
+      label.scope = "row";
+      tableRow.append(label);
+      row.values.forEach((value, index) => {
+        const cell = element("td", index === 0 ? "comparison-product" : "", value);
+        tableRow.append(cell);
+      });
+      body.append(tableRow);
+    });
+    table.append(head, body);
+    wrap.append(table);
+    article.append(wrap);
+    if (group.notes?.length) {
+      const notes = element("ol", "comparison-notes");
+      group.notes.forEach((note) => notes.append(element("li", "", note)));
+      article.append(notes);
+    }
+    section.append(article);
+  });
+  const source = paragraph("", "comparison-source");
+  source.append(link(app.comparison.source.label, app.comparison.source.url));
+  section.append(source);
+  return section;
+}
 function renderDetail(app) {
   const hero = element("section", "app-detail-hero");
   const intro = heading(`${app.category} / ${app.stage.toUpperCase()}`, app.name, app.tagline);
@@ -258,6 +310,7 @@ function renderDetail(app) {
   const story = element("section", "app-story");
   story.append(element("h2", "", t("closerLook")));
   app.description.forEach((text) => story.append(paragraph(text)));
+  const comparison = comparisonSection(app);
   const gallery = screenshotSection(app);
   const videos = videoSection(app);
   const featureSection = element("section", "app-section");
@@ -288,6 +341,7 @@ function renderDetail(app) {
     install.append(more);
   }
   content.replaceChildren(hero, story);
+  if (comparison) content.append(comparison);
   if (gallery) content.append(gallery);
   if (videos) content.append(videos);
   content.append(featureSection, platforms, install, notice(t("responsible"), app.notice));
