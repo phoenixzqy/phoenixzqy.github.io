@@ -483,7 +483,7 @@
                 "label": "Download",
                 "values": [
                   "n/a",
-                  "341.8 MB 10",
+                  "341.8 MB",
                   "216.7 MB",
                   "26.2 MB"
                 ]
@@ -492,7 +492,7 @@
                 "label": "On disk (historical pre-stripping zai build)",
                 "values": [
                   "89.9 MB",
-                  "1,007.7 MB 10",
+                  "1,007.7 MB",
                   "610.3 MB",
                   "26.2 MB"
                 ]
@@ -958,7 +958,7 @@
                 "label": "Download",
                 "values": [
                   "13.6 MiB 9",
-                  "341.8 MB",
+                  "341.8 MB 10",
                   "10.9 MiB",
                   "4.9 MiB",
                   "0.14 MiB"
@@ -968,7 +968,7 @@
                 "label": "On disk",
                 "values": [
                   "26.1 MiB 9",
-                  "1,007.7 MB",
+                  "1,007.7 MB 10",
                   "34.4 MiB",
                   "12.2 MiB",
                   "0.29 MiB"
