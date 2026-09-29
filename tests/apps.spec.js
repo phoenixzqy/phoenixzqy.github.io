@@ -9,12 +9,18 @@ async function mockRelease(page, manifest = releaseFixture()) {
     route.fulfill({ json: manifest }));
 }
 
-test("homepage links to catalog, BPlayer details, and unpublished downloads", async ({ page }) => {
+test("homepage is the catalog and links to BPlayer details and unpublished downloads", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await mockRelease(page, { schemaVersion: 1, appId: "bplayer", release: null });
   await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Small ideas. Real software.");
+  await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Apps", exact: true })).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "About me", exact: true }).click();
+  await expect(page).toHaveURL(/\/about\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Qiyu Zhao.");
   await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Apps", exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Small ideas. Real software.");
   const bplayerCard = page.locator(".catalog-card").filter({ hasText: "BPlayer" });
   const catalogLogo = bplayerCard.getByRole("img", { name: "BPlayer logo" });
@@ -200,11 +206,11 @@ test("catalog, details, and populated downloads fit narrow viewports and pass ac
   }
 });
 
-test("apps explain the JavaScript requirement without hiding fallback navigation", async ({ browser, baseURL }) => {
+test("homepage explains the JavaScript requirement without hiding fallback navigation", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto(`${baseURL}/apps/`);
+  await page.goto(baseURL);
   await expect(page.getByRole("heading", { name: "Apps by Qiyu Zhao" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Return to About me." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Read About me." })).toHaveAttribute("href", "/about/");
   await context.close();
 });

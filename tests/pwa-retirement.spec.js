@@ -29,6 +29,11 @@ async function legacySite() {
     ["/styles.css", { type: "text/css", body: await readFile(new URL("../styles.css", import.meta.url)) }],
     ["/script.js", { type: "text/javascript", body: await readFile(new URL("../script.js", import.meta.url)) }],
     ["/favicon.svg", { type: "image/svg+xml", body: await readFile(new URL("../favicon.svg", import.meta.url)) }],
+    ["/apps/apps.css", { type: "text/css", body: await readFile(new URL("../apps/apps.css", import.meta.url)) }],
+    ["/apps/apps.js", { type: "text/javascript", body: await readFile(new URL("../apps/apps.js", import.meta.url)) }],
+    ["/apps/schema.js", { type: "text/javascript", body: await readFile(new URL("../apps/schema.js", import.meta.url)) }],
+    ["/apps/locales.js", { type: "text/javascript", body: await readFile(new URL("../apps/locales.js", import.meta.url)) }],
+    ["/apps/catalog.json", { type: "application/json", body: await readFile(new URL("../apps/catalog.json", import.meta.url)) }],
   ]);
   let retired = false;
   const server = createServer((request, response) => {
@@ -82,7 +87,10 @@ for (const initialPath of ["/nonamekill.html", "/apps/?view=collection#details",
       await navigated;
       await page.waitForLoadState("domcontentloaded");
       await expect(page).toHaveURL(`${site.origin}${initialPath === "/nonamekill.html" ? "/" : initialPath}`);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Qiyu Zhao.");
+      await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+        initialPath.includes("lang=zh-CN") ? "小小灵感，实用软件。" : "Small ideas. Real software.",
+      );
       await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
       await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller)).toBeNull();
       expect(await page.evaluate(() => window.retirementMarker)).toBeUndefined();
@@ -99,9 +107,9 @@ test("retirement redirect rejects external, malformed, and looping destinations"
   for (const destination of ["https://example.invalid/", `${baseURL}/pwa-retired.html`, "%"]) {
     const hash = destination === "%" ? "%" : encodeURIComponent(destination);
     await page.goto(`/pwa-retired.html#${hash}`);
-    await expect(page.getByRole("status")).toHaveText("The return address is invalid. Use the About me link to continue.");
+    await expect(page.getByRole("status")).toHaveText("The return address is invalid. Use the apps link to continue.");
     await expect(page).toHaveURL(`${baseURL}/pwa-retired.html#${hash}`);
-    await expect(page.getByRole("link", { name: "Open About me" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("link", { name: "Open apps" })).toHaveAttribute("href", "/");
   }
 });
 

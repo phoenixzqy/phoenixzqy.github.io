@@ -7,9 +7,11 @@ the files as-is.
 
 ## Edit map
 
-- The résumé lives in `index.html`, `styles.css`, and `script.js`; `favicon.svg`
-  is its icon. Preserve usable content without JavaScript, keyboard access,
-  reduced-motion behavior, and printable A4/Letter layouts.
+- The app catalog homepage lives in `index.html`; `/apps/` remains its
+  backward-compatible alias. The résumé lives in `about/index.html`,
+  `styles.css`, and `script.js`; `favicon.svg` is the shared icon. Preserve
+  usable content without JavaScript, keyboard access, reduced-motion behavior,
+  and printable A4/Letter layouts.
 - `apps/` contains the shared catalog, detail, download, and documentation
   pages. `apps/catalog.json` supplies app descriptions; `apps/locales.js`
   supplies UI strings. App-specific release metadata lives at

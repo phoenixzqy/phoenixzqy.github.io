@@ -8,7 +8,8 @@ Review the contents of each package, not just its filename.
 
 ## URLs and layout
 
-- `/apps/` — catalog, linked from the résumé's main navigation.
+- `/` — app catalog homepage (`/apps/` remains a backward-compatible alias).
+- `/about/` — résumé and portfolio, linked from the app navigation.
 - `/apps/app/?id=bplayer` — app introduction, features, and platform readiness.
 - `/apps/releases/?id=bplayer` — latest release, package filters, installation
   notes, signing status, and SHA-256 checksums.
