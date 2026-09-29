@@ -269,8 +269,8 @@
             "zh-CN": "多个代理，一个项目 MUX"
           },
           "description": {
-            "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, shells, the editor, and the Git viewer side by side. Claude Code also integrates with delivery services, automations, live status, session resume, and managed worktrees, using its own isolated authentication home. A Codex integration preview targets codex-evo, with its own managed home, packaged instructions, lifecycle hooks, and service selection; native Copilot extensions are not interchangeable with Codex.",
-            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、终端、编辑器和 Git 查看器。Claude Code 还接入交付服务、自动化、实时状态、会话恢复和托管工作树，并使用独立的认证目录。Codex 集成预览面向 codex-evo，提供独立的托管目录、内置指令、生命周期钩子与服务代理选择；Copilot 原生扩展不能直接与 Codex 互换。"
+            "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, Codex (codex-evo), OpenCode, shells, the editor, and the Git viewer side by side. The OpenCode integration preview adds delivery services, automations, live status, session resume, packaged guidance, and managed worktrees with isolated authentication. Open it with zai opencode or zai oc; OpenCode 1.18.33+ is required. This matches zai workflows, not identical native CLI features: Copilot extensions are not interchangeable, and OpenCode lacks blocking stop hooks; shared final review and result validation still gate service completion.",
+            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、Codex（codex-evo）、OpenCode、终端、编辑器和 Git 查看器。OpenCode 集成预览支持交付服务、自动化、实时状态、会话恢复、内置指引和托管工作树，并使用独立的认证目录。通过 zai opencode 或 zai oc 打开，需要 OpenCode 1.18.33+。这是 zai 工作流层面的对齐，并非原生 CLI 功能完全相同：Copilot 扩展不能直接互换，OpenCode 也没有阻断式停止钩子；服务完成仍须通过共享的最终评审与结果校验。"
           }
         },
         {

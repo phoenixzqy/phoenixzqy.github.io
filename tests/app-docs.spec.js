@@ -69,6 +69,15 @@ test("the documentation viewer renders mirrored Markdown and navigates between d
   expect(errors).toEqual([]);
 });
 
+test("OpenCode documentation renders setup and the native parity boundary", async ({ page }) => {
+  await page.goto("/apps/docs/?id=zai-cli&doc=docs--opencode&lang=en");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("OpenCode integration");
+  await expect(page.locator(".docs-body pre")).toContainText("zai opencode auth login");
+  await expect(page.locator(".docs-body table")).toContainText("No blocking agent-stop/subagent-stop equivalent");
+  await expect(page.locator(".docs-nav-link[aria-current='page']")).toHaveText("OpenCode integration");
+  await expect(page.locator(".docs-body")).toContainText("OpenCode 1.18.33+");
+});
+
 test("an unknown document is refused instead of fetching an arbitrary file", async ({ page }) => {
   await page.goto(`/apps/docs/?id=${app.id}&doc=../../../secrets`);
   await expect(page.getByRole("alert")).toContainText("not part of the published documentation");
