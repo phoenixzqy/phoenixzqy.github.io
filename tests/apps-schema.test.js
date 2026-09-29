@@ -124,6 +124,10 @@ test("catalog validates structured comparison tables", () => {
   const badSource = structuredClone(catalog);
   badSource.apps.find((entry) => entry.id === compared.id).comparison.source.url = "http://example.com/comparison";
   assert.throws(() => validateCatalog(badSource), /public HTTPS/);
+
+  const badNoteReference = structuredClone(catalog);
+  badNoteReference.apps.find((entry) => entry.id === compared.id).comparison.groups[0].rows[0].values[0] = "✓ [99]";
+  assert.throws(() => validateCatalog(badNoteReference), /note reference 99/);
 });
 
 async function withSite(run) {

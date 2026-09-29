@@ -161,10 +161,10 @@ page with a `comparison` object:
         "rows": [
           {
             "label": "Runs over SSH",
-            "values": ["✓", "—"]
+            "values": ["✓", "— [1]"]
           }
         ],
-        "notes": ["Explain qualifications, versions, and measurement limits."]
+        "notes": ["The alternative requires a local desktop UI."]
       }
     ],
     "source": {
@@ -176,6 +176,9 @@ page with a `comparison` object:
 ```
 
 The number of values in every row must exactly match the number of columns.
+Use `[1]`, `[2]`, and so on in cell text to link claims to comparison notes.
+Note numbering continues across every comparison group for an app rather than
+restarting at each table, and every reference must identify an existing note.
 Keep comparison claims factual, qualified, and traceable to the linked public
 source. Include competitor strengths and measurement limits rather than
 presenting a one-sided scorecard. Source URLs must use public HTTPS.
