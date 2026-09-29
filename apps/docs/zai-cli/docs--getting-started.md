@@ -8,31 +8,6 @@ repository README.
 
 ## Installation
 
-Console activity icons are built in, with automatic readable text fallback when
-terminal images are unavailable. No font setup is required.
-
-### AI-guided install and setup (recommended)
-
-Let Copilot install zai, ask which repositories to onboard and which model each should use, and write the per-repository configs for you.
-
-The install guide lives in this repository. If your AI cannot access it, copy the instructions rather than sharing only a link.
-
-1. Open [the install guide](?id=zai-cli&doc=docs--install-and-config) in your checkout or on GitHub.
-2. Copy the guide from **Instructions to paste into AI** through the end of the page.
-3. Start Copilot CLI, then paste the copied instructions into the conversation with the request below. Copy only the guide text, never passwords, tokens, or browser cookies.
-
-```bash
-copilot --yolo
-```
-
-```text
-Use the following instructions to install zai and configure my repositories:
-
-[Paste the copied guide instructions here.]
-```
-
-The prompt it follows is [`docs/install-and-config.md`](?id=zai-cli&doc=docs--install-and-config). That guide stays deliberately thin: it installs, then defers to `zai doc` on the freshly installed build for every command, config field, and workflow, so the guidance cannot drift from the version you are running.
-
 ### Remote one-line install
 
 Releases are published publicly, so installing needs no GitHub sign-in, token, or
@@ -74,7 +49,36 @@ Release notes are the canonical changelog; see
 How releases are built and published is documented in
 `releases.md`.
 
+### Optional AI-guided install and setup
+
+To have Copilot install zai and configure repositories for you instead, use the
+[AI-guided install guide](?id=zai-cli&doc=docs--install-and-config). It asks which repositories to
+onboard and which model each should use, then writes the per-repository configs.
+If your AI cannot access the guide, copy the instructions rather than sharing
+only a link.
+
+1. Open [the install guide](?id=zai-cli&doc=docs--install-and-config) in your checkout or on GitHub.
+2. Copy the guide from **Instructions to paste into AI** through the end of the page.
+3. Start Copilot CLI, then paste the copied instructions into the conversation with the request below. Copy only the guide text, never passwords, tokens, or browser cookies.
+
+```bash
+copilot --yolo
+```
+
+```text
+Use the following instructions to install zai and configure my repositories:
+
+[Paste the copied guide instructions here.]
+```
+
+The guide defers to `zai doc` on the freshly installed build for every command,
+config field, and workflow, so its guidance cannot drift from the version you
+are running.
+
 ### What the installer sets up
+
+Console activity icons are built in, with automatic readable text fallback when
+terminal images are unavailable. No font setup is required.
 
 The installer copies package-owned files into `~/.zai` and installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it overwrites the previously installed package-owned content so the home always reflects the latest release. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory and fails loudly if Copilot CLI is unavailable.
 

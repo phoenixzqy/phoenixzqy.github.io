@@ -19,10 +19,11 @@ New and migrated service entries default to `auto`, letting Copilot choose the
 model. Repositories and profiles can pin `gpt-5.6-sol` or another supported
 model explicitly.
 
-Copilot and Pi are selectable through `coding_agent` without an opt-in setting.
+Copilot, Pi and Codex are selectable through `coding_agent` without an opt-in setting.
 Omitting it still selects Copilot. Service runs require the selected CLI on
 `PATH` and fail explicitly when it is missing; changing the selection takes
-effect at the next daemon start.
+effect at the next daemon start. `codex` requires codex-evo and separate
+authentication in its managed home; see Codex setup.
 
 The configurable services are `dev`, `review`, `pr-babysitter`, and `housekeep`.
 See the migration chapter for retired configuration fields.
@@ -53,11 +54,11 @@ configuration stays project-scoped.
 
 Housekeep exposes four independent task checkboxes: maintained-branch
 synchronization (on by default), stale unmanaged-worktree cleanup (off), and
-stale local/remote branch cleanup (off), plus zai/Copilot/pi log cleanup (off).
+stale local/remote branch cleanup (off), plus zai/Copilot/Pi/Codex log cleanup (off).
 Log cleanup is deterministic, uses file modification times strictly older than
 14 days, and covers only the installed zai home's debug logs and agent session
 transcripts. It preserves active sessions, session artifacts, and durable run
-records; it never touches normal user Copilot/pi homes. A log-only pass launches
+records; it never touches normal user agent homes. A log-only pass launches
 no AI agent. Worktree and branch cleanup require verified ownership,
 more than 14 days without activity, no open PR, and no data loss; uncertainty
 means skip. Managed-worktree pool maintenance remains a separate deterministic

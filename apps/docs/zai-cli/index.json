@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
-  "commit": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
+  "ref": "f0651931d276ea7c9490b4f8d43b5102c6f0ccd3",
+  "commit": "f0651931d276ea7c9490b4f8d43b5102c6f0ccd3",
   "documents": [
     {
       "slug": "docs--install-and-config",
@@ -17,7 +17,7 @@
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 13014
+      "bytes": 12950
     },
     {
       "slug": "docs--services-and-pollers",
@@ -31,7 +31,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 4696
+      "bytes": 4797
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
