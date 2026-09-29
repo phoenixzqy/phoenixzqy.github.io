@@ -129,6 +129,12 @@ No wording, source code, layout, or assets were copied. Product and comparison
 claims continue to come from the zai repositories' documented behavior,
 measurements, and linked public evidence.
 
+The Codex integration preview wording comes from the app author's requested
+integration and zai-cli's Codex setup guide, reviewed September 29, 2026.
+It explicitly targets [codex-evo](https://github.com/idleai/codex-evo), not all
+Codex distributions, and does not claim native Copilot extension compatibility
+or full feature parity. No unpublished executable is linked from the site.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online

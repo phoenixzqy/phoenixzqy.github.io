@@ -269,8 +269,8 @@
             "zh-CN": "多个代理，一个项目 MUX"
           },
           "description": {
-            "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, shells, the editor, and the Git viewer side by side. Claude Code also integrates with delivery services, automations, live status, session resume, and managed worktrees, using its own isolated authentication home.",
-            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、终端、编辑器和 Git 查看器。Claude Code 还接入交付服务、自动化、实时状态、会话恢复和托管工作树，并使用独立的认证目录。"
+            "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, shells, the editor, and the Git viewer side by side. Claude Code also integrates with delivery services, automations, live status, session resume, and managed worktrees, using its own isolated authentication home. A Codex integration preview targets codex-evo, with its own managed home, packaged instructions, lifecycle hooks, and service selection; native Copilot extensions are not interchangeable with Codex.",
+            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、终端、编辑器和 Git 查看器。Claude Code 还接入交付服务、自动化、实时状态、会话恢复和托管工作树，并使用独立的认证目录。Codex 集成预览面向 codex-evo，提供独立的托管目录、内置指令、生命周期钩子与服务代理选择；Copilot 原生扩展不能直接与 Codex 互换。"
           }
         },
         {
