@@ -269,8 +269,8 @@
             "zh-CN": "多个代理，一个项目 MUX"
           },
           "description": {
-            "en": "Project-based tabs and split panes host Copilot CLI, Pi, shells, the editor, and the Git viewer side by side. A provider boundary makes additional coding-agent CLIs an integration instead of a redesign.",
-            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Pi、终端、编辑器和 Git 查看器。通过提供程序边界，接入更多编码代理 CLI 只需新增集成，而不必重新设计产品。"
+            "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, shells, the editor, and the Git viewer side by side. Claude Code also integrates with delivery services, automations, live status, session resume, and managed worktrees, using its own isolated authentication home.",
+            "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、终端、编辑器和 Git 查看器。Claude Code 还接入交付服务、自动化、实时状态、会话恢复和托管工作树，并使用独立的认证目录。"
           }
         },
         {

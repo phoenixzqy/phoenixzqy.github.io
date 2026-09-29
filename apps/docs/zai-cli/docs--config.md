@@ -15,14 +15,16 @@ files. For the product architecture around it, see
 `architecture.md`; for the operator-facing command summary,
 run `zai config -h` and `zai doc`.
 
-New and migrated service entries default to `auto`, letting Copilot choose the
+New and migrated service entries default to `auto`, letting the selected provider choose the
 model. Repositories and profiles can pin `gpt-5.6-sol` or another supported
 model explicitly.
 
-Copilot and Pi are selectable through `coding_agent` without an opt-in setting.
+Copilot (`copilot`), Claude Code (`claude`), and Pi (`pi`) are selectable through `coding_agent` without an opt-in setting.
 Omitting it still selects Copilot. Service runs require the selected CLI on
 `PATH` and fail explicitly when it is missing; changing the selection takes
-effect at the next daemon start.
+effect at the next daemon start. Console automations also use this selection
+when their scheduler is created; reopen the console after changing it.
+[Claude Code setup](?id=zai-cli&doc=docs--claude-code) covers its managed authentication and model aliases.
 
 The configurable services are `dev`, `review`, `pr-babysitter`, and `housekeep`.
 See the migration chapter for retired configuration fields.
