@@ -152,6 +152,8 @@ export function validateCatalog(catalog) {
             localizedText(value, "Comparison cell", 240);
             for (const content of localizedStrings(value)) {
               for (const match of content.matchAll(COMPARISON_NOTE_REFERENCE)) {
+                requireValue(/^[1-9]\d*$/.test(match[1]),
+                  `Comparison note reference ${match[0]} must be a positive number without leading zeros.`);
                 comparisonReferences.push(Number(match[1]));
               }
             }

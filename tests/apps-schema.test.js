@@ -128,6 +128,12 @@ test("catalog validates structured comparison tables", () => {
   const badNoteReference = structuredClone(catalog);
   badNoteReference.apps.find((entry) => entry.id === compared.id).comparison.groups[0].rows[0].values[0] = "✓ [99]";
   assert.throws(() => validateCatalog(badNoteReference), /note reference 99/);
+
+  for (const reference of ["[01]", "[0]"]) {
+    const noncanonical = structuredClone(catalog);
+    noncanonical.apps.find((entry) => entry.id === compared.id).comparison.groups[0].rows[0].values[0] = `✓ ${reference}`;
+    assert.throws(() => validateCatalog(noncanonical), /positive number without leading zeros/);
+  }
 });
 
 async function withSite(run) {
