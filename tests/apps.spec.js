@@ -16,9 +16,16 @@ test("homepage links to catalog, BPlayer details, and unpublished downloads", as
   await page.goto("/");
   await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Apps", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Small ideas. Real software.");
-  await page.locator(".catalog-card").filter({ hasText: "BPlayer" }).getByRole("link", { name: "Explore app" }).click();
+  const bplayerCard = page.locator(".catalog-card").filter({ hasText: "BPlayer" });
+  const catalogLogo = bplayerCard.getByRole("img", { name: "BPlayer logo" });
+  await expect(catalogLogo).toHaveJSProperty("naturalWidth", 413);
+  await expect(catalogLogo).toHaveJSProperty("naturalHeight", 180);
+  await bplayerCard.getByRole("link", { name: "Explore app" }).click();
   await expect(page).toHaveURL(/\/apps\/app\/\?id=bplayer&lang=en$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("BPlayer");
+  const detailLogo = page.getByRole("img", { name: "BPlayer logo" });
+  await expect(detailLogo).toHaveJSProperty("naturalWidth", 413);
+  await expect(detailLogo).toHaveJSProperty("naturalHeight", 180);
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "One library, shaped to the screen." })).toBeVisible();
   await expect(page.locator(".screenshot-card img")).toHaveCount(2);
@@ -70,7 +77,14 @@ test("release pages distinguish ad-hoc signatures from unsigned packages", async
 });
 
 test("multiple apps reuse detail and download pages without mixing release metadata", async ({ page }) => {
-  const second = { ...structuredClone(catalog.apps[0]), id: "another-player", name: "Another Player", tagline: "A second test app.", screenshots: undefined };
+  const second = {
+    ...structuredClone(catalog.apps[0]),
+    id: "another-player",
+    name: "Another Player",
+    tagline: "A second test app.",
+    screenshots: undefined,
+    artwork: undefined,
+  };
   await page.route("**/apps/catalog.json", (route) => route.fulfill({ json: { schemaVersion: 1, apps: [...catalog.apps, second] } }));
   await page.route("**/releases/another-player/latest/manifest.json", (route) =>
     route.fulfill({ json: { schemaVersion: 1, appId: "another-player", release: null } }));

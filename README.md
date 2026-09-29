@@ -43,7 +43,9 @@ and download pages read `apps/catalog.json` and each app's
 local-first audiobook-player introduction and explicit platform-readiness
 notes. Its descriptions are paraphrased from the authorized local product
 documentation; no private source or builds were copied. No package is offered
-until a release is published.
+until a release is published. The author-supplied horizontal BPlayer logo
+(reviewed September 29, 2026) retains its original 413 × 180 dimensions
+and ratio for responsive catalog and detail-page rendering.
 
 The zai apps — zai (`zai-cli`), zai-editor, and zai-gitter — follow the same
 entry style. Their pages add short demo videos, copyable one-line install

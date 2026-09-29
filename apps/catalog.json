@@ -16,6 +16,12 @@
         { "en": "BPlayer is a Flutter-based prototype. Windows is the primary verification host; Android, iOS, and macOS are development targets, not certified releases.", "zh-CN": "BPlayer 是基于 Flutter 的原型应用，主要在 Windows 上验证。Android、iOS 和 macOS 仍是开发目标，并非已完成发布验证的平台。" }
       ],
       "stage": { "en": "Development preview", "zh-CN": "开发预览版" },
+      "artwork": {
+        "src": "/apps/media/bplayer/logo.png",
+        "alt": { "en": "BPlayer logo", "zh-CN": "BPlayer 标识" },
+        "width": 413,
+        "height": 180
+      },
       "screenshots": [
         {
           "src": "/apps/media/bplayer/player-desktop.png",
