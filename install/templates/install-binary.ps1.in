@@ -1,0 +1,25 @@
+    # --- Install ----------------------------------------------------------
+    $binary = Get-ChildItem -Path $extract -Filter $executable -Recurse -File |
+        Select-Object -First 1
+    if ($null -eq $binary) {
+        Stop-Install "the package did not contain an executable named '$executable'. Nothing was installed."
+    }
+
+    New-Item -ItemType Directory -Path $installDir -Force | Out-Null
+    $target = Join-Path $installDir $executable
+    Copy-Item -Path $binary.FullName -Destination $target -Force
+
+    $licenseDir = Join-Path (Join-Path $installDir 'licenses') $appId
+    if (Test-Path $licenseDir) { Remove-Item -Path $licenseDir -Recurse -Force }
+    New-Item -ItemType Directory -Path $licenseDir -Force | Out-Null
+    Get-ChildItem -Path $extract -Recurse -File |
+        Where-Object { $_.Name -match '^(LICENSE|NOTICE|COPYING|THIRD[-_]PARTY)' } |
+        ForEach-Object { Copy-Item -Path $_.FullName -Destination $licenseDir -Force }
+
+    Add-UserPath $installDir
+
+    Write-Host ''
+    Write-Host "Installed $displayName to $target"
+    Write-Host "Licenses: $licenseDir"
+    Write-Host "Open a new terminal so the updated PATH applies, then run '@EXECUTABLE@'."
+    Write-Host "Documentation: $site/apps/docs/?id=$appId"

@@ -4,7 +4,12 @@ export const MAX_LOCAL_BYTES = 100 * 1024 * 1024;
 const RELEASE_PREFIX = "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/";
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PACKAGE = /^[A-Za-z0-9][A-Za-z0-9._+-]*\.(?:zip|apk|aab|ipa|exe|msix|dmg|pkg|deb|rpm|AppImage)$/;
-const SCREENSHOT = /^\/apps\/media\/([a-z0-9]+(?:-[a-z0-9]+)*)\/[A-Za-z0-9][A-Za-z0-9._-]*\.(?:png|webp|avif)$/;
+const mediaPath = (extensions) =>
+  new RegExp(`^/apps/media/([a-z0-9]+(?:-[a-z0-9]+)*)/[A-Za-z0-9][A-Za-z0-9._-]*\\.(?:${extensions})$`);
+const SCREENSHOT = mediaPath("png|webp|avif");
+const VIDEO = mediaPath("mp4|webm");
+const VIDEO_TYPES = { mp4: "video/mp4", webm: "video/webm" };
+const INSTALL_COMMAND = /^[\x20-\x7e]+$/;
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
@@ -30,6 +35,20 @@ function list(value, label, min = 1, max = 100) {
 function unique(values, label) {
   requireValue(new Set(values).size === values.length, `${label} must be unique.`);
 }
+function appMedia(source, pattern, appId, label) {
+  const match = typeof source === "string" && source.match(pattern);
+  requireValue(match && match[1] === appId && !source.includes(".."), label);
+  return source;
+}
+function dimensions(value, label) {
+  requireValue(Number.isSafeInteger(value.width) && value.width > 0 &&
+    Number.isSafeInteger(value.height) && value.height > 0, `${label} dimensions must be positive integers.`);
+}
+export function videoType(src) {
+  const type = VIDEO_TYPES[src.split(".").at(-1).toLowerCase()];
+  requireValue(type, "Unsupported video format.");
+  return type;
+}
 export function validAppId(id) {
   return typeof id === "string" && id.length <= 64 && SLUG.test(id);
 }
@@ -45,20 +64,54 @@ export function validateCatalog(catalog) {
       list(app[key], `${app.id}.${key}`);
       app[key].forEach((item) => localizedText(item, `${app.id}.${key} item`));
     }
+    if (app.artwork !== undefined) {
+      object(app.artwork, `${app.id}.artwork`);
+      appMedia(app.artwork.src, SCREENSHOT, app.id,
+        "Artwork src must be an app-owned image under /apps/media/<app-id>/.");
+      localizedText(app.artwork.alt, "Artwork alt text", 240);
+      dimensions(app.artwork, "Artwork");
+    }
     if (app.screenshots !== undefined) {
       list(app.screenshots, `${app.id}.screenshots`, 1, 6);
       for (const screenshot of app.screenshots) {
         object(screenshot, "Screenshot");
-        const match = typeof screenshot.src === "string" && screenshot.src.match(SCREENSHOT);
-        requireValue(match && match[1] === app.id && !screenshot.src.includes(".."),
+        appMedia(screenshot.src, SCREENSHOT, app.id,
           "Screenshot src must be an app-owned image under /apps/media/<app-id>/.");
         localizedText(screenshot.alt, "Screenshot alt text", 240);
         localizedText(screenshot.caption, "Screenshot caption", 160);
-        requireValue(Number.isSafeInteger(screenshot.width) && screenshot.width > 0 &&
-          Number.isSafeInteger(screenshot.height) && screenshot.height > 0,
-        "Screenshot dimensions must be positive integers.");
+        dimensions(screenshot, "Screenshot");
       }
       unique(app.screenshots.map(({ src }) => src), "Screenshot sources");
+    }
+    if (app.videos !== undefined) {
+      list(app.videos, `${app.id}.videos`, 1, 6);
+      for (const video of app.videos) {
+        object(video, "Video");
+        appMedia(video.src, VIDEO, app.id,
+          "Video src must be an app-owned mp4 or webm under /apps/media/<app-id>/.");
+        videoType(video.src);
+        appMedia(video.poster, SCREENSHOT, app.id,
+          "Video poster must be an app-owned image under /apps/media/<app-id>/.");
+        localizedText(video.title, "Video title", 120);
+        localizedText(video.caption, "Video caption", 400);
+        dimensions(video, "Video");
+        if (video.muted !== undefined) requireValue(typeof video.muted === "boolean", "Video muted must be a boolean.");
+      }
+      unique(app.videos.map(({ src }) => src), "Video sources");
+    }
+    if (app.installCommands !== undefined) {
+      list(app.installCommands, `${app.id}.installCommands`, 1, 6);
+      for (const entry of app.installCommands) {
+        object(entry, "Installation command");
+        localizedText(entry.label, "Installation command label", 120);
+        text(entry.command, "Installation command", 400);
+        requireValue(INSTALL_COMMAND.test(entry.command),
+          "Installation commands must be plain printable ASCII, so they stay copyable.");
+      }
+      unique(app.installCommands.map(({ command }) => command), "Installation commands");
+    }
+    if (app.documentation !== undefined) {
+      requireValue(app.documentation === true, "Documentation must be true when present, or omitted.");
     }
     list(app.platforms, `${app.id}.platforms`);
     for (const platform of app.platforms) {
@@ -128,4 +181,37 @@ export function validateManifest(manifest, app) {
 export function assetHref(appId, asset) {
   requireValue(validAppId(appId), "Invalid app id.");
   return asset.url ?? `/releases/${appId}/latest/${encodeURIComponent(asset.file)}`;
+}
+
+const DOC_SLUG = /^[a-z0-9]+(?:[-_]+[a-z0-9]+)*$/;
+const DOC_FILE = /^[a-z0-9][a-z0-9._-]*\.md$/;
+const REPOSITORY = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
+const COMMIT = /^[0-9a-f]{40}$/;
+
+// Validates the generated index of a documentation mirror. The viewer only
+// fetches files this index names, so every entry has to stay a plain file name
+// inside the app's own mirror directory.
+export function validateDocsIndex(index, app) {
+  object(index, "Documentation index");
+  requireValue(index.schemaVersion === 1, "Unsupported documentation schemaVersion.");
+  requireValue(index.appId === app.id, "Documentation appId does not match the selected app.");
+  requireValue(typeof index.repository === "string" && REPOSITORY.test(index.repository), "Documentation repository must be owner/name.");
+  text(index.ref, "Documentation ref", 200);
+  requireValue(typeof index.commit === "string" && COMMIT.test(index.commit), "Documentation commit must be a full commit hash.");
+  list(index.documents, "Documentation documents", 1, 200);
+  for (const document_ of index.documents) {
+    object(document_, "Documentation entry");
+    requireValue(typeof document_.slug === "string" && DOC_SLUG.test(document_.slug), "Documentation slug must be a lowercase slug.");
+    requireValue(typeof document_.file === "string" && DOC_FILE.test(document_.file) && !document_.file.includes(".."), "Documentation file must be a Markdown file inside the mirror.");
+    text(document_.title, "Documentation title", 120);
+    text(document_.source, "Documentation source path", 400);
+  }
+  requireValue(Array.isArray(index.assets), "Documentation assets must be an array.");
+  for (const asset of index.assets) {
+    requireValue(typeof asset === "string" && /^assets\/[a-z0-9][a-z0-9._-]*$/.test(asset) && !asset.includes(".."), "Documentation asset must be a file inside assets/.");
+  }
+  unique(index.assets, "Documentation assets");
+  unique(index.documents.map((document_) => document_.slug), "Documentation slugs");
+  unique(index.documents.map((document_) => document_.file), "Documentation files");
+  return index;
 }

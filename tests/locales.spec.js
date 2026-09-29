@@ -19,7 +19,7 @@ test("Chinese catalog, details, gallery, and downloads have correct localized ti
   await expect(page).toHaveTitle("应用 | Qiyu Zhao");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("小小灵感，实用软件。");
-  await page.getByRole("link", { name: "了解应用" }).click();
+  await page.locator(".catalog-card").filter({ hasText: "BPlayer" }).getByRole("link", { name: "了解应用" }).click();
   await expect(page).toHaveURL(/id=bplayer&lang=zh-CN$/);
   await expect(page).toHaveTitle("BPlayer | Qiyu Zhao 的应用");
   await expect(page.getByRole("heading", { name: "英语与简体中文", exact: true })).toBeVisible();

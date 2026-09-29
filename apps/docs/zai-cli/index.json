@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "appId": "zai-cli",
+  "repository": "phoenixzqy/zai-cli",
+  "ref": "origin/main",
+  "commit": "c20935e3f9eea4f09a22c93f2d80bce0a5eb4b8b",
+  "documents": [
+    {
+      "slug": "docs--services-and-pollers",
+      "title": "Services, pollers, and labels",
+      "source": "docs/services-and-pollers.md",
+      "file": "docs--services-and-pollers.md",
+      "bytes": 4659
+    },
+    {
+      "slug": "docs--config",
+      "title": "Per-repository configuration",
+      "source": "docs/config.md",
+      "file": "docs--config.md",
+      "bytes": 4754
+    },
+    {
+      "slug": "docs--config--discovery-and-management",
+      "title": "Configuration discovery and management",
+      "source": "docs/config/discovery-and-management.md",
+      "file": "docs--config--discovery-and-management.md",
+      "bytes": 8815
+    },
+    {
+      "slug": "docs--config--migration-and-backward-compatibility",
+      "title": "Migration and backward compatibility",
+      "source": "docs/config/migration-and-backward-compatibility.md",
+      "file": "docs--config--migration-and-backward-compatibility.md",
+      "bytes": 14156
+    },
+    {
+      "slug": "docs--config--poller-filters-and-presets",
+      "title": "Poller filters and presets",
+      "source": "docs/config/poller-filters-and-presets.md",
+      "file": "docs--config--poller-filters-and-presets.md",
+      "bytes": 8638
+    },
+    {
+      "slug": "docs--config--project-registry",
+      "title": "Project registry and local project config",
+      "source": "docs/config/project-registry.md",
+      "file": "docs--config--project-registry.md",
+      "bytes": 2705
+    },
+    {
+      "slug": "docs--config--samples",
+      "title": "Configuration samples",
+      "source": "docs/config/samples.md",
+      "file": "docs--config--samples.md",
+      "bytes": 5307
+    },
+    {
+      "slug": "docs--config--validation-and-boundaries",
+      "title": "Validation and boundaries",
+      "source": "docs/config/validation-and-boundaries.md",
+      "file": "docs--config--validation-and-boundaries.md",
+      "bytes": 6657
+    },
+    {
+      "slug": "docs--teams-notifications",
+      "title": "Microsoft Teams notifications",
+      "source": "docs/teams-notifications.md",
+      "file": "docs--teams-notifications.md",
+      "bytes": 7654
+    },
+    {
+      "slug": "docs--benchmarks",
+      "title": "Benchmarks",
+      "source": "docs/benchmarks.md",
+      "file": "docs--benchmarks.md",
+      "bytes": 3853
+    }
+  ],
+  "assets": []
+}

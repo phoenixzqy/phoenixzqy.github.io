@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "note": "Allowlist for the public documentation mirror under /apps/docs/. Only user-facing documents belong here. Contributor, agent, and internal-architecture material stays in the private repositories. Re-sync with `node scripts/sync-app-docs.mjs` and follow .github/skills/app-docs-sync/SKILL.md.",
+  "apps": [
+    {
+      "appId": "zai-cli",
+      "repository": "phoenixzqy/zai-cli",
+      "ref": "origin/main",
+      "commit": "c20935e3f9eea4f09a22c93f2d80bce0a5eb4b8b",
+      "syncedAt": "2026-09-29T01:09:49Z",
+      "include": [
+        "docs/services-and-pollers.md",
+        "docs/config.md",
+        "docs/config/discovery-and-management.md",
+        "docs/config/migration-and-backward-compatibility.md",
+        "docs/config/poller-filters-and-presets.md",
+        "docs/config/project-registry.md",
+        "docs/config/samples.md",
+        "docs/config/validation-and-boundaries.md",
+        "docs/teams-notifications.md",
+        "docs/benchmarks.md"
+      ],
+      "excluded": [
+        {
+          "path": "docs/README.md",
+          "reason": "An index of the private docs tree: most of the documents it links to are contributor material that is not mirrored, so the site's own document list replaces it."
+        },
+        {
+          "path": "docs/config/field-reference.md",
+          "reason": "Names an internal notification channel. Publish once that reference is generic or removed upstream; the site owner should confirm before it is mirrored."
+        },
+        {
+          "path": "docs/getting-started.md",
+          "reason": "Still documents the legacy private release-storage install flow. Publish after the zai-cli release pull request rewrites it around the public one-line installers."
+        },
+        {
+          "path": "docs/install-and-config.md",
+          "reason": "Same legacy private install flow as docs/getting-started.md."
+        },
+        {
+          "path": "docs/automations.md",
+          "reason": "References the private observability pipeline by name. Publish once that reference is removed."
+        },
+        {
+          "path": "docs/custom-packages.md",
+          "reason": "Describes downloading installers from the private release repository. Publish once that section is rewritten."
+        },
+        {
+          "path": "docs/architecture.md",
+          "reason": "Implementation internals, including everything under docs/architecture/."
+        },
+        {
+          "path": "docs/agent-prompt-authoring.md",
+          "reason": "Agent authoring guidance, not user documentation."
+        },
+        {
+          "path": "docs/development.md",
+          "reason": "Contributor setup."
+        },
+        {
+          "path": "docs/local-validation.md",
+          "reason": "Contributor local CI gate."
+        },
+        {
+          "path": "docs/testing-and-operations.md",
+          "reason": "Contributor and operator internals."
+        },
+        {
+          "path": "docs/schema-authoring.md",
+          "reason": "Contributor internals."
+        },
+        {
+          "path": "docs/tui-interaction-parity.md",
+          "reason": "Implementation internals."
+        },
+        {
+          "path": "docs/version-management.md",
+          "reason": "Release engineering internals."
+        }
+      ]
+    },
+    {
+      "appId": "zai-editor",
+      "repository": "phoenixzqy/zai-editor",
+      "ref": "origin/main",
+      "commit": "837dd962baabab318b97ac742d7aa915ba5c3c71",
+      "syncedAt": "2026-09-29T01:09:49Z",
+      "include": [
+        "docs/reference.md",
+        "docs/language-support.md",
+        "docs/lsp-setup.md"
+      ],
+      "excluded": [
+        {
+          "path": "docs/architecture.md",
+          "reason": "Package ownership and implementation internals."
+        },
+        {
+          "path": "docs/local-validation.md",
+          "reason": "Contributor local CI gate."
+        },
+        {
+          "path": "docs/testing-and-operations.md",
+          "reason": "Contributor and operator internals."
+        },
+        {
+          "path": "docs/source-provenance.md",
+          "reason": "Vendored-dependency provenance for contributors."
+        },
+        {
+          "path": "demo/",
+          "reason": "Sample documents that only make sense beside the checkout they ship in."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "reason": "Contributor rules."
+        },
+        {
+          "path": "AGENTS.md",
+          "reason": "Agent instructions."
+        },
+        {
+          "path": ".github/",
+          "reason": "Contributor and agent material."
+        }
+      ]
+    },
+    {
+      "appId": "zai-gitter",
+      "repository": "phoenixzqy/zai-gitter",
+      "ref": "origin/main",
+      "commit": "010a9622fcb2ca11023e7d0b220838788972e658",
+      "syncedAt": "2026-09-29T01:09:49Z",
+      "include": [
+        "docs/user-guide.md",
+        "docs/packages-and-distribution.md"
+      ],
+      "excluded": [
+        {
+          "path": "docs/architecture.md",
+          "reason": "Package ownership and implementation internals."
+        },
+        {
+          "path": "docs/local-validation.md",
+          "reason": "Contributor local CI gate."
+        },
+        {
+          "path": "docs/testing-and-operations.md",
+          "reason": "Contributor and operator internals."
+        },
+        {
+          "path": "docs/source-provenance.md",
+          "reason": "Vendored-dependency provenance for contributors."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "reason": "Contributor rules."
+        },
+        {
+          "path": "AGENTS.md",
+          "reason": "Agent instructions."
+        },
+        {
+          "path": ".github/",
+          "reason": "Contributor and agent material."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "appId": "zai-gitter",
+  "repository": "phoenixzqy/zai-gitter",
+  "ref": "origin/main",
+  "commit": "010a9622fcb2ca11023e7d0b220838788972e658",
+  "documents": [
+    {
+      "slug": "docs--user-guide",
+      "title": "User guide",
+      "source": "docs/user-guide.md",
+      "file": "docs--user-guide.md",
+      "bytes": 11510
+    },
+    {
+      "slug": "docs--packages-and-distribution",
+      "title": "Packages and distribution",
+      "source": "docs/packages-and-distribution.md",
+      "file": "docs--packages-and-distribution.md",
+      "bytes": 5352
+    }
+  ],
+  "assets": []
+}

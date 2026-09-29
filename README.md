@@ -45,10 +45,15 @@ notes. Its descriptions are paraphrased from the authorized local product
 documentation; no private source or builds were copied. No package is offered
 until a release is published.
 
+The zai apps — zai (`zai-cli`), zai-editor, and zai-gitter — follow the same
+entry style. Their pages add short demo videos, copyable one-line install
+commands, and a link to the user documentation mirrored under `/apps/docs/`.
+
 See [the publishing contract](releases/README.md) for folder layout, manifest
-fields, checksum/size validation, safe pipeline handoff, signing notices, and
-large-package hosting through public GitHub Release assets. Run
-`npm run validate:apps` before publishing metadata or binaries.
+fields, checksum/size validation, app media, one-line installers, mirrored
+documentation, safe pipeline handoff, signing notices, and large-package
+hosting through public GitHub Release assets. Run `npm run validate:apps`
+before publishing metadata or binaries.
 The app catalog uses JavaScript with explicit loading/error/no-JavaScript
 messages; the résumé remains usable without JavaScript.
 

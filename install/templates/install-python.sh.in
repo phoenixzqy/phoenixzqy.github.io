@@ -1,0 +1,35 @@
+# --- Install --------------------------------------------------------------
+# zai ships a Python package installer inside the archive. It performs the
+# real installation (executable, agent homes, PATH) and reports its own result.
+PYTHON=''
+for candidate in python3 python; do
+  if command -v "$candidate" >/dev/null 2>&1; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+[ -n "$PYTHON" ] ||
+  fail "Python 3.10 or newer is required but no 'python3' was found on PATH. Install Python, then run the command again."
+
+PACKAGE_INSTALLER="$(find "$EXTRACT" -type f -name 'package_installer.py' -print 2>/dev/null | sed -n 1p)"
+[ -n "$PACKAGE_INSTALLER" ] ||
+  fail "the package did not contain 'package_installer.py'. Nothing was installed."
+
+if [ -n "${ZAI_INSTALL_DIR:-}" ]; then
+  set -- --install-dir "$INSTALL_DIR" "$@"
+fi
+
+info "Running the bundled package installer with $PYTHON…"
+# The script itself arrives on stdin when piped to sh, so reattach the terminal
+# where one is actually usable; the package installer may ask before installing
+# the agent CLI. Probe in a subshell: /dev/tty can exist and still not open,
+# and a redirection error on a compound command would end this script.
+if (exec 3</dev/tty) 2>/dev/null; then
+  "$PYTHON" "$PACKAGE_INSTALLER" "$@" </dev/tty || fail 'the bundled package installer did not complete.'
+else
+  "$PYTHON" "$PACKAGE_INSTALLER" "$@" || fail 'the bundled package installer did not complete.'
+fi
+
+info ''
+info "Open a new terminal so the updated PATH applies, then run '$EXECUTABLE'."
+info "Documentation: $SITE/apps/docs/?id=$APP_ID"

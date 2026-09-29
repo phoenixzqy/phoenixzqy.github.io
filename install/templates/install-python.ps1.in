@@ -1,0 +1,37 @@
+    # --- Install ----------------------------------------------------------
+    # zai ships a Python package installer inside the archive. It performs the
+    # real installation (executable, agent homes, PATH) and reports its result.
+    $python = $null
+    $pythonArgs = @()
+    if (Get-Command 'py' -ErrorAction SilentlyContinue) {
+        $python = 'py'
+        $pythonArgs = @('-3')
+    } elseif (Get-Command 'python' -ErrorAction SilentlyContinue) {
+        $python = 'python'
+    } elseif (Get-Command 'python3' -ErrorAction SilentlyContinue) {
+        $python = 'python3'
+    }
+    if (-not $python) {
+        Stop-Install "Python 3.10 or newer is required but no Python launcher was found on PATH. Install Python, then run the command again."
+    }
+
+    $packageInstaller = Get-ChildItem -Path $extract -Filter 'package_installer.py' -Recurse -File |
+        Select-Object -First 1
+    if ($null -eq $packageInstaller) {
+        Stop-Install "the package did not contain 'package_installer.py'. Nothing was installed."
+    }
+
+    $forwarded = @()
+    if (Get-ZaiEnv 'ZAI_INSTALL_DIR') { $forwarded += @('--install-dir', $installDir) }
+    $extraArgs = Get-ZaiEnv 'ZAI_INSTALL_ARGS'
+    if ($extraArgs) { $forwarded += @($extraArgs -split '\s+' | Where-Object { $_ }) }
+
+    Write-Host "Running the bundled package installer with $python..."
+    & $python @pythonArgs $packageInstaller.FullName @forwarded
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Install "the bundled package installer exited with code $LASTEXITCODE." $LASTEXITCODE
+    }
+
+    Write-Host ''
+    Write-Host "Open a new terminal so the updated PATH applies, then run '@EXECUTABLE@'."
+    Write-Host "Documentation: $site/apps/docs/?id=$appId"
