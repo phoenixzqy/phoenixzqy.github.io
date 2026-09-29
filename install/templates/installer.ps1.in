@@ -66,14 +66,41 @@ function Get-Architecture {
 }
 
 function Save-Download([string] $url, [string] $destination) {
-    if (-not $url.StartsWith('https://') -and -not (Get-ZaiEnv 'ZAI_RELEASE_MANIFEST_URL')) {
-        Stop-Install "refusing to download over a non-HTTPS URL: $url"
+    for ($hop = 0; $hop -le 5; $hop++) {
+        $uri = $null
+        if (-not [Uri]::TryCreate($url, [UriKind]::Absolute, [ref] $uri)) {
+            Stop-Install "invalid download URL: $url"
+        }
+        $localFixture = $hop -eq 0 -and (Get-ZaiEnv 'ZAI_RELEASE_MANIFEST_URL') -and
+            $url -cmatch '^http://127\.0\.0\.1(?::[0-9]+)?(?:/|[?#]|$)' -and
+            $uri.Host -ceq '127.0.0.1'
+        if ($uri.Scheme -ne 'https' -and -not $localFixture) {
+            Stop-Install "refusing to download over a non-HTTPS URL: $url"
+        }
+        try {
+            $response = Invoke-WebRequest -Uri $uri -OutFile $destination -UseBasicParsing -MaximumRedirection 0 -PassThru
+            $status = [int] $response.StatusCode
+            if ($status -lt 300 -or $status -ge 400) { return }
+        } catch {
+            $response = $_.Exception.Response
+            if ($null -eq $response) {
+                Stop-Install "download failed: $url ($($_.Exception.Message))"
+            }
+            $status = [int] $response.StatusCode
+            if ($status -lt 300 -or $status -ge 400) {
+                Stop-Install "download failed: $url ($($_.Exception.Message))"
+            }
+        }
+        if ($localFixture) { Stop-Install "refusing to follow a plaintext redirect: $url" }
+        if ($response -is [System.Net.Http.HttpResponseMessage]) {
+            $location = [string] $response.Headers.Location
+        } else {
+            $location = [string] $response.Headers['Location']
+        }
+        if (-not $location) { Stop-Install "redirect without a Location: $url" }
+        $url = [Uri]::new($uri, $location).AbsoluteUri
     }
-    try {
-        Invoke-WebRequest -Uri $url -OutFile $destination -UseBasicParsing
-    } catch {
-        Stop-Install "download failed: $url ($($_.Exception.Message))"
-    }
+    Stop-Install "too many download redirects: $url"
 }
 
 function Add-UserPath([string] $directory) {

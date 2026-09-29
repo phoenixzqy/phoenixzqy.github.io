@@ -120,6 +120,10 @@ files and must stay self-contained: they are consumed as
 with `npm run build:installers` from `install/templates/`; `npm test` fails if a
 published file drifts from its template.
 
+Downloads use HTTPS, including every redirect. The manifest URL override
+permits plain HTTP only for literal `127.0.0.1` test fixtures; plaintext
+redirects are rejected, and non-loopback HTTP overrides are not trusted.
+
 An installer reads `/releases/<app-id>/latest/manifest.json`, selects the asset
 matching the machine's platform and architecture, downloads it, verifies its
 SHA-256 against the manifest, and installs it. When `release` is `null` it

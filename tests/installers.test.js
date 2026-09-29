@@ -50,6 +50,10 @@ async function withServer(files, body) {
       response.writeHead(404).end("Not found");
       return;
     }
+    if (content.redirect) {
+      response.writeHead(302, { Location: content.redirect }).end();
+      return;
+    }
     response.writeHead(200, { "content-length": content.length }).end(content);
   });
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
@@ -377,16 +381,32 @@ test("the zai installer refuses an archive without install.py at its root", asyn
   }));
 });
 
-test("installers refuse insecure URLs unless a manifest override is in effect", async () => {
-  await withHome(async (home) => {
-    const result = await runInstaller("zai-editor.sh", { manifestUrl: "", home, installDir: join(home, "installed") });
+test("installer metadata overrides reject non-loopback HTTP and plaintext redirects", async () => {
+  await withServer(new Map([
+    ["/redirect", { redirect: "/manifest.json" }],
+    ["/manifest.json", Buffer.from("{}")],
+  ]), (origin) => withHome(async (home) => {
+    for (const manifestUrl of [
+      origin.replace("127.0.0.1", "localhost") + "/manifest.json",
+      origin.replace("127.0.0.1", "127.0.0.1@127.0.0.1") + "/manifest.json",
+    ]) {
+      const result = await runInstaller("zai-editor.sh", { manifestUrl, home });
+      assert.equal(result.code, 1);
+      assert.match(result.stderr, /refusing to download over a non-HTTPS URL/);
+    }
+    const result = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/redirect`, home });
     assert.equal(result.code, 1);
-    // With no override the script falls back to its own HTTPS site URL, so the
-    // insecure-URL guard only has to hold for values it is given.
-    assert.match(result.stderr, /download failed|non-HTTPS/);
-  });
-  const script = await readFile(installerPath("zai-editor.sh"), "utf8");
-  assert.match(script, /refusing to download over a non-HTTPS URL/);
+    assert.match(result.stderr, /download failed/);
+  }));
+  for (const { appId } of INSTALLERS) {
+    const shell = await readFile(installerPath(`${appId}.sh`), "utf8");
+    const ps = await readFile(installerPath(`${appId}.ps1`), "utf8");
+    assert.match(shell, /--proto '=https' --proto-redir '=https'/);
+    assert.match(shell, /wget -q --https-only/);
+    assert.match(ps, /-MaximumRedirection 0 -PassThru/);
+    assert.match(ps, /127\\\.0\\\.0\\\.1/);
+    assert.match(ps, /refusing to follow a plaintext redirect/);
+  }
 });
 
 test("fixture archives round-trip through the extraction tools the installer uses", async () => {

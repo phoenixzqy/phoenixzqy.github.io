@@ -61,7 +61,19 @@ require_https() {
     https://*) return 0 ;;
   esac
   if [ -n "${ZAI_RELEASE_MANIFEST_URL:-}" ]; then
-    return 0
+    case "$1" in
+      http://127.0.0.1 | http://127.0.0.1/* | http://127.0.0.1:*)
+        authority=${1#http://}
+        authority=${authority%%/*}
+        case "$authority" in
+          127.0.0.1) return 0 ;;
+          127.0.0.1:*)
+            port=${authority#127.0.0.1:}
+            case "$port" in '' | *[!0-9]*) ;; *) return 0 ;; esac
+            ;;
+        esac
+        ;;
+    esac
   fi
   fail "refusing to download over a non-HTTPS URL: $1"
 }
@@ -69,8 +81,18 @@ require_https() {
 download() {
   require_https "$1"
   case "$DOWNLOADER" in
-    curl) curl -fsSL -o "$2" "$1" || fail "download failed: $1" ;;
-    wget) wget -q -O "$2" "$1" || fail "download failed: $1" ;;
+    curl)
+      case "$1" in
+        https://*) curl -fsSL --proto '=https' --proto-redir '=https' -o "$2" "$1" ;;
+        *) curl -fsSL --proto '=http' --max-redirs 0 -o "$2" "$1" ;;
+      esac || fail "download failed: $1"
+      ;;
+    wget)
+      case "$1" in
+        https://*) wget -q --https-only -O "$2" "$1" ;;
+        *) wget -q --max-redirect=0 -O "$2" "$1" ;;
+      esac || fail "download failed: $1"
+      ;;
   esac
 }
 
