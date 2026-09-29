@@ -6,9 +6,11 @@
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
       "ref": "origin/main",
-      "commit": "c20935e3f9eea4f09a22c93f2d80bce0a5eb4b8b",
-      "syncedAt": "2026-09-29T01:09:49Z",
+      "commit": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
+      "syncedAt": "2026-09-29T06:13:02Z",
       "include": [
+        "docs/install-and-config.md",
+        "docs/getting-started.md",
         "docs/services-and-pollers.md",
         "docs/config.md",
         "docs/config/migration-and-backward-compatibility.md",
@@ -34,14 +36,6 @@
         {
           "path": "docs/config/field-reference.md",
           "reason": "Names an internal notification channel. Publish once that reference is generic or removed upstream; the site owner should confirm before it is mirrored."
-        },
-        {
-          "path": "docs/getting-started.md",
-          "reason": "Still documents the legacy private release-storage install flow. Publish after the zai-cli release pull request rewrites it around the public one-line installers."
-        },
-        {
-          "path": "docs/install-and-config.md",
-          "reason": "Same legacy private install flow as docs/getting-started.md."
         },
         {
           "path": "docs/automations.md",
@@ -89,9 +83,10 @@
       "appId": "zai-editor",
       "repository": "phoenixzqy/zai-editor",
       "ref": "origin/main",
-      "commit": "837dd962baabab318b97ac742d7aa915ba5c3c71",
-      "syncedAt": "2026-09-29T01:09:49Z",
+      "commit": "abd77c3f0929defb702c49b8998b62f3f3f0beec",
+      "syncedAt": "2026-09-29T06:13:02Z",
       "include": [
+        "docs/user-guide.md",
         "docs/lsp-setup.md"
       ],
       "excluded": [
@@ -141,8 +136,8 @@
       "appId": "zai-gitter",
       "repository": "phoenixzqy/zai-gitter",
       "ref": "origin/main",
-      "commit": "30a572ecfd8062a41285cfbba426d5f2e50f3df7",
-      "syncedAt": "2026-09-29T01:18:31Z",
+      "commit": "0ae912081685c56df9727396b841de0dc8436195",
+      "syncedAt": "2026-09-29T06:13:02Z",
       "include": [
         "docs/user-guide.md"
       ],

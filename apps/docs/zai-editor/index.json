@@ -2,9 +2,16 @@
   "schemaVersion": 1,
   "appId": "zai-editor",
   "repository": "phoenixzqy/zai-editor",
-  "ref": "origin/main",
-  "commit": "837dd962baabab318b97ac742d7aa915ba5c3c71",
+  "ref": "abd77c3",
+  "commit": "abd77c3f0929defb702c49b8998b62f3f3f0beec",
   "documents": [
+    {
+      "slug": "docs--user-guide",
+      "title": "User guide",
+      "source": "docs/user-guide.md",
+      "file": "docs--user-guide.md",
+      "bytes": 3265
+    },
     {
       "slug": "docs--lsp-setup",
       "title": "Set up code completion",

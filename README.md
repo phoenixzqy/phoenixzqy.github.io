@@ -118,6 +118,16 @@ describe the recordings rather than claiming independent product benchmarks;
 no private source, contributor instructions, or unpublished packages belong
 in the public mirror.
 
+For the September 29, 2026 zai positioning refresh, the public
+[herdr README](https://github.com/herdrdev/herdr) and
+[Orca README](https://github.com/stablyai/orca) were reviewed for editorial
+structure. Their concise category-first lines — a runtime for coding agents and
+an AI orchestrator for builders — informed the decision to give zai one short,
+original outcome statement: “One terminal. Many agents. One delivery loop.”
+No wording, source code, layout, or assets were copied. Product and comparison
+claims continue to come from the zai repositories' documented behavior,
+measurements, and linked public evidence.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online

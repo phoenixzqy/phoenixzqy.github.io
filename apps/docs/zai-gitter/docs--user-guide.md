@@ -1,24 +1,34 @@
 # User guide
 
-This guide covers building, running, and using the standalone `zai-gitter`
+This guide covers installing, running, and using the standalone `zai-gitter`
 app. For embedding the viewer or producing archives, see
 packages and distribution.
 
-## Build and run
+## Install and run
 
-The module root is this repository's root; its identity is
-`github.com/phoenixzqy/zai-gitter`. Use the Go version declared in `go.mod`.
+macOS / Linux:
 
-```text
-go run ./cmd/zai-gitter --help
-go run ./cmd/zai-gitter /absolute/workspace
-go build -o zai-gitter ./cmd/zai-gitter
+```bash
+curl -fsSL https://phoenixzqy.github.io/install/zai-gitter.sh | sh
 ```
 
-On Windows, use `-o zai-gitter.exe`. Put the executable on PATH to run
-`zai-gitter [--theme <theme>] [directory]` from any Git workspace. Git must
-be on PATH. Alternatively, extract a binary archive produced by the
-packaging script.
+Windows PowerShell:
+
+```powershell
+irm https://phoenixzqy.github.io/install/zai-gitter.ps1 | iex
+```
+
+The installer downloads the package for your platform and architecture,
+verifies its SHA-256, installs the executable under your home directory, and
+updates the Windows user `PATH` or common macOS/Linux shell profiles. The
+macOS/Linux installer needs Python 3, `curl` or `wget`, `sha256sum` or `shasum`,
+and a ZIP extractor such as `unzip`, `bsdtar`, `tar`, or Python. Open a new
+terminal, then run `zai-gitter [--theme <theme>] [directory]` from any Git
+workspace. Git must already be on `PATH`; after installation, the app does not
+need Python, Go, Node.js, zai, or a forge account.
+
+If your shell does not load `.profile`, `.bashrc`, or `.zshrc`, add the
+installation directory (normally `~/.zai`) to that shell's PATH yourself.
 
 Standalone use requires Git and a local working tree, not a forge remote,
 zai config, or coding agent. Redirected output produces one 100x30 plaintext
@@ -55,6 +65,11 @@ totals rather than presenting an uncertain count.
 Diffs start inline until the viewer has a size. The viewer automatically
 switches to side-by-side at 200 usable diff columns or more (viewer width minus
 the file sidebar and two separators), and back to inline below that width.
+Known source file types use syntax colors from the active theme in diffs and
+full-file previews, including both sides of split diffs. Change backgrounds,
+selection colors, and line-number gutters remain distinct; unknown file types
+and previews over 128 KiB render without syntax coloring. Multi-file previews
+color at most 1 MiB of source text in total.
 The `automaticSplitWidth` policy lives in the reusable viewer. The default
 28-column sidebar makes a 230-column viewer side-by-side. Resizing the viewer
 or its sidebar updates the layout; `i` (Inline) and `s` (Split) override
