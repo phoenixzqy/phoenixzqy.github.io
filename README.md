@@ -135,6 +135,14 @@ It explicitly targets [codex-evo](https://github.com/idleai/codex-evo), not all
 Codex distributions, and does not claim native Copilot extension compatibility
 or full feature parity. No unpublished executable is linked from the site.
 
+The OpenCode integration preview wording was reviewed September 29, 2026,
+against the app author's supplied zai-cli integration and user guide, plus
+OpenCode's public [CLI](https://opencode.ai/docs/cli/) and
+[plugin documentation](https://opencode.ai/docs/plugins/). It distinguishes
+zai workflow support from native CLI feature identity, states the 1.18.33+
+requirement, and discloses the missing blocking stop-hook equivalent.
+No credentials, private implementation, or unpublished package is published.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online

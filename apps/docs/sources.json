@@ -6,22 +6,26 @@
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
       "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
-      "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
-      "syncedAt": "2026-09-29T17:22:06Z",
+      "commit": "356180e4a6b3dea45e62ec0fdf14ca7b12e05047",
+      "syncedAt": "2026-09-29T20:46:28Z",
       "include": [
         "docs/install-and-config.md",
         "docs/getting-started.md",
         "docs/claude-code.md",
+        "docs/opencode.md",
         "docs/services-and-pollers.md",
         "docs/config.md",
         "docs/config/migration-and-backward-compatibility.md",
         "docs/config/poller-filters-and-presets.md",
         "docs/config/project-registry.md",
         "docs/config/samples.md",
-        "docs/config/validation-and-boundaries.md",
-        "docs/teams-notifications.md"
+        "docs/config/validation-and-boundaries.md"
       ],
       "excluded": [
+        {
+          "path": "docs/teams-notifications.md",
+          "reason": "Removed upstream with the retired Teams notification integration; do not publish obsolete setup instructions."
+        },
         {
           "path": "docs/config/discovery-and-management.md",
           "reason": "Mixes user configuration with private source-layout and implementation guidance. Publish after upstream separates the user-facing material."

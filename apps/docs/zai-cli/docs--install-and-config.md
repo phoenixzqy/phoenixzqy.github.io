@@ -164,6 +164,9 @@ the human to install fonts or change terminal profiles.
 - [`getting-started.md`](?id=zai-cli&doc=docs--getting-started) — installation, updates, and the
   command table.
 - [`config.md`](?id=zai-cli&doc=docs--config) — the full per-repository configuration reference.
+- [`opencode.md`](?id=zai-cli&doc=docs--opencode) — OpenCode installation, separate authentication,
+  provider selection, and compatibility. Consult `zai opencode -h` to check
+  whether the installed release includes this provider.
 - `architecture.md` — what the services do and how they fit
   together.
 - `testing-and-operations.md` — operating and

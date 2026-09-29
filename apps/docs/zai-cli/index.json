@@ -2,22 +2,22 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
-  "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
+  "ref": "356180e4a6b3dea45e62ec0fdf14ca7b12e05047",
+  "commit": "356180e4a6b3dea45e62ec0fdf14ca7b12e05047",
   "documents": [
     {
       "slug": "docs--install-and-config",
       "title": "AI-guided install and configuration",
       "source": "docs/install-and-config.md",
       "file": "docs--install-and-config.md",
-      "bytes": 6589
+      "bytes": 6823
     },
     {
       "slug": "docs--getting-started",
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 13463
+      "bytes": 12479
     },
     {
       "slug": "docs--claude-code",
@@ -25,6 +25,13 @@
       "source": "docs/claude-code.md",
       "file": "docs--claude-code.md",
       "bytes": 6883
+    },
+    {
+      "slug": "docs--opencode",
+      "title": "OpenCode integration",
+      "source": "docs/opencode.md",
+      "file": "docs--opencode.md",
+      "bytes": 6609
     },
     {
       "slug": "docs--services-and-pollers",
@@ -38,7 +45,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 4977
+      "bytes": 5250
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
@@ -74,13 +81,6 @@
       "source": "docs/config/validation-and-boundaries.md",
       "file": "docs--config--validation-and-boundaries.md",
       "bytes": 6657
-    },
-    {
-      "slug": "docs--teams-notifications",
-      "title": "Microsoft Teams notifications",
-      "source": "docs/teams-notifications.md",
-      "file": "docs--teams-notifications.md",
-      "bytes": 7654
     }
   ],
   "assets": []

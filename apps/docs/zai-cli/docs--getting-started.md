@@ -35,9 +35,10 @@ up the persistent `PATH` change. `ZAI_INSTALL_DIR` chooses another destination
 and any extra arguments are forwarded to the package installer.
 
 Packages are pre-built, so no source clone or Go toolchain is required. Install
-Python 3.10 or newer and Node.js 22/npm before running the installer;
-macOS/Linux also need `curl` and `unzip`. The package installer can install or
-update the npm-managed Copilot CLI.
+Python 3.10 or newer before running the installer; macOS/Linux also need `curl`
+and `unzip`. Install your preferred coding-agent CLI separately before using it
+with zai; the zai installer does not install or update Copilot, Pi, Claude Code, OpenCode,
+or other non-zai tools.
 
 - App page: <https://phoenixzqy.github.io/apps/app/?id=zai-cli>
 - All releases and checksums: <https://phoenixzqy.github.io/apps/releases/?id=zai-cli>
@@ -80,7 +81,7 @@ are running.
 Console activity icons are built in, with automatic readable text fallback when
 terminal images are unavailable. No font setup is required.
 
-The installer copies package-owned files into `~/.zai` and installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it overwrites the previously installed package-owned content so the home always reflects the latest release. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory and fails loudly if Copilot CLI is unavailable.
+The installer copies package-owned files into `~/.zai` and installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it overwrites the previously installed package-owned content so the home always reflects the latest release. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai does not require a coding-agent CLI.
 
 The installer also adds the install directory to your persistent user `PATH`
 (the Windows user environment, or your shell profile on macOS/Linux) so you can
@@ -88,28 +89,6 @@ run `zai` directly in new terminals. This is idempotent across reinstalls. Open
 a new terminal or restart/source your shell profile to pick up the change.
 
 You may edit the packaged prompt files (the agents and skills under `~/.zai/.copilot`) in place. The installer records a checksum manifest of every file it writes, so on upgrade it replaces unchanged files silently but detects any prompt you modified. When a modified file also changed upstream, it shows an interactive prompt to **back up & install new**, **keep mine**, **overwrite without backup**, or **abort** (with an "apply to all" shortcut). Backups are written under `~/.zai/backups/<timestamp>/`. Non-interactive runs default to keeping your edits; use `--on-conflict` to force a policy.
-
-### Export and import a team runtime
-
-**Export** a portable custom package from selected repository configs, automations,
-agents, skills, both zai Copilot homes' portable settings, and plugin
-installation declarations:
-
-```text
-zai build-custom-package --name team-runtime
-```
-
-The interactive command produces Windows, Linux, and macOS installer scripts
-plus zip/tar archives by default. For repositories that forbid archive files,
-add `--uncompressed` to emit one enclosing plain-file package directory (default
-output root: `custom-package-output/` when `--output-dir` is omitted). To
-**import** the runtime, a recipient runs the matching installer script. It
-installs the latest zai release first, then invokes
-`zai install-custom-package` to validate and apply the shared overlay
-with conflict backups (`--archive` for archive output, `--package-dir` for
-uncompressed output). Machine trust, permissions, OAuth tokens, credentials,
-sessions, databases, logs, runs, states, worktrees, and downloaded plugin
-caches are excluded. See Sharing a custom zai runtime.
 
 ### Updating
 
@@ -123,14 +102,15 @@ The command always uses the published release source without a source-selection 
 
 ## The two run modes
 
-Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Claude Code, and Pi sessions as tabs and split panes on their managed zai homes.
+Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Claude Code, Pi, Codex, and OpenCode sessions as tabs and split panes on their managed zai homes.
 
 | | **Service mode** | **Interactive console mode** |
 |---|---|---|
-| Command | `zai start <all\|service>` | `zai`, `zai copilot`, `zai claude`, or `zai pi` from any folder; each agent verb selects the first tab |
+| Command | `zai start <all\|service>` | `zai`, `zai copilot`, `zai claude`, `zai opencode`, or `zai pi` from any folder; each agent verb selects the first tab |
 | Who drives | A repo-scoped daemon runs the selected deterministic service pollers; matching service agents act on selected items within configured limits | A human, live inside the console TUI multiplexer |
 | Copilot home | `~/.zai/.copilot` | `~/.zai/.copilot` (the same home) |
 | Pi home | `~/.zai/.pi`, launched with `--no-extensions` | `~/.zai/.pi` (the same home), loading the extensions of the Pi packages inherited from `~/.pi/agent` |
+| OpenCode home | `~/.zai/.opencode`, unattended JSON run mode | Same isolated home; normal approvals unless YOLO is enabled |
 | Claude home | `~/.zai/.claude`, unattended print mode | `~/.zai/.claude` (the same home), normal interactive approvals unless console YOLO is enabled |
 | Copilot agent | launched per selected item with `--agent <service>-agent --autopilot --yolo -p <prompt>` | plain/default interactive copilot in each TUI tab or split pane (no service agent auto-launched) |
 | Scope | every packaged agent and skill | every packaged agent and skill |
@@ -165,6 +145,7 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai` | Open the project-based console TUI from any folder on a quiet Welcome tab, without launching an agent. `ctrl+\ n` opens an app. |
 | `zai copilot` | Open the console with Copilot CLI in the first tab (or the config editor when the startup forge project has no config). |
 | `zai pi` | Open the same console with Pi in the first tab; a missing Pi CLI is installed first. |
+| `zai opencode` / `zai oc` | Open OpenCode in the console; use `zai opencode install` and `zai opencode auth login` for setup. See [OpenCode](?id=zai-cli&doc=docs--opencode) for service selection and native differences. |
 | `zai claude` / `zai cc` | Open Claude Code in the same console; install a missing CLI first. |
 | `zai claude install` / `zai claude auth <login\|status\|logout>` | Install Claude Code or manage authentication in its isolated home. |
 | `zai pi install` / `zai pi session` | Install Pi and its default packages, or open one Pi session with managed-worktree liveness. |
@@ -173,8 +154,6 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai service-monitor` | Open the standalone poller and agent monitor TUI. |
 | `zai session:analyze <session-id>` | Build a read-only timeline and cost breakdown for one Copilot session. |
 | `zai config <show\|path\|init\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |
-| `zai notifications teams <setup\|status\|test\|disable>` | Configure private Microsoft Teams notifications. See [Microsoft Teams notifications](?id=zai-cli&doc=docs--teams-notifications). |
-| `zai build-custom-package` | Export a shareable team runtime. See Sharing a custom zai runtime. |
 | `zai repo-harness <eval\|eval-and-fix>` | Score a repository's docs, AI instructions/skills, and test-coverage readiness in an HTML report; `eval-and-fix` also fixes the issues found. |
 | `zai doctor` | Check package layout and the configured coding agent's CLI availability. |
 | `zai update` | Download the latest release and reinstall. |
@@ -183,7 +162,6 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai agent:run <service>` | Invoke one configured service agent for testing; item services need `--url`. |
 | `zai review:validate-comments` | Validate proposed review findings against changed diff lines. |
 | `zai worktree <claim\|release\|cleanup>` | Internal: shared worktree claims used by agent sessions. |
-| `zai install-custom-package` | Internal: import a runtime overlay; run by the generated installer. |
 
 `zai-editor [flags] [file]` and `zai-gitter [directory]` are standalone tools
 shipped beside zai; run either with `--help`.
