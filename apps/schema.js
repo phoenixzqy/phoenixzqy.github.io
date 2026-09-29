@@ -11,6 +11,7 @@ const VIDEO = mediaPath("mp4|webm");
 const VIDEO_TYPES = { mp4: "video/mp4", webm: "video/webm" };
 const INSTALL_COMMAND = /^[\x20-\x7e]+$/;
 const PUBLIC_HTTPS_URL = /^https:\/\/[^\s]+$/;
+const COMPARISON_NOTE_REFERENCE = /\[(\d+)\]/g;
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
@@ -29,6 +30,9 @@ function localizedText(value, label, max = 4000) {
     requireValue(SUPPORTED_LOCALES.includes(locale), `${label} contains an unsupported locale: ${locale}.`);
     text(translation, `${label}.${locale}`, max);
   }
+}
+function localizedStrings(value) {
+  return typeof value === "string" ? [value] : Object.values(value);
 }
 function list(value, label, min = 1, max = 100) {
   requireValue(Array.isArray(value) && value.length >= min && value.length <= max, `${label} must contain ${min}–${max} items.`);
@@ -132,6 +136,8 @@ export function validateCatalog(catalog) {
       object(app.comparison, `${app.id}.comparison`);
       localizedText(app.comparison.intro, "Comparison introduction", 600);
       list(app.comparison.groups, `${app.id}.comparison.groups`, 1, 4);
+      const comparisonReferences = [];
+      let comparisonNoteCount = 0;
       for (const group of app.comparison.groups) {
         object(group, "Comparison group");
         localizedText(group.title, "Comparison group title", 160);
@@ -142,13 +148,27 @@ export function validateCatalog(catalog) {
           object(row, "Comparison row");
           localizedText(row.label, "Comparison row label", 240);
           list(row.values, "Comparison row values", group.columns.length, group.columns.length);
-          row.values.forEach((value) => localizedText(value, "Comparison cell", 240));
+          row.values.forEach((value) => {
+            localizedText(value, "Comparison cell", 240);
+            for (const content of localizedStrings(value)) {
+              for (const match of content.matchAll(COMPARISON_NOTE_REFERENCE)) {
+                requireValue(/^[1-9]\d*$/.test(match[1]),
+                  `Comparison note reference ${match[0]} must be a positive number without leading zeros.`);
+                comparisonReferences.push(Number(match[1]));
+              }
+            }
+          });
         }
         if (group.notes !== undefined) {
           list(group.notes, "Comparison notes", 1, 20);
           group.notes.forEach((note) => localizedText(note, "Comparison note", 1200));
+          comparisonNoteCount += group.notes.length;
         }
       }
+      comparisonReferences.forEach((reference) => requireValue(
+        reference >= 1 && reference <= comparisonNoteCount,
+        `Comparison note reference ${reference} does not identify an app comparison note.`,
+      ));
       object(app.comparison.source, "Comparison source");
       localizedText(app.comparison.source.label, "Comparison source label", 160);
       text(app.comparison.source.url, "Comparison source URL", 500);
