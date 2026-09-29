@@ -480,9 +480,9 @@
             ],
             "rows": [
               {
-                "label": "Installed size (historical pre-stripping build)",
+                "label": "Installed size",
                 "values": [
-                  "89.9 MB",
+                  "72.7 MB",
                   "1,007.7 MB",
                   "610.3 MB",
                   "26.2 MB"
@@ -518,7 +518,7 @@
             ],
             "notes": [
               "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
-              "The zai installed-size value is historical and pre-stripping; current package sizes have not been remeasured. It excludes the coding-agent CLI launched inside zai.",
+              "The zai installed size is the extracted zai-cli 0.1.127 Linux x64 release archive (30.0 MB download), measured on 2026-09-29. It excludes the coding-agent CLI launched inside zai.",
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services."
             ]
           }
@@ -743,8 +743,8 @@
             "zh-CN": "实测体积，并如实说明取舍"
           },
           "description": {
-            "en": "The published Linux comparison measured a 13.6 MiB download and about 25 MiB idle PSS: far below VS Code, while Neovim, micro, and Microsoft Edit remain smaller. The evidence page records versions, method, and limits.",
-            "zh-CN": "已公布的 Linux 对比测得下载包为 13.6 MiB、空闲 PSS 约 25 MiB：远低于 VS Code，但 Neovim、micro 与 Microsoft Edit 仍更小。证据页记录了版本、方法与限制。"
+            "en": "The published Linux comparison measured an 8.2 MiB download and about 25 MiB idle PSS: far below VS Code and a smaller download than Neovim, while micro and Microsoft Edit remain smaller and Neovim uses less memory. The evidence page records versions, method, and limits.",
+            "zh-CN": "已公布的 Linux 对比测得下载包为 8.2 MiB、空闲 PSS 约 25 MiB：远低于 VS Code，下载包也小于 Neovim；但 micro 与 Microsoft Edit 仍更小，Neovim 的内存占用也更低。证据页记录了版本、方法与限制。"
           }
         }
       ],
@@ -948,7 +948,7 @@
               {
                 "label": "Download",
                 "values": [
-                  "13.6 MiB 9",
+                  "8.2 MiB 9",
                   "326.0 MiB",
                   "10.9 MiB",
                   "4.9 MiB",
@@ -958,7 +958,7 @@
               {
                 "label": "On disk",
                 "values": [
-                  "26.1 MiB 9",
+                  "19.8 MiB 9",
                   "961.0 MiB",
                   "34.4 MiB",
                   "12.2 MiB",
@@ -987,8 +987,8 @@
               }
             ],
             "notes": [
-              "zai-editor is much smaller than VS Code, but Neovim, micro, and Microsoft Edit have smaller downloads and lower idle memory. zai-editor bundles browser previews, Git history, themes, and a language-server client.",
-              "The zai-editor size values are historical pre-stripping measurements; current package sizes have not been remeasured.",
+              "zai-editor is much smaller than VS Code and has a smaller download and install than Neovim, but micro and Microsoft Edit are smaller still, and Neovim, micro, and Microsoft Edit use less idle memory. zai-editor bundles browser previews, Git history, themes, and a language-server client.",
+              "The zai-editor download and on-disk values are the published 0.3.1 Linux x64 release archive, measured on 2026-09-29.",
               "VS Code was measured with a folder open and no file open; each terminal editor had one small file open.",
               "Measured on one Linux x64 WSL2 machine in September 2026. Other editors retain strengths not captured by these tables, including Neovim’s modal workflow and plugin ecosystem."
             ]
@@ -1071,8 +1071,8 @@
           "id": "linux",
           "name": "Linux",
           "status": {
-            "en": "x64 and arm64. A single static executable of about 9 MB with no runtime to install. Git must be on PATH.",
-            "zh-CN": "提供 x64 与 arm64 版本。单个约 9 MB 的静态可执行文件，无需安装运行时。PATH 中必须能找到 Git。"
+            "en": "x64 and arm64. A single static executable of about 10 MB with no runtime to install. Git must be on PATH.",
+            "zh-CN": "提供 x64 与 arm64 版本。单个约 10 MB 的静态可执行文件，无需安装运行时。PATH 中必须能找到 Git。"
           }
         },
         {
@@ -1169,8 +1169,8 @@
             "zh-CN": "无需桌面客户端的拉取请求式审阅"
           },
           "description": {
-            "en": "The measured Windows x64 archive is about 5 MB versus a roughly 308 MB GitHub Desktop installer, while zai-gitter runs over SSH and keeps inline review comments in the terminal. Other tools retain strengths such as staging and rebasing.",
-            "zh-CN": "实测 Windows x64 压缩包约 5 MB，而 GitHub Desktop 安装包约 308 MB；zai-gitter 可通过 SSH 运行，并在终端中保留行内审阅批注。其他工具仍有暂存与变基等优势。"
+            "en": "The measured Windows x64 archive is about 4 MB versus a roughly 308 MB GitHub Desktop installer, while zai-gitter runs over SSH and keeps inline review comments in the terminal. Other tools retain strengths such as staging and rebasing.",
+            "zh-CN": "实测 Windows x64 压缩包约 4 MB，而 GitHub Desktop 安装包约 308 MB；zai-gitter 可通过 SSH 运行，并在终端中保留行内审阅批注。其他工具仍有暂存与变基等优势。"
           }
         }
       ],
@@ -1300,7 +1300,7 @@
               {
                 "label": "Windows x64 package size",
                 "values": [
-                  "~5 MB binary archive",
+                  "~4 MB binary archive",
                   "~308 MB installer"
                 ]
               },
@@ -1327,7 +1327,7 @@
               }
             ],
             "notes": [
-              "The published zai-gitter v0.3.0 Windows x64 archive was 5.0 MB with a 9.4 MB executable; current post-stripping packages have not been remeasured.",
+              "The published zai-gitter 0.3.1 Windows x64 archive is 3.8 MB with a 10.6 MB executable, measured on 2026-09-29.",
               "GitHub Desktop figures are for its 3.6.6 Windows x64 installer using Electron 44.",
               "Linux sampling observed about 20 MB RSS and no CPU ticks over 10 idle seconds; this is not a cross-platform performance guarantee."
             ]
