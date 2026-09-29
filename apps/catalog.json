@@ -186,6 +186,16 @@
             "en": "Schedule background runs hourly, daily, weekly, or by cron, and export your configs, agents, and skills as a package others can install.",
             "zh-CN": "可以按小时、按天、按周或以 cron 表达式安排后台任务，并把配置、代理与技能导出为他人可安装的软件包。"
           }
+        },
+        {
+          "title": {
+            "en": "Light on resources",
+            "zh-CN": "资源占用低"
+          },
+          "description": {
+            "en": "The console is a single native process that uses about 40 MiB of memory and about 0.1% of one CPU core at idle, from an install of about 90 MB.",
+            "zh-CN": "控制台是单个原生进程，空闲时约占用 40 MiB 内存和约 0.1% 的单核 CPU，安装体积约 90 MB。"
+          }
         }
       ],
       "documentation": true,
