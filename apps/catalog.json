@@ -480,10 +480,19 @@
             ],
             "rows": [
               {
-                "label": "Installed size (historical pre-stripping build)",
+                "label": "Download",
+                "values": [
+                  "n/a",
+                  "341.8 MB 10",
+                  "216.7 MB",
+                  "26.2 MB"
+                ]
+              },
+              {
+                "label": "On disk (historical pre-stripping zai build)",
                 "values": [
                   "89.9 MB",
-                  "1,007.7 MB",
+                  "1,007.7 MB 10",
                   "610.3 MB",
                   "26.2 MB"
                 ]
@@ -518,7 +527,7 @@
             ],
             "notes": [
               "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
-              "The zai installed-size value is historical and pre-stripping; current package sizes have not been remeasured. It excludes the coding-agent CLI launched inside zai.",
+              "The zai on-disk value is historical and pre-stripping; current package sizes have not been remeasured. zai had no published download artifact in this measurement, and its on-disk size excludes the coding-agent CLI launched inside zai.",
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services."
             ]
           }
@@ -949,7 +958,7 @@
                 "label": "Download",
                 "values": [
                   "13.6 MiB 9",
-                  "326.0 MiB",
+                  "341.8 MB",
                   "10.9 MiB",
                   "4.9 MiB",
                   "0.14 MiB"
@@ -959,7 +968,7 @@
                 "label": "On disk",
                 "values": [
                   "26.1 MiB 9",
-                  "961.0 MiB",
+                  "1,007.7 MB",
                   "34.4 MiB",
                   "12.2 MiB",
                   "0.29 MiB"
@@ -989,7 +998,7 @@
             "notes": [
               "zai-editor is much smaller than VS Code, but Neovim, micro, and Microsoft Edit have smaller downloads and lower idle memory. zai-editor bundles browser previews, Git history, themes, and a language-server client.",
               "The zai-editor size values are historical pre-stripping measurements; current package sizes have not been remeasured.",
-              "VS Code was measured with a folder open and no file open; each terminal editor had one small file open.",
+              "VS Code’s artifact sizes preserve the benchmark’s decimal MB units; the other editors are reported in binary MiB. VS Code was measured with a folder open and no file open; each terminal editor had one small file open.",
               "Measured on one Linux x64 WSL2 machine in September 2026. Other editors retain strengths not captured by these tables, including Neovim’s modal workflow and plugin ecosystem."
             ]
           }
