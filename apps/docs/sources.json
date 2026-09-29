@@ -5,12 +5,13 @@
     {
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
-      "ref": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
-      "commit": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
-      "syncedAt": "2026-09-29T06:13:02Z",
+      "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
+      "syncedAt": "2026-09-29T17:22:06Z",
       "include": [
         "docs/install-and-config.md",
         "docs/getting-started.md",
+        "docs/claude-code.md",
         "docs/services-and-pollers.md",
         "docs/config.md",
         "docs/config/migration-and-backward-compatibility.md",

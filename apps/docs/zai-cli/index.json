@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
-  "commit": "7b96d18fc07bfcdb2d585601cde8ca08fc94d0d4",
+  "ref": "9717218742c9420328ade5d0a98a01be0bf14376",
+  "commit": "9717218742c9420328ade5d0a98a01be0bf14376",
   "documents": [
     {
       "slug": "docs--install-and-config",
@@ -17,7 +17,14 @@
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 13014
+      "bytes": 13463
+    },
+    {
+      "slug": "docs--claude-code",
+      "title": "Claude Code",
+      "source": "docs/claude-code.md",
+      "file": "docs--claude-code.md",
+      "bytes": 6883
     },
     {
       "slug": "docs--services-and-pollers",
@@ -31,7 +38,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 4696
+      "bytes": 4977
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
