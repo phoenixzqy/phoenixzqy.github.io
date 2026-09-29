@@ -15,7 +15,7 @@ let locale = chooseLocale({ search: location.search, saved: savedLocale, languag
 const state = { catalog: null, app: null, manifest: undefined, docs: null, doc: null, error: null };
 let selectedPlatform = "all";
 const t = (key, values) => translate(locale, key, values);
-function appsHref(path = "/apps/", id) {
+function appsHref(path = "/", id) {
   const params = new URLSearchParams();
   if (id) params.set("id", id);
   params.set("lang", locale);

@@ -3,7 +3,7 @@ import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 
 for (const format of ["A4", "Letter"]) {
   test(`${format} PDF retains the complete resume in two unclipped pages`, async ({ page }, testInfo) => {
-    await page.goto("/");
+    await page.goto("/about/");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".earlier-experience")).not.toHaveAttribute("open", "");
     const path = testInfo.outputPath(`resume-${format}.pdf`);

@@ -15,7 +15,7 @@ async function mockLocalizedRelease(page) {
 
 test("Chinese catalog, details, gallery, and downloads have correct localized titles", async ({ page }) => {
   await mockLocalizedRelease(page);
-  await page.goto("/apps/?lang=zh-CN");
+  await page.goto("/?lang=zh-CN");
   await expect(page).toHaveTitle("应用 | Qiyu Zhao");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("小小灵感，实用软件。");
@@ -57,9 +57,9 @@ test("language switching persists, retains app/hash/filter, and updates metadata
   await expect(page.locator(".package-card")).toHaveCount(1);
   await expect(page.locator(".download-link")).toHaveAttribute("href", packageURL);
   await expect(page.locator(".package-info h3")).toHaveText("Windows 预览版");
-  await page.goto("/apps/");
+  await page.goto("/");
   await expect(page).toHaveTitle("应用 | Qiyu Zhao");
-  await page.goto("/apps/?lang=en");
+  await page.goto("/?lang=en");
   await expect(page).toHaveTitle("Apps | Qiyu Zhao");
   await page.getByLabel("Language", { exact: true }).selectOption("en");
   expect(await page.evaluate(() => localStorage.getItem("apps.locale"))).toBe("en");
@@ -71,7 +71,7 @@ test("browser-language selection and denied storage still permit explicit switch
   await page.addInitScript(() => {
     Object.defineProperty(window, "localStorage", { get() { throw new DOMException("Disabled", "SecurityError"); } });
   });
-  await page.goto(`${baseURL}/apps/`);
+  await page.goto(baseURL);
   await expect(page).toHaveTitle("应用 | Qiyu Zhao");
   await page.getByLabel("语言", { exact: true }).selectOption("en");
   await expect(page).toHaveTitle("Apps | Qiyu Zhao");
@@ -121,7 +121,7 @@ test("unpublished, invalid-app, and untranslated publisher content remain explic
 test("Chinese pages fit mobile and retain accessible controls", async ({ page, isMobile }) => {
   await mockLocalizedRelease(page);
   await page.setViewportSize({ width: isMobile ? 320 : 1440, height: 900 });
-  for (const path of ["/apps/?lang=zh-CN", "/apps/app/?id=bplayer&lang=zh-CN", "/apps/releases/?id=bplayer&lang=zh-CN"]) {
+  for (const path of ["/?lang=zh-CN", "/apps/app/?id=bplayer&lang=zh-CN", "/apps/releases/?id=bplayer&lang=zh-CN"]) {
     await page.goto(path);
     await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

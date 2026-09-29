@@ -1,8 +1,9 @@
-# Qiyu Zhao — personal résumé
+# Qiyu Zhao — apps and portfolio
 
-A static, AI-inspired résumé at **https://phoenixzqy.github.io/**. The root
-`index.html` is the GitHub Pages homepage. No build step, application server,
-API keys, or runtime JavaScript dependencies are required.
+A static app catalog at **https://phoenixzqy.github.io/** with the résumé and
+portfolio at `/about/`. The root `index.html` is the GitHub Pages homepage. No
+build step, application server, API keys, or runtime API credentials are
+required.
 
 Contributors: start with [agent coding guidance](AGENTS.md) and the reusable
 [design research](.github/skills/design-research/SKILL.md) and
@@ -37,7 +38,8 @@ Clearing site data also removes other locally stored data for this origin.
 
 ## Apps and downloads
 
-The résumé navigation links to the multi-app catalog at `/apps/`. Shared detail
+The multi-app catalog is the homepage at `/`, with `/apps/` retained as a
+backward-compatible alias. The résumé and portfolio live at `/about/`. Shared detail
 and download pages read `apps/catalog.json` and each app's
 `releases/<id>/latest/manifest.json`. BPlayer is the first entry, with a
 local-first audiobook-player introduction and explicit platform-readiness

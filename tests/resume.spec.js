@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("root homepage contains real resume content and working navigation", async ({ page }) => {
+test("About me page contains real resume content and working navigation", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/about/");
   await expect(page).toHaveTitle("Qiyu Zhao | Engineering the agentic future");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Qiyu Zhao.");
   await expect(page.getByRole("heading", { name: "Microsoft Copilot Tasks", exact: true })).toBeVisible();
@@ -25,7 +25,7 @@ test("layouts fit small and large viewports without horizontal overflow", async 
   const widths = isMobile ? [320, 390, 760] : [768, 1024, 1440, 1920];
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto("/about/");
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -34,7 +34,7 @@ test("layouts fit small and large viewports without horizontal overflow", async 
 
 test("motion respects system preference and can be paused manually", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about/");
   await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
   await expect(page.getByRole("button", { name: "Reduced motion", exact: true })).toBeDisabled();
   const canvas = page.locator("#neural-canvas");
@@ -53,7 +53,7 @@ test("motion respects system preference and can be paused manually", async ({ pa
 
 test("neural artwork animates on screen and pauses outside the viewport", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/about/");
   const canvas = page.locator("#neural-canvas");
   await canvas.scrollIntoViewIfNeeded();
   const firstFrame = await canvas.evaluate((element) => element.toDataURL());
@@ -67,7 +67,7 @@ test("neural artwork animates on screen and pauses outside the viewport", async 
 });
 
 test("keyboard command navigation opens, closes, and transfers focus", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about/");
   await page.keyboard.press("Control+k");
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("dialog").getByRole("link", { name: "About & skills" }).click();
@@ -80,7 +80,7 @@ test("keyboard command navigation opens, closes, and transfers focus", async ({ 
 });
 
 test("print includes all earlier roles and restores collapsed details", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about/");
   await page.evaluate(() => {
     window.print = () => {
       window.dispatchEvent(new Event("beforeprint"));
@@ -99,7 +99,7 @@ test("print includes all earlier roles and restores collapsed details", async ({
 
 test("print keeps company names and dates inside their column at paper widths", async ({ page }) => {
   await page.emulateMedia({ media: "print" });
-  await page.goto("/");
+  await page.goto("/about/");
   await page.evaluate(() => document.fonts.ready);
   // Printable widths for A4 and Letter with the stylesheet's 16mm margins.
   for (const width of [673, 695, 1024]) {
@@ -130,7 +130,7 @@ test("print keeps company names and dates inside their column at paper widths", 
 test("content and static artwork remain usable without JavaScript", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/about/`);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".neural-fallback")).toBeVisible();
   await expect(page.locator(".hero-actions [data-print]")).not.toBeVisible();
@@ -141,7 +141,7 @@ test("content and static artwork remain usable without JavaScript", async ({ bro
 
 test("page and command dialog pass accessibility checks", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about/");
   await page.locator("summary").click();
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
