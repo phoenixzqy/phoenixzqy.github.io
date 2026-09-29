@@ -42,6 +42,14 @@ function fixture() {
     "",
     "`[Inline code](guide_(v2).md)`",
     "",
+    "`Multiline code",
+    "[Sample](guide_(v2).md)",
+    "`",
+    "",
+    "``Code with a single ` inside",
+    "[Another sample](guide_(v2).md)",
+    "``",
+    "",
     "```md",
     "[Fenced code][guide]",
     "```",
@@ -89,6 +97,8 @@ test("documentation sync rewrites Markdown links but leaves code untouched", () 
     assert.match(mirrored, /^Unavailable$/m);
     assert.doesNotMatch(mirrored, /private-notes|^\[private\]:/m);
     assert.match(mirrored, /`\[Inline code\]\(guide_\(v2\)\.md\)`/);
+    assert.match(mirrored, /`Multiline code\n\[Sample\]\(guide_\(v2\)\.md\)\n`/);
+    assert.match(mirrored, /``Code with a single ` inside\n\[Another sample\]\(guide_\(v2\)\.md\)\n``/);
     assert.match(mirrored, /```md\n\[Fenced code\]\[guide\]\n```/);
   } finally {
     rmSync(fixtureRoot, { recursive: true, force: true });

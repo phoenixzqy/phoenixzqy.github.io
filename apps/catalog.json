@@ -455,8 +455,8 @@
           "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并将该文件夹加入用户 PATH。"
         },
         {
-          "en": "Nothing else is required: no Python, Go toolchain, Node.js runtime, or zai installation. Git and language servers stay optional and are never installed for you.",
-          "zh-CN": "无需其他前置条件：不需要 Python、Go 工具链、Node.js 运行时，也不需要安装 zai。Git 与语言服务器始终是可选项，安装脚本不会替你安装它们。"
+          "en": "The macOS/Linux one-line installer requires Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai. Git and language servers stay optional and are never installed for you.",
+          "zh-CN": "macOS/Linux 的一键安装脚本需要 Python 3 来读取发布清单；安装后的可执行文件不需要 Python、Go 工具链、Node.js 运行时或 zai。Git 与语言服务器始终是可选项，安装脚本不会替你安装它们。"
         },
         {
           "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",
@@ -650,8 +650,8 @@
           "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并将该文件夹加入用户 PATH。"
         },
         {
-          "en": "Git must already be installed and on PATH; the installer does not install it. No Python, Go toolchain, Node.js runtime, or zai installation is required.",
-          "zh-CN": "Git 必须已经安装并位于 PATH 中，安装脚本不会替你安装它。无需 Python、Go 工具链、Node.js 运行时或 zai。"
+          "en": "Git must already be installed and on PATH; the installer does not install it. The macOS/Linux one-line installer needs Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai.",
+          "zh-CN": "Git 必须已经安装并位于 PATH 中，安装脚本不会替你安装它。macOS/Linux 的一键安装脚本需要 Python 3 来读取发布清单；安装后的可执行文件不需要 Python、Go 工具链、Node.js 运行时或 zai。"
         },
         {
           "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",

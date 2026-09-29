@@ -170,23 +170,16 @@ function maskCode(markdown) {
       offset += line.length;
       continue;
     }
-    let cursor = 0;
-    while (cursor < content.length) {
-      if (content[cursor] !== "`") {
-        cursor += 1;
-        continue;
-      }
-      let run = 1;
-      while (content[cursor + run] === "`") run += 1;
-      const closing = content.indexOf("`".repeat(run), cursor + run);
-      if (closing < 0) {
-        cursor += run;
-        continue;
-      }
-      for (let i = offset + cursor; i < offset + closing + run; i += 1) masked[i] = " ";
-      cursor = closing + run;
-    }
     offset += line.length;
+  }
+  const runs = [...masked.join("").matchAll(/`+/g)];
+  for (let i = 0; i < runs.length; i += 1) {
+    const closing = runs.findIndex((run, index) => index > i && run[0].length === runs[i][0].length);
+    if (closing < 0) continue;
+    for (let cursor = runs[i].index; cursor < runs[closing].index + runs[closing][0].length; cursor += 1) {
+      if (masked[cursor] !== "\n") masked[cursor] = " ";
+    }
+    i = closing;
   }
   return masked.join("");
 }
