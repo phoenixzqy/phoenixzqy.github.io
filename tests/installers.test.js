@@ -189,6 +189,7 @@ test("the shell installer parses minified manifests with localized asset text", 
       installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
       metadata: {
         assets: [{ file: "not-the-release-asset.zip" }],
+        release: null,
         escaped: "quote: \" slash: \\ unicode: \u2603",
       },
     },

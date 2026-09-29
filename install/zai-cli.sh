@@ -128,21 +128,17 @@ WORK="$(mktemp -d 2>/dev/null || mktemp -d -t zai-install)" ||
 MANIFEST="$WORK/manifest.json"
 download "$MANIFEST_URL" "$MANIFEST"
 
-if grep -Eq '"release"[[:space:]]*:[[:space:]]*null' "$MANIFEST"; then
-  printf '%s\n' "No public release of $DISPLAY_NAME has been published yet." >&2
-  printf '%s\n' "Watch $SITE/apps/app/?id=$APP_ID for the first build." >&2
-  exit 2
-fi
-
 command -v python3 >/dev/null 2>&1 ||
   fail 'python3 is required to read release metadata safely. Install Python 3 and run the command again.'
-if ! ASSET="$(python3 - "$MANIFEST" "$PLATFORM" "$ARCHITECTURE" <<'PY'
+if ASSET="$(python3 - "$MANIFEST" "$PLATFORM" "$ARCHITECTURE" <<'PY'
 import json
 import sys
 
 try:
     with open(sys.argv[1], encoding="utf-8") as manifest_file:
         manifest = json.load(manifest_file)
+    if manifest["release"] is None:
+        raise SystemExit(2)
     assets = manifest["release"]["assets"]
     if not isinstance(assets, list):
         raise TypeError
@@ -170,6 +166,14 @@ except (KeyError, OSError, TypeError, json.JSONDecodeError):
     raise SystemExit(1)
 PY
 )"; then
+  :
+else
+  status=$?
+  if [ "$status" -eq 2 ]; then
+    printf '%s\n' "No public release of $DISPLAY_NAME has been published yet." >&2
+    printf '%s\n' "Watch $SITE/apps/app/?id=$APP_ID for the first build." >&2
+    exit 2
+  fi
   fail "the release manifest at $MANIFEST_URL could not be read as valid JSON."
 fi
 
