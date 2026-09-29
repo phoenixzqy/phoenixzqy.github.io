@@ -10,7 +10,13 @@ import { catalog, releaseFixture, packageBytes } from "./apps-fixtures.js";
 const app = catalog.apps[0];
 
 test("catalog supports additional apps without new page implementations", () => {
-  const otherApp = { ...structuredClone(app), id: "second-app", name: "Second app", screenshots: undefined };
+  const otherApp = {
+    ...structuredClone(app),
+    id: "second-app",
+    name: "Second app",
+    screenshots: undefined,
+    artwork: undefined,
+  };
   assert.equal(validateCatalog({ schemaVersion: 1, apps: [app, otherApp] }).apps.length, 2);
   assert.throws(() => validateCatalog({ schemaVersion: 1, apps: [app, app] }), /unique/);
   assert.throws(() => validateCatalog({ schemaVersion: 2, apps: [app] }), /schemaVersion/);
