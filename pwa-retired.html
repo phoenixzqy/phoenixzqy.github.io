@@ -9,7 +9,7 @@
 <body>
   <h1>The old game has been removed.</h1>
   <p id="status" role="status">Returning to your page with a fresh document.</p>
-  <a href="/">Open the résumé</a>
+  <a href="/">Open About me</a>
   <script>
     try {
       const destination = new URL(decodeURIComponent(location.hash.slice(1)), location.origin);
@@ -19,7 +19,7 @@
       location.replace(destination.href);
     } catch (error) {
       console.error("Could not restore the page after retiring the game worker:", error);
-      document.getElementById("status").textContent = "The return address is invalid. Use the résumé link to continue.";
+      document.getElementById("status").textContent = "The return address is invalid. Use the About me link to continue.";
     }
   </script>
 </body>

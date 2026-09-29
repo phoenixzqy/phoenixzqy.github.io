@@ -205,6 +205,6 @@ test("apps explain the JavaScript requirement without hiding fallback navigation
   const page = await context.newPage();
   await page.goto(`${baseURL}/apps/`);
   await expect(page.getByRole("heading", { name: "Apps by Qiyu Zhao" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Return to the résumé." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return to About me." })).toBeVisible();
   await context.close();
 });

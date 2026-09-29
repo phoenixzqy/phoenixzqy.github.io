@@ -3,9 +3,9 @@ export const SUPPORTED_LOCALES = ["en", "zh-CN"];
 export const messages = {
   en: {
     skip: "Skip to content", homeLabel: "Qiyu Zhao, home", navigation: "Main navigation",
-    resume: "Résumé", apps: "Apps", contact: "Contact", language: "Language",
+    aboutMe: "About me", apps: "Apps", contact: "Contact", language: "Language",
     breadcrumb: "Breadcrumb", home: "HOME", app: "APP", appDetails: "APP DETAILS", downloads: "DOWNLOADS",
-    backResume: "Back to résumé", allApps: "All apps", footer: "Independent apps. Purpose-built.",
+    backAboutMe: "Back to About me", allApps: "All apps", footer: "Independent apps. Purpose-built.",
     releaseFooter: "Download thoughtfully. Verify your build.",
     titleCatalog: "Apps | Qiyu Zhao", titleDetail: "App details | Qiyu Zhao",
     titleReleases: "App downloads | Qiyu Zhao", titleApp: "{name} | Apps by Qiyu Zhao",
@@ -70,9 +70,9 @@ export const messages = {
   },
   "zh-CN": {
     skip: "跳转到正文", homeLabel: "Qiyu Zhao 主页", navigation: "主导航",
-    resume: "个人简历", apps: "应用", contact: "联系", language: "语言",
+    aboutMe: "关于我", apps: "应用", contact: "联系", language: "语言",
     breadcrumb: "面包屑导航", home: "首页", app: "应用", appDetails: "应用详情", downloads: "下载",
-    backResume: "返回简历", allApps: "所有应用", footer: "独立应用，专注实用。",
+    backAboutMe: "返回关于我", allApps: "所有应用", footer: "独立应用，专注实用。",
     releaseFooter: "了解版本，安心下载。",
     titleCatalog: "应用 | Qiyu Zhao", titleDetail: "应用详情 | Qiyu Zhao",
     titleReleases: "应用下载 | Qiyu Zhao", titleApp: "{name} | Qiyu Zhao 的应用",

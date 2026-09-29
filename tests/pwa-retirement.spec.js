@@ -99,9 +99,9 @@ test("retirement redirect rejects external, malformed, and looping destinations"
   for (const destination of ["https://example.invalid/", `${baseURL}/pwa-retired.html`, "%"]) {
     const hash = destination === "%" ? "%" : encodeURIComponent(destination);
     await page.goto(`/pwa-retired.html#${hash}`);
-    await expect(page.getByRole("status")).toHaveText("The return address is invalid. Use the résumé link to continue.");
+    await expect(page.getByRole("status")).toHaveText("The return address is invalid. Use the About me link to continue.");
     await expect(page).toHaveURL(`${baseURL}/pwa-retired.html#${hash}`);
-    await expect(page.getByRole("link", { name: "Open the résumé" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("link", { name: "Open About me" })).toHaveAttribute("href", "/");
   }
 });
 
