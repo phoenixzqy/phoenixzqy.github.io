@@ -168,27 +168,18 @@ test("zai app comparisons render early with every catalog table", async ({ page,
   }
 });
 
-test("zai-cli detail page presents its supplied screenshots and demos", async ({ page, browserName }) => {
-  test.skip(browserName !== "chromium", "zai detail pages include videos that headless WebKit cannot instantiate");
+test("zai-cli detail page presents its supplied screenshot", async ({ page }) => {
   await page.goto("/apps/app/?id=zai-cli&lang=en");
 
   const screenshots = page.locator(".screenshot-card img");
-  await expect(screenshots).toHaveCount(3);
-  await screenshots.nth(2).scrollIntoViewIfNeeded();
-  await expect(screenshots.nth(0)).toHaveJSProperty("naturalWidth", 4368);
-  await expect(screenshots.nth(1)).toHaveJSProperty("naturalWidth", 600);
-  await expect(screenshots.nth(2)).toHaveJSProperty("naturalWidth", 3840);
-  await expect(screenshots.nth(0)).toHaveAttribute("alt", "Project initialization in the zai console.");
-
-  const videos = page.locator(".video-player");
-  await expect(videos).toHaveCount(2);
-  await expect(videos.nth(0).locator("source")).toHaveAttribute("src", "/apps/media/zai-cli/zai-cli-themes.mp4");
-  await expect(videos.nth(1).locator("source")).toHaveAttribute("src", "/apps/media/zai-cli/zai-cli-seven-agent-sessions.mp4");
-  await expect(page.locator(".video-caption h3").first()).toHaveText("Changing console themes");
+  await expect(screenshots).toHaveCount(1);
+  await screenshots.first().scrollIntoViewIfNeeded();
+  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 600);
+  await expect(screenshots.first()).toHaveAttribute("alt", "A real-time coding-agent status hint in the zai console.");
+  await expect(page.locator(".video-player")).toHaveCount(0);
 
   await page.goto("/apps/app/?id=zai-cli&lang=zh-CN");
-  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台中的项目初始化界面。");
-  await expect(page.locator(".video-caption h3").first()).toHaveText("切换控制台主题");
+  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台中的编码代理实时状态提示。");
 });
 
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {
