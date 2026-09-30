@@ -175,7 +175,7 @@ test("zai-cli detail page presents its supplied screenshots and demos", async ({
   const screenshots = page.locator(".screenshot-card img");
   await expect(screenshots).toHaveCount(3);
   await expect(page.locator(".screenshot-card.screenshot-row")).toHaveCount(3);
-  await expect(page.locator(".screenshot-card").nth(2)).toHaveClass(/screenshot-compact/);
+  await expect(page.locator(".screenshot-card").nth(1)).toHaveClass(/screenshot-compact/);
   await screenshots.first().scrollIntoViewIfNeeded();
   await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 2560);
   await expect(screenshots.first()).toHaveAttribute("alt", "The zai console Welcome screen with the new-tab app picker open.");

@@ -251,19 +251,6 @@
           "height": 1164
         },
         {
-          "src": "/apps/media/zai-cli/zai-cli-working-with-managed-worktrees.webp",
-          "alt": {
-            "en": "The zai console showing managed worktrees shared by humans and agents.",
-            "zh-CN": "zai 控制台展示由人和代理共享的托管工作树。"
-          },
-          "caption": {
-            "en": "Working with managed worktrees",
-            "zh-CN": "使用托管工作树"
-          },
-          "width": 2560,
-          "height": 1392
-        },
-        {
           "src": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
           "alt": {
             "en": "A real-time coding-agent status hint in the zai console.",
@@ -275,6 +262,19 @@
           },
           "width": 600,
           "height": 376
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-working-with-managed-worktrees.webp",
+          "alt": {
+            "en": "The zai console showing managed worktrees shared by humans and agents.",
+            "zh-CN": "zai 控制台展示由人和代理共享的托管工作树。"
+          },
+          "caption": {
+            "en": "Working with managed worktrees",
+            "zh-CN": "使用托管工作树"
+          },
+          "width": 2560,
+          "height": 1392
         }
       ],
       "platforms": [
