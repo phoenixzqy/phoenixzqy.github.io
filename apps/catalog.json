@@ -380,8 +380,8 @@
             "zh-CN": "实测控制台基线，而非完整代理环境"
           },
           "description": {
-            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The README separates the Linux baselines from native Windows GitHub Copilot app first-run observations; it does not rank complete AI setups.",
-            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。README 将 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测分开列出，并不对完整 AI 编码环境排名。"
+            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The comparison distinguishes Linux baselines from native Windows GitHub Copilot app first-run observations; it does not rank complete AI setups.",
+            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。对比区分 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测，并不对完整 AI 编码环境排名。"
           }
         }
       ],
@@ -440,7 +440,7 @@
               "zh-CN": "工作空间能力"
             },
             "columns": [
-              "zai",
+              "zai-cli (your pick of coding agent)",
               "VS Code",
               "GitHub Copilot app",
               "Orca",
@@ -452,7 +452,7 @@
                 "values": [
                   "Native Go",
                   "Electron",
-                  "Desktop app [5]",
+                  "Desktop app; stack unverified [5]",
                   "Electron",
                   "Native Rust"
                 ]
@@ -472,7 +472,7 @@
                 "values": [
                   "✓",
                   "✓",
-                  "Not evaluated [5]",
+                  "✓ [5]",
                   "✓",
                   "—"
                 ]
@@ -482,7 +482,7 @@
                 "values": [
                   "✓",
                   "✓",
-                  "Not evaluated [5]",
+                  "Not documented in editor [5]",
                   "— [3]",
                   "—"
                 ]
@@ -502,7 +502,7 @@
                 "values": [
                   "✓",
                   "—",
-                  "GitHub workflow [5]",
+                  "GitHub agent merge; Azure DevOps lifecycle unverified [5]",
                   "—",
                   "—"
                 ]
@@ -513,7 +513,7 @@
               "Orca's SSH worktrees are driven from its desktop or mobile app.",
               "Orca's public editor documentation does not describe language-server support.",
               "Orca documents creating a worktree per task plus archive/delete cleanup; it does not describe returning released checkouts to a shared reusable pool or recovering stale session claims.",
-              "GitHub's app overview, checked on 2026-09-30, describes a desktop workspace built on Copilot CLI, parallel worktrees, scheduled automations, and GitHub PR workflows, not its UI implementation stack or zai's dual-forge service/pool contract. Editor and language-server capabilities were not tested; unknown does not mean absent."
+              "Checked on 2026-09-30: https://github.com/github/app/blob/main/changelog.md documents built-in editor canvases (1.1.13), a code editor with line numbers and syntax highlighting (1.1.15), and code-editor fixes (1.1.21). https://docs.github.com/en/copilot/concepts/agents/github-copilot-app confirms a desktop app built on Copilot CLI, parallel worktrees, and scheduled automations. https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests documents background agent merge that fixes blockers and merges when GitHub allows. The agent-session guide permits Azure DevOps Git URL clones, but native Azure DevOps work-item/PR lifecycle support is unverified. Editor LSP, the UI implementation stack, and a claimed/released reusable pool with stale-session recovery remain unverified; Copilot CLI's documented LSP tools do not establish editor LSP support. These are documentation findings, not hands-on tests; unknown does not mean absent."
             ]
           },
           {
@@ -568,12 +568,13 @@
           },
           {
             "title": {
-              "en": "Linux workspace baselines",
-              "zh-CN": "Linux 工作空间基线"
+              "en": "Workspace footprint observations (Linux / Windows)",
+              "zh-CN": "工作空间资源观测（Linux / Windows）"
             },
             "columns": [
-              "zai",
+              "zai-cli (your pick of coding agent)",
               "VS Code",
+              "GitHub Copilot app",
               "Orca",
               "herdr"
             ],
@@ -581,118 +582,100 @@
               {
                 "label": "Download",
                 "values": [
-                  "30.0 MB",
-                  "341.8 MB",
-                  "216.7 MB",
-                  "26.2 MB"
+                  "30.0 MB (Linux x64) [8]",
+                  "341.8 MB (Linux)",
+                  "264.6 MB (Windows x64 installer) [10]",
+                  "216.7 MB (Linux)",
+                  "26.2 MB (Linux)"
                 ]
               },
               {
                 "label": "On disk",
                 "values": [
-                  "72.7 MB",
-                  "1,007.7 MB",
-                  "610.3 MB",
-                  "26.2 MB"
+                  "72.7 MB (Linux; workspace only) [8]",
+                  "1,007.7 MB (Linux)",
+                  "640.2 MB (Windows; app + SDK CLI cache) [11]",
+                  "610.3 MB (Linux)",
+                  "26.2 MB (Linux)"
                 ]
               },
               {
-                "label": "Idle memory (PSS)",
+                "label": "Linux idle memory (PSS)",
                 "values": [
                   "≈ 40 MiB",
                   "745.9 MiB",
+                  "Not measured on Linux",
                   "≈ 543 MiB",
                   "≈ 23 MiB"
                 ]
               },
               {
-                "label": "Idle CPU (one core)",
+                "label": "Windows first-run private memory (USS, tree endpoints)",
+                "values": [
+                  "Not measured on Windows",
+                  "Not measured on Windows",
+                  "687.6–959.5 MiB [11]",
+                  "Not measured on Windows",
+                  "Not measured on Windows"
+                ]
+              },
+              {
+                "label": "Windows first-run working set (summed RSS, tree endpoints)",
+                "values": [
+                  "Not measured on Windows",
+                  "Not measured on Windows",
+                  "2,073.0–2,615.3 MiB [11]",
+                  "Not measured on Windows",
+                  "Not measured on Windows"
+                ]
+              },
+              {
+                "label": "Linux idle CPU (one core)",
                 "values": [
                   "0.07–0.15%",
                   "≥ 7.1%",
+                  "Not measured on Linux",
                   "0.3%",
                   "0.5–0.6%"
                 ]
               },
               {
-                "label": "Idle processes",
+                "label": "Windows first-run app root CPU (one core)",
                 "values": [
-                  "1",
-                  "13",
-                  "8",
-                  "3"
+                  "Not measured on Windows",
+                  "Not measured on Windows",
+                  "0.34–0.39% (app root only) [10]",
+                  "Not measured on Windows",
+                  "Not measured on Windows"
+                ]
+              },
+              {
+                "label": "Windows first-run descendant CPU (one core, lower bound)",
+                "values": [
+                  "Not measured on Windows",
+                  "Not measured on Windows",
+                  "0.03–0.60% (observed descendants only) [12]",
+                  "Not measured on Windows",
+                  "Not measured on Windows"
+                ]
+              },
+              {
+                "label": "Observed processes (Linux idle / Windows first-run)",
+                "values": [
+                  "1 (Linux idle)",
+                  "13 (Linux idle)",
+                  "11–13 (Windows first-run) [10]",
+                  "8 (Linux idle)",
+                  "3 (Linux idle)"
                 ]
               }
             ],
             "notes": [
               "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
               "The zai download and on-disk sizes are from the zai-cli 0.1.127 Linux x64 release archive, measured on 2026-09-29. The on-disk size excludes the coding-agent CLI, and the idle console has no agent running. These are workspace-only figures, not full AI setup totals.",
-              "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services."
-            ]
-          },
-          {
-            "title": {
-              "en": "GitHub Copilot app: native Windows first-run",
-              "zh-CN": "GitHub Copilot 应用：原生 Windows 首次启动观测"
-            },
-            "columns": [
-              "GitHub Copilot app",
-              "Measurement scope"
-            ],
-            "rows": [
-              {
-                "label": "Windows x64 installer",
-                "values": [
-                  "264.6 MB",
-                  "Windows x64 setup executable"
-                ]
-              },
-              {
-                "label": "App install + provisioned SDK CLI cache",
-                "values": [
-                  "640.2 MB",
-                  "488.3 MB app + 151.9 MB SDK cache; shared runtimes and user data excluded"
-                ]
-              },
-              {
-                "label": "Private memory (USS, tree endpoints)",
-                "values": [
-                  "687.6–959.5 MiB",
-                  "Private memory of the root and surviving observed descendants"
-                ]
-              },
-              {
-                "label": "Working set (summed RSS, tree endpoints)",
-                "values": [
-                  "2,073.0–2,615.3 MiB",
-                  "Summed working sets can double-count shared pages"
-                ]
-              },
-              {
-                "label": "App root CPU (one core)",
-                "values": [
-                  "0.34–0.39%",
-                  "App root only; 100% means one logical CPU"
-                ]
-              },
-              {
-                "label": "Observed descendant CPU (one core, lower bound)",
-                "values": [
-                  "0.03–0.60%",
-                  "Observed descendants only; exit tails and short-lived children may be missed"
-                ]
-              },
-              {
-                "label": "Observed processes",
-                "values": [
-                  "11–13",
-                  "App, WebView2, SDK CLI helpers, and console hosts"
-                ]
-              }
-            ],
-            "notes": [
-              "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; SDK CLI 1.0.90-0 helpers are included in the observed tree.",
-              "Installed files total 488.3 MB for the app plus 151.9 MB for its provisioned SDK CLI cache, excluding shared WebView2/runtime files and user data. Summed RSS can double-count shared pages; USS is private memory, not Linux PSS. These Windows results must not be ranked against the Linux table.",
+              "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services.",
+              "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; the tree includes the app, WebView2, SDK CLI 1.0.90-0 helpers, and console hosts. CPU percentages use one logical core (100%).",
+              "Installed files total 488.3 MB for the app plus 151.9 MB for its provisioned SDK CLI cache, excluding shared WebView2/runtime files and user data. USS covers the root and surviving observed descendants. Summed RSS can double-count shared pages; USS is private memory, not Linux PSS. The Windows and Linux observations share columns for reference only, not a like-for-like ranking.",
               "Two descendant processes exited during trial 2; observed child CPU is a lower bound. The changing tree is a first-run observation, not a stable signed-in workspace or active coding-task benchmark. The README links all per-trial results, methodology, and gaps."
             ]
           }

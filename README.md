@@ -159,6 +159,28 @@ workspace-only PSS baselines remain separate from Windows USS/RSS observations,
 and selected CLI/runtime requirements are explicit. No complete-setup ranking,
 untested editor/LSP absence, or inferred UI implementation stack is claimed.
 
+The subsequent September 30, 2026 revision for #22 integrates Copilot's
+Windows observations into the existing zai-cli/VS Code/Orca/herdr footprint
+comparison rather than a standalone section. Platform-specific memory and CPU
+rows retain their distinct scopes; sharing columns does not make them comparable.
+The author's clarification confines the change to the Orca/herdr contents on the
+zai-cli page, not new third-party app pages.
+
+Public sources accessed September 30, 2026 substantiate the revised Copilot
+capability cells:
+
+| Source | Verified observation and limits |
+| --- | --- |
+| [Official app changelog](https://github.com/github/app/blob/main/changelog.md) | Versions 1.1.13, 1.1.15, and 1.1.21 document built-in editor canvases, a code editor with line numbers and syntax highlighting, and code-editor fixes. This supports the built-in editor cell without claiming tested feature parity. |
+| [App overview](https://docs.github.com/en/copilot/concepts/agents/github-copilot-app) | Desktop app built on Copilot CLI, supported on macOS/Linux/Windows, with isolated parallel worktrees and scheduled automations. It does not establish the UI implementation stack or a claimed/released reusable worktree pool with stale-session recovery. |
+| [Agent-session guide](https://docs.github.com/en/copilot/how-tos/github-copilot-app/agent-sessions) | Git URL cloning supports repositories outside GitHub, including Azure DevOps. Cloning is not evidence of native Azure DevOps work-item/PR lifecycle support. |
+| [Issues and pull requests guide](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests) | GitHub issue sessions, PR reviews, review/CI fixes, and background agent merge that survives restarts and merges when GitHub permits. Native Azure DevOps lifecycle support remains unverified. |
+| [Copilot CLI LSP guide](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/lsp-servers) | Language-server code intelligence is documented for the agent's CLI tools, not proven for the app's built-in editor. Editor LSP remains explicitly undocumented in the reviewed sources, not asserted absent. |
+
+These are documentation findings, not hands-on Copilot app evaluations. The
+earlier authorized Windows measurements are retained unchanged in value and
+scope; no new benchmark or inferred complete-setup ranking is introduced.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online
