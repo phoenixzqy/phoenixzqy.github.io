@@ -33,7 +33,7 @@ test("homepage is the catalog and links to BPlayer details and unpublished downl
   await expect(detailLogo).toHaveJSProperty("naturalWidth", 413);
   await expect(detailLogo).toHaveJSProperty("naturalHeight", 180);
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "One library, shaped to the screen." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A look inside." })).toBeVisible();
   await expect(page.locator(".screenshot-card img")).toHaveCount(2);
   await expect(page.locator(".screenshot-card img").first()).toHaveJSProperty("naturalWidth", 2560);
   await expect(page.locator(".screenshot-card img").last()).toHaveJSProperty("naturalWidth", 780);
@@ -166,6 +166,20 @@ test("zai app comparisons render early with every catalog table", async ({ page,
     });
     expect(isEarly).toBe(true);
   }
+});
+
+test("zai-cli detail page presents its supplied screenshot", async ({ page }) => {
+  await page.goto("/apps/app/?id=zai-cli&lang=en");
+
+  const screenshots = page.locator(".screenshot-card img");
+  await expect(screenshots).toHaveCount(1);
+  await screenshots.first().scrollIntoViewIfNeeded();
+  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 600);
+  await expect(screenshots.first()).toHaveAttribute("alt", "A real-time coding-agent status hint in the zai console.");
+  await expect(page.locator(".video-player")).toHaveCount(0);
+
+  await page.goto("/apps/app/?id=zai-cli&lang=zh-CN");
+  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台中的编码代理实时状态提示。");
 });
 
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {

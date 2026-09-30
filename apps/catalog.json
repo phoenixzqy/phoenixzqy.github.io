@@ -236,6 +236,21 @@
         "width": 414,
         "height": 164
       },
+      "screenshots": [
+        {
+          "src": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
+          "alt": {
+            "en": "A real-time coding-agent status hint in the zai console.",
+            "zh-CN": "zai 控制台中的编码代理实时状态提示。"
+          },
+          "caption": {
+            "en": "Real-time coding-agent status hint",
+            "zh-CN": "编码代理实时状态提示"
+          },
+          "width": 600,
+          "height": 376
+        }
+      ],
       "platforms": [
         {
           "id": "linux",

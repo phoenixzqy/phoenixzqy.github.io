@@ -117,9 +117,10 @@ paraphrase the app author's supplied README material; the comparison sections
 link back to those public README evidence and methodology sections. The
 allowlisted user documentation has source commit identifiers in
 `apps/docs/sources.json`. The app author supplied the wordmark and demo
-recordings for this public-site PR. The video captions describe the recordings
-rather than claiming independent product benchmarks; no private source,
-contributor instructions, or unpublished packages belong in the public mirror.
+recordings for the site. For the September 30, 2026 update, the author also
+supplied a zai-cli status-hint screenshot for the app detail page. No private
+source, contributor instructions, or unpublished packages belong in the public
+mirror.
 
 For the September 29, 2026 zai positioning refresh, the public
 [herdr README](https://github.com/herdrdev/herdr) and
