@@ -376,12 +376,12 @@
         },
         {
           "title": {
-            "en": "Measured lighter than desktop workspaces",
-            "zh-CN": "实测比桌面工作空间更轻"
+            "en": "Measured console baseline, not a full agent setup",
+            "zh-CN": "实测控制台基线，而非完整代理环境"
           },
           "description": {
-            "en": "On the published Linux test machine, zai idled at about 40 MiB PSS and one process. The README records the full method and side-by-side VS Code, Orca, and herdr measurements.",
-            "zh-CN": "在已公布的 Linux 测试机上，zai 空闲时约占 40 MiB PSS，只有一个进程。README 记录了完整方法，以及与 VS Code、Orca 和 herdr 的并列测量。"
+            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The README separates the Linux baselines from native Windows GitHub Copilot app first-run observations; it does not rank complete AI setups.",
+            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。README 将 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测分开列出，并不对完整 AI 编码环境排名。"
           }
         }
       ],
@@ -430,8 +430,8 @@
       ],
       "comparison": {
         "intro": {
-          "en": "zai combines a terminal-native multi-agent workspace with an editor, language servers, reusable worktrees, diff review, and delivery services. The footprint table reports one Linux test machine, not a universal benchmark.",
-          "zh-CN": "zai 把终端原生的多代理工作空间、编辑器、语言服务器、可复用工作树、差异审阅与交付服务整合在一起。体积与资源数据来自一台 Linux 测试机，并非通用基准。"
+          "en": "zai is a terminal workspace and delivery harness for a separately installed coding-agent CLI. Orca, herdr, and GitHub Copilot app are agent-workspace peers; VS Code is a broader editor/IDE. Copilot app is built on Copilot CLI and also documents parallel worktrees, scheduled automations, and GitHub PR workflows. The Linux workspace baselines and native Windows first-run observations below use different environments and memory metrics: do not rank them together or infer a complete AI-workflow winner.",
+          "zh-CN": "zai 是终端工作空间与交付工具，需要配合另行安装的编码代理 CLI。Orca、herdr 和 GitHub Copilot 应用属于同类代理工作空间；VS Code 则是功能更广的编辑器/IDE。Copilot 应用基于 Copilot CLI，也提供并行工作树、定时自动化和 GitHub PR 工作流。下方 Linux 工作空间基线与原生 Windows 首次启动观测的环境和内存指标不同，不能混合排名，也不能据此判断完整 AI 工作流的优劣。"
         },
         "groups": [
           {
@@ -442,6 +442,7 @@
             "columns": [
               "zai",
               "VS Code",
+              "GitHub Copilot app",
               "Orca",
               "herdr"
             ],
@@ -451,6 +452,7 @@
                 "values": [
                   "Native Go",
                   "Electron",
+                  "Desktop app [5]",
                   "Electron",
                   "Native Rust"
                 ]
@@ -460,6 +462,7 @@
                 "values": [
                   "✓",
                   "— [1]",
+                  "—",
                   "— [2]",
                   "✓"
                 ]
@@ -469,6 +472,7 @@
                 "values": [
                   "✓",
                   "✓",
+                  "Not evaluated [5]",
                   "✓",
                   "—"
                 ]
@@ -478,6 +482,7 @@
                 "values": [
                   "✓",
                   "✓",
+                  "Not evaluated [5]",
                   "— [3]",
                   "—"
                 ]
@@ -487,6 +492,7 @@
                 "values": [
                   "✓",
                   "—",
+                  "Not documented [5]",
                   "— [4]",
                   "—"
                 ]
@@ -496,6 +502,7 @@
                 "values": [
                   "✓",
                   "—",
+                  "GitHub workflow [5]",
                   "—",
                   "—"
                 ]
@@ -505,13 +512,64 @@
               "VS Code Remote - SSH runs the desktop app locally and installs VS Code Server on the remote host.",
               "Orca's SSH worktrees are driven from its desktop or mobile app.",
               "Orca's public editor documentation does not describe language-server support.",
-              "Orca documents creating a worktree per task plus archive/delete cleanup; it does not describe returning released checkouts to a shared reusable pool or recovering stale session claims."
+              "Orca documents creating a worktree per task plus archive/delete cleanup; it does not describe returning released checkouts to a shared reusable pool or recovering stale session claims.",
+              "GitHub's app overview, checked on 2026-09-30, describes a desktop workspace built on Copilot CLI, parallel worktrees, scheduled automations, and GitHub PR workflows, not its UI implementation stack or zai's dual-forge service/pool contract. Editor and language-server capabilities were not tested; unknown does not mean absent."
             ]
           },
           {
             "title": {
-              "en": "Measured footprint",
-              "zh-CN": "实测资源占用"
+              "en": "The separately installed coding-agent layer",
+              "zh-CN": "另行安装的编码代理层"
+            },
+            "columns": [
+              "Command",
+              "Integration requirements"
+            ],
+            "rows": [
+              {
+                "label": "GitHub Copilot CLI",
+                "values": [
+                  "copilot",
+                  "Separate CLI installation and Copilot authentication"
+                ]
+              },
+              {
+                "label": "Codex",
+                "values": [
+                  "codex",
+                  "Hook-capable codex-evo fork; stock upstream Codex is not the current adapter target"
+                ]
+              },
+              {
+                "label": "Pi",
+                "values": [
+                  "pi",
+                  "CLI and provider credentials; npm installation also requires Node.js"
+                ]
+              },
+              {
+                "label": "Claude Code",
+                "values": [
+                  "claude",
+                  "2.1.281+ and separate authentication"
+                ]
+              },
+              {
+                "label": "OpenCode",
+                "values": [
+                  "opencode",
+                  "1.18.33+ and provider authentication; first launch can install the official npm package"
+                ]
+              }
+            ],
+            "notes": [
+              "Choose one agent; all five are not required. A working setup includes the workspace, chosen CLI/runtime, language servers/extensions, and terminal host where applicable; count shared installations once. Standalone CLI sizes and matched active-task CPU/memory have not been measured here. VS Code's fresh-profile baseline has no agent extension, while Copilot app's first-run tree already includes SDK CLI helpers."
+            ]
+          },
+          {
+            "title": {
+              "en": "Linux workspace baselines",
+              "zh-CN": "Linux 工作空间基线"
             },
             "columns": [
               "zai",
@@ -568,8 +626,74 @@
             ],
             "notes": [
               "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
-              "The zai download and on-disk sizes are from the zai-cli 0.1.127 Linux x64 release archive, measured on 2026-09-29. The on-disk size excludes the coding-agent CLI launched inside zai.",
+              "The zai download and on-disk sizes are from the zai-cli 0.1.127 Linux x64 release archive, measured on 2026-09-29. The on-disk size excludes the coding-agent CLI, and the idle console has no agent running. These are workspace-only figures, not full AI setup totals.",
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services."
+            ]
+          },
+          {
+            "title": {
+              "en": "GitHub Copilot app: native Windows first-run",
+              "zh-CN": "GitHub Copilot 应用：原生 Windows 首次启动观测"
+            },
+            "columns": [
+              "GitHub Copilot app",
+              "Measurement scope"
+            ],
+            "rows": [
+              {
+                "label": "Windows x64 installer",
+                "values": [
+                  "264.6 MB",
+                  "Windows x64 setup executable"
+                ]
+              },
+              {
+                "label": "App install + provisioned SDK CLI cache",
+                "values": [
+                  "640.2 MB",
+                  "488.3 MB app + 151.9 MB SDK cache; shared runtimes and user data excluded"
+                ]
+              },
+              {
+                "label": "Private memory (USS, tree endpoints)",
+                "values": [
+                  "687.6–959.5 MiB",
+                  "Private memory of the root and surviving observed descendants"
+                ]
+              },
+              {
+                "label": "Working set (summed RSS, tree endpoints)",
+                "values": [
+                  "2,073.0–2,615.3 MiB",
+                  "Summed working sets can double-count shared pages"
+                ]
+              },
+              {
+                "label": "App root CPU (one core)",
+                "values": [
+                  "0.34–0.39%",
+                  "App root only; 100% means one logical CPU"
+                ]
+              },
+              {
+                "label": "Observed descendant CPU (one core, lower bound)",
+                "values": [
+                  "0.03–0.60%",
+                  "Observed descendants only; exit tails and short-lived children may be missed"
+                ]
+              },
+              {
+                "label": "Observed processes",
+                "values": [
+                  "11–13",
+                  "App, WebView2, SDK CLI helpers, and console hosts"
+                ]
+              }
+            ],
+            "notes": [
+              "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; SDK CLI 1.0.90-0 helpers are included in the observed tree.",
+              "Installed files total 488.3 MB for the app plus 151.9 MB for its provisioned SDK CLI cache, excluding shared WebView2/runtime files and user data. Summed RSS can double-count shared pages; USS is private memory, not Linux PSS. These Windows results must not be ranked against the Linux table.",
+              "Two descendant processes exited during trial 2; observed child CPU is a lower bound. The changing tree is a first-run observation, not a stable signed-in workspace or active coding-task benchmark. The README links all per-trial results, methodology, and gaps."
             ]
           }
         ],
@@ -578,7 +702,7 @@
             "en": "Read the complete comparison and benchmark method on GitHub ↗",
             "zh-CN": "在 GitHub 阅读完整对比与基准方法 ↗"
           },
-          "url": "https://github.com/phoenixzqy/zai-cli#how-it-compares"
+          "url": "https://github.com/phoenixzqy/zai-cli#how-zai-compares"
         }
       },
       "videos": [

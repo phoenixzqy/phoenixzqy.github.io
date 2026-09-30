@@ -148,6 +148,17 @@ zai workflow support from native CLI feature identity, states the 1.18.33+
 requirement, and discloses the missing blocking stop-hook equivalent.
 No credentials, private implementation, or unpublished package is published.
 
+The September 30, 2026 Copilot app comparison refresh follows the author's
+authorized [zai-cli README update](https://github.com/phoenixzqy/zai-cli/pull/136)
+at revision `f8cd4947cb1c10eb1aba2456b21643241ca3df77` and its benchmark report.
+The [official GitHub Copilot app overview](https://docs.github.com/en/copilot/concepts/agents/github-copilot-app),
+accessed on that date, verifies its parallel worktrees, scheduled automations,
+and GitHub PR workflow. Only sanitized native Windows first-run summaries are
+repeated here; raw process reports and local paths are not published. Linux
+workspace-only PSS baselines remain separate from Windows USS/RSS observations,
+and selected CLI/runtime requirements are explicit. No complete-setup ranking,
+untested editor/LSP absence, or inferred UI implementation stack is claimed.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online
