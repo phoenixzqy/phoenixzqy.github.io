@@ -33,7 +33,7 @@ test("homepage is the catalog and links to BPlayer details and unpublished downl
   await expect(detailLogo).toHaveJSProperty("naturalWidth", 413);
   await expect(detailLogo).toHaveJSProperty("naturalHeight", 180);
   await expect(page.getByText("English & Simplified Chinese", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "One library, shaped to the screen." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A look inside." })).toBeVisible();
   await expect(page.locator(".screenshot-card img")).toHaveCount(2);
   await expect(page.locator(".screenshot-card img").first()).toHaveJSProperty("naturalWidth", 2560);
   await expect(page.locator(".screenshot-card img").last()).toHaveJSProperty("naturalWidth", 780);
@@ -166,6 +166,29 @@ test("zai app comparisons render early with every catalog table", async ({ page,
     });
     expect(isEarly).toBe(true);
   }
+});
+
+test("zai-cli detail page presents its supplied screenshots and demos", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "zai detail pages include videos that headless WebKit cannot instantiate");
+  await page.goto("/apps/app/?id=zai-cli&lang=en");
+
+  const screenshots = page.locator(".screenshot-card img");
+  await expect(screenshots).toHaveCount(3);
+  await screenshots.nth(2).scrollIntoViewIfNeeded();
+  await expect(screenshots.nth(0)).toHaveJSProperty("naturalWidth", 4368);
+  await expect(screenshots.nth(1)).toHaveJSProperty("naturalWidth", 600);
+  await expect(screenshots.nth(2)).toHaveJSProperty("naturalWidth", 3840);
+  await expect(screenshots.nth(0)).toHaveAttribute("alt", "Project initialization in the zai console.");
+
+  const videos = page.locator(".video-player");
+  await expect(videos).toHaveCount(2);
+  await expect(videos.nth(0).locator("source")).toHaveAttribute("src", "/apps/media/zai-cli/zai-cli-themes.mp4");
+  await expect(videos.nth(1).locator("source")).toHaveAttribute("src", "/apps/media/zai-cli/zai-cli-seven-agent-sessions.mp4");
+  await expect(page.locator(".video-caption h3").first()).toHaveText("Changing console themes");
+
+  await page.goto("/apps/app/?id=zai-cli&lang=zh-CN");
+  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台中的项目初始化界面。");
+  await expect(page.locator(".video-caption h3").first()).toHaveText("切换控制台主题");
 });
 
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {

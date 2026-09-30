@@ -236,6 +236,77 @@
         "width": 414,
         "height": 164
       },
+      "screenshots": [
+        {
+          "src": "/apps/media/zai-cli/zai-cli-app-init-page.png",
+          "alt": {
+            "en": "Project initialization in the zai console.",
+            "zh-CN": "zai 控制台中的项目初始化界面。"
+          },
+          "caption": {
+            "en": "Project setup in the console",
+            "zh-CN": "在控制台中初始化项目"
+          },
+          "width": 4368,
+          "height": 1986
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
+          "alt": {
+            "en": "A real-time coding-agent status hint in the zai console.",
+            "zh-CN": "zai 控制台中的编码代理实时状态提示。"
+          },
+          "caption": {
+            "en": "Real-time coding-agent status hint",
+            "zh-CN": "编码代理实时状态提示"
+          },
+          "width": 600,
+          "height": 376
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-working-with-managed-worktrees.png",
+          "alt": {
+            "en": "The zai console showing managed worktrees.",
+            "zh-CN": "zai 控制台中的托管工作树界面。"
+          },
+          "caption": {
+            "en": "Working with managed worktrees",
+            "zh-CN": "使用托管工作树"
+          },
+          "width": 3840,
+          "height": 2088
+        }
+      ],
+      "videos": [
+        {
+          "src": "/apps/media/zai-cli/zai-cli-themes.mp4",
+          "poster": "/apps/media/zai-cli/zai-cli-app-init-page.png",
+          "title": {
+            "en": "Changing console themes",
+            "zh-CN": "切换控制台主题"
+          },
+          "caption": {
+            "en": "A recording of the zai console's built-in theme picker.",
+            "zh-CN": "zai 控制台内置主题选择器的录屏。"
+          },
+          "width": 4368,
+          "height": 1986
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-seven-agent-sessions.mp4",
+          "poster": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
+          "title": {
+            "en": "Seven coding-agent sessions in one workspace",
+            "zh-CN": "一个工作空间中的七个编码代理会话"
+          },
+          "caption": {
+            "en": "A recording of zai's features while seven LLM coding-agent sessions are running.",
+            "zh-CN": "zai 在七个大型语言模型编码代理会话运行期间的功能录屏。"
+          },
+          "width": 1920,
+          "height": 1152
+        }
+      ],
       "platforms": [
         {
           "id": "linux",
