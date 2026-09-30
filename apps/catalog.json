@@ -430,8 +430,8 @@
       ],
       "comparison": {
         "intro": {
-          "en": "zai is a terminal workspace and delivery harness for a separately installed coding-agent CLI. Orca, herdr, and GitHub Copilot app are agent-workspace peers; VS Code is a broader editor/IDE. Copilot app is built on Copilot CLI and also documents parallel worktrees, scheduled automations, and GitHub PR workflows. The Linux workspace baselines and native Windows first-run observations below use different environments and memory metrics: do not rank them together or infer a complete AI-workflow winner.",
-          "zh-CN": "zai 是终端工作空间与交付工具，需要配合另行安装的编码代理 CLI。Orca、herdr 和 GitHub Copilot 应用属于同类代理工作空间；VS Code 则是功能更广的编辑器/IDE。Copilot 应用基于 Copilot CLI，也提供并行工作树、定时自动化和 GitHub PR 工作流。下方 Linux 工作空间基线与原生 Windows 首次启动观测的环境和内存指标不同，不能混合排名，也不能据此判断完整 AI 工作流的优劣。"
+          "en": "zai, Orca, and herdr are workspaces for your choice of separately installed coding-agent CLI, not built-in coding agents. Their '+ agent' headers describe intended setups, not measured agent-inclusive totals. VS Code's fresh-profile baseline has no agent extension; GitHub Copilot app is built on Copilot CLI and its first-run tree includes SDK CLI helpers. Linux workspace baselines and Windows first-run observations use different environments and memory metrics: do not rank them together or infer a complete AI-workflow winner.",
+          "zh-CN": "zai、Orca 和 herdr 是配合自选、另行安装的编码代理 CLI 使用的工作空间，并不内置编码代理。表头中的“+ agent”说明这种组合方式，不表示资源观测已计入代理。VS Code 是功能更广的编辑器/IDE，其全新配置基线不含代理扩展；GitHub Copilot 应用基于 Copilot CLI，首次启动观测的进程树已包含 SDK CLI 辅助进程。Copilot 应用也提供并行工作树、定时自动化和 GitHub PR 工作流。下方 Linux 工作空间基线与原生 Windows 首次启动观测的环境和内存指标不同，不能混合排名，也不能据此判断完整 AI 工作流的优劣。"
         },
         "groups": [
           {
@@ -440,11 +440,11 @@
               "zh-CN": "工作空间能力"
             },
             "columns": [
-              "zai-cli (your pick of coding agent)",
+              "zai-cli (+ agent) [13]",
               "VS Code",
               "GitHub Copilot app",
-              "Orca",
-              "herdr"
+              "Orca (+ agent) [13]",
+              "herdr (+ agent) [13]"
             ],
             "rows": [
               {
@@ -572,11 +572,11 @@
               "zh-CN": "工作空间资源观测（Linux / Windows）"
             },
             "columns": [
-              "zai-cli (your pick of coding agent)",
+              "zai-cli (+ agent) [13]",
               "VS Code",
               "GitHub Copilot app",
-              "Orca",
-              "herdr"
+              "Orca (+ agent) [13]",
+              "herdr (+ agent) [13]"
             ],
             "rows": [
               {
@@ -676,7 +676,8 @@
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services.",
               "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; the tree includes the app, WebView2, SDK CLI 1.0.90-0 helpers, and console hosts. CPU percentages use one logical core (100%).",
               "Installed files total 488.3 MB for the app plus 151.9 MB for its provisioned SDK CLI cache, excluding shared WebView2/runtime files and user data. USS covers the root and surviving observed descendants. Summed RSS can double-count shared pages; USS is private memory, not Linux PSS. The Windows and Linux observations share columns for reference only, not a like-for-like ranking.",
-              "Two descendant processes exited during trial 2; observed child CPU is a lower bound. The changing tree is a first-run observation, not a stable signed-in workspace or active coding-task benchmark. The README links all per-trial results, methodology, and gaps."
+              "Two descendant processes exited during trial 2; observed child CPU is a lower bound. The changing tree is a first-run observation, not a stable signed-in workspace or active coding-task benchmark. The README links all per-trial results, methodology, and gaps.",
+              "In both product tables, '+ agent' means your choice of separately installed coding-agent CLI for zai-cli, Orca, or herdr; none includes a built-in coding agent. The headers describe intended setups, not measured complete setups: their workspace baselines exclude the chosen agent CLI/runtime. VS Code's fresh-profile baseline has no agent extension; GitHub Copilot app's first-run tree already includes SDK CLI helpers. Add the chosen CLI/runtime and any required extension to compare complete setups; matched complete-setup measurements are not available here."
             ]
           }
         ],

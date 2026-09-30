@@ -15,7 +15,13 @@ test("zai-cli integrates Copilot with Orca/herdr while distinguishing measuremen
     const capabilities = comparison.getByRole("region", { name: titles[0], exact: true });
     const footprint = comparison.getByRole("region", { name: titles[2], exact: true });
     for (const table of [capabilities, footprint]) {
-      for (const product of ["zai-cli (your pick of coding agent)", "VS Code", "GitHub Copilot app", "Orca", "herdr"]) {
+      for (const product of ["zai-cli (+ agent)", "VS Code", "GitHub Copilot app", "Orca (+ agent)", "herdr (+ agent)"]) {
+        if (product.includes("+ agent")) {
+          const header = table.getByRole("columnheader").filter({ hasText: product });
+          await expect(header).toBeVisible();
+          await expect(header.getByRole("link")).toHaveAttribute("href", "#comparison-zai-cli-note-13");
+          continue;
+        }
         await expect(table.getByRole("columnheader", { name: product, exact: true })).toBeVisible();
       }
       await expect(table.getByRole("columnheader")).toHaveCount(6);
@@ -41,6 +47,15 @@ test("zai-cli integrates Copilot with Orca/herdr while distinguishing measuremen
     await expect(footprint.getByRole("row", { name: /^Windows first-run working set/ })).toContainText("2,073.0–2,615.3 MiB");
     await expect(footprint.getByRole("row", { name: /^Observed processes/ })).toContainText("11–13 (Windows first-run)");
     await expect(comparison.locator("#comparison-zai-cli-note-11")).toContainText("not a like-for-like ranking");
+    const scopeNote = comparison.locator("#comparison-zai-cli-note-13");
+    await expect(scopeNote).toContainText("none includes a built-in coding agent");
+    await expect(scopeNote).toContainText("workspace baselines exclude the chosen agent CLI/runtime");
+    const headerReference = capabilities.getByRole("columnheader").filter({ hasText: "Orca (+ agent)" }).getByRole("link");
+    await headerReference.focus();
+    await expect(headerReference).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#comparison-zai-cli-note-13$/);
+    await expect(scopeNote).toBeInViewport();
     for (const link of await comparison.locator(".comparison-note-reference a").all()) {
       await expect(comparison.locator(await link.getAttribute("href"))).toHaveCount(1);
     }

@@ -166,6 +166,14 @@ rows retain their distinct scopes; sharing columns does not make them comparable
 The author's clarification confines the change to the Orca/herdr contents on the
 zai-cli page, not new third-party app pages.
 
+The author's [September 30, 2026 PR clarification](https://github.com/phoenixzqy/phoenixzqy.github.io/pull/23#issuecomment-5917290101)
+also requires the same separately installed coding-agent scope for zai-cli,
+Orca, and herdr. Both product tables use concise `(+ agent)` headers with a
+shared linked note, and the bilingual introduction distinguishes these workspaces
+from Copilot app's included SDK CLI helpers and VS Code's agent-free baseline.
+The header describes the intended setup, not extra components included in the
+measurements; no measurement values or complete-setup claims were changed.
+
 Public sources accessed September 30, 2026 substantiate the revised Copilot
 capability cells:
 

@@ -4,7 +4,7 @@ import { catalog } from "./apps-fixtures.js";
 
 const comparison = catalog.apps.find(({ id }) => id === "zai-cli").comparison;
 const [capabilities, agents, footprint] = comparison.groups;
-const products = ["zai-cli (your pick of coding agent)", "VS Code", "GitHub Copilot app", "Orca", "herdr"];
+const products = ["zai-cli (+ agent) [13]", "VS Code", "GitHub Copilot app", "Orca (+ agent) [13]", "herdr (+ agent) [13]"];
 const cells = (group, label) => group.rows.find((row) => row.label === label).values;
 
 test("Copilot is a peer column, not a standalone comparison", () => {
@@ -17,6 +17,23 @@ test("Copilot is a peer column, not a standalone comparison", () => {
     assert.doesNotMatch(group.title.en, /^GitHub Copilot/);
     assert.doesNotMatch(group.title["zh-CN"], /^GitHub Copilot/);
   }
+});
+
+test("workspace headers distinguish separately installed agents from measured baselines", () => {
+  const scope = footprint.notes[6];
+  assert.equal(comparison.groups.flatMap(({ notes }) => notes).indexOf(scope), 12);
+  for (const phrase of [
+    "your choice of separately installed coding-agent CLI",
+    "none includes a built-in coding agent",
+    "workspace baselines exclude the chosen agent CLI/runtime",
+    "VS Code's fresh-profile baseline has no agent extension",
+    "GitHub Copilot app's first-run tree already includes SDK CLI helpers",
+    "matched complete-setup measurements are not available",
+  ]) {
+    assert.ok(scope.includes(phrase), `scope note: ${phrase}`);
+  }
+  assert.match(comparison.intro.en, /not built-in coding agents/);
+  assert.match(comparison.intro["zh-CN"], /并不内置编码代理/);
 });
 
 test("Copilot capability answers distinguish verified documentation from uncertainty", () => {

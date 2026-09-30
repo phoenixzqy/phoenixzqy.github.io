@@ -285,7 +285,8 @@ function comparisonSection(app) {
     const headingRow = element("tr");
     headingRow.append(element("th", "comparison-row-heading", ""));
     group.columns.forEach((column) => {
-      const cell = element("th", "", column);
+      const cell = element("th");
+      cell.append(comparisonValue(column, app.id));
       cell.scope = "col";
       headingRow.append(cell);
     });
