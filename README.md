@@ -159,6 +159,28 @@ workspace-only PSS baselines remain separate from Windows USS/RSS observations,
 and selected CLI/runtime requirements are explicit. No complete-setup ranking,
 untested editor/LSP absence, or inferred UI implementation stack is claimed.
 
+The September 30, 2026 integrated-table revision uses the existing capability
+and footprint tables for zai-cli, VS Code, GitHub Copilot app, Orca, and herdr;
+there is no standalone Copilot comparison. Agent-qualified headers and note [6]
+clarify that zai-cli, Orca, and herdr need a separately installed coding agent.
+Windows/Linux provenance and metric limits remain explicit in the shared table.
+The synchronized README and exact measurement provenance are recorded at
+[zai-cli revision e4587078](https://github.com/phoenixzqy/zai-cli/commit/e4587078d12e9f5d2c52670bfdcfe612d61705a1).
+Sources read directly on 2026-09-30:
+
+| Source | Verified claim and editorial use |
+| --- | --- |
+| [GitHub app changelog, f37efcac](https://github.com/github/app/blob/f37efcac9f6563656e6bc9c49ccbdb20ddb3a856/changelog.md) | v1.1.21 confirms a code editor; v1.1.15 confirms line numbers and syntax highlighting. Mark the editor supported. v0.2.8 confirms scheduled automation workspace reuse, which does not verify a shared claim/release pool with stale-owner recovery. |
+| [Agent sessions](https://docs.github.com/en/copilot/how-tos/github-copilot-app/agent-sessions) | Isolated workspaces, archive/delete management, and cloning non-GitHub Git URLs including Azure DevOps; does not establish native Azure DevOps delivery services. |
+| [Issue and PR workflows](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests) | CI/review fixes and background agent merge; retain the supported GitHub workflow entry. |
+| [App overview](https://docs.github.com/en/copilot/concepts/agents/github-copilot-app) and [product page](https://github.com/features/ai/github-app) | Desktop app built on Copilot CLI, parallel sessions, and scheduled workflows; do not infer the UI implementation stack or LSP support. |
+| [Orca overview](https://www.onorca.dev/docs) and [herdr product page](https://herdr.dev/) | Both run users' existing coding-agent CLIs; use the shared separately installed agent footnote. |
+
+LSP support, the specific shared claim/release pool, native Azure DevOps
+work-item-to-merge services, and UI implementation stack remain explicitly
+unverified. These are public-documentation findings, not signed-in app tests.
+No measurement was recollected and no complete-setup ranking is inferred.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online
