@@ -3,17 +3,10 @@
 OpenCode is available as a coding-agent provider for the console, all four
 background services, and console automations. Requires **OpenCode 1.18.33+**.
 
-```text
-zai opencode install
-zai opencode auth login
-zai opencode models
-zai opencode
-```
-
-`zai oc` and `zai open-code` are aliases. The official `opencode-ai` npm package
-is installed only when missing; an existing executable is version-checked, not
-replaced. Node.js/npm is needed for this installation route. You can also use
-OpenCode's official native installation.
+Open zai and choose **OpenCode** from the app picker. The official `opencode-ai`
+npm package is installed only when missing; an existing executable is
+version-checked, not replaced. Node.js/npm is needed for this installation
+route. You can also use OpenCode's official native installation.
 
 ## Configuration and authentication
 
@@ -21,14 +14,14 @@ Set `"coding_agent": "opencode"` in project configuration. The alias `"oc"`
 also resolves to OpenCode; omission still selects Copilot. Service models use
 native `provider/model` identifiers; `auto` and `default` omit a model override.
 Restart services and reopen the console after changing the selected provider.
-Use `zai opencode models` for the locally available catalog; catalog membership
-does not prove your account is entitled to use a model.
+OpenCode's native model picker shows the locally available catalog; catalog
+membership does not prove your account is entitled to use a model.
 
 The managed home is `~/.zai/.opencode`. Native configuration, credentials,
 session database, state, and cache remain inside it. OpenCode and XDG path
 variables are scoped only to the child. Personal OpenCode state is never copied
-or modified. Authenticate separately with `auth login`; `auth status` lists
-configured credentials and `auth logout` signs out in this home only.
+or modified. Use `/connect` inside the hosted OpenCode session to authenticate
+this managed home separately.
 Existing provider API environment variables remain inherited. A provider can
 still reject expired credentials or an unavailable model when the run starts.
 
@@ -85,7 +78,9 @@ OpenCode's custom config directory alone does not isolate all state. The adapter
 also redirects XDG storage and uses the version-gated native home override for
 personal compatibility discovery, without replacing `HOME` for repository
 commands. Its shell-environment hook restores inherited XDG values for commands
-run by the agent, preserving tools such as forge CLIs.
+run by the agent; when a value was originally unset, the final spawned tool
+process receives it as unset rather than inheriting the managed OpenCode
+directory. This preserves native paths for tools such as forge CLIs on Windows.
 
 OpenCode's lifecycle plugin is event-driven, uses direct-exec helper calls with
 a ten-second deadline, and loads no external dependency. Identity binding

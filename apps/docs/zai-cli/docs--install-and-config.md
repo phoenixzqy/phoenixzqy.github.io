@@ -151,7 +151,7 @@ Then tell the human what they now have, and point them at the CLI rather than
 repeating it yourself:
 
 - `zai start all` runs the services for the repository you are in.
-- `zai copilot` opens the console TUI on the same harness.
+- `zai` opens the console TUI on the same harness.
 - `zai doc` documents everything else, including how to change the
   configuration you just created.
 
@@ -165,8 +165,7 @@ the human to install fonts or change terminal profiles.
   command table.
 - [`config.md`](?id=zai-cli&doc=docs--config) — the full per-repository configuration reference.
 - [`opencode.md`](?id=zai-cli&doc=docs--opencode) — OpenCode installation, separate authentication,
-  provider selection, and compatibility. Consult `zai opencode -h` to check
-  whether the installed release includes this provider.
+  provider selection, and compatibility.
 - `architecture.md` — what the services do and how they fit
   together.
 - `testing-and-operations.md` — operating and

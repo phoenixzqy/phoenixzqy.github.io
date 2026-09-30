@@ -55,6 +55,11 @@ policies rather than disabling them.
 Terminal applications can intercept key combinations. Use the command palette
 when a shortcut does not reach the editor.
 
+With no explicit theme selection, the editor uses Kanagawa Wave dark
+(`kanagawa-wave`) on both light and dark terminals. Existing selections remain
+unchanged. See Themes and settings for
+configuration and session overrides.
+
 ## History, previews, and AI context
 
 When Git is available, blame follows the unsaved buffer and file history follows

@@ -36,9 +36,9 @@ and any extra arguments are forwarded to the package installer.
 
 Packages are pre-built, so no source clone or Go toolchain is required. Install
 Python 3.10 or newer before running the installer; macOS/Linux also need `curl`
-and `unzip`. Install your preferred coding-agent CLI separately before using it
-with zai; the zai installer does not install or update Copilot, Pi, Claude Code, OpenCode,
-or other non-zai tools.
+and `unzip`. The package installer does not install coding-agent CLIs. Hosted
+launches can provision the supported npm-distributed Pi, Claude Code, and
+OpenCode CLIs when missing; other providers must already be installed.
 
 - App page: <https://phoenixzqy.github.io/apps/app/?id=zai-cli>
 - All releases and checksums: <https://phoenixzqy.github.io/apps/releases/?id=zai-cli>
@@ -102,28 +102,29 @@ The command always uses the published release source without a source-selection 
 
 ## The two run modes
 
-Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Claude Code, Pi, Codex, and OpenCode sessions as tabs and split panes on their managed zai homes.
+Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Pi, Codex, Claude Code, and OpenCode sessions as tabs and split panes on their managed zai homes.
 
 | | **Service mode** | **Interactive console mode** |
 |---|---|---|
-| Command | `zai start <all\|service>` | `zai`, `zai copilot`, `zai claude`, `zai opencode`, or `zai pi` from any folder; each agent verb selects the first tab |
+| Command | `zai start <all\|service>` | `zai` from any folder; choose agents from the app picker |
 | Who drives | A repo-scoped daemon runs the selected deterministic service pollers; matching service agents act on selected items within configured limits | A human, live inside the console TUI multiplexer |
 | Copilot home | `~/.zai/.copilot` | `~/.zai/.copilot` (the same home) |
 | Pi home | `~/.zai/.pi`, launched with `--no-extensions` | `~/.zai/.pi` (the same home), loading the extensions of the Pi packages inherited from `~/.pi/agent` |
-| OpenCode home | `~/.zai/.opencode`, unattended JSON run mode | Same isolated home; normal approvals unless YOLO is enabled |
+| Codex home | `~/.zai/.codex`, unattended full-access mode | `~/.zai/.codex` (the same home), normal interactive approvals unless console YOLO is enabled |
 | Claude home | `~/.zai/.claude`, unattended print mode | `~/.zai/.claude` (the same home), normal interactive approvals unless console YOLO is enabled |
+| OpenCode home | `~/.zai/.opencode`, unattended JSON run mode | `~/.zai/.opencode` (the same home), normal interactive approvals unless console YOLO is enabled |
 | Copilot agent | launched per selected item with `--agent <service>-agent --autopilot --yolo -p <prompt>` | plain/default interactive copilot in each TUI tab or split pane (no service agent auto-launched) |
 | Scope | every packaged agent and skill | every packaged agent and skill |
 
-The managed homes carry the packaged agents, schemas, skills, and tools, so console mode exposes the harness agents and skills to you, including a few `zai-`-prefixed operator-facing skills that describe and drive zai itself. These homes stay separate from your own `~/.copilot`, `~/.claude`, and `~/.pi`. Service sessions also appear in the console's resume list. See [Claude Code](?id=zai-cli&doc=docs--claude-code) for installation, separate managed-home authentication, resource compatibility, and native differences.
+The managed homes carry the packaged agents, schemas, skills, and tools, so console mode exposes the harness agents and skills to you, including a few `zai-`-prefixed operator-facing skills that describe and drive zai itself. These homes stay separate from your personal coding-agent homes and state. Service sessions also appear in the console's resume list. See [Claude Code](?id=zai-cli&doc=docs--claude-code) and [OpenCode](?id=zai-cli&doc=docs--opencode) for installation, separate managed-home authentication, resource compatibility, and native differences.
 
 Which mode do I want? Use **service mode** when you want zai to run automated poller+agent loops for the current repository. Use **interactive console mode** when you want a hands-on Copilot CLI session — in a project-based TUI multiplexer with tabs and split panes — with the packaged harness agents and skills available inside the session.
 
-Shared invariant for both modes: `COPILOT_HOME` is set only in the spawned Copilot child process through the spawn API. The terminal's own `COPILOT_HOME` is never mutated, so there is nothing to restore on exit.
+Shared invariant for both modes: provider home variables are set only in the spawned coding-agent child process through the spawn API. The terminal's own environment is never mutated, so there is nothing to restore on exit.
 
 ### Themes and settings
 
-The console, `zai-editor`, and `zai-gitter` share one theme file, `~/.zai/theme.json` (`$ZAI_THEME_CONFIG` overrides the location). Until you pick a theme, every app uses One Dark and follows the terminal's light or dark background. Every app paints its whole screen with the theme's own colors, so light themes look right on dark terminals and vice versa.
+The console, `zai-editor`, and `zai-gitter` share one theme file, `~/.zai/theme.json` (`$ZAI_THEME_CONFIG` overrides the location). Until you pick a theme, the console and native Diff Review rail use Kanagawa Wave dark on any terminal background; the editor uses One Dark and follows the terminal background. Git viewer tabs follow the installed `zai-gitter` companion's default. Every app paints its whole screen with the theme's own colors, so light themes look right on dark terminals and vice versa.
 
 Open **Settings** from the right activity bar or Right Rail menu to choose:
 
@@ -133,7 +134,7 @@ Open **Settings** from the right activity bar or Right Rail menu to choose:
 | Editor theme | The editor rail and tabs, and the embedded config editor |
 | Git viewer theme | The native diff rail and gitter tabs |
 
-Pick from built-in themes such as Tokyo Night, Catppuccin, Gruvbox, Dracula, Nord, Rosé Pine, Kanagawa, and One Dark (families follow the terminal background). **Reset to default** (`r`) returns a row to One Dark (earlier `zai`, `zai-dark` and `zai-light` choices keep working as One Dark). Saved changes, including hand edits to the file, apply to running apps immediately. `$ZAI_THEME` overrides every app for one launch, and a broken file never blocks startup: the apps fall back to the defaults and warn. `zai config update` and `zai service-monitor` use the console theme. The standalone tools also accept `--theme` and open the same settings with F2 Settings. Inside zai, zai owns the tools' settings: editor tabs, the editor rail and gitter tabs launch with `ZAI_SETTINGS_HOST=zai`, so they hide their own F2 Settings (F2 points here instead), while still restyling live when you change the **Editor theme** or **Git viewer theme** row. See [theming](https://github.com/phoenixzqy/zai-design-system/blob/main/docs/theming.md) for the file format and custom themes.
+Pick from built-in themes such as Tokyo Night, Catppuccin, Gruvbox, Dracula, Nord, Rosé Pine, Kanagawa, and One Dark (families follow the terminal background). With no explicit selection, the console and native Diff Review rail use Kanagawa Wave dark even on a light terminal; the editor keeps its background-following One Dark default. **Reset to default** (`r`) restores those defaults; Git viewer tabs follow the installed companion's default (earlier `zai`, `zai-dark` and `zai-light` choices keep working as One Dark). Explicit app and shared selections remain selected. Saved changes, including hand edits to the file, apply to running apps immediately. `$ZAI_THEME` overrides every app for one launch, and a broken file never blocks startup: the apps fall back to the defaults and warn. `zai config update` and the Service Monitor page use the console theme. Inside zai, zai owns the tools' settings: editor tabs, the editor rail and gitter tabs launch with `ZAI_SETTINGS_HOST=zai`, so they hide their own F2 Settings (F2 points here instead), while still restyling live when you change the **Editor theme** or **Git viewer theme** row. See [theming](https://github.com/phoenixzqy/zai-design-system/blob/main/docs/theming.md) for the file format and custom themes.
 
 ## Command reference
 
@@ -143,16 +144,8 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | Command | Purpose |
 |---|---|
 | `zai` | Open the project-based console TUI from any folder on a quiet Welcome tab, without launching an agent. `ctrl+\ n` opens an app. |
-| `zai copilot` | Open the console with Copilot CLI in the first tab (or the config editor when the startup forge project has no config). |
-| `zai pi` | Open the same console with Pi in the first tab; a missing Pi CLI is installed first. |
-| `zai opencode` / `zai oc` | Open OpenCode in the console; use `zai opencode install` and `zai opencode auth login` for setup. See [OpenCode](?id=zai-cli&doc=docs--opencode) for service selection and native differences. |
-| `zai claude` / `zai cc` | Open Claude Code in the same console; install a missing CLI first. |
-| `zai claude install` / `zai claude auth <login\|status\|logout>` | Install Claude Code or manage authentication in its isolated home. |
-| `zai pi install` / `zai pi session` | Install Pi and its default packages, or open one Pi session with managed-worktree liveness. |
 | `zai start <all\|service\|list>` | Start one repo-scoped background daemon that runs `dev`, `review`, `pr-babysitter`, and `housekeep` (`all`), one service, or a comma-separated subset. |
 | `zai stop` / `zai restart` / `zai status` | Stop, restart with the same services, or show this repository's daemon. |
-| `zai service-monitor` | Open the standalone poller and agent monitor TUI. |
-| `zai session:analyze <session-id>` | Build a read-only timeline and cost breakdown for one Copilot session. |
 | `zai config <show\|path\|init\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |
 | `zai repo-harness <eval\|eval-and-fix>` | Score a repository's docs, AI instructions/skills, and test-coverage readiness in an HTML report; `eval-and-fix` also fixes the issues found. |
 | `zai doctor` | Check package layout and the configured coding agent's CLI availability. |
@@ -163,5 +156,6 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai review:validate-comments` | Validate proposed review findings against changed diff lines. |
 | `zai worktree <claim\|release\|cleanup>` | Internal: shared worktree claims used by agent sessions. |
 
-`zai-editor [flags] [file]` and `zai-gitter [directory]` are standalone tools
-shipped beside zai; run either with `--help`.
+Editor, Git viewer, coding-agent, and service-monitor surfaces open inside zai.
+Their adjacent companion executables are implementation details rather than
+standalone product commands.

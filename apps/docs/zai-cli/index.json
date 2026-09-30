@@ -2,36 +2,36 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "356180e4a6b3dea45e62ec0fdf14ca7b12e05047",
-  "commit": "356180e4a6b3dea45e62ec0fdf14ca7b12e05047",
+  "ref": "f9bb3764ef22be89579f28dbf92e9e4405130f6e",
+  "commit": "f9bb3764ef22be89579f28dbf92e9e4405130f6e",
   "documents": [
     {
       "slug": "docs--install-and-config",
       "title": "AI-guided install and configuration",
       "source": "docs/install-and-config.md",
       "file": "docs--install-and-config.md",
-      "bytes": 6823
+      "bytes": 6724
     },
     {
       "slug": "docs--getting-started",
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 12479
+      "bytes": 12078
     },
     {
       "slug": "docs--claude-code",
       "title": "Claude Code",
       "source": "docs/claude-code.md",
       "file": "docs--claude-code.md",
-      "bytes": 6883
+      "bytes": 6559
     },
     {
       "slug": "docs--opencode",
       "title": "OpenCode integration",
       "source": "docs/opencode.md",
       "file": "docs--opencode.md",
-      "bytes": 6609
+      "bytes": 6674
     },
     {
       "slug": "docs--services-and-pollers",

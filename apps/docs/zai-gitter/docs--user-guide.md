@@ -195,19 +195,20 @@ if the link cannot open. The notice identifies launcher failures.
 
 ## Themes and settings
 
-The viewer uses One Dark by default (onedark-dark or onedark-light) and
-follows the terminal's light or dark background. Every cell is painted with
+The viewer uses Kanagawa Wave dark (`kanagawa-wave`) by default, on both light
+and dark terminals. Every cell is painted with
 the theme's own background and foreground, so light themes look right on dark
 terminals and vice versa. Press F2 or click `[F2 Settings]` next to
 `[F1 Commands]` in the footer to open Settings and choose any theme from the
 shared catalog. The highlighted theme previews live; Enter saves it and Reset
-to default returns to One Dark. Choices are saved in the shared zai
+to default returns to Kanagawa Wave dark. Choices are saved in the shared zai
 theme file (`~/.zai/theme.json`, or `$ZAI_THEME_CONFIG`) under
 `apps.zai-gitter`, and a running viewer applies changes to that file live,
 including changes made from zai's Settings page. The `t` toggle's forced dark
 and light modes use the configured theme when it suits that background, and
 a configured family's matching variant (for example `catppuccin` gives
-catppuccin-mocha and catppuccin-latte); otherwise onedark-dark or onedark-light.
+catppuccin-mocha and catppuccin-latte); forced light falls back to
+onedark-light when the selected theme has no light variant.
 
 When a host launches git-diff tabs with `ZAI_SETTINGS_HOST=zai`, the host owns
 settings: the footer has no `[F2 Settings]` and F2 directs users to zai's
@@ -218,7 +219,8 @@ zai's native Diff Review rail embeds the viewer without a settings control.
 
 `--theme <name>` (a theme or a family such as `catppuccin`) and `$ZAI_THEME`
 override the file for one session. `--theme dark` or `light` assumes that
-background instead of following the terminal, so the default is onedark-dark or
-onedark-light, and families use that variant. `--theme auto` is the default.
+background instead of following the terminal; without a selected theme,
+Kanagawa Wave remains dark, while selected families use that background's
+variant. `--theme auto` is the default.
 An invalid theme file never stops the viewer: it reports the problem and
 keeps the last good themes. Redirected output keeps its fixed plain frame.

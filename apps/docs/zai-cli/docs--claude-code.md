@@ -6,26 +6,17 @@ Ask AI handoff, live status, managed worktrees, and service result validation.
 
 ## Install and authenticate
 
-```text
-zai claude install
-zai claude auth login
-zai claude auth status
-zai claude
-```
-
-`zai cc` and `zai claude-code` are aliases. The explicit install command installs
-the official `@anthropic-ai/claude-code` npm package when missing; npm must be on
-PATH. An existing installation is checked, not silently replaced. Claude Code
+Install the official `@anthropic-ai/claude-code` package or use its native
+installer, then open zai and choose Claude Code from the app picker. An existing installation is checked, not silently replaced. Claude Code
 2.1.281 or newer is required. For an older installation, update it using its
-original installation method. Opening `zai claude` also offers the missing CLI's
+original installation method. Selecting Claude Code offers the missing CLI's
 installation path. Authentication can require a browser and an eligible Claude
 account; signing into Copilot does not authenticate Claude.
 
 The managed home is `<zai-install>/.claude` (normally `~/.zai/.claude`).
 `CLAUDE_CONFIG_DIR` is set only on child processes. Personal `~/.claude`
 credentials, trust decisions, settings, and history are never copied or changed.
-Existing provider API environment variables are inherited. Use
-`zai claude auth logout` to sign out of the managed home only.
+Existing provider API environment variables are inherited.
 
 For a separate test installation, invoke **that installation's executable** for
 both authentication and launch; its Claude home is separate from production.
@@ -112,16 +103,15 @@ marks; it does not force-release worktrees or delete retained work. Native
 transcripts and captured evidence participate in the existing age-based
 retention policy while live sessions are protected.
 
-The existing `zai session:analyze` tool remains Copilot-only; this integration
-does not add Claude session analysis. Claude session discovery, native resume,
-and service evidence remain available. Copilot plugins, login state, and
+Claude session discovery, native resume, and service evidence remain available.
+Copilot plugins, login state, and
 Copilot-specific billing are not imported.
 
 ## Manual acceptance checks
 
 Authenticate in the test installation before checking model-backed behavior.
-Open Claude from both `zai claude` and the app picker, then check new tabs and
-both split directions. Verify status transitions on a prompt, a question, a tool
+Open Claude from the app picker, then check new tabs and both split directions.
+Verify status transitions on a prompt, a question, a tool
 permission request, a delegated task, and completion.
 
 Open a managed worktree and a nested folder, check that their own instructions

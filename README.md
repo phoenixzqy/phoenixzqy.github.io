@@ -124,6 +124,8 @@ general-features and themes demo recordings. No private
 source, contributor instructions, or unpublished packages belong in the public
 mirror.
 
+The September 30, 2026 manual releases — [zai-cli 0.1.200](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.200), [zai-editor 0.3.2](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-editor-v0.3.2), and [zai-gitter 0.3.2](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-gitter-v0.3.2) — use the app author’s authorized merged source and repository-owned release scripts. Release notes were checked against those revisions; source identities for the privacy-reviewed user-guide refresh are recorded in `apps/docs/sources.json`. Each release supplies six unsigned archives with sizes and SHA-256 values computed from the final bytes. Archive contents and native Linux smoke checks were reviewed; cross-compilation does not establish native macOS or Windows behavior.
+
 For the September 29, 2026 zai positioning refresh, the public
 [herdr README](https://github.com/herdrdev/herdr) and
 [Orca README](https://github.com/stablyai/orca) were reviewed for editorial

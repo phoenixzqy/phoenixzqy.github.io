@@ -2,10 +2,14 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "release": {
-    "version": "0.1.127",
+    "version": "0.1.200",
     "channel": "preview",
-    "publishedAt": "2026-09-29T07:23:23Z",
+    "publishedAt": "2026-09-30T20:16:54Z",
     "notes": [
+      {
+        "en": "Refreshes the bundled editor and Git viewer, fixes hosted logo rendering, and includes the latest project-folder and agent-session changes.",
+        "zh-CN": "更新内置编辑器与 Git 查看器，修复宿主中的徽标渲染，并包含最新的项目文件夹与代理会话改进。"
+      },
       {
         "en": "Cross-compiled zai CLI packages built from one pinned source revision.",
         "zh-CN": "由同一份固定源代码修订版交叉编译出的 zai CLI 安装包。"
@@ -27,14 +31,14 @@
         },
         "platform": "linux",
         "architecture": "x64",
-        "file": "zai-cli-0.1.127-linux-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-linux-amd64.zip",
-        "bytes": 29989813,
-        "sha256": "2892e963f66b988cf45e89c53791579b5297f153e6e74ffedac5339c077b36f0",
+        "file": "zai-cli-0.1.200-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-linux-amd64.zip",
+        "bytes": 30140097,
+        "sha256": "442a2336ca03baaf59d84591682632c0edb863392d609eecae7f68e5b1be6a28",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。"
         }
       },
       {
@@ -44,14 +48,14 @@
         },
         "platform": "linux",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.127-linux-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-linux-arm64.zip",
-        "bytes": 27650495,
-        "sha256": "bb1d6bdb787a4f676908ebcd6c99b075e5a4aa2d0c0258beabce36716086f788",
+        "file": "zai-cli-0.1.200-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-linux-arm64.zip",
+        "bytes": 27790662,
+        "sha256": "f1a0cb23405d0212c9a4560924315b2df7501d06d250287956055ab959b45a46",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。"
         }
       },
       {
@@ -61,14 +65,14 @@
         },
         "platform": "macos",
         "architecture": "x64",
-        "file": "zai-cli-0.1.127-darwin-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-darwin-amd64.zip",
-        "bytes": 27602755,
-        "sha256": "ba3ede715af06932be15bf39a6d41e9947f456d2a7f1ba2a231840eb06070b82",
+        "file": "zai-cli-0.1.200-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-darwin-amd64.zip",
+        "bytes": 27762651,
+        "sha256": "86e5def4e93bc7ad76fb8efb43d22996e74340b09897c3836db76bdb9c106599",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -78,14 +82,14 @@
         },
         "platform": "macos",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.127-darwin-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-darwin-arm64.zip",
-        "bytes": 26010538,
-        "sha256": "59f31e54f797b670589eae66ee26137b67604a009ddbdde4de6df29f85f1cb7a",
+        "file": "zai-cli-0.1.200-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-darwin-arm64.zip",
+        "bytes": 26153243,
+        "sha256": "312aab2ca6b5e3a47fad716146786bbb5afe2a2181aa041170da06b79867e402",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
         }
       },
       {
@@ -95,14 +99,14 @@
         },
         "platform": "windows",
         "architecture": "x64",
-        "file": "zai-cli-0.1.127-windows-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-windows-amd64.zip",
-        "bytes": 30559923,
-        "sha256": "61712346aea80b950c43aa17923918cf79c25be0164a4a7f30932f6c59f4fccf",
+        "file": "zai-cli-0.1.200-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-windows-amd64.zip",
+        "bytes": 30724970,
+        "sha256": "b64ea572ec6c617180e97af2179c4f995ca4ee6cee90eef81cd6e762e575e541",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       },
       {
@@ -112,14 +116,14 @@
         },
         "platform": "windows",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.127-windows-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.127/zai-cli-0.1.127-windows-arm64.zip",
-        "bytes": 27969516,
-        "sha256": "dcc5c1f049548824ad0a806d679785cbfd375b53f01d9fd15c59e6387b9beb9d",
+        "file": "zai-cli-0.1.200-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.200/zai-cli-0.1.200-windows-arm64.zip",
+        "bytes": 28112481,
+        "sha256": "340d8a4ca0936bb0517aac4f9ba98ce9081db929a0091aee606f0c6a97b64106",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer, Node.js/npm, and GitHub Copilot CLI are required. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。需要 Python 3.10 及以上、Node.js/npm 以及 GitHub Copilot CLI。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
+          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
         }
       }
     ]
