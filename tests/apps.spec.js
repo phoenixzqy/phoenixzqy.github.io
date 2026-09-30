@@ -149,8 +149,8 @@ test("zai app comparisons render early with every catalog table", async ({ page,
     for (let number = 1; number <= notes.length; number += 1) {
       await expect(comparison.locator(`#comparison-${app.id}-note-${number}`)).toHaveText(notes[number - 1]);
     }
-    const references = app.comparison.groups.flatMap((group) => group.rows)
-      .flatMap((row) => row.values)
+    const references = app.comparison.groups
+      .flatMap((group) => [...group.columns, ...group.rows.flatMap((row) => row.values)])
       .flatMap((value) => [...value.matchAll(/\[(\d+)\]/g)].map((match) => match[1]));
     await expect(comparison.locator(".comparison-note-reference a")).toHaveCount(references.length);
     for (const number of new Set(references)) {
