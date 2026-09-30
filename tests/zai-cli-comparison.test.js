@@ -6,6 +6,7 @@ const comparison = catalog.apps.find(({ id }) => id === "zai-cli").comparison;
 const [capabilities, agents, footprint] = comparison.groups;
 const products = ["zai-cli (+ agent) [13]", "VS Code", "GitHub Copilot app", "Orca (+ agent) [13]", "herdr (+ agent) [13]"];
 const cells = (group, label) => group.rows.find((row) => row.label === label).values;
+const localized = (value, locale) => typeof value === "string" ? value : value[locale];
 
 test("Copilot is a peer column, not a standalone comparison", () => {
   assert.equal(comparison.groups.length, 3);
@@ -39,14 +40,27 @@ test("workspace headers distinguish separately installed agents from measured ba
 test("Copilot capability answers distinguish verified documentation from uncertainty", () => {
   assert.equal(cells(capabilities, "Built-in code editor")[2], "✓ [5]");
   assert.match(cells(capabilities, "Runtime")[2], /stack unverified/);
-  assert.match(cells(capabilities, "Language servers in the editor")[2], /Not documented in editor/);
-  assert.match(cells(capabilities, "Reusable claimed/released worktree pool with stale-session recovery")[2], /Not documented/);
+  for (const [locale, uncertainty] of [["en", /unverified/i], ["zh-CN", /尚未核实/]]) {
+    assert.match(localized(cells(capabilities, "Language servers in the editor")[2], locale), uncertainty);
+    assert.match(localized(cells(capabilities, "Reusable claimed/released worktree pool with stale-session recovery")[2], locale), uncertainty);
+    assert.match(localized(capabilities.notes[4], locale), /2026-09-30/);
+    assert.match(localized(capabilities.notes[4], locale),
+      /https:\/\/github.com\/github\/app\/blob\/f37efcac9f6563656e6bc9c49ccbdb20ddb3a856\/changelog.md/);
+  }
   assert.match(cells(capabilities, "Services that take GitHub and Azure DevOps work items to merged pull requests")[2],
     /GitHub agent merge; Azure DevOps lifecycle unverified/);
-  assert.match(capabilities.notes[4], /2026-09-30/);
-  assert.match(capabilities.notes[4], /https:\/\/github.com\/github\/app\/blob\/main\/changelog.md/);
-  assert.match(capabilities.notes[4], /unknown does not mean absent/);
+  assert.match(capabilities.notes[4].en, /unknown does not mean absent/);
+  assert.match(capabilities.notes[4].en, /v0\.2\.8 documents automation workspace reuse, not a verified shared claim\/release pool/);
+  assert.match(capabilities.notes[4].en, /CLI's documented LSP tools do not establish editor LSP support/);
   assert.doesNotMatch(JSON.stringify(capabilities), /Not evaluated/);
+});
+
+test("footprint preserves explicit measurement platforms and localized states", () => {
+  const platforms = footprint.rows.find((row) => row.label.en === "Measurement platform").values;
+  assert.deepEqual(platforms, ["Linux x64", "Linux x64", "Windows x64", "Linux x64", "Linux x64"]);
+  const states = footprint.rows.find((row) => row.label.en === "State").values;
+  assert.deepEqual(states.map((state) => state.en), ["No agent", "No extensions", "First-run, signed out", "First-run", "Shell pane"]);
+  assert.deepEqual(states.map((state) => state["zh-CN"]), ["未运行代理", "无扩展", "首次启动，未登录", "首次启动", "Shell 面板"]);
 });
 
 test("integrated footprint retains every Linux observation in product order", () => {

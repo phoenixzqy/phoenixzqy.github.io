@@ -380,8 +380,8 @@
             "zh-CN": "实测控制台基线，而非完整代理环境"
           },
           "description": {
-            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The comparison distinguishes Linux baselines from native Windows GitHub Copilot app first-run observations; it does not rank complete AI setups.",
-            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。对比区分 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测，并不对完整 AI 编码环境排名。"
+            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The README labels Linux baselines and native Windows GitHub Copilot app first-run observations in one shared table; it does not rank complete AI setups.",
+            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。README 在共享表格中分别标明 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测，并不对完整 AI 编码环境排名。"
           }
         }
       ],
@@ -482,7 +482,10 @@
                 "values": [
                   "✓",
                   "✓",
-                  "Not documented in editor [5]",
+                  {
+                    "en": "Unverified [5]",
+                    "zh-CN": "尚未核实 [5]"
+                  },
                   "— [3]",
                   "—"
                 ]
@@ -492,7 +495,10 @@
                 "values": [
                   "✓",
                   "—",
-                  "Not documented [5]",
+                  {
+                    "en": "Pool unverified [5]",
+                    "zh-CN": "共享池尚未核实 [5]"
+                  },
                   "— [4]",
                   "—"
                 ]
@@ -513,7 +519,10 @@
               "Orca's SSH worktrees are driven from its desktop or mobile app.",
               "Orca's public editor documentation does not describe language-server support.",
               "Orca documents creating a worktree per task plus archive/delete cleanup; it does not describe returning released checkouts to a shared reusable pool or recovering stale session claims.",
-              "Checked on 2026-09-30: https://github.com/github/app/blob/main/changelog.md documents built-in editor canvases (1.1.13), a code editor with line numbers and syntax highlighting (1.1.15), and code-editor fixes (1.1.21). https://docs.github.com/en/copilot/concepts/agents/github-copilot-app confirms a desktop app built on Copilot CLI, parallel worktrees, and scheduled automations. https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests documents background agent merge that fixes blockers and merges when GitHub allows. The agent-session guide permits Azure DevOps Git URL clones, but native Azure DevOps work-item/PR lifecycle support is unverified. Editor LSP, the UI implementation stack, and a claimed/released reusable pool with stale-session recovery remain unverified; Copilot CLI's documented LSP tools do not establish editor LSP support. These are documentation findings, not hands-on tests; unknown does not mean absent."
+              {
+                "en": "Sources checked 2026-09-30: GitHub's official app overview confirms a desktop workspace built on Copilot CLI; the UI stack remains unverified. https://github.com/github/app/blob/f37efcac9f6563656e6bc9c49ccbdb20ddb3a856/changelog.md confirms a code editor (v1.1.21) and line numbers/syntax highlighting (v1.1.15); editor LSP remains unverified, and Copilot CLI's documented LSP tools do not establish editor LSP support. Agent-session docs describe isolated worktrees and archive/delete management; changelog v0.2.8 documents automation workspace reuse, not a verified shared claim/release pool with stale-session recovery. The PR guide verifies CI/review fixes and background agent merge. Azure DevOps Git URLs can be cloned, but a native Azure DevOps work-item-to-merge service remains unverified. Documentation findings, not signed-in tests; unknown does not mean absent. Other source links are in the benchmark report and site provenance.",
+                "zh-CN": "来源核查于 2026-09-30：GitHub 官方概览确认这是基于 Copilot CLI 的桌面工作空间，UI 技术栈尚未核实。https://github.com/github/app/blob/f37efcac9f6563656e6bc9c49ccbdb20ddb3a856/changelog.md 确认代码编辑器（v1.1.21）及行号、语法高亮（v1.1.15）；编辑器 LSP 尚未核实，Copilot CLI 的 LSP 工具文档并不能证明编辑器支持 LSP。会话文档描述独立工作树及归档、删除管理；v0.2.8 记录自动化复用工作空间，但未证实共享认领/释放池及失效会话恢复。PR 指南确认修复 CI、评审问题与后台代理合并。支持克隆 Azure DevOps Git URL，但原生工作项到合并服务尚未核实。这些来自公开文档，并非登录后的实测；尚未核实不代表不存在。其他来源链接见基准报告与本站溯源记录。"
+              }
             ]
           },
           {
@@ -579,6 +588,47 @@
               "herdr (+ agent) [13]"
             ],
             "rows": [
+              {
+                "label": {
+                  "en": "Measurement platform",
+                  "zh-CN": "测量平台"
+                },
+                "values": [
+                  "Linux x64",
+                  "Linux x64",
+                  "Windows x64",
+                  "Linux x64",
+                  "Linux x64"
+                ]
+              },
+              {
+                "label": {
+                  "en": "State",
+                  "zh-CN": "状态"
+                },
+                "values": [
+                  {
+                    "en": "No agent",
+                    "zh-CN": "未运行代理"
+                  },
+                  {
+                    "en": "No extensions",
+                    "zh-CN": "无扩展"
+                  },
+                  {
+                    "en": "First-run, signed out",
+                    "zh-CN": "首次启动，未登录"
+                  },
+                  {
+                    "en": "First-run",
+                    "zh-CN": "首次启动"
+                  },
+                  {
+                    "en": "Shell pane",
+                    "zh-CN": "Shell 面板"
+                  }
+                ]
+              },
               {
                 "label": "Download",
                 "values": [
@@ -671,7 +721,7 @@
               }
             ],
             "notes": [
-              "Measured on one Linux machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1.",
+              "Linux figures measured on one machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1. The agent-qualified headers describe working setups, but these measurements cover only the stated baselines, excluding separately installed agents.",
               "The zai download and on-disk sizes are from the zai-cli 0.1.127 Linux x64 release archive, measured on 2026-09-29. The on-disk size excludes the coding-agent CLI, and the idle console has no agent running. These are workspace-only figures, not full AI setup totals.",
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services.",
               "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; the tree includes the app, WebView2, SDK CLI 1.0.90-0 helpers, and console hosts. CPU percentages use one logical core (100%).",

@@ -144,13 +144,15 @@ test("zai app comparisons render early with every catalog table", async ({ page,
     await expect(comparison.locator("tbody tr")).toHaveCount(
       app.comparison.groups.reduce((total, group) => total + group.rows.length, 0));
     await expect(comparison.locator(".comparison-source a")).toHaveAttribute("href", app.comparison.source.url);
-    const notes = app.comparison.groups.flatMap((group) => group.notes ?? []);
+    const english = (value) => typeof value === "string" ? value : value.en;
+    const notes = app.comparison.groups.flatMap((group) => group.notes ?? []).map(english);
     await expect(comparison.locator(".comparison-notes li")).toHaveCount(notes.length);
     for (let number = 1; number <= notes.length; number += 1) {
       await expect(comparison.locator(`#comparison-${app.id}-note-${number}`)).toHaveText(notes[number - 1]);
     }
     const references = app.comparison.groups
       .flatMap((group) => [...group.columns, ...group.rows.flatMap((row) => row.values)])
+      .map(english)
       .flatMap((value) => [...value.matchAll(/\[(\d+)\]/g)].map((match) => match[1]));
     await expect(comparison.locator(".comparison-note-reference a")).toHaveCount(references.length);
     for (const number of new Set(references)) {

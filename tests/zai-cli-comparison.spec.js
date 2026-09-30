@@ -27,7 +27,7 @@ test("zai-cli integrates Copilot with Orca/herdr while distinguishing measuremen
       await expect(table.getByRole("columnheader")).toHaveCount(6);
     }
     await expect(capabilities.getByRole("row", { name: /^Built-in code editor/ }).getByRole("cell").nth(2)).toContainText("✓");
-    await expect(capabilities.getByRole("row", { name: /^Language servers/ }).getByRole("cell").nth(2)).toContainText("Not documented in editor");
+    await expect(capabilities.getByRole("row", { name: /^Language servers/ }).getByRole("cell").nth(2)).toContainText(locale === "en" ? "Unverified" : "尚未核实");
     await expect(capabilities.getByRole("row", { name: /^Services that take/ }).getByRole("cell").nth(2)).toContainText("GitHub agent merge; Azure DevOps lifecycle unverified");
 
     const agents = comparison.getByRole("region", { name: titles[1], exact: true });
@@ -38,6 +38,11 @@ test("zai-cli integrates Copilot with Orca/herdr while distinguishing measuremen
     await expect(agents.getByRole("row", { name: /^Pi / })).toContainText("Node.js");
     await expect(agents.getByRole("row", { name: /^Claude Code / })).toContainText("2.1.281+");
 
+    const platform = footprint.getByRole("row", { name: locale === "en" ? /^Measurement platform/ : /^测量平台/ });
+    await expect(platform.getByRole("cell").nth(2)).toHaveText("Windows x64");
+    await expect(platform.getByRole("cell").nth(0)).toHaveText("Linux x64");
+    const state = footprint.getByRole("row", { name: locale === "en" ? /^State/ : /^状态/ });
+    await expect(state.getByRole("cell").nth(2)).toHaveText(locale === "en" ? "First-run, signed out" : "首次启动，未登录");
     const linuxMemory = footprint.getByRole("row", { name: /^Linux idle memory/ });
     await expect(linuxMemory).toContainText("≈ 40 MiB");
     await expect(linuxMemory.getByRole("cell").nth(2)).toHaveText("Not measured on Linux");

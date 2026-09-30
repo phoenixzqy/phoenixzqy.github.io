@@ -165,6 +165,8 @@ comparison rather than a standalone section. Platform-specific memory and CPU
 rows retain their distinct scopes; sharing columns does not make them comparable.
 The author's clarification confines the change to the Orca/herdr contents on the
 zai-cli page, not new third-party app pages.
+The synchronized README and exact measurement provenance are recorded at
+[zai-cli revision e4587078](https://github.com/phoenixzqy/zai-cli/commit/e4587078d12e9f5d2c52670bfdcfe612d61705a1).
 
 The author's [September 30, 2026 PR clarification](https://github.com/phoenixzqy/phoenixzqy.github.io/pull/23#issuecomment-5917290101)
 also requires the same separately installed coding-agent scope for zai-cli,
@@ -179,11 +181,13 @@ capability cells:
 
 | Source | Verified observation and limits |
 | --- | --- |
-| [Official app changelog](https://github.com/github/app/blob/main/changelog.md) | Versions 1.1.13, 1.1.15, and 1.1.21 document built-in editor canvases, a code editor with line numbers and syntax highlighting, and code-editor fixes. This supports the built-in editor cell without claiming tested feature parity. |
+| [Official app changelog, f37efcac](https://github.com/github/app/blob/f37efcac9f6563656e6bc9c49ccbdb20ddb3a856/changelog.md) | Versions 1.1.13, 1.1.15, and 1.1.21 document built-in editor canvases, a code editor with line numbers and syntax highlighting, and code-editor fixes. This supports the built-in editor cell without claiming tested feature parity. Version 0.2.8 documents scheduled automation workspace reuse, not a verified shared claim/release pool with stale-owner recovery. |
 | [App overview](https://docs.github.com/en/copilot/concepts/agents/github-copilot-app) | Desktop app built on Copilot CLI, supported on macOS/Linux/Windows, with isolated parallel worktrees and scheduled automations. It does not establish the UI implementation stack or a claimed/released reusable worktree pool with stale-session recovery. |
 | [Agent-session guide](https://docs.github.com/en/copilot/how-tos/github-copilot-app/agent-sessions) | Git URL cloning supports repositories outside GitHub, including Azure DevOps. Cloning is not evidence of native Azure DevOps work-item/PR lifecycle support. |
 | [Issues and pull requests guide](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests) | GitHub issue sessions, PR reviews, review/CI fixes, and background agent merge that survives restarts and merges when GitHub permits. Native Azure DevOps lifecycle support remains unverified. |
 | [Copilot CLI LSP guide](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/lsp-servers) | Language-server code intelligence is documented for the agent's CLI tools, not proven for the app's built-in editor. Editor LSP remains explicitly undocumented in the reviewed sources, not asserted absent. |
+| [Product page](https://github.com/features/ai/github-app) | Parallel sessions and scheduled workflows do not establish the UI implementation stack or editor LSP support. |
+| [Orca overview](https://www.onorca.dev/docs) and [herdr product page](https://herdr.dev/) | Both run users' existing coding-agent CLIs; use the shared separately installed agent footnote. |
 
 These are documentation findings, not hands-on Copilot app evaluations. The
 earlier authorized Windows measurements are retained unchanged in value and
