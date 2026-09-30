@@ -373,14 +373,22 @@ function renderDetail(app) {
   if (videos) content.append(videos);
   content.append(featureSection, platforms, install, notice(t("responsible"), app.notice));
 }
+// The first screenshot leads the gallery. Later landscape captures take a full
+// row, and small ones keep their natural size instead of being upscaled.
+function screenshotCardClass(screenshot, index, hasPortrait) {
+  if (index === 0) return `screenshot-card screenshot-wide${hasPortrait ? "" : " screenshot-row"}`;
+  if (screenshot.width <= screenshot.height) return "screenshot-card";
+  return `screenshot-card screenshot-row${screenshot.width < 1200 ? " screenshot-compact" : ""}`;
+}
 function screenshotSection(app) {
   if (!app.screenshots?.length) return null;
   const section = element("section", "app-section app-gallery");
   section.append(paragraph(t("inApp"), "eyebrow section-index"), element("h2", "", t("galleryHeading")));
   const intro = paragraph(t("galleryIntro"), "gallery-intro");
   const grid = element("div", "screenshot-grid");
+  const hasPortrait = app.screenshots.some((screenshot) => screenshot.width <= screenshot.height);
   app.screenshots.forEach((screenshot, index) => {
-    const figure = element("figure", `screenshot-card${index === 0 ? " screenshot-wide" : ""}`);
+    const figure = element("figure", screenshotCardClass(screenshot, index, hasPortrait));
     const image = element("img");
     image.src = screenshot.src;
     image.alt = screenshot.alt;

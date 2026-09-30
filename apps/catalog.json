@@ -238,6 +238,32 @@
       },
       "screenshots": [
         {
+          "src": "/apps/media/zai-cli/zai-cli-app-init-page.webp",
+          "alt": {
+            "en": "The zai console Welcome screen with the new-tab app picker open.",
+            "zh-CN": "zai 控制台欢迎页，已打开新标签页应用选择器。"
+          },
+          "caption": {
+            "en": "App init page",
+            "zh-CN": "应用初始页"
+          },
+          "width": 2560,
+          "height": 1164
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-working-with-managed-worktrees.webp",
+          "alt": {
+            "en": "The zai console showing managed worktrees shared by humans and agents.",
+            "zh-CN": "zai 控制台展示由人和代理共享的托管工作树。"
+          },
+          "caption": {
+            "en": "Working with managed worktrees",
+            "zh-CN": "使用托管工作树"
+          },
+          "width": 2560,
+          "height": 1392
+        },
+        {
           "src": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
           "alt": {
             "en": "A real-time coding-agent status hint in the zai console.",
@@ -554,7 +580,39 @@
           },
           "url": "https://github.com/phoenixzqy/zai-cli#how-it-compares"
         }
-      }
+      },
+      "videos": [
+        {
+          "src": "/apps/media/zai-cli/zai-cli-general-features-recorded-while-running-7-LLM-coding-sessions.mp4",
+          "poster": "/apps/media/zai-cli/zai-cli-general-features-recorded-while-running-7-LLM-coding-sessions-poster.webp",
+          "width": 1920,
+          "height": 1152,
+          "muted": true,
+          "title": {
+            "en": "General features, recorded while running 7 LLM coding sessions",
+            "zh-CN": "常用功能演示：同时运行 7 个 LLM 编码会话"
+          },
+          "caption": {
+            "en": "Tabs, split panes, the editor, diff review, and live agent status, captured while seven coding-agent sessions run side by side.",
+            "zh-CN": "在七个编码代理会话并行运行时录制：标签页、分屏、编辑器、差异审阅与实时代理状态。"
+          }
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-themes.mp4",
+          "poster": "/apps/media/zai-cli/zai-cli-themes-poster.webp",
+          "width": 1920,
+          "height": 872,
+          "muted": true,
+          "title": {
+            "en": "Themes",
+            "zh-CN": "主题"
+          },
+          "caption": {
+            "en": "Browse the built-in themes and watch the whole console restyle live.",
+            "zh-CN": "浏览内置主题，实时查看整个控制台的样式变化。"
+          }
+        }
+      ]
     },
     {
       "id": "zai-editor",

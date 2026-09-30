@@ -78,6 +78,8 @@ html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style
 .screenshot-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(230px, .72fr); gap: 18px; align-items: start; }
 .screenshot-card { margin: 0; min-width: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #11160f; }
 .screenshot-card img { display: block; width: 100%; height: auto; background: #e9edf3; }
+.screenshot-row { grid-column: 1 / -1; }
+.screenshot-compact { justify-self: start; width: min(100%, 640px); }
 .screenshot-card figcaption { padding: 13px 15px; border-top: 1px solid var(--line); color: #b5c1a8; font-size: 8px; letter-spacing: .7px; }
 .app-art-image { padding: 30px; }
 .app-artwork { position: relative; z-index: 1; display: block; width: min(100%, 300px); height: auto; }
@@ -210,7 +212,7 @@ html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style
   .comparison-table th, .comparison-table td { padding: 11px 12px; }
   .comparison-table .comparison-row-heading { min-width: 220px; }
   .screenshot-grid { grid-template-columns: 1fr; }
-  .screenshot-card:not(.screenshot-wide) { max-width: 390px; }
+  .screenshot-card:not(.screenshot-wide):not(.screenshot-row) { max-width: 390px; }
   .video-grid { grid-template-columns: 1fr; }
   .command-block { grid-template-columns: 1fr; padding: 16px; }
   .command-copy { justify-self: start; }

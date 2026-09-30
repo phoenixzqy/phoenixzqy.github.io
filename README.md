@@ -118,7 +118,9 @@ link back to those public README evidence and methodology sections. The
 allowlisted user documentation has source commit identifiers in
 `apps/docs/sources.json`. The app author supplied the wordmark and demo
 recordings for the site. For the September 30, 2026 update, the author also
-supplied a zai-cli status-hint screenshot for the app detail page. No private
+supplied a zai-cli status-hint screenshot for the app detail page, then
+supplied the zai-cli app init page and managed-worktrees screenshots and the
+general-features and themes demo recordings. No private
 source, contributor instructions, or unpublished packages belong in the public
 mirror.
 

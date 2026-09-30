@@ -168,18 +168,23 @@ test("zai app comparisons render early with every catalog table", async ({ page,
   }
 });
 
-test("zai-cli detail page presents its supplied screenshot", async ({ page }) => {
+test("zai-cli detail page presents its supplied screenshots and demos", async ({ page, browserName }) => {
+  test.skip(browserName === "webkit", "headless WebKit cannot instantiate media elements in this environment");
   await page.goto("/apps/app/?id=zai-cli&lang=en");
 
   const screenshots = page.locator(".screenshot-card img");
-  await expect(screenshots).toHaveCount(1);
+  await expect(screenshots).toHaveCount(3);
+  await expect(page.locator(".screenshot-card.screenshot-row")).toHaveCount(3);
+  await expect(page.locator(".screenshot-card").nth(2)).toHaveClass(/screenshot-compact/);
   await screenshots.first().scrollIntoViewIfNeeded();
-  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 600);
-  await expect(screenshots.first()).toHaveAttribute("alt", "A real-time coding-agent status hint in the zai console.");
-  await expect(page.locator(".video-player")).toHaveCount(0);
+  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 2560);
+  await expect(screenshots.first()).toHaveAttribute("alt", "The zai console Welcome screen with the new-tab app picker open.");
+  await expect(page.locator(".video-player")).toHaveCount(2);
+  await expect(page.getByText("General features, recorded while running 7 LLM coding sessions", { exact: true })).toBeVisible();
+  await expect(page.getByText("Themes", { exact: true })).toBeVisible();
 
   await page.goto("/apps/app/?id=zai-cli&lang=zh-CN");
-  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台中的编码代理实时状态提示。");
+  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台欢迎页，已打开新标签页应用选择器。");
 });
 
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {
