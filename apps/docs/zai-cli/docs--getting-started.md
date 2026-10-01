@@ -100,6 +100,31 @@ zai update
 
 The command always uses the published release source without a source-selection prompt. Extra arguments are forwarded to the installer (for example `zai update --on-conflict backup`). The console update action asks for confirmation before closing and restarting sessions.
 
+
+## Uninstall and remove local data
+
+Close zai apps and stop services before uninstalling. These commands delete `zai-cli` and its app-owned local data, including edited settings and saved runtime/session data. Python 3.10+ is required.
+
+macOS / Linux:
+
+```sh
+curl --proto '=https' --proto-redir '=https' -fsSL https://phoenixzqy.github.io/uninstall/zai-cli.sh | sh
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://phoenixzqy.github.io/uninstall/zai-cli.ps1 | iex
+```
+
+From a source checkout, run `python src/scripts/uninstall.py`, `sh src/scripts/uninstall.sh`, or `& ./src/scripts/uninstall.ps1`. All three contain the same standalone cleanup implementation and do not fetch more code. Preview with `python src/scripts/uninstall.py --dry-run`; pass `--install-dir /absolute/install/directory` for a custom installation.
+
+For hosted commands, set `ZAI_UNINSTALL_DRY_RUN=1` to preview or `ZAI_INSTALL_DIR` to select the absolute install directory before running the command. Shared theme cleanup respects `ZAI_THEME_CONFIG`. Editor cleanup also respects `ZAI_EDITOR_LSP_HOME` and `ZAI_EDITOR_PREVIEW_HOME`. Custom locations must be supplied again if they differ from their defaults.
+
+The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
+
+zai cleanup includes its packaged and derived agent homes, configs, service state, runs, logs, backups, private editor/viewer companions, and installer metadata. Standalone editor and viewer installations and their data remain. Git worktrees and their registry are retained because they contain project work.
+
 ## The two run modes
 
 Both modes are implemented. **Service mode** runs an automated poller+agent loop; **interactive console mode** opens a TUI multiplexer that hosts Copilot CLI, Pi, Codex, Claude Code, and OpenCode sessions as tabs and split panes on their managed zai homes.

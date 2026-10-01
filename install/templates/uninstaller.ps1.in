@@ -1,0 +1,35 @@
+# Generated from install/templates/. Requires Python 3.10+; no network at runtime.
+& {
+    $ErrorActionPreference = 'Stop'
+    $python = $null
+    $prefix = @()
+    foreach ($name in @('py', 'python', 'python3')) {
+        if (Get-Command $name -ErrorAction SilentlyContinue) {
+            $candidatePrefix = @()
+            if ($name -eq 'py') { $candidatePrefix = @('-3') }
+            & $name @candidatePrefix -c 'import sys; sys.exit(sys.version_info < (3, 10))'
+            if ($LASTEXITCODE -eq 0) { $python = $name; $prefix = $candidatePrefix; break }
+        }
+    }
+    if (-not $python) { throw 'Python 3.10+ is required to uninstall.' }
+    $program = @'
+@PYTHON@
+'@
+    $program | & $python @prefix - @args
+    if ($LASTEXITCODE -ne 0) { throw "Uninstaller failed with exit code $LASTEXITCODE" }
+    # Refresh only this entry; preserve session-only tools and virtual environments.
+    if ($env:ZAI_UNINSTALL_DRY_RUN -ne '1' -and $args -notcontains '--dry-run') {
+        $directory = $env:ZAI_INSTALL_DIR
+        if (-not $directory) { $directory = Join-Path $env:USERPROFILE '.zai' }
+        $at = [Array]::IndexOf($args, '--install-dir')
+        if ($at -ge 0 -and $at + 1 -lt $args.Count) { $directory = $args[$at + 1] }
+        $target = [IO.Path]::GetFullPath($directory).TrimEnd('\', '/')
+        $hasExecutables = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -in @('.exe', '.cmd', '.bat') }).Count -gt 0
+        if (-not $hasExecutables) {
+            $env:Path = ($env:Path -split ';' | Where-Object {
+                if (-not $_) { return $true }
+                [Environment]::ExpandEnvironmentVariables($_.Trim().Trim('"')).TrimEnd('\', '/') -ine $target
+            }) -join ';'
+        }
+    }
+} @args

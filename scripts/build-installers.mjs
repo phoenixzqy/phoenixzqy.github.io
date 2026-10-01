@@ -6,7 +6,7 @@
 //
 //   node scripts/build-installers.mjs          write install/<app-id>.{sh,ps1}
 //   node scripts/build-installers.mjs --check  fail if a committed file is stale
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -57,6 +57,10 @@ export async function buildInstallers() {
       );
       if (PLACEHOLDER.test(content.replace(PLACEHOLDER, ""))) throw new Error(`${label}: unexpanded placeholder.`);
       files.set(`install/${installer.appId}.${extension}`, content);
+      const python = expand(await readFile(join(templates, "uninstaller.py.in"), "utf8"), values, label);
+      files.set(`uninstall/${installer.appId}.py`, python);
+      const uninstall = await readFile(join(templates, `uninstaller.${extension}.in`), "utf8");
+      files.set(`uninstall/${installer.appId}.${extension}`, uninstall.replace("@PYTHON@", () => python.trimEnd()));
     }
   }
   return files;
@@ -71,7 +75,10 @@ async function main() {
     const existing = await readFile(file, "utf8").catch(() => null);
     if (existing === content) continue;
     if (check) stale.push(path);
-    else await writeFile(file, content);
+    else {
+      await mkdir(dirname(file), { recursive: true });
+      await writeFile(file, content);
+    }
   }
   if (stale.length) {
     console.error(`Installers are out of date: ${stale.join(", ")}. Run "npm run build:installers".`);
