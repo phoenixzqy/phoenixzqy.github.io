@@ -71,4 +71,7 @@ fails `Load`, a pre-existing config carrying a value that predates these bounds
 (for example an `agent_limit` above `16`) will fail startup and the affected
 `config` commands with a path-specific error naming the field. Correct it by
 editing `config.json` directly to a value inside the accepted range, or by
-running `zai config delete` followed by `zai config init`.
+running `zai config delete` followed by `zai config show` to recreate defaults.
+Deletion discards the repository's configs and profiles; repair the original
+file when you need to preserve those settings. Automatic creation never replaces
+an existing invalid config or falls back from a missing selected named profile.

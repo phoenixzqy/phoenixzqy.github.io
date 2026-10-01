@@ -42,7 +42,12 @@ checkout recorded by service history is normalized to its repository's main
 working tree. Adding a project in the console opens the Projects panel's **+ Add Project**
 folder browser, validates an absolute path (expanding a leading `~`), optionally
 creates a missing selected folder after confirmation (or a named folder made
-with **New folder**), and registers the path. Registry order is the Projects
+with **New folder**), and registers the path. Registration persists missing
+default config for every project kind: service defaults for forge projects and
+minimal local settings for git and directory projects. Existing settings and
+active profiles are preserved, including on repeat registration; invalid files
+and missing selected named profiles remain errors. Adding a project in the
+console opens its Config right rail for review, including repeat registration. Registry order is the Projects
 panel order; Shift+Up/Shift+Down in the panel rewrite it.
 Projects migrated without a known location show "location unknown; open to
 locate it"; opening that project, or one whose folder is missing, opens

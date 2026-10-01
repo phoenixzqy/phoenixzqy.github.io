@@ -135,6 +135,8 @@ and `ZAI_RELEASE_MANIFEST_URL` override the install location and the metadata
 source. Because the installers only trust the manifest, publishing a release is
 a pure data change to `manifest.json`.
 
+Prerequisites are checked before release downloads. The zai-cli bootstrap requires a working Python 3.10+ interpreter (`python3`/`python` on macOS/Linux; `py -3`/`python`/`python3` on Windows), then runs `install.py` from the verified archive root. macOS/Linux bootstraps for the standalone tools require Python 3 for metadata parsing. Shell installers also check for `curl` or `wget` and `sha256sum` or `shasum`; ZIP extraction can fall back to the selected Python interpreter. Missing, old, or broken Python fails with installation guidance before the bundled installer creates `~/.zai`. Coding-agent CLIs, Git, and Node.js/npm are runtime dependencies where needed, not prerequisites for installing the zai archive.
+
 An entry may advertise these commands on its detail page:
 
 ```json

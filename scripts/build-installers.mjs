@@ -42,16 +42,20 @@ export async function buildInstallers() {
       APP_ID: installer.appId,
       EXECUTABLE: installer.executable,
       DISPLAY_NAME: installer.displayName,
+      PYTHON_MIN_MINOR: installer.mode === "python" ? "10" : "0",
+      PYTHON_VERSION: installer.mode === "python" ? "3.10" : "3",
     };
     for (const [extension, indented] of [["sh", false], ["ps1", true]]) {
       const shell = await readFile(join(templates, `installer.${extension}.in`), "utf8");
       const step = await readFile(join(templates, `install-${installer.mode}.${extension}.in`), "utf8");
       const label = `${installer.appId}.${extension}`;
+      const prerequisite = extension === "ps1" && installer.mode === "python"
+        ? await readFile(join(templates, "prerequisites-python.ps1.in"), "utf8") : "";
       const body = expand(step, values, label).replace(/\n+$/, "");
       const content = expand(
         // A function replacer keeps `$$`, `$&`, and friends literal: the shell
         // step uses `$$` for a per-process staging name.
-        shell.replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
+        shell.replace("@PREREQUISITE_STEP@\n", () => prerequisite ? prerequisite.trimEnd() + "\n" : "").replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
         values,
         label,
       );

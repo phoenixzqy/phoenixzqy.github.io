@@ -2,22 +2,22 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "3322253759ac6e397dc5b098db28ca566f036cfd",
-  "commit": "3322253759ac6e397dc5b098db28ca566f036cfd",
+  "ref": "7599d24feeb078f80552e1cae3163ef9347a04c1",
+  "commit": "7599d24feeb078f80552e1cae3163ef9347a04c1",
   "documents": [
     {
       "slug": "docs--install-and-config",
-      "title": "AI-guided install and configuration",
+      "title": "Install and configure zai",
       "source": "docs/install-and-config.md",
       "file": "docs--install-and-config.md",
-      "bytes": 6724
+      "bytes": 4950
     },
     {
       "slug": "docs--getting-started",
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 14979
+      "bytes": 14620
     },
     {
       "slug": "docs--claude-code",
@@ -38,14 +38,14 @@
       "title": "Services, pollers, and labels",
       "source": "docs/services-and-pollers.md",
       "file": "docs--services-and-pollers.md",
-      "bytes": 4601
+      "bytes": 4942
     },
     {
       "slug": "docs--config",
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 6054
+      "bytes": 6947
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
@@ -66,7 +66,7 @@
       "title": "Project registry and local project config",
       "source": "docs/config/project-registry.md",
       "file": "docs--config--project-registry.md",
-      "bytes": 2705
+      "bytes": 3124
     },
     {
       "slug": "docs--config--samples",
@@ -80,7 +80,7 @@
       "title": "Validation and boundaries",
       "source": "docs/config/validation-and-boundaries.md",
       "file": "docs--config--validation-and-boundaries.md",
-      "bytes": 6883
+      "bytes": 7142
     }
   ],
   "assets": []
