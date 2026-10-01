@@ -1,62 +1,14 @@
-# AI-guided install and configuration
+# Install and configure zai
 
-## Give these instructions to your AI
+## Prerequisites
 
-This guide lives in the repository. An AI tool may not have repository access,
-so copy the instructions if it cannot read your checkout or the GitHub page.
+Installing a pre-built release requires **Python 3.10 or newer** on PATH. On macOS/Linux, the command below also needs `curl`; the bootstrap supports `curl` or `wget` when run from a downloaded file, and `sha256sum` or `shasum` for checksum verification. ZIP extraction uses `unzip`, `bsdtar`, a ZIP-capable `tar`, or the selected Python interpreter. No source checkout, Go toolchain, GitHub sign-in, or coding-agent CLI is needed to install the package.
 
-1. Open `docs/install-and-config.md` in your checkout or on GitHub.
-2. Copy everything from **Instructions to paste into AI** below through the end of the page.
-3. Start Copilot CLI, then paste the copied text into the conversation with the request below. Share only the guide instructions, never passwords, tokens, or browser cookies.
+The bootstrap checks that Python runs and meets the minimum version before downloading the release. It tries `python3`, then `python` on macOS/Linux; on Windows it tries `py -3`, `python`, then `python3`. If none works, install [Python](https://www.python.org/downloads/), enable its PATH option on Windows, open a new terminal, and rerun the installer.
 
-```bash
-copilot --yolo
-```
+Git and an authenticated coding-agent CLI are needed for repository sessions and services. Node.js/npm is needed for npm-distributed coding agents and automatic provisioning of supported providers; the zai package installer does not install coding agents. Provider authentication is separate from installing zai. See [getting started](?id=zai-cli&doc=docs--getting-started#installation), [Claude Code](?id=zai-cli&doc=docs--claude-code), and [OpenCode](?id=zai-cli&doc=docs--opencode) for provider requirements.
 
-```text
-Use the following instructions to install zai and configure my repositories:
-
-[Paste the copied guide instructions here.]
-```
-
-## Instructions to paste into AI
-
-Install zai and onboard the repositories the human names by following
-the steps below. Use this supplied text directly; do not require fetching this
-page again. If a linked reference is inaccessible behind SSO, ask the human to
-open it in their browser and paste the relevant instructions. Do not ask for
-sign-in credentials, tokens, or browser cookies.
-
-After setup, point the human at the installed CLI for ongoing usage.
-
-## Prime directive: the installed CLI is the source of truth
-
-This page tells you **which command to run and which question to ask**. It
-deliberately does not restate command flags, config fields, defaults, labels, or
-workflows, because the installed build already documents them and this page
-would drift away from it.
-
-After the install succeeds, read the installed documentation and treat it as
-authoritative for every later decision:
-
-```bash
-zai doc            # the full guide: config, services, console, labels
-zai -h             # command summary
-zai <command> -h   # exact flags for one command
-```
-
-If this page and `zai doc` ever disagree, `zai doc` wins.
-
-## Step 1 — check the prerequisites
-
-You are already running inside Copilot CLI, so confirm the rest: `git` works and the runtime prerequisites listed in the [getting-started guide's installation section](?id=zai-cli&doc=docs--getting-started#installation) are present.
-
-Report anything missing to the human and let them decide rather than guessing at a fix.
-
-## Step 2 — install
-
-Run the single-line installer command for the human's platform. It removes its
-temporary download on success or failure and leaves the current directory clean.
+## Install the public release
 
 macOS / Linux:
 
@@ -70,103 +22,43 @@ Windows PowerShell:
 irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex
 ```
 
-This is the public release installer. It needs no GitHub sign-in, token, or
-repository access: it reads the published manifest over anonymous HTTPS and
-verifies the downloaded archive's SHA-256 before installing it. Never embed a
-token in an installer or image.
+The bootstrap reads the public release manifest over anonymous HTTPS, verifies the archive's SHA-256, and runs **`install.py` from the archive root**. That Python entry point and its bundled installer modules create `~/.zai`, install `zai`, `zai-hook`, the private editor/viewer companions, and the packaged `.copilot` home, and update persistent user PATH. Downloads are removed on success or failure. `ZAI_INSTALL_DIR` selects another destination.
 
-## Step 3 — verify the install
+Open a new terminal after installation, then verify:
 
-```bash
+```text
 zai version
+zai doc
+zai -h
 ```
 
-The installer adds the install directory to the user's persistent `PATH`, which
-does not affect the shell you are already in. If the command is not found, use
-the full path to the installed binary for the rest of this session and tell the
-human to open a new terminal afterwards.
+Use `zai <command> -h` for the flags supported by your installed version. The installed CLI documentation is the source of truth for commands, configuration fields, defaults, and workflows.
 
-## Step 4 — read the installed documentation
+### If installation fails or `~/.zai` is missing
 
-Run `zai doc` now and keep its output in mind for the remaining steps.
-It is where the config file shape, the poller settings, the service model, the
-label catalog, and the console workflow are actually specified.
+The folder is created by the bundled Python installer, not by downloading or extracting the archive. Missing or unsupported Python, a failed download or checksum, or a malformed archive can stop the bootstrap before that step. Read the terminal's error message, correct the reported problem, and rerun the installer; creating an empty `.zai` folder does not install the application.
 
-## Step 5 — ask which repositories to onboard
+For a manual installation, download the archive for your platform from the [releases page](https://phoenixzqy.github.io/apps/releases/?id=zai-cli), verify its published SHA-256, and extract the entire archive. From its root, run `python3 install.py` on macOS/Linux or `py -3 install.py` on Windows, using a Python 3.10+ interpreter. Keep the adjacent `_installer.py` and other bundled modules together. Directory creation or write failures name the affected path; choose a writable destination with `--install-dir` when needed.
 
-Configuration is **per repository**, so ask the human which repositories they
-want zai to work on:
+If installation succeeded but `zai` is not found, open a new terminal for the persistent PATH change, or run the executable by its full path (`~/.zai/zai` on macOS/Linux, `%USERPROFILE%\.zai\zai.exe` on Windows). Check `ZAI_INSTALL_DIR` if the default folder is absent.
 
-> Which repository would you like to onboard? Please paste its absolute local
-> path. You can list several, one per line.
+## Configure each repository
 
-Ask for paths. **Do not scan the disk for repositories** — it is slow, it reads
-directories the human did not offer you, and it produces a list they then have
-to filter anyway.
+From inside a local checkout with a supported GitHub or Azure DevOps remote, run:
 
-Validate each answer before continuing: the path must exist and
-`git -C <path> remote get-url origin` must resolve to a GitHub or Azure DevOps
-remote. If it does not, say so and ask again.
-
-## Step 6 — ask the model for each repository
-
-For each repository the human named, ask which coding model its services should
-use:
-
-> Which model should zai use for `<repo>`? `auto` lets the coding
-> agent pick per run, or name a specific model id.
-
-Recommend `auto` unless they have a reason to pin one. Ask once per repository —
-a heavy repository and a small one often deserve different answers. Use one
-answer for all four services unless the human asks to differentiate.
-
-## Step 7 — write the config file
-
-Do **not** run `zai config init`: it opens an interactive TUI you
-cannot drive. Follow the "Onboard a repository without the interactive editor"
-section of `zai doc` instead. In short, for each repository:
-
-1. `cd` into the repository.
-2. Run `zai config path` to get the file to write, and
-   `zai config show` to get the detected repo identity.
-3. Write that file, using the minimal config shape from `zai doc` with
-   the repo identity from step 2 and the model from step 6.
-
-The file lands under `~/.zai/configs/`, in the zai home. It
-never goes inside the repository, so onboarding leaves the repository's working
-tree clean — confirm that with `git status` before moving on.
-
-## Step 8 — verify and hand off
-
-From each repository, confirm the config loads:
-
-```bash
+```text
 zai config show
+zai config path
 ```
 
-It reports `initialized=true` and fails loudly on a bad value. Fix and re-run
-until it loads.
+`config show` creates missing default settings and reports `initialized=true` and the detected repository identity. `config path` locates the active profile's file without creating one. Configuration lives under `~/.zai/configs/`, outside the checkout. Existing settings and active profile choices are preserved; invalid files and missing selected named profiles remain errors to repair.
 
-Then tell the human what they now have, and point them at the CLI rather than
-repeating it yourself:
+Review or edit the file reported by `config path`, or use `zai config update` for the interactive editor. Preserve its repository identity and existing settings. The output of `config show` is a report, not a configuration file; do not write it back as JSON. Read the "Onboard a repository without the interactive editor" section of `zai doc` for the current schema and model choices.
 
-- `zai start all` runs the services for the repository you are in.
-- `zai` opens the console TUI on the same harness.
-- `zai doc` documents everything else, including how to change the
-  configuration you just created.
+Verify any edits with `zai config show`, then start the repository's services:
 
-For console users, confirm the activity controls are readable. Built-in images
-or the automatic `S`, `T`, `G`, `>_` text fallback are both expected. Do not ask
-the human to install fonts or change terminal profiles.
+```text
+zai start all
+```
 
-## Related documentation
-
-- [`getting-started.md`](?id=zai-cli&doc=docs--getting-started) — installation, updates, and the
-  command table.
-- [`config.md`](?id=zai-cli&doc=docs--config) — the full per-repository configuration reference.
-- [`opencode.md`](?id=zai-cli&doc=docs--opencode) — OpenCode installation, separate authentication,
-  provider selection, and compatibility.
-- `architecture.md` — what the services do and how they fit
-  together.
-- `testing-and-operations.md` — operating and
-  debugging an install.
+Run `zai` to open the console. Repeat configuration from each repository you want to use. For ongoing usage, consult `zai doc`, `zai config -h`, and the [configuration reference](?id=zai-cli&doc=docs--config).

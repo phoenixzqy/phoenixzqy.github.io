@@ -23,8 +23,12 @@ Copilot (`copilot`), Pi (`pi`), Codex (`codex`), Claude Code (`claude`), and Ope
 are selectable through `coding_agent` without an opt-in setting.
 Omitting it still selects Copilot. Service runs require the selected CLI on
 `PATH` and fail explicitly when it is missing; changing the selection takes
-effect at the next daemon start. Console automations also use this selection
-when their scheduler is created; reopen the console after changing it.
+effect at the next daemon start. Console automations save their own `coding_agent` and `model` in `automation.json`.
+The Automations editor remembers the last successfully saved pair for the
+repository and preselects it for the next new automation. Either choice can be
+changed. Definitions without a provider inherit the project's selection captured
+when its scheduler is created; reopen the console after changing that inherited
+selection. See Automations for the settings and defaults.
 Codex setup covers the required codex-evo fork and managed
 authentication. [Claude Code setup](?id=zai-cli&doc=docs--claude-code) covers its managed
 authentication and model aliases.
@@ -41,6 +45,14 @@ field reference.
 The repository-relative `working_directory` accepts either `packages/app` or
 the equivalent `./packages/app`; the leading `./` is normalized away.
 
+Adding or registering a project creates missing default config automatically
+and adding through the console opens its Config right rail for review. Existing
+settings and active profiles are preserved. Headless forge-repository onboarding
+can use `zai config show`; it creates missing defaults and reports
+`initialized=true` plus the effective label catalog. `zai start`, config update,
+and profile list/add also ensure missing defaults. Invalid existing configs or
+a missing selected named profile remain errors.
+
 The console project registry lives at `~/.zai/projects.json`. Forge projects
 reuse `~/.zai/configs/<repo-slug>/`; non-forge projects store
 `config.json` under `~/.zai/configs/_project-<name>-<12-hex-sha256-prefix>/` with
@@ -52,7 +64,7 @@ and `console_device_status_interval_seconds` live in
 left-rail **Settings** page alongside themes. Unlike themes, these edits are a
 draft until saved with Ctrl+S; while any differ from the saved file the page
 shows an unsaved-changes reminder, and Ctrl+R discards them. Defaults are YOLO off and 2000
-scrollback lines, with device status on and refreshing every five seconds
+scrollback lines, with CPU/MEM status in the footer on and refreshing every five seconds
 (accepted interval: 1–300 seconds). Saved device preferences apply immediately
 in the current console; Ctrl+R applies preferences saved by another console.
 No project preference is imported into the app setting. A
@@ -63,8 +75,8 @@ Scrollback is app-wide only. Themes retain the shared
 configuration stays project-scoped.
 
 The console remembers the last used coding-agent client separately in
-`~/.zai/agent-client.json` (under the active installation home). Sessions opens
-and receives keyboard focus at startup, selecting that client when available
+`~/.zai/agent-client.json` (under the active installation home). For existing
+projects, Sessions opens and receives keyboard focus at startup, selecting that client when available
 or the first available client otherwise. Successful launches/resumes and
 explicit Sessions client-tab selections update it automatically across projects;
 New Tab and Split pickers also preselect the remembered client when launchable.

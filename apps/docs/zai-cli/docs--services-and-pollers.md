@@ -64,8 +64,12 @@ one repository. See the field reference.
 
 ## Configuration
 
-A repository needs a config before services start. `zai config init` creates
-one and `zai config update` edits it. Named profiles are managed with
+`zai start` creates missing default repository config automatically. Adding or
+registering a console project also creates missing defaults; adding a project
+opens its Config right rail for review, including repeat registration. Use `zai config update` to edit
+the active config, or `zai config show` for headless creation and inspection.
+Existing settings and active profiles are preserved; invalid files and missing
+selected named profiles remain errors. Named profiles are managed with
 `zai config profile add/use/delete/edit`. Configs live under
 `~/.zai/configs/<repo-slug>/`. See the [configuration reference](?id=zai-cli&doc=docs--config),
 discovery and management, and

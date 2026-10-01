@@ -35,8 +35,11 @@ up the persistent `PATH` change. `ZAI_INSTALL_DIR` chooses another destination
 and any extra arguments are forwarded to the package installer.
 
 Packages are pre-built, so no source clone or Go toolchain is required. Install
-Python 3.10 or newer before running the installer; macOS/Linux also need `curl`
-and `unzip`. The package installer does not install coding-agent CLIs. Hosted
+Python 3.10 or newer on PATH before running the installer. The bootstrap probes
+for a working interpreter before downloading the release and stops with setup
+instructions if none meets the minimum version. macOS/Linux also need `curl`
+for the one-line command and `sha256sum` or `shasum` for verification; ZIP
+extraction can use `unzip`, `bsdtar`, a ZIP-capable `tar`, or Python. The package installer does not install coding-agent CLIs. Hosted
 launches can provision the supported npm-distributed Pi, Claude Code, and
 OpenCode CLIs when missing; other providers must already be installed.
 
@@ -50,38 +53,16 @@ Release notes are the canonical changelog; see
 How releases are built and published is documented in
 `releases.md`.
 
-### Optional AI-guided install and setup
+### Repository setup
 
-To have Copilot install zai and configure repositories for you instead, use the
-[AI-guided install guide](?id=zai-cli&doc=docs--install-and-config). It asks which repositories to
-onboard and which model each should use, then writes the per-repository configs.
-If your AI cannot access the guide, copy the instructions rather than sharing
-only a link.
-
-1. Open [the install guide](?id=zai-cli&doc=docs--install-and-config) in your checkout or on GitHub.
-2. Copy the guide from **Instructions to paste into AI** through the end of the page.
-3. Start Copilot CLI, then paste the copied instructions into the conversation with the request below. Copy only the guide text, never passwords, tokens, or browser cookies.
-
-```bash
-copilot --yolo
-```
-
-```text
-Use the following instructions to install zai and configure my repositories:
-
-[Paste the copied guide instructions here.]
-```
-
-The guide defers to `zai doc` on the freshly installed build for every command,
-config field, and workflow, so its guidance cannot drift from the version you
-are running.
+Follow [Install and configure zai](?id=zai-cli&doc=docs--install-and-config#configure-each-repository) for direct setup. From a supported repository, `zai config show` creates missing defaults; `zai config path` locates the active profile for editing. Use `zai doc` and command help for your installed version.
 
 ### What the installer sets up
 
 Console activity icons are built in, with automatic readable text fallback when
 terminal images are unavailable. No font setup is required.
 
-The installer copies package-owned files into `~/.zai` and installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it overwrites the previously installed package-owned content so the home always reflects the latest release. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai does not require a coding-agent CLI.
+The bundled Python installer creates `~/.zai` and installs `zai`, `zai-hook`, private `.zai-editor`/`.zai-gitter` companions, and package-owned files there. It installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it replaces unchanged package-owned files while handling locally edited prompts through the conflict policy described below. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai does not require a coding-agent CLI.
 
 The installer also adds the install directory to your persistent user `PATH`
 (the Windows user environment, or your shell profile on macOS/Linux) so you can
@@ -173,7 +154,7 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai` | Open the project-based console TUI from any folder on a quiet Welcome tab, without launching an agent. `ctrl+\ n` opens an app. |
 | `zai start <all\|service\|list>` | Start one repo-scoped background daemon that runs `dev`, `review`, `pr-babysitter`, and `housekeep` (`all`), one service, or a comma-separated subset. |
 | `zai stop` / `zai restart` / `zai status` | Stop, restart with the same services, or show this repository's daemon. |
-| `zai config <show\|path\|init\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |
+| `zai config <show\|path\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |
 | `zai repo-harness <eval\|eval-and-fix>` | Score a repository's docs, AI instructions/skills, and test-coverage readiness in an HTML report; `eval-and-fix` also fixes the issues found. |
 | `zai doctor` | Check package layout and the configured coding agent's CLI availability. |
 | `zai update` | Download the latest release and reinstall. |

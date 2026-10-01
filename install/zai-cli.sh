@@ -48,6 +48,20 @@ case "$(uname -m)" in
 esac
 
 # --- Tools ----------------------------------------------------------------
+PYTHON=''
+for candidate in python3 python; do
+  if command -v "$candidate" >/dev/null 2>&1 &&
+      "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))' >/dev/null 2>&1; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+[ -n "$PYTHON" ] ||
+  fail 'A working Python 3.10 or newer is required on PATH (python3 or python). Install it from https://www.python.org/downloads/, open a new terminal, and rerun the installer. Nothing was installed.'
+
+if ! command -v sha256sum >/dev/null 2>&1 && ! command -v shasum >/dev/null 2>&1; then
+  fail 'no SHA-256 tool was found. Install sha256sum (coreutils) or shasum and run the command again. Nothing was installed.'
+fi
 if command -v curl >/dev/null 2>&1; then
   DOWNLOADER=curl
 elif command -v wget >/dev/null 2>&1; then
@@ -113,10 +127,8 @@ extract() {
     bsdtar -xf "$1" -C "$2" || fail 'the downloaded archive could not be extracted with bsdtar.'
   elif tar -xf "$1" -C "$2" 2>/dev/null; then
     :
-  elif command -v python3 >/dev/null 2>&1; then
-    python3 -m zipfile -e "$1" "$2" || fail 'the downloaded archive could not be extracted with python3.'
   else
-    fail 'no ZIP extraction tool was found. Install unzip, bsdtar, or python3 and run the command again.'
+    "$PYTHON" -m zipfile -e "$1" "$2" || fail 'the downloaded archive could not be extracted with Python.'
   fi
 }
 
@@ -150,9 +162,7 @@ WORK="$(mktemp -d 2>/dev/null || mktemp -d -t zai-install)" ||
 MANIFEST="$WORK/manifest.json"
 download "$MANIFEST_URL" "$MANIFEST"
 
-command -v python3 >/dev/null 2>&1 ||
-  fail 'python3 is required to read release metadata safely. Install Python 3 and run the command again.'
-if ASSET="$(python3 - "$MANIFEST" "$PLATFORM" "$ARCHITECTURE" <<'PY'
+if ASSET="$("$PYTHON" - "$MANIFEST" "$PLATFORM" "$ARCHITECTURE" <<'PY'
 import json
 import sys
 
@@ -243,16 +253,6 @@ extract "$ARCHIVE" "$EXTRACT"
 # the real installation (executable, agent homes, PATH) and reports its own
 # result. The entry point is exactly 'install.py' beside its '_installer.py'
 # library; the archive carries other .py files that must never be run instead.
-PYTHON=''
-for candidate in python3 python; do
-  if command -v "$candidate" >/dev/null 2>&1; then
-    PYTHON="$candidate"
-    break
-  fi
-done
-[ -n "$PYTHON" ] ||
-  fail "Python 3.10 or newer is required but no 'python3' was found on PATH. Install Python, then run the command again."
-
 PACKAGE_INSTALLER="$EXTRACT/install.py"
 [ -f "$PACKAGE_INSTALLER" ] ||
   fail "the package did not contain 'install.py' at its root. Nothing was installed."
@@ -263,8 +263,8 @@ fi
 
 info "Running the bundled package installer with $PYTHON…"
 # The script itself arrives on stdin when piped to sh, so reattach the terminal
-# where one is actually usable; the package installer may ask before installing
-# the agent CLI. Probe in a subshell: /dev/tty can exist and still not open,
+# where one is actually usable; the package installer may ask about locally modified
+# packaged prompts. Probe in a subshell: /dev/tty can exist and still not open,
 # and a redirection error on a compound command would end this script.
 if (exec 3</dev/tty) 2>/dev/null; then
   "$PYTHON" "$PACKAGE_INSTALLER" "$@" </dev/tty || fail 'the bundled package installer did not complete.'
