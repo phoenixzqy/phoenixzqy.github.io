@@ -361,6 +361,13 @@ function renderDetail(app) {
   const steps = element("ol", "installation-list");
   app.installation.forEach((text) => steps.append(element("li", "", text)));
   install.append(steps);
+  if (app.uninstallCommands?.length) {
+    install.append(element("h3", "", t("uninstallHeading")), paragraph(t("uninstallCommandsIntro"), "gallery-intro"));
+    const commands = element("div", "command-list");
+    app.uninstallCommands.forEach((entry) => commands.append(commandBlock(entry)));
+    install.append(commands);
+    app.uninstallation?.forEach((text) => install.append(paragraph(text)));
+  }
   if (app.documentation) {
     const more = paragraph("");
     more.className = "docs-pointer";

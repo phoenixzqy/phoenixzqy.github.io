@@ -104,16 +104,21 @@ export function validateCatalog(catalog) {
       }
       unique(app.videos.map(({ src }) => src), "Video sources");
     }
-    if (app.installCommands !== undefined) {
-      list(app.installCommands, `${app.id}.installCommands`, 1, 6);
-      for (const entry of app.installCommands) {
+    for (const field of ["installCommands", "uninstallCommands"]) {
+      if (app[field] === undefined) continue;
+      list(app[field], `${app.id}.${field}`, 1, 6);
+      for (const entry of app[field]) {
         object(entry, "Installation command");
         localizedText(entry.label, "Installation command label", 120);
         text(entry.command, "Installation command", 400);
         requireValue(INSTALL_COMMAND.test(entry.command),
           "Installation commands must be plain printable ASCII, so they stay copyable.");
       }
-      unique(app.installCommands.map(({ command }) => command), "Installation commands");
+      unique(app[field].map(({ command }) => command), `${app.id}.${field}`);
+    }
+    if (app.uninstallation !== undefined) {
+      list(app.uninstallation, `${app.id}.uninstallation`);
+      app.uninstallation.forEach((item) => localizedText(item, `${app.id}.uninstallation item`));
     }
     if (app.documentation !== undefined) {
       requireValue(app.documentation === true, "Documentation must be true when present, or omitted.");

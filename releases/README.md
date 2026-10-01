@@ -18,6 +18,7 @@ Review the contents of each package, not just its filename.
 - `/apps/docs/?id=bplayer` — mirrored user documentation, when the entry sets
   `"documentation": true`.
 - `/install/<app-id>.sh` and `/install/<app-id>.ps1` — one-line installers.
+- `/uninstall/<app-id>.sh`, `.ps1`, and `.py` — standalone app uninstallers.
 
 The detail and download pages are shared by every app. Add an entry to
 `apps/catalog.json` and a `releases/<id>/latest/manifest.json`; no new HTML or
@@ -145,6 +146,22 @@ An entry may advertise these commands on its detail page:
 ```
 
 Commands must be plain printable ASCII so they survive copy and paste.
+
+## One-line uninstallers
+
+The zai apps also expose `uninstallCommands` and localized `uninstallation` notes on their detail pages. Generate `/uninstall/<app-id>.sh`, `.ps1`, and `.py` with `npm run build:installers` from `install/templates/uninstaller.*.in`; the source repositories carry matching standalone scripts. All cleanup logic is embedded in each shell entrypoint, with no additional network fetch or dependency on an installed app. Python 3.10+ is required on every platform.
+
+```sh
+curl --proto '=https' --proto-redir '=https' -fsSL https://phoenixzqy.github.io/uninstall/zai-editor.sh | sh
+```
+
+```powershell
+irm https://phoenixzqy.github.io/uninstall/zai-editor.ps1 | iex
+```
+
+These are destructive app removals: close the apps and services first. Set `ZAI_UNINSTALL_DRY_RUN=1` to preview; `ZAI_INSTALL_DIR` selects a custom absolute install directory. Local `.py`, `.sh`, and `.ps1` scripts also accept `--dry-run` and `--install-dir`. App-owned settings, runtime homes, logs, and data are removed; sibling apps, project files, Git worktrees, and independently installed coding agents are preserved. Custom editor data and theme locations use their original `ZAI_EDITOR_LSP_HOME`, `ZAI_EDITOR_PREVIEW_HOME`, and `ZAI_THEME_CONFIG` variables. The shared PATH entry remains while another executable needs it. Otherwise exact installer-added profile lines or the matching Windows user PATH entry are removed; manually authored shell configuration is preserved. Open a new terminal afterwards. The shared `releases/install.lock` is retained to preserve installer coordination; partial failures retain a per-app recovery marker for retry. Ambiguous caches in custom LSP roots and global theme settings are preserved.
+
+Uninstaller content provenance: the owner requested per-app cleanup on 2026-10-01. The published templates and disposable-home regression fixtures define and verify the behavior described here and in the catalog; no private application source or release package is copied into the public site.
 
 ## App comparison tables
 

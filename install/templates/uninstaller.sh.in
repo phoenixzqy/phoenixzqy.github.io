@@ -1,0 +1,8 @@
+#!/bin/sh
+# Generated from install/templates/. Requires Python 3.10+; no network at runtime.
+set -eu
+command -v python3 >/dev/null 2>&1 || { printf '%s\n' 'Python 3.10+ is required to uninstall.' >&2; exit 1; }
+python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { printf '%s\n' 'Python 3.10+ is required to uninstall.' >&2; exit 1; }
+python3 - "$@" <<'ZAI_UNINSTALL_PYTHON'
+@PYTHON@
+ZAI_UNINSTALL_PYTHON

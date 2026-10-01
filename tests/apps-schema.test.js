@@ -107,6 +107,7 @@ test("catalog accepts app-owned videos, artwork, and install commands", () => {
   reject((entry) => { entry.videos[0].width = 0; }, /dimensions/, "a zero width");
   reject((entry) => { entry.artwork = { ...entry.artwork, src: "/apps/media/other-app/logo.png" }; }, /app-owned image/, "foreign artwork");
   reject((entry) => { entry.installCommands[0].command = "curl … | sh"; }, /printable ASCII/, "a non-ASCII command");
+  reject((entry) => { entry.uninstallCommands[0].command = "curl … | sh"; }, /printable ASCII/, "a non-ASCII uninstall command");
   reject((entry) => { entry.documentation = "yes"; }, /Documentation must be true/, "non-boolean documentation");
 });
 

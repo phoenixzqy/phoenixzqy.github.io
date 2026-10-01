@@ -36,6 +36,29 @@ frame and exits. Interactive use retains working-tree/history review, comments,
 OSC 52 export, and the explicit F1 Git command palette with destructive-action
 confirmations, and F2 Settings (see [Themes and settings](#themes-and-settings)).
 
+
+## Uninstall and remove local data
+
+Close zai apps and stop services before uninstalling. These commands delete `zai-gitter` and its app-owned local data, including edited settings and saved runtime/session data. Python 3.10+ is required.
+
+macOS / Linux:
+
+```sh
+curl --proto '=https' --proto-redir '=https' -fsSL https://phoenixzqy.github.io/uninstall/zai-gitter.sh | sh
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://phoenixzqy.github.io/uninstall/zai-gitter.ps1 | iex
+```
+
+From a source checkout, run `python scripts/uninstall.py`, `sh scripts/uninstall.sh`, or `& ./scripts/uninstall.ps1`. All three contain the same standalone cleanup implementation and do not fetch more code. Preview with `python scripts/uninstall.py --dry-run`; pass `--install-dir /absolute/install/directory` for a custom installation.
+
+For hosted commands, set `ZAI_UNINSTALL_DRY_RUN=1` to preview or `ZAI_INSTALL_DIR` to select the absolute install directory before running the command. Shared theme cleanup respects `ZAI_THEME_CONFIG`. Custom locations must be supplied again if they differ from their defaults.
+
+The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
+
 ## Review scope
 
 The viewer covers read-only working-tree and commit-history review,
