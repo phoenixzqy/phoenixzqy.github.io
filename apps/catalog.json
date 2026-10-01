@@ -1648,6 +1648,61 @@
           "zh-CN": "仅预览、不删除：运行命令前设置 ZAI_UNINSTALL_DRY_RUN=1。若安装在其他位置，请将 ZAI_INSTALL_DIR 设置为该绝对路径。编辑器清理也会使用 ZAI_EDITOR_LSP_HOME 和 ZAI_EDITOR_PREVIEW_HOME；共享主题清理会使用 ZAI_THEME_CONFIG。运行前可打开脚本地址查看内容。"
         }
       ]
+    },
+    {
+      "id": "zai-codex",
+      "name": "zai-codex",
+      "category": "DEVELOPER TOOLS",
+      "tagline": "Codex with your GitHub Copilot subscription.",
+      "summary": "A customized OpenAI Codex build with GitHub Copilot subscription support. Telemetry and remote diagnostic uploads are disabled.",
+      "description": [
+        "Use your GitHub account and an eligible Copilot subscription in the Codex command-line coding agent.",
+        "Telemetry and remote diagnostic uploads are disabled; local diagnostic logs remain available."
+      ],
+      "stage": "First release in preparation",
+      "platforms": [
+        {
+          "id": "linux",
+          "name": "Linux",
+          "status": "Download availability depends on published, validated packages for your architecture."
+        },
+        {
+          "id": "macos",
+          "name": "macOS",
+          "status": "Download availability depends on published, validated packages for your architecture."
+        },
+        {
+          "id": "windows",
+          "name": "Windows",
+          "status": "Download availability depends on published, validated packages for your architecture."
+        }
+      ],
+      "features": [
+        {
+          "title": "GitHub Copilot subscriptions",
+          "description": "Sign in with your own GitHub account and an eligible Copilot subscription."
+        },
+        {
+          "title": "Remote telemetry and diagnostics disabled",
+          "description": "Telemetry, remote feedback and error-report uploads are disabled. Local logs remain available."
+        }
+      ],
+      "notice": "An independent OpenAI Codex fork distributed under Apache 2.0, with bundled third-party notices. Not an official OpenAI release.",
+      "installCommands": [
+        {
+          "label": "Linux and macOS",
+          "command": "curl -fsSL https://phoenixzqy.github.io/install/zai-codex.sh | sh"
+        },
+        {
+          "label": "Windows (PowerShell)",
+          "command": "irm https://phoenixzqy.github.io/install/zai-codex.ps1 | iex"
+        }
+      ],
+      "installation": [
+        "The first downloadable release is being prepared. The installers explain when no package is published for your platform.",
+        "Python 3.10+ is required. The installer verifies the package checksum, keeps its full bundle together, and preserves the original codex command.",
+        "Add ~/.local/bin to PATH if needed, then run zai-codex (zai-codex.cmd on Windows). Sign in with your own eligible GitHub Copilot account."
+      ]
     }
   ]
 }

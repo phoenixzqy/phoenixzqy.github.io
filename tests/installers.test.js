@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, readlink, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -100,7 +100,7 @@ test("every published installer is generated from the shared templates", async (
 });
 
 test("shell installers are self-contained, fail-safe, and honour the documented overrides", async () => {
-  for (const { appId } of INSTALLERS) {
+  for (const { appId } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
     const script = await readFile(installerPath(`${appId}.sh`), "utf8");
     const label = `${appId}.sh`;
     assert.match(script, /^#!\/bin\/sh\n/, label);
@@ -123,7 +123,7 @@ test("shell installers are self-contained, fail-safe, and honour the documented 
 });
 
 test("PowerShell installers stay compatible with Windows PowerShell 5.1", async () => {
-  for (const { appId, executable } of INSTALLERS) {
+  for (const { appId, executable } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
     const script = await readFile(installerPath(`${appId}.ps1`), "utf8");
     const label = `${appId}.ps1`;
     assert.match(script, /#Requires -Version 5\.1/, label);
@@ -400,7 +400,7 @@ test("installer metadata overrides reject non-loopback HTTP and plaintext redire
     assert.equal(result.code, 1);
     assert.match(result.stderr, /download failed/);
   }));
-  for (const { appId } of INSTALLERS) {
+  for (const { appId } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
     const shell = await readFile(installerPath(`${appId}.sh`), "utf8");
     const ps = await readFile(installerPath(`${appId}.ps1`), "utf8");
     assert.match(shell, /--proto '=https' --proto-redir '=https'/);
@@ -422,6 +422,107 @@ test("fixture archives round-trip through the extraction tools the installer use
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+function codexPackage(version = "0.1.0") {
+  const target = process.arch === "arm64" ? "aarch64-unknown-linux-gnu" : "x86_64-unknown-linux-gnu";
+  const file = `zai-codex-${version}-${target}.zip`;
+  const bytes = createZip({
+    "bin/codex": `#!/bin/sh\necho custom-fixture-${version}\n`,
+    "bin/codex-code-mode-host": "#!/bin/sh\nexit 0\n",
+    "codex-path/rg": "#!/bin/sh\nexit 0\n",
+    "codex-resources/bwrap": "#!/bin/sh\nexit 0\n",
+    "LICENSE": "Apache test fixture", "NOTICE": "Test notice",
+    "MODIFICATIONS.txt": "Test modifications", "third-party-notices/dependency.txt": "Test notice",
+    "codex-package.json": JSON.stringify({ layoutVersion: 1, target, variant: "codex",
+      version, entrypoint: "bin/codex" }),
+    "zai-release.json": JSON.stringify({ repository: "phoenixzqy/zai-codex", branch: "zai-codex",
+      commit: "a".repeat(40), tag: `zai-codex-v${version}` }),
+  });
+  return { file, bytes, architecture: process.arch === "arm64" ? "arm64" : "x64" };
+}
+
+test("zai-codex installs and upgrades complete bundles without replacing codex", { skip: process.platform !== "linux" }, async () => {
+  const { file, bytes, architecture } = codexPackage();
+  const files = new Map([["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [
+    asset("linux", architecture, file, bytes),
+  ])))], [`/${file}`, bytes]]);
+  await withServer(files, (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    await import("node:fs/promises").then(({ mkdir }) => mkdir(installDir));
+    await writeFile(join(installDir, "codex"), "preserve upstream");
+    for (let i = 0; i < 2; i++) {
+      const result = await runInstaller("zai-codex.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
+      assert.equal(result.code, 0, result.stderr);
+    }
+    assert.equal(await readFile(join(installDir, "codex"), "utf8"), "preserve upstream");
+    const { readdir, realpath } = await import("node:fs/promises");
+    assert.equal((await readdir(join(installDir, "releases/zai-codex"))).length, 2);
+    const binary = await realpath(join(installDir, "zai-codex"));
+    assert.match(binary, /releases\/zai-codex\/.*\/bin\/codex$/);
+    assert.equal(await readFile(join(dirname(binary), "../third-party-notices/dependency.txt"), "utf8"), "Test notice");
+    assert.match((await run(join(installDir, "zai-codex"), ["--version"])).stdout, /custom-fixture/);
+  }));
+});
+
+test("zai-codex rejects corrupt archives on a fresh installation", { skip: process.platform !== "linux" }, async () => {
+  const { file, bytes, architecture } = codexPackage();
+  const entry = asset("linux", architecture, file, bytes);
+  entry.sha256 = "0".repeat(64);
+  await withServer(new Map([["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [entry])))],
+    [`/${file}`, bytes]]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-codex.sh", { manifestUrl: `${origin}/manifest.json`, home });
+    assert.notEqual(result.code, 0);
+    assert.match(result.stderr, /SHA-256 mismatch/);
+    await assert.rejects(stat(join(home, ".local/bin/zai-codex")), { code: "ENOENT" });
+  }));
+});
+
+test("zai-codex rejects corrupt upgrades and preserves the installed launcher", { skip: process.platform !== "linux" }, async () => {
+  const initial = codexPackage();
+  const upgrade = codexPackage("0.2.0");
+  const corrupt = manifest("zai-codex", [
+    { ...asset("linux", upgrade.architecture, upgrade.file, upgrade.bytes), sha256: "0".repeat(64) },
+  ]);
+  corrupt.release.version = "0.2.0";
+  const files = new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [
+      asset("linux", initial.architecture, initial.file, initial.bytes),
+    ])))],
+    [`/${initial.file}`, initial.bytes],
+    [`/${upgrade.file}`, upgrade.bytes],
+  ]);
+  await withServer(files, (origin) => withHome(async (home) => {
+    const installDir = join(home, "installed");
+    const options = { manifestUrl: `${origin}/manifest.json`, home, installDir };
+    const installed = await runInstaller("zai-codex.sh", options);
+    assert.equal(installed.code, 0, installed.stderr);
+    const launcher = join(installDir, "zai-codex");
+    const releases = join(installDir, "releases/zai-codex");
+    const target = await readlink(launcher);
+    const previousReleases = await readdir(releases);
+    const previousOutput = (await run(launcher, ["--version"])).stdout;
+    assert.equal(previousOutput, "custom-fixture-0.1.0\n");
+
+    files.set("/manifest.json", Buffer.from(JSON.stringify(corrupt)));
+    const result = await runInstaller("zai-codex.sh", options);
+    assert.notEqual(result.code, 0);
+    assert.match(result.stderr, /SHA-256 mismatch/);
+    assert.equal(await readlink(launcher), target);
+    assert.deepEqual(await readdir(releases), previousReleases);
+    assert.equal((await run(launcher, ["--version"])).stdout, previousOutput);
+  }));
+});
+
+test("zai-codex standalone installers embed the reviewed source with no sibling fetch", async () => {
+  const source = await readFile(join(siteRoot, "install/templates/zai-codex.py.in"), "utf8");
+  for (const extension of ["sh", "ps1"]) {
+    const script = await readFile(installerPath(`zai-codex.${extension}`), "utf8");
+    assert.ok(script.includes(source.trimEnd()));
+    assert.match(script, /ZAI_INSTALL_DIR/);
+    assert.match(script, /ZAI_RELEASE_MANIFEST_URL/);
+  }
+  await run("sh", ["-n", installerPath("zai-codex.sh")]);
 });
 
 async function withToolPath(home, names) {

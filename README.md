@@ -220,3 +220,12 @@ Run `npm run validate:apps` for app/release metadata, or `npm test` for the
 complete Node and browser/PDF suite. See [local checks](AGENTS.md#local-checks)
 for dependency setup, focused test commands, and the optional local pre-push
 hook.
+
+The zai-codex introduction uses the author's authorized release brief and the
+customization source reviewed on October 1, 2026: GitHub Copilot subscription
+login, disabled telemetry exporters and disabled remote feedback/error uploads.
+Local diagnostic logs remain available. Its first-release manifest is explicitly
+unpublished; Linux, macOS and Windows are intended targets, with package
+availability determined by verified release assets. Future maintainers should
+follow [the zai-codex instructions](releases/zai-codex/README.md), which reuse the
+source packager and installer and record the `zai-codex` branch exception.
