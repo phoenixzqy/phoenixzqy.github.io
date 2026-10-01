@@ -56,8 +56,8 @@ PR synchronization is review evidence only, not an available release.
 The installers require Python 3.10+ and use this site's
 `releases/zai-codex/latest/manifest.json`. They verify size/SHA-256, reject archive
 traversal/links, validate bundle provenance and smoke-test before activation.
-They retain complete old bundles and preserve `codex`. Defaults are
-`~/.local/lib/zai-codex` and `~/.local/bin/zai-codex` (`.cmd` on Windows).
+They retain complete old bundles and install the fork as `codex`. Defaults are
+`~/.local/lib/zai-codex` and `~/.local/bin/codex` (`.cmd` on Windows).
 `ZAI_INSTALL_DIR` places the launcher there and bundles in its
 `releases/zai-codex` subdirectory; the source-specific overrides
 `ZAI_CODEX_INSTALL_ROOT` and `ZAI_CODEX_BIN_LINK` remain supported.
@@ -69,7 +69,9 @@ and upgrades with isolated paths; add the launcher directory to PATH if needed.
 
 Keep `latest/manifest.json` at `release: null` until actual packages are ready.
 For the first release use custom version `0.1.0`, independent of the upstream
-version embedded in the executable. Subsequent releases repeat this workflow.
+version embedded in the executable. Keep `codex-package.json.version` equal to
+the executable version; record the public version in `zai-release.json.version`.
+The normal background-server launch rejects a mismatched internal version. Subsequent releases repeat this workflow.
 
 Upload reviewed final ZIPs to a draft release on
 `phoenixzqy/phoenixzqy.github.io`, tagged **`zai-codex-v<version>`** and targeting a

@@ -428,21 +428,21 @@ function codexPackage(version = "0.1.0") {
   const target = process.arch === "arm64" ? "aarch64-unknown-linux-gnu" : "x86_64-unknown-linux-gnu";
   const file = `zai-codex-${version}-${target}.zip`;
   const bytes = createZip({
-    "bin/codex": `#!/bin/sh\necho custom-fixture-${version}\n`,
+    "bin/codex": `#!/bin/sh\necho codex-cli 0.0.0\n`,
     "bin/codex-code-mode-host": "#!/bin/sh\nexit 0\n",
     "codex-path/rg": "#!/bin/sh\nexit 0\n",
     "codex-resources/bwrap": "#!/bin/sh\nexit 0\n",
     "LICENSE": "Apache test fixture", "NOTICE": "Test notice",
     "MODIFICATIONS.txt": "Test modifications", "third-party-notices/dependency.txt": "Test notice",
     "codex-package.json": JSON.stringify({ layoutVersion: 1, target, variant: "codex",
-      version, entrypoint: "bin/codex" }),
+      version: "0.0.0", entrypoint: "bin/codex" }),
     "zai-release.json": JSON.stringify({ repository: "phoenixzqy/zai-codex", branch: "zai-codex",
-      commit: "a".repeat(40), tag: `zai-codex-v${version}` }),
+      commit: "a".repeat(40), version, tag: `zai-codex-v${version}` }),
   });
   return { file, bytes, architecture: process.arch === "arm64" ? "arm64" : "x64" };
 }
 
-test("zai-codex installs and upgrades complete bundles without replacing codex", { skip: process.platform !== "linux" }, async () => {
+test("zai-codex installs and upgrades complete bundles as codex", { skip: process.platform !== "linux" }, async () => {
   const { file, bytes, architecture } = codexPackage();
   const files = new Map([["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [
     asset("linux", architecture, file, bytes),
@@ -450,18 +450,18 @@ test("zai-codex installs and upgrades complete bundles without replacing codex",
   await withServer(files, (origin) => withHome(async (home) => {
     const installDir = join(home, "installed");
     await import("node:fs/promises").then(({ mkdir }) => mkdir(installDir));
-    await writeFile(join(installDir, "codex"), "preserve upstream");
+    await writeFile(join(installDir, "codex-upstream"), "preserve upstream");
     for (let i = 0; i < 2; i++) {
       const result = await runInstaller("zai-codex.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
       assert.equal(result.code, 0, result.stderr);
     }
-    assert.equal(await readFile(join(installDir, "codex"), "utf8"), "preserve upstream");
+    assert.equal(await readFile(join(installDir, "codex-upstream"), "utf8"), "preserve upstream");
     const { readdir, realpath } = await import("node:fs/promises");
     assert.equal((await readdir(join(installDir, "releases/zai-codex"))).length, 2);
-    const binary = await realpath(join(installDir, "zai-codex"));
+    const binary = await realpath(join(installDir, "codex"));
     assert.match(binary, /releases\/zai-codex\/.*\/bin\/codex$/);
     assert.equal(await readFile(join(dirname(binary), "../third-party-notices/dependency.txt"), "utf8"), "Test notice");
-    assert.match((await run(join(installDir, "zai-codex"), ["--version"])).stdout, /custom-fixture/);
+    assert.match((await run(join(installDir, "codex"), ["--version"])).stdout, /codex-cli 0\.0\.0/);
   }));
 });
 
@@ -474,7 +474,7 @@ test("zai-codex rejects corrupt archives on a fresh installation", { skip: proce
     const result = await runInstaller("zai-codex.sh", { manifestUrl: `${origin}/manifest.json`, home });
     assert.notEqual(result.code, 0);
     assert.match(result.stderr, /SHA-256 mismatch/);
-    await assert.rejects(stat(join(home, ".local/bin/zai-codex")), { code: "ENOENT" });
+    await assert.rejects(stat(join(home, ".local/bin/codex")), { code: "ENOENT" });
   }));
 });
 
@@ -497,12 +497,12 @@ test("zai-codex rejects corrupt upgrades and preserves the installed launcher", 
     const options = { manifestUrl: `${origin}/manifest.json`, home, installDir };
     const installed = await runInstaller("zai-codex.sh", options);
     assert.equal(installed.code, 0, installed.stderr);
-    const launcher = join(installDir, "zai-codex");
+    const launcher = join(installDir, "codex");
     const releases = join(installDir, "releases/zai-codex");
     const target = await readlink(launcher);
     const previousReleases = await readdir(releases);
     const previousOutput = (await run(launcher, ["--version"])).stdout;
-    assert.equal(previousOutput, "custom-fixture-0.1.0\n");
+    assert.equal(previousOutput, "codex-cli 0.0.0\n");
 
     files.set("/manifest.json", Buffer.from(JSON.stringify(corrupt)));
     const result = await runInstaller("zai-codex.sh", options);
