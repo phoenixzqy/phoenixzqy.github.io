@@ -48,6 +48,21 @@ the files as-is.
   usable specification for public packages, metadata, verification, and
   cross-repository handoff. Do not substitute these instructions for it.
 
+## zai-codex releases
+
+- Follow [zai-codex release instructions](releases/zai-codex/README.md) in addition
+  to the publishing contract for every zai-codex release/update.
+- Its source/default/customization branch is `zai-codex`, **not `main`**. Build
+  from freshly fetched `origin/zai-codex`; source PRs target `zai-codex`.
+  This website still publishes from `main`.
+- Reuse the source repository's `scripts/prepare_zai_codex_release.py` and sync
+  its `scripts/install_zai_codex.py` with `scripts/sync-zai-codex-installer.mjs`,
+  then regenerate installers. Do not replace the packager with ad hoc builds.
+- Public assets and `zai-codex-v<version>` tags belong to this website repository.
+  Keep source, build caches, logs and credentials outside the public tree.
+- Publish only actual verified packages. Keep `release: null` before the first
+  release; do not promise platform availability from unbuilt artifacts.
+
 ## Local checks
 
 Use Node.js 24.21.0 (pinned in `.nvmrc`; `package.json` supports newer 24.x).

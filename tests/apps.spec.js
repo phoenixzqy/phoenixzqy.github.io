@@ -132,9 +132,9 @@ test("missing, invalid, and unknown app ids show errors instead of fabricated co
   }
 });
 
-test("zai app comparisons render early with every catalog table", async ({ page, browserName }) => {
+test("app comparisons render early with every declared catalog table", async ({ page, browserName }) => {
   test.skip(browserName !== "chromium", "zai detail pages include videos that headless WebKit cannot instantiate");
-  for (const app of catalog.apps.filter((entry) => entry.id.startsWith("zai-"))) {
+  for (const app of catalog.apps.filter((entry) => entry.comparison)) {
     await page.goto(`/apps/app/?id=${app.id}&lang=en`);
     await expect(page.locator("#app-content")).toHaveAttribute("aria-busy", "false");
     const comparison = page.locator(".app-comparison");

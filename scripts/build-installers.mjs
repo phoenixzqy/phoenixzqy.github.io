@@ -9,6 +9,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const templates = join(siteRoot, "install/templates");
@@ -17,6 +18,7 @@ export const INSTALLERS = [
   { appId: "zai-cli", executable: "zai", displayName: "zai", mode: "python" },
   { appId: "zai-editor", executable: "zai-editor", displayName: "zai-editor", mode: "binary" },
   { appId: "zai-gitter", executable: "zai-gitter", displayName: "zai-gitter", mode: "binary" },
+  { appId: "zai-codex", executable: "zai-codex", displayName: "zai-codex", mode: "codex" },
 ];
 
 const PLACEHOLDER = /@([A-Z_]+)@/g;
@@ -38,6 +40,21 @@ function indentLike(block, marker, shell) {
 export async function buildInstallers() {
   const files = new Map();
   for (const installer of INSTALLERS) {
+    if (installer.mode === "codex") {
+      const python = await readFile(join(templates, "zai-codex.py.in"), "utf8");
+      const source = JSON.parse(await readFile(join(siteRoot, "install/zai-codex-source.json"), "utf8"));
+      if (source.repository !== "phoenixzqy/zai-codex" || source.branch !== "zai-codex" ||
+          !/^[0-9a-f]{40}$/.test(source.commit) ||
+          createHash("sha256").update(python).digest("hex") !== source.sha256) {
+        throw new Error("zai-codex installer drifted; sync its reviewed source before generating.");
+      }
+      for (const extension of ["sh", "ps1"]) {
+        const wrapper = await readFile(join(templates, `zai-codex.${extension}.in`), "utf8");
+        files.set(`install/zai-codex.${extension}`, wrapper.replace("@SOURCE_COMMIT@", source.commit)
+          .replace("@PYTHON@", () => python.trimEnd()));
+      }
+      continue;
+    }
     const values = {
       APP_ID: installer.appId,
       EXECUTABLE: installer.executable,
