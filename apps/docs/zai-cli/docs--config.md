@@ -58,6 +58,14 @@ Scrollback is app-wide only. Themes retain the shared
 `~/.zai/theme.json` and `$ZAI_THEME_CONFIG` contract. Service and automation
 configuration stays project-scoped.
 
+The console remembers the last used coding-agent client separately in
+`~/.zai/agent-client.json` (under the active installation home). Sessions opens
+and receives keyboard focus at startup, selecting that client when available
+or the first available client otherwise. Successful launches/resumes and
+explicit Sessions client-tab selections update it automatically across projects;
+New Tab and Split pickers also preselect the remembered client when launchable.
+This preference does not change a service's `coding_agent`.
+
 Housekeep exposes four independent task checkboxes: maintained-branch
 synchronization (on by default), stale unmanaged-worktree cleanup (off), and
 stale local/remote branch cleanup (off), plus zai/Copilot/Pi/Codex log cleanup (off).

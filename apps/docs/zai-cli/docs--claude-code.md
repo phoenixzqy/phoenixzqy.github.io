@@ -86,8 +86,13 @@ configure them in a native `.claude/agents` definition instead. Other
 provider-specific frontmatter is not translated.
 Native `.claude` agent restrictions are left intact.
 
-Resource discovery is bounded and rejects linked compatibility files. A failure
-is surfaced at launch rather than silently omitting instructions.
+Repository instruction and skill discovery accepts relative symlinks that stay
+inside the checkout, including shared skill-directory aliases and links to
+plugin-owned skills. Aliases to the same skill directory at one ancestor are
+scanned once; distinct directories with duplicate logical names remain errors.
+Escaping links, directory cycles, non-regular files, and oversized resources fail
+at launch rather than silently omitting instructions. Managed-home resources and
+agent definitions retain their stricter no-symlink policy.
 
 ## Sessions and lifecycle
 
@@ -95,6 +100,8 @@ The Sessions rail includes managed interactive and service sessions, groups
 subagents with their parent, and resumes sessions through Claude's native resume
 command. Selecting a subagent reopens its parent session: Claude resumes a
 subagent through that parent, not as a standalone top-level conversation.
+Titles use the first user prompt, whether stored as a string or as text blocks;
+image and tool-result blocks are ignored. A custom session name takes precedence.
 
 Lifecycle hooks report running, waiting, and done state, publish live session
 identities for worktree ownership, and ask subagents to release their own claims

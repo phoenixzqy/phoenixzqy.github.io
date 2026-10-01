@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "f9bb3764ef22be89579f28dbf92e9e4405130f6e",
-  "commit": "f9bb3764ef22be89579f28dbf92e9e4405130f6e",
+  "ref": "c4449863f04a3403310113fed2a06fde7d0f75ab",
+  "commit": "c4449863f04a3403310113fed2a06fde7d0f75ab",
   "documents": [
     {
       "slug": "docs--install-and-config",
@@ -24,7 +24,7 @@
       "title": "Claude Code",
       "source": "docs/claude-code.md",
       "file": "docs--claude-code.md",
-      "bytes": 6559
+      "bytes": 7107
     },
     {
       "slug": "docs--opencode",
@@ -45,7 +45,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 5250
+      "bytes": 5772
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
