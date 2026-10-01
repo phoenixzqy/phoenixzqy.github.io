@@ -219,8 +219,8 @@
           "zh-CN": "四项后台服务各自由一个确定性轮询器搭配一个编码代理：dev 负责实现带标签的工作项并提交关联的拉取请求，review 发布结构化评审，pr-babysitter 修复检查与冲突直至可以合并，housekeep 执行本地维护。标签驱动整个生命周期，运行数据保存在本地。"
         },
         {
-          "en": "zai is a preview release. It needs Python 3.10+, Git, Node.js/npm, and a supported coding-agent CLI on your machine; it does not replace them. Published measurements were taken on one Linux machine and are not a general benchmark.",
-          "zh-CN": "zai 目前是预览版本。它需要你的机器上已安装 Python 3.10+、Git、Node.js/npm 以及受支持的编码代理 CLI，并不会替代它们。README 中的性能数据仅在一台 Linux 机器上测得，不代表通用基准。"
+          "en": "zai is a preview release. Installation needs Python 3.10+; repository sessions and services need Git and an authenticated coding-agent CLI, with Node.js/npm for npm-distributed providers. Published measurements were taken on one Linux machine and are not a general benchmark.",
+          "zh-CN": "zai 目前是预览版本。安装需要 Python 3.10+；仓库会话与服务需要 Git 和已认证的编码代理 CLI，通过 npm 分发的代理还需要 Node.js/npm。README 中的性能数据仅在一台 Linux 机器上测得，不代表通用基准。"
         }
       ],
       "stage": {
@@ -282,8 +282,8 @@
           "id": "linux",
           "name": "Linux",
           "status": {
-            "en": "x64 and arm64 archives. Needs Python 3.10+, Git, Node.js/npm, and a supported coding-agent CLI already installed. Tested most on Linux terminals.",
-            "zh-CN": "提供 x64 与 arm64 压缩包。需要事先安装 Python 3.10+、Git、Node.js/npm 以及受支持的编码代理 CLI。在 Linux 终端上测试最充分。"
+            "en": "x64 and arm64 archives. Installation needs Python 3.10+; repository sessions and services need Git and an authenticated coding-agent CLI. Tested most on Linux terminals.",
+            "zh-CN": "提供 x64 与 arm64 压缩包。安装需要 Python 3.10+；仓库会话与服务需要 Git 和已认证的编码代理 CLI。在 Linux 终端上测试最充分。"
           }
         },
         {
@@ -412,8 +412,8 @@
           "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验其 SHA-256 值，然后运行压缩包内附带的 Python 安装程序。"
         },
         {
-          "en": "Install Python 3.10 or newer, Git, Node.js with npm, and your coding-agent CLI first. The installer needs python3 (py -3 or python on Windows) on PATH and will stop with a message if it is missing.",
-          "zh-CN": "请先安装 Python 3.10 或更高版本、Git、带 npm 的 Node.js 以及你的编码代理 CLI。安装脚本需要 PATH 中存在 python3（Windows 上为 py -3 或 python），否则会给出提示并停止。"
+          "en": "Install Python 3.10 or newer on PATH first. Before downloading, the bootstrap probes python3/python on macOS/Linux and py -3/python/python3 on Windows; missing, outdated, or broken interpreters stop with setup instructions. Git and an authenticated coding-agent CLI are needed for repository sessions and services; Node.js/npm is needed for npm-distributed providers.",
+          "zh-CN": "请先安装 Python 3.10 或更高版本并加入 PATH。下载前，脚本会在 macOS/Linux 上检测 python3/python，在 Windows 上检测 py -3/python/python3；若解释器缺失、版本过旧或无法运行，会给出安装提示并停止。仓库会话与服务需要 Git 和已认证的编码代理 CLI；通过 npm 分发的代理还需要 Node.js/npm。"
         },
         {
           "en": "Prefer to read before running? Open the installer URL in a browser, or download the archive from the downloads page and verify the published SHA-256 yourself before extracting it.",
@@ -424,8 +424,8 @@
           "zh-CN": "安装包未签名。macOS 会隔离未签名的下载文件，Windows SmartScreen 也会发出警告。请不要为了运行预览版本而关闭操作系统或组织的安全策略。"
         },
         {
-          "en": "Open a new terminal after installing so the updated PATH applies, then run zai from any folder. To start the services in a repository, run zai config init and then zai start all.",
-          "zh-CN": "安装完成后请打开新的终端，使更新后的 PATH 生效，然后在任意目录运行 zai。若要在某个仓库中启动服务，请先运行 zai config init，再运行 zai start all。"
+          "en": "The bundled Python installer creates ~/.zai and installs the executable and packaged home; extracting the archive alone does not install zai. Open a new terminal for the updated PATH, then run zai. From a supported repository, run zai config show to create or inspect defaults, zai config path to locate settings, and zai start all to start services.",
+          "zh-CN": "压缩包内的 Python 安装程序会创建 ~/.zai 并安装可执行文件与运行目录；仅解压并不等于安装。安装后请打开新终端，使 PATH 生效，再运行 zai。在受支持的仓库内，运行 zai config show 创建或查看默认配置，运行 zai config path 查找配置文件，再运行 zai start all 启动服务。"
         }
       ],
       "comparison": {

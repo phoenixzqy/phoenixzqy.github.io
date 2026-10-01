@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -73,11 +73,13 @@ async function withHome(body) {
   }
 }
 
-async function runInstaller(script, { manifestUrl, home, installDir, args = [] }) {
+const shellPath = (await run("sh", ["-c", "command -v sh"])).stdout.trim();
+
+async function runInstaller(script, { manifestUrl, home, installDir, path = process.env.PATH, args = [] }) {
   try {
-    const { stdout, stderr } = await run("sh", [installerPath(script), ...args], {
+    const { stdout, stderr } = await run(shellPath, [installerPath(script), ...args], {
       env: {
-        PATH: process.env.PATH,
+        PATH: path,
         HOME: home,
         SHELL: "/bin/bash",
         ZAI_RELEASE_MANIFEST_URL: manifestUrl,
@@ -107,8 +109,8 @@ test("shell installers are self-contained, fail-safe, and honour the documented 
     assert.match(script, /ZAI_INSTALL_DIR/, label);
     assert.match(script, /ZAI_RELEASE_MANIFEST_URL/, label);
     assert.match(script, /sha256sum[\s\S]*shasum -a 256/, label);
-    assert.match(script, /unzip[\s\S]*bsdtar[\s\S]*python3 -m zipfile/, label);
-    assert.match(script, /python3 - "\$MANIFEST"[\s\S]*json\.load\(manifest_file\)/, label);
+    assert.match(script, /unzip[\s\S]*bsdtar[\s\S]*\"\$PYTHON\" -m zipfile/, label);
+    assert.match(script, /\"\$PYTHON\" - "\$MANIFEST"[\s\S]*json\.load\(manifest_file\)/, label);
     assert.match(script, /x86_64 \| amd64[\s\S]*aarch64 \| arm64/, label);
     // A piped installer cannot read sibling files, and bash-only syntax breaks dash.
     assert.doesNotMatch(script, /^\s*(?:\.|source)\s+\S*templates/m, label);
@@ -360,11 +362,11 @@ test("the zai installer runs install.py from the archive root and forwards argum
   ]), (origin) => withHome(async (home) => {
     const receipt = join(home, "receipt.txt");
     const result = await runInstaller("zai-cli.sh", {
-      manifestUrl: `${origin}/manifest.json`, home, args: [receipt, "--install-copilot", "no"],
+      manifestUrl: `${origin}/manifest.json`, home, args: [receipt, "--on-conflict", "keep"],
     });
     assert.equal(result.code, 0, result.stderr);
     assert.match(result.stdout, /installed: fixture/);
-    assert.equal(await readFile(receipt, "utf8"), "--install-copilot no");
+    assert.equal(await readFile(receipt, "utf8"), "--on-conflict keep");
   }));
 });
 
@@ -485,4 +487,89 @@ test("zai-codex standalone installers embed the reviewed source with no sibling 
     assert.match(script, /ZAI_RELEASE_MANIFEST_URL/);
   }
   await run("sh", ["-n", installerPath("zai-codex.sh")]);
+});
+
+async function withToolPath(home, names) {
+  const bin = join(home, "bin");
+  await mkdir(bin);
+  for (const name of names) {
+    const target = (await run(shellPath, ["-c", `command -v ${name}`])).stdout.trim();
+    await symlink(target, join(bin, name));
+  }
+  return bin;
+}
+
+test("Python preflight rejects missing, old, and broken interpreters before downloads", async () => {
+  for (const kind of ["missing", "old", "broken"]) {
+    await withHome(async (home) => {
+      const bin = await withToolPath(home, ["uname", "sha256sum"]);
+      const interpreter = (await run("python3", ["-c", "import sys; print(sys.executable)"])).stdout.trim();
+      const touched = join(home, "downloaded");
+      await writeFile(join(bin, "curl"), `#!/bin/sh\n: > '${touched}'\nexit 99\n`, { mode: 0o755 });
+      if (kind !== "missing") {
+        await writeFile(join(bin, "python3"), kind === "old"
+          ? `#!/bin/sh\nexec '${interpreter}' -c 'import sys; sys.version_info = (3, 9, 0); exec(sys.argv[1])' "$2"\n`
+          : "#!/bin/sh\nexit 127\n", { mode: 0o755 });
+      }
+      const result = await runInstaller("zai-cli.sh", { home, path: bin });
+      assert.equal(result.code, 1, kind);
+      assert.match(result.stderr, /working Python 3\.10 or newer.*PATH/);
+      assert.match(result.stderr, /python\.org.*new terminal.*Nothing was installed/s);
+      assert.equal(await stat(touched).catch(() => null), null);
+      assert.equal(await stat(join(home, ".zai")).catch(() => null), null);
+      assert.deepEqual(await readdir(home), ["bin"]);
+    });
+  }
+});
+
+test("the selected Python fallback handles metadata, ZIP extraction, and package installation", async () => {
+  const bytes = createZip({ "install.py": "import pathlib\npathlib.Path.home().joinpath('receipt').write_text('installed')\n" });
+  const file = "zai-0.1.0-linux-x64.zip";
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)])))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const bin = await withToolPath(home, ["uname", "curl", "sha256sum", "mktemp", "rm", "sed", "cut", "wc", "tr", "mkdir"]);
+    await writeFile(join(bin, "python3"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
+    const interpreter = (await run("python3", ["-c", "import sys; print(sys.executable)"])).stdout.trim();
+    await symlink(interpreter, join(bin, "python"));
+    const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home, path: bin });
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /bundled package installer with python/);
+    assert.equal(await readFile(join(home, "receipt"), "utf8"), "installed");
+  }));
+});
+
+const powerShellPath = await run(shellPath, ["-c", "command -v pwsh"]).then((result) => result.stdout.trim()).catch(() => "");
+
+test("PowerShell Python preflight skips broken launchers and accepts only Python 3.10+", {
+  skip: !powerShellPath && "PowerShell is unavailable on this host",
+}, async () => {
+  const preflight = await readFile(join(siteRoot, "install/templates/prerequisites-python.ps1.in"), "utf8");
+  const interpreter = (await run("python3", ["-c", "import sys; print(sys.executable)"])).stdout.trim();
+  for (const kind of ["missing", "old", "broken", "fallback"]) {
+    await withHome(async (home) => {
+      const bin = await withToolPath(home, []);
+      if (kind !== "missing") {
+        const body = kind === "old"
+          ? `#!/bin/sh\nexec '${interpreter}' -c 'import sys; sys.version_info = (3, 9, 0); exec(sys.argv[1])' "$3"\n`
+          : "#!/bin/sh\nexit 127\n";
+        await writeFile(join(bin, "py"), body, { mode: 0o755 });
+      }
+      if (kind === "fallback") await symlink(interpreter, join(bin, "python3"));
+      const driver = join(home, "preflight.ps1");
+      await writeFile(driver, "$ErrorActionPreference = 'Stop'\nfunction Stop-Install($message) { throw $message }\n" + preflight + '\nWrite-Output "selected:$python"\n');
+      const result = await run(powerShellPath, ["-NoProfile", "-File", driver], {
+        env: { ...process.env, PATH: bin },
+      }).then((value) => ({ code: 0, ...value })).catch((error) => error);
+      if (kind === "fallback") {
+        assert.equal(result.code, 0, result.stderr);
+        assert.match(result.stdout, /selected:.*python3/);
+      } else {
+        assert.notEqual(result.code, 0, kind);
+        assert.match(result.stderr, /working Python 3\.10 or newer/);
+      }
+      assert.equal(await stat(join(home, ".zai")).catch(() => null), null);
+    });
+  }
 });

@@ -4,20 +4,6 @@
     # its result. The entry point is exactly 'install.py' beside its
     # '_installer.py' library; the archive carries other .py files that must
     # never be run instead.
-    $python = $null
-    $pythonArgs = @()
-    if (Get-Command 'py' -ErrorAction SilentlyContinue) {
-        $python = 'py'
-        $pythonArgs = @('-3')
-    } elseif (Get-Command 'python' -ErrorAction SilentlyContinue) {
-        $python = 'python'
-    } elseif (Get-Command 'python3' -ErrorAction SilentlyContinue) {
-        $python = 'python3'
-    }
-    if (-not $python) {
-        Stop-Install "Python 3.10 or newer is required but no Python launcher was found on PATH. Install Python, then run the command again."
-    }
-
     $packageInstaller = Join-Path $extract 'install.py'
     if (-not (Test-Path -LiteralPath $packageInstaller -PathType Leaf)) {
         Stop-Install "the package did not contain 'install.py' at its root. Nothing was installed."

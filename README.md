@@ -187,6 +187,8 @@ work-item-to-merge services, and UI implementation stack remain explicitly
 unverified. These are public-documentation findings, not signed-in app tests.
 No measurement was recollected and no complete-setup ranking is inferred.
 
+The October 1, 2026 installation documentation audit follows the author's request to check zai-cli against its current implementation. The source revision in `apps/docs/sources.json` records the direct setup guide and privacy-reviewed mirror. The generated [shell installer](install/zai-cli.sh) and [PowerShell installer](install/zai-cli.ps1) substantiate the Python prerequisite probes and bundled installer flow; the catalog now separates installation prerequisites from repository-session requirements and uses automatic configuration defaults.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online

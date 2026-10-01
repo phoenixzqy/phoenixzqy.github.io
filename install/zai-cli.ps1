@@ -134,6 +134,29 @@ function Add-UserPath([string] $directory) {
 }
 
 $architecture = Get-Architecture
+# Probe launchers before downloads; a launcher or Store alias may exist without
+# a usable interpreter. Keep trying when a candidate is missing, old, or broken.
+$python = $null
+$pythonArgs = @()
+foreach ($candidate in @('py', 'python', 'python3')) {
+    $command = Get-Command $candidate -CommandType Application -ErrorAction SilentlyContinue
+    if (-not $command) { continue }
+    $prefix = @()
+    if ($candidate -eq 'py') { $prefix = @('-3') }
+    try {
+        & $command.Source @prefix -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $python = $command.Source
+            $pythonArgs = $prefix
+            break
+        }
+    } catch {
+        continue
+    }
+}
+if (-not $python) {
+    Stop-Install 'A working Python 3.10 or newer is required on PATH (py -3, python, or python3). Install it from https://www.python.org/downloads/, enable its PATH option, open a new terminal, and rerun the installer. Nothing was installed.'
+}
 $work = Join-Path ([System.IO.Path]::GetTempPath()) ("zai-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 
@@ -206,20 +229,6 @@ try {
     # its result. The entry point is exactly 'install.py' beside its
     # '_installer.py' library; the archive carries other .py files that must
     # never be run instead.
-    $python = $null
-    $pythonArgs = @()
-    if (Get-Command 'py' -ErrorAction SilentlyContinue) {
-        $python = 'py'
-        $pythonArgs = @('-3')
-    } elseif (Get-Command 'python' -ErrorAction SilentlyContinue) {
-        $python = 'python'
-    } elseif (Get-Command 'python3' -ErrorAction SilentlyContinue) {
-        $python = 'python3'
-    }
-    if (-not $python) {
-        Stop-Install "Python 3.10 or newer is required but no Python launcher was found on PATH. Install Python, then run the command again."
-    }
-
     $packageInstaller = Join-Path $extract 'install.py'
     if (-not (Test-Path -LiteralPath $packageInstaller -PathType Leaf)) {
         Stop-Install "the package did not contain 'install.py' at its root. Nothing was installed."

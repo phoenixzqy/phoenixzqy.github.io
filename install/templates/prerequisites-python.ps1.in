@@ -1,0 +1,23 @@
+# Probe launchers before downloads; a launcher or Store alias may exist without
+# a usable interpreter. Keep trying when a candidate is missing, old, or broken.
+$python = $null
+$pythonArgs = @()
+foreach ($candidate in @('py', 'python', 'python3')) {
+    $command = Get-Command $candidate -CommandType Application -ErrorAction SilentlyContinue
+    if (-not $command) { continue }
+    $prefix = @()
+    if ($candidate -eq 'py') { $prefix = @('-3') }
+    try {
+        & $command.Source @prefix -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $python = $command.Source
+            $pythonArgs = $prefix
+            break
+        }
+    } catch {
+        continue
+    }
+}
+if (-not $python) {
+    Stop-Install 'A working Python 3.10 or newer is required on PATH (py -3, python, or python3). Install it from https://www.python.org/downloads/, enable its PATH option, open a new terminal, and rerun the installer. Nothing was installed.'
+}
