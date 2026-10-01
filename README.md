@@ -128,6 +128,8 @@ The September 30, 2026 manual releases — [zai-cli 0.1.200](https://github.com/
 
 The October 1, 2026 [zai-cli 0.1.213 release](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.213) follows the author’s authorized merged updates to Sessions search and previews, coding-agent preferences, repository symlink handling, session titles, and service-monitor transcripts. The refreshed allowlisted guides record their source revision in `apps/docs/sources.json`; release sizes and SHA-256 values come from the final unsigned package bytes.
 
+The later October 1, 2026 manual releases — [zai-cli 0.1.246](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.246), [zai-editor 0.3.3](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-editor-v0.3.3), and [zai-gitter 0.3.3](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-gitter-v0.3.3) — were built from the then-current `main` revisions with each repository's release scripts. The final unsigned archives passed their repository-owned packaging tests, checksum verification, archive-content review, and privacy scans. The synchronized allowlisted user guides were reviewed separately and record the exact source revisions in `apps/docs/sources.json`.
+
 For the September 29, 2026 zai positioning refresh, the public
 [herdr README](https://github.com/herdrdev/herdr) and
 [Orca README](https://github.com/stablyai/orca) were reviewed for editorial

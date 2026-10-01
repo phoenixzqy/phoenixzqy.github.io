@@ -105,6 +105,20 @@ when it is omitted or empty, the service's default scope is used.
 
 ### Preset combinations
 
+The console's start-services dialog shows these examples. Its checkboxes select
+which services to start; configure scopes separately in Project config under
+each service's Poller. Enlarge the terminal if only the compact hint is visible.
+
+| Workflow | Services to enable and scopes |
+| --- | --- |
+| Solo: develop, self-review and merge | `dev all`, `review all`, `pr-babysitter all` |
+| Team: work on demand (defaults) | `dev assigned`, `review assigned`, `pr-babysitter authored` |
+| Review only | `review assigned`; turn off `dev` and `pr-babysitter` |
+| Maintain my PRs | `pr-babysitter authored`; turn off `dev` and `review` |
+
+`all` still selects only eligible marker-labeled items. Self-review does not
+bypass required independent approvals, checks, or branch rules (see above).
+
 - **default** — zai's built-in selection: `dev`/`review` act on items
   assigned to you; `pr-babysitter` acts on your own pull requests; `review`
   skips drafts. `review` also always skips pull

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "2123d4a01ed6112dcb8be1b585af1033a442b81f",
-  "commit": "2123d4a01ed6112dcb8be1b585af1033a442b81f",
+  "ref": "3322253759ac6e397dc5b098db28ca566f036cfd",
+  "commit": "3322253759ac6e397dc5b098db28ca566f036cfd",
   "documents": [
     {
       "slug": "docs--install-and-config",
@@ -17,7 +17,7 @@
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 14561
+      "bytes": 14979
     },
     {
       "slug": "docs--claude-code",
@@ -45,7 +45,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 5772
+      "bytes": 6054
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
@@ -59,7 +59,7 @@
       "title": "Poller filters and presets",
       "source": "docs/config/poller-filters-and-presets.md",
       "file": "docs--config--poller-filters-and-presets.md",
-      "bytes": 8638
+      "bytes": 9425
     },
     {
       "slug": "docs--config--project-registry",
@@ -80,7 +80,7 @@
       "title": "Validation and boundaries",
       "source": "docs/config/validation-and-boundaries.md",
       "file": "docs--config--validation-and-boundaries.md",
-      "bytes": 6657
+      "bytes": 6883
     }
   ],
   "assets": []

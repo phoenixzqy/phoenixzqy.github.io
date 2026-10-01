@@ -58,11 +58,11 @@ Windows PowerShell:
 irm https://phoenixzqy.github.io/uninstall/zai-editor.ps1 | iex
 ```
 
-From a source checkout, run `python scripts/uninstall.py`, `sh scripts/uninstall.sh`, or `& ./scripts/uninstall.ps1`. All three contain the same standalone cleanup implementation and do not fetch more code. Preview with `python scripts/uninstall.py --dry-run`; pass `--install-dir /absolute/install/directory` for a custom installation.
+From a source checkout, run `python scripts/uninstall.py`, `sh scripts/uninstall.sh`, or `& ./scripts/uninstall.ps1`. The Python entrypoint uses its adjacent file-support module; both wrappers embed the same cleanup implementation and do not fetch more code. The wrappers run Python in isolated mode, so modules in the current directory or `PYTHONPATH` cannot intercept their imports. Preview with `python scripts/uninstall.py --dry-run`; pass `--install-dir /absolute/install/directory` for a custom installation.
 
 For hosted commands, set `ZAI_UNINSTALL_DRY_RUN=1` to preview or `ZAI_INSTALL_DIR` to select the absolute install directory before running the command. Shared theme cleanup respects `ZAI_THEME_CONFIG`. Editor cleanup also respects `ZAI_EDITOR_LSP_HOME` and `ZAI_EDITOR_PREVIEW_HOME`. Custom locations must be supplied again if they differ from their defaults.
 
-The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
+The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes installer-marked PATH exports whose directory normalizes to the installation (including trailing slashes and equivalent spellings) from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Shared metadata and shell profiles are staged beside their originals and replaced atomically only after the staged write and close succeed; failed writes leave the original bytes and permissions intact. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
 
 Editor cleanup includes managed language servers, profiler logs, and preview endpoint metadata. Workspace documents, externally installed language servers, and browser storage remain. Close browser previews before uninstalling.
 
@@ -91,6 +91,10 @@ When Git is available, blame follows the unsaved buffer and file history follows
 renames. Browser previews support Markdown, Mermaid, and saved HTML without a
 frontend toolchain. Preview only content you trust because HTML can run scripts
 on the shared preview origin.
+
+Saved Markdown previews read from disk on browser refresh when opened with F7
+from a clean buffer. Unsaved Markdown uses a snapshot; press F7 again to update
+it, or after saving to switch back to disk reads.
 
 Inline comments do not modify the file. Ask AI packages your question, captured
 code excerpts, comments, and current selection into a bounded request you can

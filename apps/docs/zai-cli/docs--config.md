@@ -46,12 +46,16 @@ reuse `~/.zai/configs/<repo-slug>/`; non-forge projects store
 `config.json` under `~/.zai/configs/_project-<name>-<12-hex-sha256-prefix>/` with
 `schema_version` plus an optional `console_yolo` override.
 
-App-wide `console_yolo` and `console_scrollback_lines` live in
+App-wide `console_yolo`, `console_scrollback_lines`, `console_device_status`,
+and `console_device_status_interval_seconds` live in
 `~/.zai/settings.json` (under the active installation home), edited in the
 left-rail **Settings** page alongside themes. Unlike themes, these edits are a
 draft until saved with Ctrl+S; while any differ from the saved file the page
 shows an unsaved-changes reminder, and Ctrl+R discards them. Defaults are YOLO off and 2000
-scrollback lines; no project preference is imported into the app setting. A
+scrollback lines, with device status on and refreshing every five seconds
+(accepted interval: 1–300 seconds). Saved device preferences apply immediately
+in the current console; Ctrl+R applies preferences saved by another console.
+No project preference is imported into the app setting. A
 project config may still set `console_yolo` to `true` or `false` to override the
 app-wide toggle for launches in that project; omitting it (the default) inherits.
 Scrollback is app-wide only. Themes retain the shared

@@ -2,17 +2,13 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "release": {
-    "version": "0.1.213",
+    "version": "0.1.246",
     "channel": "preview",
-    "publishedAt": "2026-10-01T02:28:11Z",
+    "publishedAt": "2026-10-01T06:06:37Z",
     "notes": [
       {
-        "en": "Adds scoped Sessions search with highlighted user-input previews and remembers the coding-agent selection across Sessions and launch pickers.",
-        "zh-CN": "新增限定范围的会话搜索与高亮用户输入预览，并在会话与启动选择器之间记住所选编程代理。"
-      },
-      {
-        "en": "Fixes Claude/Codex startup with repository symlinks, improves native session titles and the quit-session tree, and captures agent stderr in service-monitor transcripts.",
-        "zh-CN": "修复仓库符号链接导致的 Claude/Codex 启动问题，改进原生会话标题与退出会话树，并在服务监控记录中捕获代理标准错误输出。"
+        "en": "Adds disk health diagnostics, richer device status, safer worktree deletion, service-selection examples, browser preview tooling, and clearer agent permission warnings.",
+        "zh-CN": "新增磁盘健康诊断、更丰富的设备状态、更安全的工作树删除、服务选择示例、浏览器预览工具，以及更清晰的代理权限警告。"
       },
       {
         "en": "Cross-compiled zai CLI packages built from one pinned source revision.",
@@ -35,14 +31,14 @@
         },
         "platform": "linux",
         "architecture": "x64",
-        "file": "zai-cli-0.1.213-linux-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-linux-amd64.zip",
-        "bytes": 30192031,
-        "sha256": "1c357cb783f97907ad090634de788b52ec1b4cafe2969d67d1e4d02180409e0e",
+        "file": "zai-cli-0.1.246-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-linux-amd64.zip",
+        "bytes": 30335184,
+        "sha256": "11702d9cc4ba0830bec0f0b4559b010196db7190d7e07594ccbe7d7593e5cf89",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       },
       {
@@ -52,14 +48,14 @@
         },
         "platform": "linux",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.213-linux-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-linux-arm64.zip",
-        "bytes": 27838194,
-        "sha256": "280acb117ace5f2973d27f72c9a99af0b2700a4248d0572c2582f7a19d83a1f8",
+        "file": "zai-cli-0.1.246-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-linux-arm64.zip",
+        "bytes": 27972248,
+        "sha256": "dd31e3e243a91df4d7b43b687157c2c54fef61daa87beed56ae7352192127ac8",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       },
       {
@@ -69,14 +65,14 @@
         },
         "platform": "macos",
         "architecture": "x64",
-        "file": "zai-cli-0.1.213-darwin-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-darwin-amd64.zip",
-        "bytes": 27814828,
-        "sha256": "ef807d1edea4f48c297ffaa8e7e7c1d3d187f72ea3f7ae350e1656bf82bb825c",
+        "file": "zai-cli-0.1.246-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-darwin-amd64.zip",
+        "bytes": 27978876,
+        "sha256": "4c75f93151620f1baf353b819361a5ce0b69e6d1949e6d6933116a9ef688a891",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       },
       {
@@ -86,14 +82,14 @@
         },
         "platform": "macos",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.213-darwin-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-darwin-arm64.zip",
-        "bytes": 26204673,
-        "sha256": "bd565a2472cc4feee8c83b1f7983150841610e8a811e5947377398660b1c44bc",
+        "file": "zai-cli-0.1.246-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-darwin-arm64.zip",
+        "bytes": 26369230,
+        "sha256": "bc5edb9062b3b8de507e26294ee926bd765db17e8a6d622173aa323cbed5f856",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. The package is not notarized; follow macOS Gatekeeper and your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 该安装包未经公证，请遵循 macOS Gatekeeper 与所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       },
       {
@@ -103,14 +99,14 @@
         },
         "platform": "windows",
         "architecture": "x64",
-        "file": "zai-cli-0.1.213-windows-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-windows-amd64.zip",
-        "bytes": 30777490,
-        "sha256": "eb29c4327f50abf03f80cd770848f61454e7019f1e1b611499eaefffe212d9ff",
+        "file": "zai-cli-0.1.246-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-windows-amd64.zip",
+        "bytes": 30915859,
+        "sha256": "0cd6d4096d41d25fbc0819f341ab4311088f21a2f356621aedc9a3db0d4b4506",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       },
       {
@@ -120,14 +116,14 @@
         },
         "platform": "windows",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.213-windows-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.213/zai-cli-0.1.213-windows-arm64.zip",
-        "bytes": 28158720,
-        "sha256": "3e9da3e7da4c1f7fb0124e67149ca1c3c3d412d4a3b6f12763bae7bace44c1a9",
+        "file": "zai-cli-0.1.246-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.246/zai-cli-0.1.246-windows-arm64.zip",
+        "bytes": 28287798,
+        "sha256": "622e7d4d30df96f0a366db84e57062fbd587153b7bb5af8add170643f5a311de",
         "signing": "unsigned",
         "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256, installs the zai family under your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. Open a new terminal and run zai. Python 3.10 or newer is required to install. Install your chosen coding-agent CLI separately; Node.js/npm is needed for supported npm-based provisioning. Windows SmartScreen may warn because the package is unsigned; follow your organization's security policy.",
-          "zh-CN": "未签名的构建。请使用一行安装命令；它会校验该压缩包的 SHA-256，把 zai 应用系列安装到主目录下，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。打开新终端后运行 zai。安装需要 Python 3.10 及以上。请另行安装所选编程代理 CLI；支持的 npm 安装方式需要 Node.js/npm。 由于安装包未签名，Windows SmartScreen 可能发出警告；请遵循所在组织的安全策略。"
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。"
         }
       }
     ]
