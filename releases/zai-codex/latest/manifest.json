@@ -1,5 +1,27 @@
 {
   "schemaVersion": 1,
   "appId": "zai-codex",
-  "release": null
+  "release": {
+    "version": "0.1.0",
+    "channel": "preview",
+    "publishedAt": "2026-10-01T23:32:00Z",
+    "notes": [
+      "First public Linux x64 preview with GitHub Copilot subscription support; telemetry and remote diagnostic uploads are disabled.",
+      "Installs as codex. Internal package version matches the executable so normal background-server launch works.",
+      "macOS, Windows and Linux ARM64 packages have not been published. Live account login/inference and the full workspace test suite have not been completed."
+    ],
+    "assets": [
+      {
+        "name": "zai-codex for Linux x64",
+        "platform": "linux",
+        "architecture": "x64",
+        "file": "zai-codex-0.1.0-x86_64-unknown-linux-gnu.zip",
+        "bytes": 125609206,
+        "sha256": "a56fdc5917ab487a865da5e79bac24f1bb6295d46326e686e2817692198170a8",
+        "signing": "unsigned",
+        "installNotes": "Linux x64, glibc 2.39+, OpenSSL 3, libcap2, zlib, zstd and libtinfo6. Python 3.10+ is required for the installer. Run codex after installation. Unsigned preview; keep the complete bundle together. Alpine/musl is unsupported.",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.0/zai-codex-0.1.0-x86_64-unknown-linux-gnu.zip"
+      }
+    ]
+  }
 }
