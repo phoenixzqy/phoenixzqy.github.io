@@ -117,7 +117,7 @@ Windows PowerShell:
 irm https://phoenixzqy.github.io/uninstall/zai-cli.ps1 | iex
 ```
 
-From a source checkout, run `python src/scripts/uninstall.py`, `sh src/scripts/uninstall.sh`, or `& ./src/scripts/uninstall.ps1`. All three contain the same standalone cleanup implementation and do not fetch more code. Preview with `python src/scripts/uninstall.py --dry-run`; pass `--install-dir /absolute/install/directory` for a custom installation.
+For a local script, download [zai-cli.py](https://phoenixzqy.github.io/uninstall/zai-cli.py) and run `python zai-cli.py --dry-run` to preview. Remove `--dry-run` to uninstall; pass `--install-dir /absolute/install/directory` for a custom installation. The Python, shell, and PowerShell scripts contain the same standalone cleanup implementation and do not fetch more code. Matching scripts also live in the source checkout; see its README for their location.
 
 For hosted commands, set `ZAI_UNINSTALL_DRY_RUN=1` to preview or `ZAI_INSTALL_DIR` to select the absolute install directory before running the command. Shared theme cleanup respects `ZAI_THEME_CONFIG`. Editor cleanup also respects `ZAI_EDITOR_LSP_HOME` and `ZAI_EDITOR_PREVIEW_HOME`. Custom locations must be supplied again if they differ from their defaults.
 

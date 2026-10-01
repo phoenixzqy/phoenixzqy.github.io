@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "35b9968d1617828a8f37267681ff1546bb695be2",
-  "commit": "35b9968d1617828a8f37267681ff1546bb695be2",
+  "ref": "2123d4a01ed6112dcb8be1b585af1033a442b81f",
+  "commit": "2123d4a01ed6112dcb8be1b585af1033a442b81f",
   "documents": [
     {
       "slug": "docs--install-and-config",
@@ -17,7 +17,7 @@
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 14455
+      "bytes": 14561
     },
     {
       "slug": "docs--claude-code",
