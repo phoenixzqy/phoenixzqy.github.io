@@ -26,12 +26,12 @@
         "name": "Android App Bundle",
         "platform": "android",
         "architecture": "universal",
-        "file": "BPlayer-0.7.7+14-android-selfsigned.aab",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.7+14/BPlayer-0.7.7+14-android-selfsigned.aab",
-        "bytes": 83212367,
-        "sha256": "2b9690a95f5b0f54381be853ace834e2a789f105ee3dfb6652754ee6d975aae5",
+        "file": "BPlayer-0.7.7+14-android-selfsigned-public.aab",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.7+14/BPlayer-0.7.7+14-android-selfsigned-public.aab",
+        "bytes": 82713661,
+        "sha256": "80c9c573f18dfb7de28d9b73d39c5a7efe06e5073670f538b5aa2063c286ade2",
         "signing": "self-signed",
-        "installNotes": "Signed publishing bundle for authorized testing or store preparation; it is not directly installable."
+        "installNotes": "Signed publishing bundle for authorized testing or store preparation; it is not directly installable. The public bundle omits the ProGuard debugging map and retains the original self-signed identity."
       },
       {
         "name": "iOS application archive",
