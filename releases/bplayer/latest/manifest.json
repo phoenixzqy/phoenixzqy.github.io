@@ -8,7 +8,8 @@
     "notes": [
       "Cross-platform development packages built from one pinned BPlayer source revision.",
       "Release assets are mirrored publicly while the application source remains private.",
-      "Android and Windows are self-signed; iOS and macOS are ad-hoc signed development builds."
+      "Android and Windows are self-signed; iOS and macOS are ad-hoc signed development builds.",
+      "The public Android App Bundle excludes the ProGuard debugging map while retaining its original self-signed identity."
     ],
     "assets": [
       {
@@ -26,12 +27,12 @@
         "name": "Android App Bundle",
         "platform": "android",
         "architecture": "universal",
-        "file": "BPlayer-0.7.8+15-android-selfsigned.aab",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.8+15/BPlayer-0.7.8+15-android-selfsigned.aab",
-        "bytes": 83256372,
-        "sha256": "0c7497a07b149d48c1026ea3b7640f042a9a8a74395ba2de2ac1e00c172c3e04",
+        "file": "BPlayer-0.7.8+15-android-selfsigned-public.aab",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/bplayer-v0.7.8+15/BPlayer-0.7.8+15-android-selfsigned-public.aab",
+        "bytes": 82757102,
+        "sha256": "66236c33cc5f79ae26d4f5144e09710c24cad90b9d11df07998f7802306b8e3c",
         "signing": "self-signed",
-        "installNotes": "Signed publishing bundle for authorized testing or store preparation; it is not directly installable."
+        "installNotes": "Self-signed publishing bundle for authorized testing or store preparation; it is not directly installable. The public bundle excludes the ProGuard debugging map."
       },
       {
         "name": "iOS application archive",
