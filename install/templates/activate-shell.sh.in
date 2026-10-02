@@ -14,6 +14,10 @@ quote_shell() {
   printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
 }
 
+quote_fish() {
+  printf "'%s'" "$(printf '%s' "$1" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")"
+}
+
 show_activation() {
   activation_dir=$1
   activation_executable=$2
@@ -27,21 +31,19 @@ show_activation() {
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
-      # Only suggest an existing profile containing this installation's PATH.
-      # Bundled installers may not create a profile, so retain a direct fallback.
+      # A profile text match is only a hint; always activate the actual directory.
       if [ -n "$activation_profile" ] && [ -f "$activation_profile" ] &&
           { grep -Fq -- "$activation_dir" "$activation_profile" ||
             grep -Fq -- "$quoted_activation_dir" "$activation_profile"; }; then
         case "$activation_shell" in bash | zsh) source_command=source ;; *) source_command=. ;; esac
         printf '  %s %s\n' "$source_command" "$(quote_shell "$activation_profile")"
-      else
-        printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
       fi
+      printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
       printf '  %s\n' "$(quote_shell "$activation_executable")"
       ;;
     fish)
-      printf '  set -gx PATH %s $PATH\n' "$quoted_activation_dir"
-      printf '  %s\n' "$(quote_shell "$activation_executable")"
+      printf '  set -gx PATH %s $PATH\n' "$(quote_fish "$activation_dir")"
+      printf '  %s\n' "$(quote_fish "$activation_executable")"
       ;;
     *)
       printf '%s\n' 'Shell not recognized. Add the installation directory to PATH using your shell settings, or launch directly:'
