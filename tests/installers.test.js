@@ -74,16 +74,19 @@ async function withHome(body) {
 }
 
 const shellPath = (await run("sh", ["-c", "command -v sh"])).stdout.trim();
+const zshAvailable = await run(shellPath, ["-c", "command -v zsh"]).then(() => true).catch(() => false);
 
-async function runInstaller(script, { manifestUrl, home, installDir, path = process.env.PATH, args = [] }) {
+async function runInstaller(script, { manifestUrl, home, installDir, path = process.env.PATH, args = [], shell = "/bin/bash", parentShell, envOverrides = {} }) {
   try {
-    const { stdout, stderr } = await run(shellPath, [installerPath(script), ...args], {
+    const { stdout, stderr } = await run(parentShell ?? shellPath,
+      parentShell ? ["-c", 'sh "$1"; result=$?; exit "$result"', parentShell, installerPath(script)] : [installerPath(script), ...args], {
       env: {
         PATH: path,
         HOME: home,
-        SHELL: "/bin/bash",
+        SHELL: shell,
         ZAI_RELEASE_MANIFEST_URL: manifestUrl,
         ...(installDir ? { ZAI_INSTALL_DIR: installDir } : {}),
+        ...envOverrides,
       },
     });
     return { code: 0, stdout, stderr };
@@ -608,4 +611,123 @@ test("PowerShell Python preflight skips broken launchers and accepts only Python
       assert.equal(await stat(join(home, ".zai")).catch(() => null), null);
     });
   }
+});
+
+test("all zai shell installers print activation commands that expose the installed app", async () => {
+  for (const { appId, mode, executable } of INSTALLERS) {
+    for (const shell of ["/bin/bash", "/bin/zsh", "/bin/sh"]) {
+      const packageData = mode === "codex" ? codexPackage() : {
+        file: `${appId}-0.1.0-linux-x64.zip`, architecture: "x64",
+        bytes: createZip(mode === "python" ? {
+          "install.py": [
+            "import os, pathlib, sys",
+            "home = pathlib.Path(os.environ['HOME'])",
+            "directory = pathlib.Path(sys.argv[sys.argv.index('--install-dir') + 1])",
+            "directory.mkdir(parents=True, exist_ok=True)",
+            "binary = directory / 'zai'",
+            "binary.write_text('#!/bin/sh\\necho activated-fixture\\n')",
+            "binary.chmod(0o755)",
+            "for name in ('.profile', '.bashrc', '.zshrc'):",
+            "    (home / name).write_text('export PATH=' + str(directory) + ':\"$PATH\"\\n')",
+          ].join("\n"),
+        } : { [executable]: "#!/bin/sh\necho activated-fixture\n" }),
+      };
+      const { file, bytes, architecture } = packageData;
+      await withServer(new Map([
+        ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", architecture, file, bytes)])))],
+        [`/${file}`, bytes],
+      ]), (origin) => withHome(async (home) => {
+        const installDir = join(home, "installed");
+        const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home, installDir, shell });
+        assert.equal(result.code, 0, `${appId}/${shell}: ${result.stderr}`);
+        const commands = result.stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
+        assert.equal(commands.length, 2, result.stdout);
+        if (mode === "codex") assert.equal(commands[0], `export PATH='${installDir}':"$PATH"`);
+        else assert.match(commands[0], shell.endsWith("/sh") ? /^\. / : /^source /);
+        // The installer is a child process: only running its printed command
+        // in the calling shell makes the installed executable available.
+        const actualShell = shell.endsWith("/zsh") && zshAvailable ? "zsh" : shell.endsWith("/sh") ? "sh" : "bash";
+        const activated = await run(actualShell, ["-c", commands.join("\n")], { env: { HOME: home, PATH: process.env.PATH } });
+        assert.match(activated.stdout, mode === "codex" ? /codex-cli 0\.0\.0/ : /activated-fixture/);
+      }));
+    }
+  }
+});
+
+test("calling shell detection takes precedence over the login shell", async () => {
+  const file = "zai-editor.zip";
+  const bytes = createZip({ "zai-editor": "#!/bin/sh\nexit 0\n" });
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [asset("linux", "x64", file, bytes)])))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const result = await runInstaller("zai-editor.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, shell: "/bin/zsh", parentShell: "bash",
+    });
+    assert.equal(result.code, 0, result.stderr);
+    assert.ok(result.stdout.includes(`source '${home}/.bashrc'`), result.stdout);
+  }));
+});
+
+test("activation fallback quotes custom paths and handles fish and unknown shells", async () => {
+  const helper = await readFile(join(siteRoot, "install/templates/activate-shell.sh.in"), "utf8");
+  await withHome(async (home) => {
+    const directory = join(home, "space ' quote $(touch pwned)");
+    await mkdir(directory);
+    const binary = join(directory, "fixture");
+    await writeFile(binary, "#!/bin/sh\necho activated-fixture\n", { mode: 0o755 });
+    for (const shell of ["/bin/bash", "/bin/fish", "/bin/unknown"]) {
+      const { stdout } = await run("sh", ["-c", helper + '\nshow_activation "$1" fixture', "sh", directory], {
+        env: { HOME: home, PATH: process.env.PATH, SHELL: shell },
+      });
+      const commands = stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
+      if (shell.endsWith("fish")) {
+        assert.match(commands[0], /^set -gx PATH /);
+      } else {
+        const result = await run("sh", ["-c", commands.join("\n")], { cwd: home, env: { HOME: home, PATH: process.env.PATH } });
+        assert.match(result.stdout, /activated-fixture/);
+        await assert.rejects(stat(join(home, "pwned")), { code: "ENOENT" });
+      }
+    }
+  });
+});
+
+
+test("zai-codex activation uses the overridden launcher directory and filename", { skip: process.platform !== "linux" }, async () => {
+  const { file, bytes, architecture } = codexPackage();
+  await withServer(new Map([
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [asset("linux", architecture, file, bytes)])))],
+    [`/${file}`, bytes],
+  ]), (origin) => withHome(async (home) => {
+    const launcher = join(home, "custom ' bin", "custom codex");
+    const result = await runInstaller("zai-codex.sh", {
+      manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "install"),
+      envOverrides: { ZAI_CODEX_BIN_LINK: launcher },
+    });
+    assert.equal(result.code, 0, result.stderr);
+    const commands = result.stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
+    assert.equal(commands[1], "'custom codex'");
+    const activated = await run("bash", ["-c", commands.join("\n")], { env: { HOME: home, PATH: process.env.PATH } });
+    assert.match(activated.stdout, /codex-cli 0\.0\.0/);
+  }));
+});
+
+test("PowerShell activation quotes paths without executing their contents", {
+  skip: !powerShellPath && "PowerShell is unavailable on this host",
+}, async () => {
+  const helper = await readFile(join(siteRoot, "install/templates/activate-shell.ps1.in"), "utf8");
+  await withHome(async (home) => {
+    const directory = join(home, "space ' quote $HOME");
+    await mkdir(directory);
+    const script = join(home, "activate.ps1");
+    await writeFile(script, helper + '\nShow-Activation $env:ZAI_TEST_BIN fixture');
+    const { stdout } = await run(powerShellPath, ["-NoProfile", "-File", script], {
+      env: { ...process.env, ZAI_TEST_BIN: directory },
+    });
+    const command = stdout.split("\n").find((line) => line.startsWith("  $env:Path"));
+    assert.ok(command, stdout);
+    await writeFile(script, command + '\n[Console]::Write($env:Path)');
+    const activated = await run(powerShellPath, ["-NoProfile", "-File", script]);
+    assert.ok(activated.stdout.startsWith(directory + (process.platform === "win32" ? ";" : ":")));
+  });
 });

@@ -23,5 +23,5 @@ else
 fi
 
 info ''
-info "Open a new terminal so the updated PATH applies, then run '$EXECUTABLE'."
+show_activation "$INSTALL_DIR" "$EXECUTABLE"
 info "Documentation: $SITE/apps/docs/?id=$APP_ID"

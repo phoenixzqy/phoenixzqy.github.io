@@ -22,5 +22,5 @@ ensure_on_path "$INSTALL_DIR"
 info ''
 info "Installed $DISPLAY_NAME to $INSTALL_DIR/$EXECUTABLE"
 info "Licenses: $LICENSE_DIR"
-info "Open a new terminal so the updated PATH applies, then run '$EXECUTABLE'."
+show_activation "$INSTALL_DIR" "$EXECUTABLE"
 info "Documentation: $SITE/apps/docs/?id=$APP_ID"
