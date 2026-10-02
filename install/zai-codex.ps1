@@ -4,6 +4,14 @@
 # Python 3.10+ required. ZAI_INSTALL_DIR and ZAI_RELEASE_MANIFEST_URL are supported.
 # irm https://phoenixzqy.github.io/install/zai-codex.ps1 | iex
 $ErrorActionPreference = 'Stop'
+function Show-Activation([string] $directory, [string] $command) {
+    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
+    Write-Host ''
+    Write-Host 'To use the app in this PowerShell terminal, copy and run:'
+    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+}
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) { throw 'Python 3.10+ is required. Install Python and run this command again.' }
 $installer = @'
@@ -329,3 +337,13 @@ if __name__ == "__main__":
 '@
 $installer | & $python.Source -B -
 if ($LASTEXITCODE -ne 0) { throw "zai-codex installer failed (exit $LASTEXITCODE)." }
+$resolveLauncher = @'
+import os
+from pathlib import Path
+launcher = Path(os.environ.get("ZAI_CODEX_BIN_LINK", str(Path(os.environ.get("ZAI_INSTALL_DIR") or "~/.local/bin") / "codex.cmd"))).expanduser()
+print(launcher.parent.resolve())
+print(launcher.name)
+'@
+$launcherLocation = $resolveLauncher | & $python.Source -B -
+if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the installed launcher directory.' }
+Show-Activation $launcherLocation[0] $launcherLocation[1]

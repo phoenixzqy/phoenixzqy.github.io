@@ -133,6 +133,14 @@ function Add-UserPath([string] $directory) {
     }
 }
 
+function Show-Activation([string] $directory, [string] $command) {
+    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
+    Write-Host ''
+    Write-Host 'To use the app in this PowerShell terminal, copy and run:'
+    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+}
 $architecture = Get-Architecture
 # Probe launchers before downloads; a launcher or Store alias may exist without
 # a usable interpreter. Keep trying when a candidate is missing, old, or broken.
@@ -246,7 +254,7 @@ try {
     }
 
     Write-Host ''
-    Write-Host "Open a new terminal so the updated PATH applies, then run 'zai'."
+    Show-Activation $installDir 'zai'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"
 } finally {
     Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue

@@ -133,6 +133,14 @@ function Add-UserPath([string] $directory) {
     }
 }
 
+function Show-Activation([string] $directory, [string] $command) {
+    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
+    Write-Host ''
+    Write-Host 'To use the app in this PowerShell terminal, copy and run:'
+    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+}
 $architecture = Get-Architecture
 $work = Join-Path ([System.IO.Path]::GetTempPath()) ("zai-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
@@ -223,7 +231,7 @@ try {
     Write-Host ''
     Write-Host "Installed $displayName to $target"
     Write-Host "Licenses: $licenseDir"
-    Write-Host "Open a new terminal so the updated PATH applies, then run 'zai-editor'."
+    Show-Activation $installDir 'zai-editor'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"
 } finally {
     Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue

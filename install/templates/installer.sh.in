@@ -35,6 +35,7 @@ info() {
   printf '%s\n' "$1"
 }
 
+@ACTIVATION_HELPER@
 # --- Platform -------------------------------------------------------------
 case "$(uname -s)" in
   Linux*) PLATFORM=linux ;;
@@ -137,9 +138,9 @@ ensure_on_path() {
   quoted_dir="$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
   line="export PATH='$quoted_dir':\"\$PATH\"  $marker"
   profiles="$HOME/.profile"
-  case "${SHELL:-}" in
-    *zsh*) profiles="$profiles $HOME/.zshrc" ;;
-    *bash*) profiles="$profiles $HOME/.bashrc" ;;
+  case "$activation_shell" in
+    zsh) profiles="$profiles $HOME/.zshrc" ;;
+    bash) profiles="$profiles $HOME/.bashrc" ;;
     *) profiles="$profiles $HOME/.bashrc $HOME/.zshrc" ;;
   esac
   for profile in $profiles; do

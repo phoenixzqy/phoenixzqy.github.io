@@ -1,0 +1,8 @@
+function Show-Activation([string] $directory, [string] $command) {
+    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
+    Write-Host ''
+    Write-Host 'To use the app in this PowerShell terminal, copy and run:'
+    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+}

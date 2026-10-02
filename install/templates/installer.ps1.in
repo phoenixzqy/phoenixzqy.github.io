@@ -133,6 +133,7 @@ function Add-UserPath([string] $directory) {
     }
 }
 
+@ACTIVATION_HELPER@
 $architecture = Get-Architecture
 @PREREQUISITE_STEP@
 $work = Join-Path ([System.IO.Path]::GetTempPath()) ("zai-install-" + [guid]::NewGuid().ToString('N'))

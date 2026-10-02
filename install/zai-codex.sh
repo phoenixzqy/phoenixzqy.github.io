@@ -4,6 +4,60 @@
 # Python 3.10+ required. ZAI_INSTALL_DIR and ZAI_RELEASE_MANIFEST_URL are supported.
 # curl -fsSL https://phoenixzqy.github.io/install/zai-codex.sh | sh
 set -eu
+# Detect the calling shell, not /bin/sh used to run this installer. SHELL is
+# the login-shell fallback when the parent is a wrapper or cannot be inspected.
+activation_shell=${SHELL:-}
+activation_shell=${activation_shell##*/}
+if command -v ps >/dev/null 2>&1; then
+  parent_shell=$(ps -p "$PPID" -o comm= 2>/dev/null | sed 's/^[[:space:]]*//; s/^-//')
+  parent_shell=${parent_shell##*/}
+  case "$parent_shell" in
+    bash | zsh | sh | dash | ksh | fish) activation_shell=$parent_shell ;;
+  esac
+fi
+
+quote_shell() {
+  printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
+}
+
+quote_fish() {
+  printf "'%s'" "$(printf '%s' "$1" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")"
+}
+
+show_activation() {
+  activation_dir=$1
+  activation_executable=$2
+  activation_profile=''
+  case "$activation_shell" in
+    zsh) activation_profile="$HOME/.zshrc" ;;
+    bash) activation_profile="$HOME/.bashrc" ;;
+    sh | dash | ksh) activation_profile="$HOME/.profile" ;;
+  esac
+  printf '\n%s\n' 'To use the app in this terminal, copy and run:'
+  quoted_activation_dir=$(quote_shell "$activation_dir")
+  case "$activation_shell" in
+    bash | zsh | sh | dash | ksh)
+      # A profile text match is only a hint; always activate the actual directory.
+      if [ -n "$activation_profile" ] && [ -f "$activation_profile" ] &&
+          { grep -Fq -- "$activation_dir" "$activation_profile" ||
+            grep -Fq -- "$quoted_activation_dir" "$activation_profile"; }; then
+        case "$activation_shell" in bash | zsh) source_command=source ;; *) source_command=. ;; esac
+        printf '  %s %s\n' "$source_command" "$(quote_shell "$activation_profile")"
+      fi
+      printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
+      printf '  %s\n' "$(quote_shell "$activation_executable")"
+      ;;
+    fish)
+      printf '  set -gx PATH %s $PATH\n' "$(quote_fish "$activation_dir")"
+      printf '  %s\n' "$(quote_fish "$activation_executable")"
+      ;;
+    *)
+      printf '%s\n' 'Shell not recognized. Add the installation directory to PATH using your shell settings, or launch directly:'
+      printf '  %s\n' "$(quote_shell "$activation_dir/$activation_executable")"
+      ;;
+  esac
+  printf '%s\n' 'Run the command above in your current shell; a child installer cannot update its parent shell.'
+}
 command -v python3 >/dev/null 2>&1 || { printf '%s\n' 'Python 3.10+ is required.' >&2; exit 1; }
 python3 -B - <<'ZAI_CODEX_PYTHON'
 #!/usr/bin/env python3
@@ -326,3 +380,6 @@ if __name__ == "__main__":
     ) as error:
         raise SystemExit(str(error))
 ZAI_CODEX_PYTHON
+# Resolve the same launcher override/default as the reviewed Python installer.
+launcher_path=$(python3 -B -c 'import os; from pathlib import Path; launcher = Path(os.environ.get("ZAI_CODEX_BIN_LINK", str(Path(os.environ.get("ZAI_INSTALL_DIR") or "~/.local/bin") / "codex"))).expanduser(); print(launcher.parent.resolve() / launcher.name)')
+show_activation "${launcher_path%/*}" "${launcher_path##*/}"
