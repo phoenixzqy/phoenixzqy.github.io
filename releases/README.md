@@ -137,6 +137,13 @@ a pure data change to `manifest.json`.
 
 Prerequisites are checked before release downloads. The zai-cli bootstrap requires a working Python 3.10+ interpreter (`python3`/`python` on macOS/Linux; `py -3`/`python`/`python3` on Windows), then runs `install.py` from the verified archive root. macOS/Linux bootstraps for the standalone tools require Python 3 for metadata parsing. Shell installers also check for `curl` or `wget` and `sha256sum` or `shasum`; ZIP extraction can fall back to the selected Python interpreter. Missing, old, or broken Python fails with installation guidance before the bundled installer creates `~/.zai`. Coding-agent CLIs, Git, and Node.js/npm are runtime dependencies where needed, not prerequisites for installing the zai archive.
 
+Installing zai-cli exposes the public `zai`, `zai-editor`, and `zai-gitter`
+commands. Its archive contains all three public binaries at the root
+(with `.exe` on Windows). The bundled `install.py` owns executable validation
+and installation; the bootstrap reports public commands present afterwards.
+Installing either standalone tool exposes only its own command and preserves
+existing sibling apps in the shared installation directory.
+
 After installation, each bootstrap prints commands to activate the executable in the current terminal. Shell installers detect a recognized parent shell, falling back to `SHELL`: bash/zsh suggest `source` for an existing profile mentioning the installation PATH; POSIX shells use `.`. These shells always receive an explicit `export PATH` command afterward, even when a profile is sourced, because matching profile text does not guarantee that it adds the actual launcher directory. Fish receives `set -gx PATH` with fish-specific literal escaping, PowerShell receives `$env:Path`, and unknown shells receive the quoted executable path. Run the printed commands in the calling terminal: a child installer cannot change its parent shell's environment. zai-codex activation respects its launcher override and defaults to `~/.local/bin`.
 
 An entry may advertise these commands on its detail page:

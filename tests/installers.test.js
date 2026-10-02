@@ -184,6 +184,30 @@ test("the shell installer verifies, extracts, and installs a published package",
   }));
 });
 
+test("standalone installers replace only their own app in a family installation", async () => {
+  for (const appId of ["zai-editor", "zai-gitter"]) {
+    const bytes = createZip(Object.fromEntries(["zai", "zai-editor", "zai-gitter"].map((app) =>
+      [app, `#!/bin/sh\necho package-${app}\n`])));
+    const file = `${appId}-0.1.0-linux-x64.zip`;
+    await withServer(new Map([
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", "x64", file, bytes)])))],
+      [`/${file}`, bytes],
+    ]), (origin) => withHome(async (home) => {
+      const installDir = join(home, "installed");
+      await mkdir(installDir);
+      for (const app of ["zai", "zai-editor", "zai-gitter"]) {
+        await writeFile(join(installDir, app), `existing-${app}`, { mode: 0o755 });
+      }
+      const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home, installDir });
+      assert.equal(result.code, 0, result.stderr);
+      for (const app of ["zai", "zai-editor", "zai-gitter"]) {
+        const actual = await readFile(join(installDir, app), "utf8");
+        assert.equal(actual, app === appId ? `#!/bin/sh\necho package-${app}\n` : `existing-${app}`);
+      }
+    }));
+  }
+});
+
 test("the shell installer parses minified manifests with localized asset text", async () => {
   const bytes = createZip({ "zai-editor": "#!/bin/sh\necho localized fixture\n" });
   const file = "zai-editor-0.1.0-linux-x64.zip";
@@ -351,6 +375,9 @@ test("the zai installer runs install.py from the archive root and forwards argum
   const bytes = createZip({
     // The published archive keeps its entry point at the root, beside the
     // library it imports, and ships other Python files that must not be run.
+    "zai": "fixture",
+    "zai-editor": "fixture",
+    "zai-gitter": "fixture",
     "install.py":
       "import sys, pathlib\n" +
       "pathlib.Path(sys.argv[1]).write_text(' '.join(sys.argv[2:]))\n" +
@@ -563,7 +590,8 @@ test("Python preflight rejects missing, old, and broken interpreters before down
 });
 
 test("the selected Python fallback handles metadata, ZIP extraction, and package installation", async () => {
-  const bytes = createZip({ "install.py": "import pathlib\npathlib.Path.home().joinpath('receipt').write_text('installed')\n" });
+  const bytes = createZip({ "zai": "fixture", "zai-editor": "fixture", "zai-gitter": "fixture",
+    "install.py": "import pathlib\npathlib.Path.home().joinpath('receipt').write_text('installed')\n" });
   const file = "zai-0.1.0-linux-x64.zip";
   await withServer(new Map([
     ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)])))],
@@ -620,18 +648,21 @@ test("all zai shell installers print activation commands that expose the install
       const packageData = mode === "codex" ? codexPackage() : {
         file: `${appId}-0.1.0-linux-x64.zip`, architecture: "x64",
         bytes: createZip(mode === "python" ? {
+          "zai": "fixture", "zai-editor": "fixture", "zai-gitter": "fixture",
           "install.py": [
             "import os, pathlib, sys",
             "home = pathlib.Path(os.environ['HOME'])",
             "directory = pathlib.Path(sys.argv[sys.argv.index('--install-dir') + 1])",
             "directory.mkdir(parents=True, exist_ok=True)",
-            "binary = directory / 'zai'",
-            "binary.write_text('#!/bin/sh\\necho activated-fixture\\n')",
-            "binary.chmod(0o755)",
+            "for app in ('zai', 'zai-editor', 'zai-gitter'):",
+            "    binary = directory / app",
+            "    binary.write_text('#!/bin/sh\\necho activated-fixture\\n')",
+            "    binary.chmod(0o755)",
             "for name in ('.profile', '.bashrc', '.zshrc'):",
             "    (home / name).write_text('export PATH=' + str(directory) + ':\"$PATH\"\\n')",
           ].join("\n"),
-        } : { [executable]: "#!/bin/sh\necho activated-fixture\n" }),
+        } : { [executable]: "#!/bin/sh\necho activated-fixture\n",
+          "zai": "sibling fixture", [appId === "zai-editor" ? "zai-gitter" : "zai-editor"]: "sibling fixture" }),
       };
       const { file, bytes, architecture } = packageData;
       await withServer(new Map([
@@ -641,6 +672,19 @@ test("all zai shell installers print activation commands that expose the install
         const installDir = join(home, "installed");
         const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home, installDir, shell });
         assert.equal(result.code, 0, `${appId}/${shell}: ${result.stderr}`);
+        if (mode !== "codex") {
+          const expected = mode === "python" ? ["zai", "zai-editor", "zai-gitter"] : [executable];
+          assert.deepEqual(result.stdout.split("\n").filter((line) => line.startsWith("Installed command: ")),
+            expected.map((app) => `Installed command: ${app}`));
+          for (const app of ["zai", "zai-editor", "zai-gitter"]) {
+            if (expected.includes(app)) {
+              const launched = await run(app, ["--help"], { env: { PATH: installDir, HOME: home } });
+              assert.match(launched.stdout, /activated-fixture/, `${appId}: ${app} unavailable on PATH`);
+            } else await assert.rejects(stat(join(installDir, app)), /ENOENT/);
+            await assert.rejects(stat(join(installDir, "." + app)), /ENOENT/);
+          }
+        }
+
         const commands = result.stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
         assert.equal(commands.length, mode === "codex" ? 2 : 3, result.stdout);
         if (mode === "codex") assert.equal(commands[0], `export PATH='${installDir}':"$PATH"`);

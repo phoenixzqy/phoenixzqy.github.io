@@ -2,22 +2,22 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "7ff62e02a24fa06cc368aa835f1ac6253cf87d5a",
-  "commit": "7ff62e02a24fa06cc368aa835f1ac6253cf87d5a",
+  "ref": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
+  "commit": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
   "documents": [
     {
       "slug": "docs--install-and-config",
       "title": "Install and configure zai",
       "source": "docs/install-and-config.md",
       "file": "docs--install-and-config.md",
-      "bytes": 4950
+      "bytes": 4964
     },
     {
       "slug": "docs--getting-started",
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 14640
+      "bytes": 14814
     },
     {
       "slug": "docs--claude-code",
@@ -45,7 +45,7 @@
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 7323
+      "bytes": 7659
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
@@ -80,7 +80,7 @@
       "title": "Validation and boundaries",
       "source": "docs/config/validation-and-boundaries.md",
       "file": "docs--config--validation-and-boundaries.md",
-      "bytes": 7142
+      "bytes": 7331
     }
   ],
   "assets": []

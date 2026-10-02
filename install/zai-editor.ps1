@@ -229,6 +229,7 @@ try {
     Add-UserPath $installDir
 
     Write-Host ''
+    Write-Host 'Installed command: zai-editor'
     Write-Host "Installed $displayName to $target"
     Write-Host "Licenses: $licenseDir"
     Show-Activation $installDir 'zai-editor'

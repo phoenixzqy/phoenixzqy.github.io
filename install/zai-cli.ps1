@@ -254,6 +254,11 @@ try {
     }
 
     Write-Host ''
+    foreach ($app in @('zai', 'zai-editor', 'zai-gitter')) {
+        if (Test-Path -LiteralPath (Join-Path $installDir "$app.exe") -PathType Leaf) {
+            Write-Host "Installed command: $app"
+        }
+    }
     Show-Activation $installDir 'zai'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"
 } finally {

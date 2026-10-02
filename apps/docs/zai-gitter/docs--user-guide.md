@@ -27,6 +27,9 @@ terminal, then run `zai-gitter [--theme <theme>] [directory]` from any Git
 workspace. Git must already be on `PATH`; after installation, the app does not
 need Python, Go, Node.js, zai, or a forge account.
 
+Installing this app exposes only `zai-gitter`. Installing zai-cli exposes
+`zai`, `zai-editor`, and `zai-gitter`, which can also run independently.
+
 If your shell does not load `.profile`, `.bashrc`, or `.zshrc`, add the
 installation directory (normally `~/.zai`) to that shell's PATH yourself.
 

@@ -327,5 +327,10 @@ else
 fi
 
 info ''
+for app in zai zai-editor zai-gitter; do
+  if [ -f "$INSTALL_DIR/$app" ]; then
+    info "Installed command: $app"
+  fi
+done
 show_activation "$INSTALL_DIR" "$EXECUTABLE"
 info "Documentation: $SITE/apps/docs/?id=$APP_ID"
