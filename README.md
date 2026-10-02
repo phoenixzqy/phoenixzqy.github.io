@@ -189,6 +189,18 @@ No measurement was recollected and no complete-setup ranking is inferred.
 
 The October 1, 2026 installation documentation audit follows the author's request to check zai-cli against its current implementation. The source revision in `apps/docs/sources.json` records the direct setup guide and privacy-reviewed mirror. The generated [shell installer](install/zai-cli.sh) and [PowerShell installer](install/zai-cli.ps1) substantiate the Python prerequisite probes and bundled installer flow; the catalog now separates installation prerequisites from repository-session requirements and uses automatic configuration defaults.
 
+The October 2, 2026 release refresh uses the author's authorized current-main
+changes and user guides for
+[zai-cli 0.1.303](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.303),
+[zai-editor 0.3.4](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-editor-v0.3.4),
+and [zai-gitter 0.3.4](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-gitter-v0.3.4).
+The bilingual notes describe the Usage dashboard, workspace restoration,
+terminal image previews, source-location opening, buffer indentation, and
+headless browser previews without adding performance or platform-trust claims.
+The privacy-reviewed documentation mirrors record their exact source revisions
+in `apps/docs/sources.json`; release archives contain approved runtime files
+and license notices, not private application source or debugging symbols.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online

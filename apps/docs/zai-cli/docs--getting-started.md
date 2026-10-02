@@ -151,7 +151,7 @@ Installed help is the source of truth: run `zai -h` for the summary,
 
 | Command | Purpose |
 |---|---|
-| `zai` | Open the project-based console TUI from any folder on a quiet Welcome tab, without launching an agent. `ctrl+\ n` opens an app. |
+| `zai` | Open the project-based console TUI and restore saved middle tabs, splits and conversations. Fresh workspaces show Welcome. `ctrl+\ n` opens an app. |
 | `zai start <all\|service\|list>` | Start one repo-scoped background daemon that runs `dev`, `review`, `pr-babysitter`, and `housekeep` (`all`), one service, or a comma-separated subset. |
 | `zai stop` / `zai restart` / `zai status` | Stop, restart with the same services, or show this repository's daemon. |
 | `zai config <show\|path\|update\|delete\|profile>` | Manage the detected repository's config and named config profiles. |

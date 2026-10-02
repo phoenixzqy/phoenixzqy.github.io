@@ -73,6 +73,18 @@ reader implementation. zai owns workspace selection and explicit delivery
 to its live agent panes. Standalone Ask AI exports for the user to copy; it
 does not claim delivery.
 
+### Image previews
+
+PNG, JPEG and GIF changes show labeled Before and After previews through the shared design-system image viewer. GIF previews use the first frame. Added files show After, deleted files show Before, and modified or renamed files show both images from the selected comparison. Full-file mode keeps this comparison, including immutable Git history rather than the current working file.
+
+Symlinks retain their target-path text diff even when their names have image suffixes. Comparisons that change between a symlink and a regular file also remain text diffs; previews never substitute the linked image for the link's own content.
+
+Kitty and Sixel terminals draw images when capability detection succeeds. The zai host owns graphics for hosted tabs, splits and Diff Review; older hosts and unsupported or ASCII terminals retain format, dimensions and an explicit fallback notice. Partially visible image viewports and overlays withdraw the image, and narrow or short panes preserve readable fallback text. At most two fully visible images are placed at once.
+
+Image reads never access the network or use Git external diff/textconv. Working files stay confined to the workspace; Git images come from bounded read-only blob reads. A scope retains at most eight images, 8 MiB source bytes and 4 million pixels in aggregate. Malformed, unsupported or oversized files show a notice; selecting a smaller folder or file resolves scope-budget notices.
+
+Canceling a read or reaching its 30-second deadline stops the entire patch load rather than publishing an image-error patch.
+
 ### Change totals
 
 The diff header shows green added-line and red deleted-line totals for the

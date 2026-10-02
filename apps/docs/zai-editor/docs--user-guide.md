@@ -34,6 +34,40 @@ Run `zai-editor path/to/file` to open a file or
 optional. The core editor does not need Python, Node.js, a language server, or
 another editor after installation.
 
+### Open a source location
+
+Pass one file with a line and optional column, for example
+`zai-editor src/main.go:42:7` or `zai-editor "a folder/main.go:42"`.
+Flags still precede the single file argument. Relative paths use the workspace
+root; locations do not relax workspace access or file-format limits.
+
+In **Ctrl+P Quick Open**, enter `path:line` or `path:line:column`.
+The suffix is shown as a destination hint, not searched as part of the
+filename. Enter opens an exact path directly, otherwise applies the position
+to the selected fuzzy match. Existing open buffers are reused, retaining
+unsaved edits and undo history. Go Back/Forward restores the previous location.
+`:42` remains the separate form for line 42 of the active buffer.
+
+Lines and columns are positive, one-based integers; an omitted column is 1.
+Columns count Unicode code points in the logical source line, not bytes,
+UTF-16 units, tab cells, or wrapped screen rows. Positions inside a combined
+character or emoji snap to its start. A line past EOF clamps to the last
+logical line, then a column past that line clamps to its end, with a status
+notice. Empty files resolve to their initial caret.
+
+An exact existing filename such as `notes:12`, or an exact already-open buffer,
+wins over suffix parsing on systems that support literal colon filenames.
+Trailing nonnumeric colon text remains filename text; zero, negative, and
+overflowing explicit positions show an error unless the complete literal path
+exists. Drive prefixes, UNC paths, and colons in directories stay path text.
+
+Quick Open may remove one balanced pair of single or double quotes around
+the complete input. It does not interpret shell escapes or expand variables.
+CLI arguments have already been decoded by your shell and keep their literal
+characters; do not add another layer of quotes inside the argument.
+Invalid CLI positions are reported before terminal startup. Invalid palette
+positions keep the palette open so you can correct them.
+
 If your shell does not load `.profile`, `.bashrc`, or `.zshrc`, add the
 installation directory (normally `~/.zai`) to that shell's PATH yourself.
 
@@ -80,10 +114,43 @@ Editor cleanup includes managed language servers, profiler logs, and preview end
 Terminal applications can intercept key combinations. Use the command palette
 when a shortcut does not reach the editor.
 
+Select source text and press **Tab** to indent its touched logical lines, or
+**Shift+Tab** to dedent. With multiple selections each line changes only once;
+an empty caret participates when another selection is nonempty. A selection
+ending at the next line's start excludes that next line. With only empty
+carets, Tab still inserts normally; Shift+Tab dedents the current lines.
+**F1 > Indent lines / Dedent lines** also works at an empty caret.
+Selections stay attached to the source and one Undo/Redo restores the whole
+operation. Blank lines are not indented. Completion accepts Tab first, and
+dialogs and palette fields keep their own handling.
+Choose the indentation style, indent width, and tab width from F1; see
+buffer indentation for mixed-prefix rules.
+
 With no explicit theme selection, the editor uses Kanagawa Wave dark
 (`kanagawa-wave`) on both light and dark terminals. Existing selections remain
 unchanged. See Themes and settings for
 configuration and session overrides.
+
+Open PNG, JPEG, or GIF files from the tree, Quick Open, or a launch argument to view them in read-only tabs. Kitty and Sixel terminals show the image; other terminals show file details. GIFs display their first frame. Images are limited to 8 MiB and 4 million pixels, with eight image tabs open at once. Ctrl+S never changes image files; F5 refreshes them.
+
+## Buffer indentation
+
+Use F1 > **Set indentation style** to choose Spaces or Tabs for the active
+buffer. **Set indent width** and **Set tab width** show the current value and
+accept integers 1–16; an invalid value shows an inline message without changing
+anything. Escape cancels. Defaults remain Spaces, indent width 4, tab width 4.
+
+Tab inserts exactly indent-width spaces in Spaces mode, or one literal tab
+in Tabs mode, including at multiple carets. Literal tabs display at the next
+configured tab stop of the logical source line, including across soft wraps.
+Completion keeps priority over indentation when its menu is open.
+
+These choices never convert existing whitespace, dirty the file, or add undo
+steps. They survive reload and path changes while the buffer stays open, but
+are not saved across close/reopen or restart. **Reset buffer indentation
+overrides** restores the buffer's base values (currently the defaults unless
+a package host supplies others). See Buffer indentation
+for geometry and package integration.
 
 ## History, previews, and AI context
 
@@ -92,9 +159,18 @@ renames. Browser previews support Markdown, Mermaid, and saved HTML without a
 frontend toolchain. Preview only content you trust because HTML can run scripts
 on the shared preview origin.
 
+For a saved file without opening the terminal editor, run
+`zai-editor preview /absolute/path/document.md`. It opens the browser and prints
+the URL; keep the command running while viewing, and stop it with Ctrl+C.
+Use `--no-open` before the file for a URL only, or `--root <trusted-directory>`
+for parent assets. See `zai-editor preview --help` and
+browser previews.
+
 Saved Markdown previews read from disk on browser refresh when opened with F7
 from a clean buffer. Unsaved Markdown uses a snapshot; press F7 again to update
 it, or after saving to switch back to disk reads.
+Saved previews and unsaved snapshots use separate URLs so they cannot replace
+each other's content, including when a headless preview is already open.
 
 Inline comments do not modify the file. Ask AI packages your question, captured
 code excerpts, comments, and current selection into a bounded request you can
