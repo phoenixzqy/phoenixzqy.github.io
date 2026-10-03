@@ -241,3 +241,15 @@ unpublished; Linux, macOS and Windows are intended targets, with package
 availability determined by verified release assets. Future maintainers should
 follow [the zai-codex instructions](releases/zai-codex/README.md), which reuse the
 source packager and installer and record the `zai-codex` branch exception.
+
+The October 3, 2026 release refresh uses the author's authorized merged-main
+updates for [zai-cli 0.1.341](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.341),
+[zai-editor 0.3.5](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-editor-v0.3.5),
+and [zai-gitter 0.3.5](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-gitter-v0.3.5).
+The release notes follow those source revisions: editor groups, Find/Replace,
+bracket matching and buffer-word completion; console lifecycle and side-rail
+fixes; and bounded painting caches. The allowlisted guides record the exact
+privacy-reviewed revisions in `apps/docs/sources.json`. Repository-owned
+release scripts produce the six unsigned archives per app; byte counts and
+SHA-256 values come from the final packages. Cross-compilation does not
+establish native macOS or Windows behavior.

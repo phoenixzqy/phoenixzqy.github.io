@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "release": {
-    "version": "0.1.303",
+    "version": "0.1.341",
     "channel": "preview",
-    "publishedAt": "2026-10-02T16:56:14Z",
+    "publishedAt": "2026-10-03T09:04:41Z",
     "notes": [
       {
-        "en": "Adds a Usage dashboard, restores saved console workspaces and conversations, and improves session navigation and terminal resize handling.",
-        "zh-CN": "新增 Usage 用量面板，恢复已保存的控制台工作区与会话，并改进会话导航和终端尺寸变化处理。"
+        "en": "Improves console rendering and narrow side rails, preserves restored project permissions, and prevents queued terminal input from leaking after shutdown.",
+        "zh-CN": "改进控制台渲染与窄窗口侧栏，保留恢复项目的权限设置，并防止关闭后排队的终端输入泄漏。"
       },
       {
-        "en": "Displays image files in hosted editor tabs and image changes in Git review panes, with updated editor and Git viewer companions.",
-        "zh-CN": "在托管编辑器标签页中显示图像文件，在 Git 审阅窗格中显示图像变更，并更新随附的编辑器和 Git 查看器。"
+        "en": "Updates the bundled editor and Git viewer and exposes zai, zai-editor, and zai-gitter as public commands.",
+        "zh-CN": "更新随附的编辑器与 Git 查看器，并提供 zai、zai-editor 和 zai-gitter 三个公开命令。"
       },
       {
         "en": "Cross-compiled zai CLI packages built from one pinned source revision.",
@@ -35,10 +35,10 @@
         },
         "platform": "linux",
         "architecture": "x64",
-        "file": "zai-cli-0.1.303-linux-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-linux-amd64.zip",
-        "bytes": 30882676,
-        "sha256": "1270bf59920c2a1f665bb0dfaf7a469f66eca2630a1dadbe24d5d3dcc453e451",
+        "file": "zai-cli-0.1.341-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-linux-amd64.zip",
+        "bytes": 31497012,
+        "sha256": "d5f256b2a706912efccac040824b9a8650052e4db4eb519809bf111b0a911b43",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
@@ -52,10 +52,10 @@
         },
         "platform": "linux",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.303-linux-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-linux-arm64.zip",
-        "bytes": 28477275,
-        "sha256": "cc95d61451e3f271b70f96484b8a2a9767e70290aaa0774a3a8a0b00d053105c",
+        "file": "zai-cli-0.1.341-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-linux-arm64.zip",
+        "bytes": 29030924,
+        "sha256": "5403210022379d615a651bd923cbfaa2a6544880db0c6b761362c5a93b3d70fb",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
@@ -69,10 +69,10 @@
         },
         "platform": "macos",
         "architecture": "x64",
-        "file": "zai-cli-0.1.303-darwin-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-darwin-amd64.zip",
-        "bytes": 28536962,
-        "sha256": "fa484278b43ea3fa2ea8ea632fb9e34ef23946d348444bef901f3743f5327ea2",
+        "file": "zai-cli-0.1.341-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-darwin-amd64.zip",
+        "bytes": 29156079,
+        "sha256": "af573683ac72f3c7882362cec33e3077a41f896346354ebf982d00d88ba20ab1",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
@@ -86,10 +86,10 @@
         },
         "platform": "macos",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.303-darwin-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-darwin-arm64.zip",
-        "bytes": 26886826,
-        "sha256": "ef86c536bbdf16815e984d6bb049b18d44a1a104fc43a0725470457c2a41a1f5",
+        "file": "zai-cli-0.1.341-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-darwin-arm64.zip",
+        "bytes": 27463617,
+        "sha256": "dcb783a5b6a44fa302aa8e1b4fd210b02ea30d75a6607a26c428e22c45f6ddf3",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
@@ -103,10 +103,10 @@
         },
         "platform": "windows",
         "architecture": "x64",
-        "file": "zai-cli-0.1.303-windows-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-windows-amd64.zip",
-        "bytes": 31464607,
-        "sha256": "73ab9bd4ef9519c01ba89d0d1bf22eeeb04a5e5d26a8c82d9b1abd3ace82381d",
+        "file": "zai-cli-0.1.341-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-windows-amd64.zip",
+        "bytes": 32082985,
+        "sha256": "19edcb75f5477947904286297ace48ec38d187ced055795f5cc94426a267e976",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",
@@ -120,10 +120,10 @@
         },
         "platform": "windows",
         "architecture": "arm64",
-        "file": "zai-cli-0.1.303-windows-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.303/zai-cli-0.1.303-windows-arm64.zip",
-        "bytes": 28786158,
-        "sha256": "5dd626ccf2f967ec906f0dcece755162dd0ed3a06d5dfce042eba4e31b782e43",
+        "file": "zai-cli-0.1.341-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.341/zai-cli-0.1.341-windows-arm64.zip",
+        "bytes": 29347646,
+        "sha256": "fdbb5a5033e24f6cecbe2d837088149c83fb00457deeb946d0b9d9f42a3b10cf",
         "signing": "unsigned",
         "installNotes": {
           "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai.",

@@ -137,6 +137,16 @@ Editor cleanup includes managed language servers, profiler logs, and preview end
 Terminal applications can intercept key combinations. Use the command palette
 when a shortcut does not reach the editor.
 
+With one empty source caret on a bracket (or immediately after it), the editor
+underlines that bracket and its matching `()`, `[]`, or `{}` delimiter when a
+current match is available. **F1 > Jump to matching bracket** moves to its mate,
+scrolls it into view, and keeps the previous location in Go Back/Forward.
+It never changes the file or needs a language server. Selected text, multiple
+carets, and overlays suppress automatic emphasis. Go and JSON exclude strings
+and comments; plaintext treats all brackets literally. Other detected languages
+are unavailable rather than guessed. See matching brackets
+for coverage and scan limits.
+
 Select source text and press **Tab** to indent its touched logical lines, or
 **Shift+Tab** to dedent. With multiple selections each line changes only once;
 an empty caret participates when another selection is nonempty. A selection
@@ -259,10 +269,27 @@ Inline comments do not modify the file. Ask AI packages your question, captured
 code excerpts, comments, and current selection into a bounded request you can
 copy to a coding agent.
 
+## Word completion
+
+**Ctrl+Space** or **F1 > Complete code** suggests case-sensitive identifier-like
+words from open source buffers, including unsaved text, without a language
+server. Manual completion needs a nonempty prefix; automatic suggestions wait
+250 ms and need at least two prefix characters. Empty prefixes do not list
+every buffer word. Entries show `buffer word`; Up/Down selects, Tab/Enter
+replaces only the prefix in one undo step, and Esc dismisses.
+
+The active buffer ranks first, then occurrence count and lexical order.
+The unfinished occurrence at the caret is excluded, but another occurrence
+of the same word remains eligible. A background index refreshes after edits,
+undo/redo and reload; stale buffers are temporarily omitted. Manual completion
+reports indexing or limited coverage. Only open source text in this editor is
+indexed, never unopened files, annotations, previews, or another workspace.
+See completion limits for resource bounds.
+
 ## Optional language servers
 
-Syntax highlighting works without a language server. Install supported servers
-only when you want completion and go-to-definition:
+Syntax highlighting and buffer-word completion work without a language server.
+Install supported servers only when you want richer completion and go-to-definition:
 
 ```text
 zai-editor lsp install go

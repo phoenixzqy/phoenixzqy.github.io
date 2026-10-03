@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "appId": "zai-editor",
   "repository": "phoenixzqy/zai-editor",
-  "ref": "05c200a707a78ae0ccde9b596c1088958c62402e",
-  "commit": "05c200a707a78ae0ccde9b596c1088958c62402e",
+  "ref": "b6a18f9ee2cf6f8f50af62beab335442e01e1c08",
+  "commit": "b6a18f9ee2cf6f8f50af62beab335442e01e1c08",
   "documents": [
     {
       "slug": "docs--user-guide",
       "title": "User guide",
       "source": "docs/user-guide.md",
       "file": "docs--user-guide.md",
-      "bytes": 15985
+      "bytes": 17623
     },
     {
       "slug": "docs--lsp-setup",

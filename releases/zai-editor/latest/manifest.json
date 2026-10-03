@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "appId": "zai-editor",
   "release": {
-    "version": "0.3.4",
+    "version": "0.3.5",
     "channel": "preview",
-    "publishedAt": "2026-10-02T16:56:14Z",
+    "publishedAt": "2026-10-03T09:03:32Z",
     "notes": [
       {
-        "en": "Adds read-only PNG, JPEG and GIF tabs, source-location opening with line and column suffixes, and selection-preserving line indentation with per-buffer controls.",
-        "zh-CN": "新增 PNG、JPEG 和 GIF 只读标签页，支持通过行列后缀打开源码位置，并提供保留选区的行缩进及缓冲区级缩进设置。"
+        "en": "Adds editor groups with tabs and split views, tree multi-selection and bulk actions, and rooted EditorConfig indentation settings.",
+        "zh-CN": "新增带标签页与分屏视图的编辑器组、文件树多选与批量操作，以及受工作区根目录限制的 EditorConfig 缩进设置。"
       },
       {
-        "en": "Adds a headless Markdown and HTML browser-preview command, with separate URLs for saved files and unsaved snapshots.",
-        "zh-CN": "新增无需打开终端编辑器的 Markdown 与 HTML 浏览器预览命令，并为已保存文件和未保存快照使用独立 URL。"
+        "en": "Adds buffer Find and Replace, matching-bracket navigation, and offline word completion from open buffers; improves rendering and graphics across split groups.",
+        "zh-CN": "新增缓冲区查找与替换、匹配括号跳转以及基于已打开缓冲区的离线单词补全，并改进分屏组中的渲染与图像显示。"
       },
       {
         "en": "Standalone terminal editor built from one pinned zai-editor source revision.",
@@ -35,10 +35,10 @@
         },
         "platform": "linux",
         "architecture": "x64",
-        "file": "zai-editor-0.3.4-linux-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-linux-amd64.zip",
-        "bytes": 8701866,
-        "sha256": "49338731a439948b184c9269c4ae3e190939b50fb633d5658f7ebd59b6e3da5a",
+        "file": "zai-editor-0.3.5-linux-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-linux-amd64.zip",
+        "bytes": 8976727,
+        "sha256": "1364da7040aabd8ea067d179dae8121e5c983a1ddc201a4c1d53fb80924bca49",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
@@ -52,10 +52,10 @@
         },
         "platform": "linux",
         "architecture": "arm64",
-        "file": "zai-editor-0.3.4-linux-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-linux-arm64.zip",
-        "bytes": 8025098,
-        "sha256": "94c11997c0ef7e15ded00947702cf95209e4d1781361e6fed0942aed7ce3ae12",
+        "file": "zai-editor-0.3.5-linux-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-linux-arm64.zip",
+        "bytes": 8271437,
+        "sha256": "e246b7d295070e4356eec7e2cd85024cc03a0831022a309ef0dd71140e43b16d",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned; verify the SHA-256 value before running it.",
@@ -69,10 +69,10 @@
         },
         "platform": "macos",
         "architecture": "x64",
-        "file": "zai-editor-0.3.4-darwin-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-darwin-amd64.zip",
-        "bytes": 8798094,
-        "sha256": "85a239177023c8e82e73e3d35d6249eaff581665f4bc409d27932f7cd1a13f42",
+        "file": "zai-editor-0.3.5-darwin-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-darwin-amd64.zip",
+        "bytes": 9077379,
+        "sha256": "c05526c25cbb00bce4abcb4eaaf95bc22d887872fd5b1d61e0222d8e9df8b6c7",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
@@ -86,10 +86,10 @@
         },
         "platform": "macos",
         "architecture": "arm64",
-        "file": "zai-editor-0.3.4-darwin-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-darwin-arm64.zip",
-        "bytes": 8277022,
-        "sha256": "7ac503bc8f64a762faccd2acfe030b5710724a5937634db9800107044a6f909b",
+        "file": "zai-editor-0.3.5-darwin-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-darwin-arm64.zip",
+        "bytes": 8532823,
+        "sha256": "f1cad8c7fc0de8c0a53f603f913b68896d672b806537ac13553748ddaa896e70",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor` on your PATH. The build is unsigned and not notarized, so macOS Gatekeeper requires an explicit approval; verify the SHA-256 value before running it.",
@@ -103,10 +103,10 @@
         },
         "platform": "windows",
         "architecture": "x64",
-        "file": "zai-editor-0.3.4-windows-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-windows-amd64.zip",
-        "bytes": 8875842,
-        "sha256": "fcc043d39fa944eec8165dafb9c891e30cc359a15c0d97b2b29e023afba8b7a7",
+        "file": "zai-editor-0.3.5-windows-amd64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-windows-amd64.zip",
+        "bytes": 9154195,
+        "sha256": "ede49be17a66def927bb4e29231e1f76c263f38d1f9a8d7d602c20a8b50245b9",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",
@@ -120,10 +120,10 @@
         },
         "platform": "windows",
         "architecture": "arm64",
-        "file": "zai-editor-0.3.4-windows-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.4/zai-editor-0.3.4-windows-arm64.zip",
-        "bytes": 8122150,
-        "sha256": "6d09c3c9b10c7fecf4584dc7fed2d4f85416de88a9dbe8e51b0da09eef751fcd",
+        "file": "zai-editor-0.3.5-windows-arm64.zip",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-editor-v0.3.5/zai-editor-0.3.5-windows-arm64.zip",
+        "bytes": 8371171,
+        "sha256": "ab9d2d82204f99913a03174b15a1fee5a53adbd44ebad584ce8023be22560dbb",
         "signing": "unsigned",
         "installNotes": {
           "en": "Extract the archive and put `zai-editor.exe` on your PATH. The build is unsigned, so SmartScreen requires an explicit approval; verify the SHA-256 value before running it.",

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
-  "commit": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
+  "ref": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
+  "commit": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
   "documents": [
     {
       "slug": "docs--install-and-config",

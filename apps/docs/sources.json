@@ -5,9 +5,9 @@
     {
       "appId": "zai-cli",
       "repository": "phoenixzqy/zai-cli",
-      "ref": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
-      "commit": "beac1914e5f4e203f15cbffd2d7fcbfdd64d5d7b",
-      "syncedAt": "2026-10-02T23:08:46Z",
+      "ref": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
+      "commit": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
+      "syncedAt": "2026-10-03T06:39:25Z",
       "include": [
         "docs/install-and-config.md",
         "docs/getting-started.md",
@@ -87,9 +87,9 @@
     {
       "appId": "zai-editor",
       "repository": "phoenixzqy/zai-editor",
-      "ref": "05c200a707a78ae0ccde9b596c1088958c62402e",
-      "commit": "05c200a707a78ae0ccde9b596c1088958c62402e",
-      "syncedAt": "2026-10-02T23:08:17Z",
+      "ref": "b6a18f9ee2cf6f8f50af62beab335442e01e1c08",
+      "commit": "b6a18f9ee2cf6f8f50af62beab335442e01e1c08",
+      "syncedAt": "2026-10-03T06:38:28Z",
       "include": [
         "docs/user-guide.md",
         "docs/lsp-setup.md"
@@ -140,9 +140,9 @@
     {
       "appId": "zai-gitter",
       "repository": "phoenixzqy/zai-gitter",
-      "ref": "96d47eb59218f7687c4767995fa8434545d9664a",
-      "commit": "96d47eb59218f7687c4767995fa8434545d9664a",
-      "syncedAt": "2026-10-02T23:08:17Z",
+      "ref": "a1cb0a83e91d72bc225ebe45ff5640d31c0c4f5f",
+      "commit": "a1cb0a83e91d72bc225ebe45ff5640d31c0c4f5f",
+      "syncedAt": "2026-10-03T06:35:01Z",
       "include": [
         "docs/user-guide.md"
       ],
