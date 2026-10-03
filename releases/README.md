@@ -261,8 +261,9 @@ After building and approving packages in the private app pipeline:
    validated metadata, but does not download every package merely to display
    the list. A manifest does not establish that a remote package exists.
 
-No app pipeline, signing setup, or cross-repository credential is configured
-by this website. Those remain in the private build environment.
+The optional operator scripts in [`scripts/app-release/`](../scripts/app-release/README.md)
+orchestrate releases in a private local environment. Signing setup, credentials,
+source clones and diagnostic logs remain outside the public site.
 
 ### Populated manifest example
 
