@@ -191,6 +191,7 @@ def verify_pages(runtime, site, name, data):
     import urllib.request
     runtime.stage = f'{name}:pages'
     deadline = time.monotonic() + 1200
+    website_commit = runtime.run(['git', 'rev-parse', 'HEAD'], cwd=site)
     # Verify the actual deployed manifest; a green older deployment is insufficient.
     while time.monotonic() < deadline:
         try:
@@ -199,7 +200,12 @@ def verify_pages(runtime, site, name, data):
             with urllib.request.build_opener(HTTPSOnly()).open(request, timeout=30) as response:
                 public = json.load(response)
             if public == data:
-                return
+                runs = runtime.api(f'repos/{runtime.site_repository}/actions/runs?head_sha={website_commit}&per_page=100')['workflow_runs']
+                deployments = [run for run in runs if run.get('path', '').endswith('pages-build-deployment')]
+                if any(run['status'] == 'completed' and run['conclusion'] != 'success' for run in deployments):
+                    raise RuntimeError('Pages deployment failed for the published website commit')
+                if any(run['conclusion'] == 'success' for run in deployments):
+                    return
         except (OSError, ValueError):
             pass
         time.sleep(10)
