@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from release_packages import download
 from release_publish import release_for_manifest, verify_pages
-from release_runtime import write_json
+from release_runtime import timestamp, write_json
 from release_sources import provenance, remote_snapshot
 
 
@@ -61,8 +61,18 @@ def run_bplayer(runtime, snapshot, site, journal_path, journal, output):
     while time.monotonic() < deadline:
         run = runtime.api(f'repos/{repository}/actions/runs/{journal["run_id"]}')
         if run['status'] == 'completed':
+            journal['workflow_terminal'] = {
+                'run_id': journal['run_id'],
+                'run_attempt': run.get('run_attempt'),
+                'conclusion': run['conclusion'],
+                'url': run.get('html_url'),
+                'observed_at': timestamp(),
+            }
+            write_json(journal_path, journal)
             if run['conclusion'] != 'success':
-                raise RuntimeError(f'BPlayer release {run["html_url"]} concluded {run["conclusion"]}')
+                raise RuntimeError(f'BPlayer release {run["html_url"]} concluded {run["conclusion"]}; '
+                                   f'terminal result recorded in {journal_path}. Reconcile published assets '
+                                   'before resuming or retiring this attempt; see scripts/app-release/README.md')
             break
         time.sleep(15)
     else:

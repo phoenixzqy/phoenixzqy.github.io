@@ -6,6 +6,11 @@ must be readable through the existing Git credential helper; no credentials
 are embedded in commands, configuration or public metadata. Playwright's Linux
 system dependencies must already be installed.
 
+On Windows, standard Node.js `npm.cmd` and `npx.cmd` launchers are resolved to
+their adjacent `node_modules/npm/bin/npm-cli.js` and `npx-cli.js` and executed
+directly with Node, without a shell. Unsupported wrapper layouts fail with an
+explicit prerequisite error; install the standard Node.js toolchain.
+
 ```sh
 python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
@@ -79,6 +84,49 @@ pruned. Keep the same state directory across scheduled invocations.
 
 The script does not mirror changed user documentation or infer translated
 release claims. Those still follow the documentation privacy review workflow.
+
+### Recovering a failed or cancelled BPlayer workflow
+
+A completed unsuccessful workflow records `workflow_terminal` in the private
+`bplayer.json` journal, including its run ID, attempt, conclusion, URL and
+observation time. The journal remains incomplete and retains dispatch intent.
+Later invocations inspect that same run and never dispatch a replacement merely
+because the source branch changed. A workflow failure can happen after packages
+or website metadata were published; it is not evidence that nothing was written.
+
+1. Stop scheduled invocations and wait for the state-directory process lock to
+   be released. Preserve the journal and relevant private run logs. Inspect the
+   recorded workflow URL, all job results and source revision; confirm the run
+   is terminal and no related publication job or rerun remains active.
+2. Reconcile the workflow's outputs with this public website repository: inspect
+   its draft and published BPlayer releases, tag/version ownership and source
+   provenance, the latest remote manifest, and deployed Pages metadata. Download
+   every existing package for the attempt and verify its checksum, size, contents
+   and signing status against the workflow's approved metadata. Include partial
+   drafts and packages not yet referenced by the latest manifest. Preserve
+   existing versioned bytes, releases and tags; never overwrite, delete or roll
+   back published assets, and never downgrade a newer latest manifest.
+3. If the same attempt can finish safely, repair its missing publication steps
+   under the publishing contract. A GitHub rerun of the recorded run ID may be
+   used only after verifying the selected jobs can reuse existing assets without
+   replacing bytes or duplicating publication. A rerun uses the original source
+   revision, so it does not pick up a later source fix. Keep the original journal
+   and run ID, then invoke the script with the same state directory to resume
+   monitoring and public verification. A successful rerun replaces the recorded
+   terminal result with its new attempt and success conclusion.
+4. If the attempt cannot resume (for example it requires a new source revision),
+   first finish reconciliation: either confirm it created no public release/tag/
+   assets/manifest change, or repair and verify everything it did publish and
+   record any preserved partial draft for operator follow-up. Retain the exact
+   versions and asset hashes as private evidence; the next attempt must allocate
+   fresh versioned names for different bytes. Only after this review, with no
+   publication still active, atomically move `bplayer.json` to a unique archived
+   filename in the same private state directory. Do not simply delete the
+   journal or clear `dispatch_intent`/`run_id`. A subsequent explicit invocation
+   may dispatch a new attempt from the freshly discovered source default branch.
+
+Uncertain release ownership, missing approved metadata, checksum differences or
+an unreconciled partial publication require operator repair before either path.
 
 After zai-cli's Script automation support is installed, preserve the existing
 schedule/id and replace its prompt execution with:
