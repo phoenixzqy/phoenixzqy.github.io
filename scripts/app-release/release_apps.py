@@ -13,26 +13,14 @@ import tempfile
 import subprocess
 import zipfile
 import uuid
+import signal
 
 from release_bplayer import run_bplayer
-from release_builds import allocate, build, refresh_dependencies
+from release_jobs import GO_APPS, FAILURES, history, parallel_prepare, prepare
 from release_publish import publish, recover, release_for_manifest
 from release_runtime import Runtime, exclusive_lock, write_json
+from release_website import publish_website
 from release_sources import APPS, changed, clone, discover, provenance, remote_snapshot
-
-
-def dependencies(runtime, owner, name):
-    # Track bundled producers even when their own release is excluded.
-    names = ('zai-editor', 'zai-gitter', 'zai-design-system') if name == 'zai-cli' else (
-        ('zai-design-system',) if name in ('zai-editor', 'zai-gitter') else ())
-    return {f'{owner}/{dependency}': remote_snapshot(runtime, f'{owner}/{dependency}')['commit']
-            for dependency in names}
-
-
-def history(runtime, repository):
-    tags = [item['name'] for item in runtime.pages(f'repos/{repository}/tags?per_page=100')]
-    tags += [item['tag_name'] for item in runtime.pages(f'repos/{repository}/releases?per_page=100')]
-    return tags
 
 
 def configure_site(runtime, site):
@@ -44,30 +32,29 @@ def configure_site(runtime, site):
     runtime.run(['npx', 'playwright', 'install', 'chromium', 'webkit'], cwd=site)
 
 
-def process(runtime, args, root):
-    runtime.site_repository = f'{args.owner}/phoenixzqy.github.io'
-    if args.publish:
-        settings = json.loads(runtime.run(['go', 'env', '-json', 'GOPRIVATE', 'GONOSUMDB', 'GONOPROXY']))
-        for key, value in settings.items():
-            runtime.environment[key] = ','.join(dict.fromkeys([*filter(None, value.split(',')), f'github.com/{args.owner}/*']))
-    site_snapshot = remote_snapshot(runtime, runtime.site_repository)
-    runtime.site_branch = site_snapshot['branch']
-    snapshots = discover(runtime, args.owner, args.apps)
-    site = clone(runtime, site_snapshot, args.workspace, root)
-    reports = []
-    configured_site = False
+def detect_tasks(runtime, args, snapshots, site, root):
+    tasks, reports = [], []
+    revisions = {snapshot['repository']: snapshot['commit'] for snapshot in snapshots}
     for snapshot in snapshots:
         name = snapshot['repository'].split('/')[1]
         app = name.lower()
         runtime.stage = f'{name}:detect'
         journal_path = args.state_dir / f'{app}.json'
-        journal = json.loads(journal_path.read_text()) if journal_path.exists() else {}
         try:
-            snapshot['dependencies'] = dependencies(runtime, args.owner, name)
+            journal = json.loads(journal_path.read_text()) if journal_path.exists() else {}
+            # A shared producer is resolved once so all consumers start from the
+            # same immutable dependency snapshot, before any worker starts.
+            producers = ('zai-editor', 'zai-gitter', 'zai-design-system') if name == 'zai-cli' else (
+                ('zai-design-system',) if name in ('zai-editor', 'zai-gitter') else ())
+            snapshot['dependencies'] = {}
+            for producer in producers:
+                repository = f'{args.owner}/{producer}'
+                if repository not in revisions:
+                    revisions[repository] = remote_snapshot(runtime, repository)['commit']
+                snapshot['dependencies'][repository] = revisions[repository]
             snapshot['site_repository'] = runtime.site_repository
             previous_release = release_for_manifest(runtime, site, app)
             previous = provenance(previous_release['body']) if previous_release else None
-            # Legacy release notes record bundled CLI revisions explicitly.
             if previous and not previous['dependencies'] and name == 'zai-cli':
                 for dependency in snapshot['dependencies']:
                     label = {'zai-editor': 'editor', 'zai-gitter': 'Git viewer', 'zai-design-system': 'design system'}[dependency.split('/')[1]]
@@ -83,65 +70,102 @@ def process(runtime, args, root):
                 reports.append({'app': name, 'status': 'pending-recovery' if pending else 'update', 'snapshot': snapshot})
                 runtime.event('Would recover publication' if pending else 'Would build and release')
                 continue
-            if not configured_site:
-                configure_site(runtime, site)
-                configured_site = True
-            output = root / f'{app}-assets'
-            if pending:
-                if journal['app'] != app or journal['snapshot']['repository'] != snapshot['repository']:
-                    raise ValueError('Journal identity mismatch')
-                if app == 'bplayer' and (journal.get('dispatch_intent') or journal.get('run_id')):
-                    run_bplayer(runtime, journal['snapshot'], site, journal_path, journal, output)
-                elif journal.get('create_intent'):
-                    def rebuild_interrupted():
-                        recorded = journal['snapshot']
-                        source = clone(runtime, recorded, args.workspace, root)
-                        refresh_dependencies(runtime, source, recorded)
-                        if name in ('zai-editor', 'zai-gitter'):
-                            module = f'github.com/{args.owner}/zai-design-system'
-                            runtime.run(['go', 'get', f'{module}@{recorded["dependencies"][f"{args.owner}/zai-design-system"]}'], cwd=source)
-                            runtime.run(['go', 'mod', 'tidy'], cwd=source)
-                        build(runtime, source, recorded, journal['version'], output, site, args.codex_notices)
-                    recover(runtime, site, journal_path, journal, output, rebuild_interrupted)
-                else:
-                    # No external write occurred: discard the old local attempt.
-                    pending = False
-            if not pending:
+            if pending and (journal['app'] != app or journal['snapshot']['repository'] != snapshot['repository']):
+                raise ValueError('Journal identity mismatch')
+            resumable = pending and (journal.get('create_intent') or
+                        (app == 'bplayer' and (journal.get('dispatch_intent') or journal.get('run_id'))))
+            if not resumable:
                 journal = {'app': app, 'snapshot': snapshot, 'complete': False}
-                if app == 'bplayer':
-                    write_json(journal_path, journal)
-                    run_bplayer(runtime, snapshot, site, journal_path, journal, output)
-                else:
-                    source = clone(runtime, snapshot, args.workspace, root)
-                    refresh_dependencies(runtime, source, snapshot)
-                    # Resolve the tools' shared dependency through native tooling.
-                    if name in ('zai-editor', 'zai-gitter'):
-                        module = f'github.com/{args.owner}/zai-design-system'
-                        runtime.run(['go', 'get', f'{module}@{snapshot["dependencies"][f"{args.owner}/zai-design-system"]}'], cwd=source)
-                        runtime.run(['go', 'mod', 'tidy'], cwd=source)
-                    versions = history(runtime, snapshot['repository']) + history(runtime, runtime.site_repository)
-                    version = allocate(runtime, source, name, versions)
-                    journal.update(version=version, tag=f'{app}-v{version}')
-                    data = build(runtime, source, snapshot, version, output, site, args.codex_notices)
-                    journal['manifest'] = data
-                    write_json(journal_path, journal)
-                    # A newer remote release allocated while we built is a real collision.
-                    if journal['tag'] in history(runtime, runtime.site_repository):
-                        raise RuntimeError('Version/tag allocated concurrently; retry before publication')
-                    publish(runtime, snapshot, data, output, site, journal_path, journal)
-            reports.append({'app': name, 'status': 'superseded' if journal.get('superseded') else 'released', 'journal': str(journal_path)})
-        except (OSError, ValueError, RuntimeError, KeyError, zipfile.BadZipFile, subprocess.TimeoutExpired) as error:
-            runtime.event(f'FAILED: {error}')
+            tasks.append({'name': name, 'snapshot': journal['snapshot'], 'journal': journal,
+                          'pending': bool(resumable), 'journal_path': journal_path,
+                          'output': root / f'{app}-assets'})
+        except FAILURES as error:
             reports.append({'app': name, 'status': 'failed', 'stage': runtime.stage, 'error': str(error)})
-            # Installer changes/conflicts from a failed app must not contaminate
-            # another release commit. Stop, report, and reconcile on the next run.
+    return tasks, reports
+
+
+def outcome(task, error=None, stage=None):
+    if error:
+        return {'app': task['name'], 'status': 'failed', 'stage': stage, 'error': str(error)}
+    return {'app': task['name'], 'status': 'superseded' if task['journal'].get('superseded') else 'released',
+            'journal': str(task['journal_path'])}
+
+
+def process(runtime, args, root):
+    runtime.site_repository = f'{args.owner}/phoenixzqy.github.io'
+    if args.publish:
+        settings = json.loads(runtime.run(['go', 'env', '-json', 'GOPRIVATE', 'GONOSUMDB', 'GONOPROXY']))
+        for key, value in settings.items():
+            runtime.environment[key] = ','.join(dict.fromkeys([*filter(None, value.split(',')), f'github.com/{args.owner}/*']))
+    site_snapshot = remote_snapshot(runtime, runtime.site_repository)
+    runtime.site_branch = site_snapshot['branch']
+    snapshots = discover(runtime, args.owner, args.apps)
+    site = clone(runtime, site_snapshot, args.workspace, root)
+    tasks, reports = detect_tasks(runtime, args, snapshots, site, root)
+    if not tasks:
+        return reports
+    configure_site(runtime, site)
+    # Recovery and native/workflow releases remain serialized. Only fresh Go
+    # builds are independent and never write to the shared site checkout.
+    go_tasks = [task for task in tasks if task['name'] in GO_APPS and not task['pending']]
+    prepared = parallel_prepare(runtime, args, go_tasks, root, site)
+    batch, queued = [], []
+    for task in go_tasks:
+        result = prepared[task['name']]
+        if 'error' in result:
+            reports.append(outcome(task, result['error'], result['stage']))
+            continue
+        try:
+            publish(runtime, task['snapshot'], result['data'], task['output'], site,
+                    task['journal_path'], task['journal'], batch=batch)
+            if task['journal'].get('complete'):
+                reports.append(outcome(task))
+            else:
+                queued.append(task)
+        except FAILURES as error:
+            reports.append(outcome(task, error, runtime.stage))
+    if batch:
+        try:
+            publish_website(runtime, site, batch)
+            reports.extend(outcome(task) for task in queued)
+        except FAILURES as error:
+            reports.extend(outcome(task) if task['journal'].get('complete') else
+                           outcome(task, error, runtime.stage) for task in queued)
+            # Site conflict/dirty state cannot contaminate a subsequent release.
+            reports.extend({'app': task['name'], 'status': 'failed', 'stage': 'website:batch',
+                            'error': 'Deferred because the combined website publication failed'}
+                           for task in tasks if task not in go_tasks)
+            return reports
+    for task in tasks:
+        if task in go_tasks:
+            continue
+        runtime.stage = f'{task["name"]}:release'
+        try:
+            if task['name'] == 'BPlayer':
+                write_json(task['journal_path'], task['journal'])
+                run_bplayer(runtime, task['snapshot'], site, task['journal_path'], task['journal'], task['output'])
+            elif task['pending']:
+                recover(runtime, site, task['journal_path'], task['journal'], task['output'],
+                        lambda: prepare(runtime, args, task, root, site))
+            else:
+                data = prepare(runtime, args, task, root, site)
+                publish(runtime, task['snapshot'], data, task['output'], site, task['journal_path'], task['journal'])
+            reports.append(outcome(task))
+        except FAILURES as error:
+            reports.append(outcome(task, error, runtime.stage))
             if runtime.run(['git', 'status', '--porcelain'], cwd=site):
+                remaining = tasks[tasks.index(task) + 1:]
+                reports.extend({'app': item['name'], 'status': 'failed', 'stage': runtime.stage,
+                                'error': 'Deferred because the site checkout needs recovery'}
+                               for item in remaining if item not in go_tasks)
                 break
     return reports
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--jobs', type=int, choices=(1, 2, 3), default=2,
+                        help='Concurrent Go validation/build jobs (default: 2). Publishing is serialized.')
     parser.add_argument('--publish', action='store_true', help='Build and publish; default is read-only detection.')
     parser.add_argument('--force', action='store_true', help='Release selected apps even when already current.')
     parser.add_argument('--apps', nargs='+', choices=APPS)
@@ -162,6 +186,10 @@ def main(argv=None):
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '-' + uuid.uuid4().hex[:8]
     runtime = Runtime(args.state_dir / 'runs' / run_id, args.timeout)
     report = {'run_id': run_id, 'publish': args.publish, 'apps': []}
+    previous_term = signal.getsignal(signal.SIGTERM)
+    def interrupt(_signal, _frame):
+        raise KeyboardInterrupt
+    signal.signal(signal.SIGTERM, interrupt)
     try:
         with exclusive_lock(args.state_dir / 'release.lock'):
             with tempfile.TemporaryDirectory(prefix='app-release-') as temporary:
@@ -171,6 +199,8 @@ def main(argv=None):
         report['error'] = str(error)
         return_code = 130 if isinstance(error, KeyboardInterrupt) else 1
         runtime.event(f'FAILED: {error}')
+    finally:
+        signal.signal(signal.SIGTERM, previous_term)
     report['exit_code'] = return_code
     write_json(runtime.directory / 'summary.json', report)
     print(f'Report: {runtime.directory / "summary.json"}', flush=True)

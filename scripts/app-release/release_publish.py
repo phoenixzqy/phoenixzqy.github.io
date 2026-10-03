@@ -44,7 +44,7 @@ def validate_metadata(runtime, site, data):
         path.write_bytes(previous)
 
 
-def publish(runtime, snapshot, data, output, site, journal_path, journal):
+def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=None):
     name = data['appId']
     version = data['release']['version']
     tag = f'{name}-v{version}'
@@ -75,10 +75,10 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal):
                  *[output / a['file'] for a in data['release']['assets']]])
     journal['uploaded'] = True
     write_json(journal_path, journal)
-    finish(runtime, data, output, site, journal_path, journal)
+    finish(runtime, data, output, site, journal_path, journal, batch=batch)
 
 
-def recover(runtime, site, journal_path, journal, output, rebuild=None):
+def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=None):
     runtime.stage = f'{journal["app"]}:recover'
     repository, tag = runtime.site_repository, journal['tag']
     release = release_by_tag(runtime, tag)
@@ -109,7 +109,7 @@ def recover(runtime, site, journal_path, journal, output, rebuild=None):
                 verify_file(check / asset['file'], asset)
             else:
                 runtime.run(['gh', 'release', 'upload', tag, '--repo', repository, output / asset['file']])
-        finish(runtime, data, output, site, journal_path, journal)
+        finish(runtime, data, output, site, journal_path, journal, batch=batch)
         return
     output.mkdir(parents=True)
     # Never overwrite partial draft assets with different freshly rebuilt bytes.
@@ -117,7 +117,7 @@ def recover(runtime, site, journal_path, journal, output, rebuild=None):
                  *[arg for a in data['release']['assets'] for arg in ('--pattern', a['file'])]])
     for asset in data['release']['assets']:
         verify_file(output / asset['file'], asset)
-    finish(runtime, data, output, site, journal_path, journal)
+    finish(runtime, data, output, site, journal_path, journal, batch=batch)
 
 
 def version_key(version):
@@ -166,7 +166,7 @@ def update_codex_catalog(site, data):
     path.write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + '\n')
 
 
-def finish(runtime, data, output, site, journal_path, journal):
+def finish(runtime, data, output, site, journal_path, journal, batch=None):
     name, repository = data['appId'], runtime.site_repository
     tag = journal['tag']
     runtime.run(['git', 'fetch', 'origin', runtime.site_branch], cwd=site)
@@ -185,34 +185,12 @@ def finish(runtime, data, output, site, journal_path, journal):
     downloaded.mkdir(exist_ok=True)
     for asset in data['release']['assets']:
         download(asset, downloaded)
-    runtime.stage = f'{name}:website'
-    path = site / f'releases/{name}/latest/manifest.json'
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
-    if name == 'zai-codex':
-        update_codex_catalog(site, data)
-    runtime.run(['npm', 'run', 'validate:apps'], cwd=site)
-    runtime.run(['git', 'add', str(path)], cwd=site)
-    if name == 'zai-codex':
-        runtime.run(['git', 'add', 'apps/catalog.json', 'install/templates/zai-codex.py.in', 'install/zai-codex-source.json',
-                     'install/zai-codex.sh', 'install/zai-codex.ps1'], cwd=site)
-    if runtime.run(['git', 'diff', '--cached', '--name-only'], cwd=site):
-        runtime.run(['git', 'commit', '-m', f'Publish {name} {data["release"]["version"]}'], cwd=site)
-    for attempt in range(3):
-        runtime.run(['git', 'fetch', 'origin', runtime.site_branch], cwd=site)
-        runtime.run(['git', 'rebase', f'origin/{runtime.site_branch}'], cwd=site)
-        runtime.run(['npm', 'run', 'validate:apps'], cwd=site)
-        # Installed pre-push hook runs the full website test suite each attempt.
-        try:
-            runtime.run(['git', 'push', 'origin', f'HEAD:refs/heads/{runtime.site_branch}'], cwd=site)
-            break
-        except RuntimeError:
-            if attempt == 2:
-                raise
-    journal['website_commit'] = runtime.run(['git', 'rev-parse', 'HEAD'], cwd=site)
-    write_json(journal_path, journal)
-    verify_pages(runtime, site, name, data)
-    journal['complete'] = True
-    write_json(journal_path, journal)
+    entry = {'data': data, 'journal_path': journal_path, 'journal': journal}
+    if batch is not None:
+        batch.append(entry)
+    else:
+        from release_website import publish_website
+        publish_website(runtime, site, [entry])
 
 
 def verify_pages(runtime, site, name, data):
