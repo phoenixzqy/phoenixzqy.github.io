@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import sys
 import time
+import threading
+from concurrent.futures import CancelledError
 
 
 def timestamp():
@@ -75,13 +77,26 @@ class Runtime:
         self.sequence = 0
         self.stage = 'discovery'
         self.environment = {}
+        self.cancel = threading.Event()
         self.secrets = [value for key, value in os.environ.items()
                         if any(word in key.upper() for word in ('TOKEN', 'PASSWORD', 'SECRET')) and value]
+
+    def fork(self, name):
+        child = Runtime(self.directory / name, self.timeout)
+        child.environment = dict(self.environment)
+        child.secrets = list(self.secrets)
+        child.cancel = self.cancel
+        child.site_repository = self.site_repository
+        child.site_branch = self.site_branch
+        child.stage = f'{name}:prepare'
+        return child
 
     def event(self, message):
         print(f'{timestamp()} [{self.stage}] {message}', flush=True)
 
     def run(self, args, cwd=None, env=None, timeout=None):
+        if self.cancel.is_set():
+            raise CancelledError('Release run cancelled')
         self.sequence += 1
         path = self.directory / f'{self.sequence:04d}.log'
         safe_args = [str(arg) for arg in args]
@@ -111,7 +126,17 @@ class Runtime:
                 process = subprocess.Popen(safe_args, cwd=cwd, env=child_env,
                                            stdin=subprocess.DEVNULL, stdout=log, stderr=log, **creation)
                 try:
-                    process.wait(timeout=timeout or self.timeout)
+                    deadline = time.monotonic() + (timeout or self.timeout)
+                    while process.poll() is None:
+                        if self.cancel.is_set():
+                            raise CancelledError('Release run cancelled')
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise subprocess.TimeoutExpired(safe_args, timeout or self.timeout)
+                        try:
+                            process.wait(timeout=min(.2, remaining))
+                        except subprocess.TimeoutExpired:
+                            continue
                 except BaseException:
                     if os.name == 'nt':
                         subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],

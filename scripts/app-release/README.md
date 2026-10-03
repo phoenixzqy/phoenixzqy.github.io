@@ -14,7 +14,7 @@ explicit prerequisite error; install the standard Node.js toolchain.
 ```sh
 python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
-python3 -B scripts/app-release/release_apps.py --publish --apps zai-gitter
+python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 2
 ```
 
 The default checks for unpublished updates without building or writing to GitHub.
@@ -143,3 +143,25 @@ Use `python` on Windows. Add the absolute reviewed Codex notice-directory option
 in the local automation configuration when releasing Codex. zai must remain open
 for scheduled execution; an OS scheduler can also invoke this command. Detailed
 logs remain private and are never copied to the public site.
+
+## Parallel Go builds and combined publishing
+
+zai-cli, zai-editor and zai-gitter validate and build in isolated clones with
+two concurrent jobs by default. `--jobs 1` runs them sequentially; `--jobs 3`
+permits all three at once. Each job has its own log directory under the run
+report and bounded Go compiler/test parallelism (at most four processes per
+job, reduced further for small CPU counts or a lower existing GOMAXPROCS).
+All consumers resolve shared producer revisions before jobs start.
+
+Only successfully validated packages are published. Public assets and their
+downloaded checksums are verified serially, then successful Go manifests share
+one website commit, full pre-push gate and Pages deployment. An app build
+failure still permits successful apps to publish, while the run exits nonzero
+and reports the failure. A combined website failure leaves every unfinished
+app journal recoverable and stops later releases from using dirty site state.
+A newer remote manifest is checked again before the combined commit.
+
+Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
+sequential. Ctrl+C or termination cancels and joins owned workers before
+temporary clones and staging are removed. Existing release locks, checksums,
+source validation and website hooks still apply to every outgoing release.
