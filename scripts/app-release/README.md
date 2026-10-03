@@ -68,8 +68,11 @@ A process lock serializes runs sharing the state directory.
 
 An interrupted upload/publication keeps its app journal. The next invocation
 reconciles the same tag and verifies downloaded assets instead of allocating a
-duplicate release. An incomplete draft, lost create response without a matching
-release, or interrupted Codex installer synchronization needs operator repair;
+duplicate release. Missing draft assets can be rebuilt only if the recorded source is still the
+remote default tip and rebuilt bytes match the journal exactly; existing assets
+are verified and never overwritten. A lost create response without a matching
+release, different rebuilt bytes, or interrupted Codex installer synchronization
+needs operator repair;
 the script reports the exact journal rather than replacing versioned bytes or
 deleting someone else's release. Published releases are never rolled back or
 pruned. Keep the same state directory across scheduled invocations.

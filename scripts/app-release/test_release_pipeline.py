@@ -14,7 +14,7 @@ import stat
 import release_apps
 import release_bplayer
 from release_packages import inspect_archive, verify_file, digest, asset_name
-from release_publish import reconcile_latest
+from release_publish import reconcile_latest, release_by_tag, recover
 from release_runtime import Runtime, exclusive_lock
 from release_sources import changed, clone, identity, provenance, remote_snapshot
 
@@ -116,6 +116,40 @@ class PackageTest(unittest.TestCase):
             path.write_bytes(b'different')
             with self.assertRaisesRegex(ValueError, 'mismatch'):
                 verify_file(path, asset)
+
+
+class DraftRecoveryTest(unittest.TestCase):
+    def test_release_collection_finds_unpublished_draft(self):
+        class Fake:
+            site_repository = 'owner/site'
+            def pages(self, endpoint):
+                return [{'tag_name': 'app-v1', 'draft': True, 'id': 10}]
+        self.assertEqual(release_by_tag(Fake(), 'app-v1')['id'], 10)
+
+    def test_missing_draft_assets_never_upload_different_rebuilt_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            expected = root / 'expected.zip'
+            with zipfile.ZipFile(expected, 'w') as archive:
+                archive.writestr('binary', b'approved')
+            asset = {'file': 'asset.zip', 'bytes': expected.stat().st_size, 'sha256': digest(expected)}
+            journal = {'app': 'zai-gitter', 'tag': 'zai-gitter-v0.3.6',
+                'snapshot': {'commit': 'a' * 40, 'dependencies': {}},
+                'manifest': {'appId': 'zai-gitter', 'release': {'assets': [asset]}}}
+            class Fake:
+                site_repository = 'owner/site'
+                stage = ''
+                def pages(self, endpoint):
+                    return [{'tag_name': journal['tag'], 'id': 10, 'draft': True,
+                             'body': 'Source `' + 'a' * 40 + '`', 'assets': []}]
+                def run(self, args, **kwargs):
+                    raise AssertionError('Different rebuilt bytes must never be uploaded')
+            output = root / 'output'
+            def rebuild():
+                output.mkdir()
+                (output / 'asset.zip').write_bytes(b'different')
+            with self.assertRaisesRegex(ValueError, 'mismatch'):
+                recover(Fake(), root, root / 'journal.json', journal, output, rebuild)
 
 
 class RuntimeTest(unittest.TestCase):

@@ -11,6 +11,16 @@ from release_runtime import timestamp, write_json
 from release_sources import provenance
 
 
+def release_by_tag(runtime, tag):
+    # GitHub's by-tag endpoint can omit an unpublished draft. The authenticated
+    # release collection includes drafts even before their Git tag exists.
+    matches = [release for release in runtime.pages(f'repos/{runtime.site_repository}/releases?per_page=100')
+               if release['tag_name'] == tag]
+    if len(matches) != 1:
+        raise ValueError(f'Expected one owned release for {tag}; found {len(matches)}')
+    return matches[0]
+
+
 def release_for_manifest(runtime, site, app):
     manifest_path = site / f'releases/{app}/latest/manifest.json'
     manifest = json.loads(manifest_path.read_text())
@@ -56,7 +66,7 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal):
         write_json(journal_path, journal)
         runtime.run(['gh', 'release', 'create', tag, '--repo', repository, '--target', target,
                      '--draft', '--prerelease', '--title', f'{name} {version}', '--notes-file', note])
-        release = runtime.api(f'repos/{repository}/releases/tags/{tag}')
+        release = release_by_tag(runtime, tag)
         journal['release_id'] = release['id']
         write_json(journal_path, journal)
     for asset in data['release']['assets']:
@@ -68,10 +78,10 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal):
     finish(runtime, data, output, site, journal_path, journal)
 
 
-def recover(runtime, site, journal_path, journal, output):
+def recover(runtime, site, journal_path, journal, output, rebuild=None):
     runtime.stage = f'{journal["app"]}:recover'
     repository, tag = runtime.site_repository, journal['tag']
-    release = runtime.api(f'repos/{repository}/releases/tags/{tag}')
+    release = release_by_tag(runtime, tag)
     record = provenance(release['body'])
     if record['commit'] != journal['snapshot']['commit'] or record.get('dependencies', {}) != journal['snapshot']['dependencies']:
         raise ValueError('Release tag ownership/provenance differs from the interrupted journal')
@@ -80,6 +90,27 @@ def recover(runtime, site, journal_path, journal, output):
     if data['appId'] == 'zai-codex':
         raise RuntimeError('Interrupted codex release requires its installer synchronization to be restored; '
                            f'inspect {journal_path} before resuming')
+    expected = {asset['file'] for asset in data['release']['assets']}
+    existing = {asset['name'] for asset in release['assets']}
+    if existing - expected:
+        raise ValueError('Interrupted draft has unexpected assets; inspect it before resuming')
+    if expected - existing:
+        if not release['draft'] or not rebuild:
+            raise RuntimeError('Interrupted release lacks required assets; repair the draft without overwriting published bytes')
+        rebuild()
+        for asset in data['release']['assets']:
+            verify_file(output / asset['file'], asset)
+        for asset in data['release']['assets']:
+            if asset['file'] in existing:
+                check = output / 'existing-assets'
+                check.mkdir(exist_ok=True)
+                runtime.run(['gh', 'release', 'download', tag, '--repo', repository, '--dir', check,
+                             '--pattern', asset['file']])
+                verify_file(check / asset['file'], asset)
+            else:
+                runtime.run(['gh', 'release', 'upload', tag, '--repo', repository, output / asset['file']])
+        finish(runtime, data, output, site, journal_path, journal)
+        return
     output.mkdir(parents=True)
     # Never overwrite partial draft assets with different freshly rebuilt bytes.
     runtime.run(['gh', 'release', 'download', tag, '--repo', repository, '--dir', output,
@@ -119,7 +150,7 @@ def finish(runtime, data, output, site, journal_path, journal):
         write_json(journal_path, journal)
         runtime.event('Interrupted publication superseded by a newer remote release')
         return
-    release = runtime.api(f'repos/{repository}/releases/tags/{tag}')
+    release = release_by_tag(runtime, tag)
     if release['draft']:
         runtime.run(['gh', 'release', 'edit', tag, '--repo', repository, '--draft=false', '--prerelease'])
     runtime.stage = f'{name}:public-downloads'

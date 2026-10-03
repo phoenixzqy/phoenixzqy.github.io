@@ -93,7 +93,16 @@ def process(runtime, args, root):
                 if app == 'bplayer' and (journal.get('dispatch_intent') or journal.get('run_id')):
                     run_bplayer(runtime, journal['snapshot'], site, journal_path, journal, output)
                 elif journal.get('create_intent'):
-                    recover(runtime, site, journal_path, journal, output)
+                    def rebuild_interrupted():
+                        recorded = journal['snapshot']
+                        source = clone(runtime, recorded, args.workspace, root)
+                        refresh_dependencies(runtime, source, recorded)
+                        if name in ('zai-editor', 'zai-gitter'):
+                            module = f'github.com/{args.owner}/zai-design-system'
+                            runtime.run(['go', 'get', f'{module}@{recorded["dependencies"][f"{args.owner}/zai-design-system"]}'], cwd=source)
+                            runtime.run(['go', 'mod', 'tidy'], cwd=source)
+                        build(runtime, source, recorded, journal['version'], output, site, args.codex_notices)
+                    recover(runtime, site, journal_path, journal, output, rebuild_interrupted)
                 else:
                     # No external write occurred: discard the old local attempt.
                     pending = False
