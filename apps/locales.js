@@ -2,6 +2,8 @@ export const SUPPORTED_LOCALES = ["en", "zh-CN"];
 
 export const messages = {
   en: {
+    licenseNotices: "Licenses and third-party notices", rawNotices: "Open the notice file",
+    loadingNotices: "Loading license notices…", noticesError: "Could not load the notices. Open the notice file to read them.",
     skip: "Skip to content", homeLabel: "Qiyu Zhao, home", navigation: "Main navigation",
     aboutMe: "About me", apps: "Apps", contact: "Contact", language: "Language",
     breadcrumb: "Breadcrumb", home: "HOME", app: "APP", appDetails: "APP DETAILS", downloads: "DOWNLOADS",
@@ -71,6 +73,8 @@ export const messages = {
     metadataError: "The app or release metadata is invalid. Please try again later.",
   },
   "zh-CN": {
+    licenseNotices: "许可证与第三方声明", rawNotices: "打开声明文件",
+    loadingNotices: "正在加载许可声明…", noticesError: "无法加载声明，请打开声明文件阅读。",
     skip: "跳转到正文", homeLabel: "Qiyu Zhao 主页", navigation: "主导航",
     aboutMe: "关于我", apps: "应用", contact: "联系", language: "语言",
     breadcrumb: "面包屑导航", home: "首页", app: "应用", appDetails: "应用详情", downloads: "下载",

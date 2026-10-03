@@ -226,3 +226,7 @@ html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style
   .package-count { flex-basis: 100%; }
   .apps-site .site-footer > p { flex-basis: auto; font-size: 9px; }
 }
+
+.license-notices { margin-top: 1rem; }
+.license-notices summary { cursor: pointer; font-weight: 600; }
+.license-notice-text { max-height: 32rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; }

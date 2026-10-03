@@ -186,6 +186,9 @@ def finish(runtime, data, output, site, journal_path, journal, batch=None):
     for asset in data['release']['assets']:
         download(asset, downloaded)
     entry = {'data': data, 'journal_path': journal_path, 'journal': journal}
+    if name == 'zai-codex':
+        from release_notices import notices_text
+        entry['notices'] = notices_text(data, output, journal['snapshot']['commit'])
     if batch is not None:
         batch.append(entry)
     else:

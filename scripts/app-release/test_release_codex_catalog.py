@@ -88,14 +88,17 @@ class CodexCatalogTest(unittest.TestCase):
                         return [{'tag_name': 'zai-codex-v0.1.1', 'draft': False}]
 
                 runtime = Fake()
-                journal = {'tag': 'zai-codex-v0.1.1'}
-                with patch('release_publish.download') as download, patch('release_publish.verify_pages'):
+                journal = {'tag': 'zai-codex-v0.1.1', 'snapshot': {'commit': 'a' * 40}}
+                with patch('release_publish.download') as download, patch('release_publish.verify_pages'), \
+                        patch('release_notices.notices_text', return_value='Original license fixture'):
                     finish(runtime, data, output, site, site / 'journal.json', journal)
                 download.assert_called_once()
                 staged = [str(arg) for args in runtime.commands if args[:2] == ['git', 'add']
                           for arg in args[2:]]
                 self.assertIn('apps/catalog.json', staged)
                 self.assertIn(str(path), staged)
+                self.assertIn(str(site / 'apps/notices/zai-codex.txt'), staged)
+                self.assertEqual((site / 'apps/notices/zai-codex.txt').read_text(), 'Original license fixture')
                 self.assertEqual(sum(args[:2] == ['git', 'commit'] for args in runtime.commands), 1)
                 self.assertTrue(journal['complete'])
 

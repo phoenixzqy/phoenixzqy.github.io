@@ -131,6 +131,29 @@ function notice(title, text) {
   block.append(element("h2", "", title), paragraph(text));
   return block;
 }
+function licenseNotices(app) {
+  const details = element("details", "license-notices");
+  details.append(element("summary", "", t("licenseNotices")), link(t("rawNotices"), app.licenseNotices));
+  const status = paragraph(t("loadingNotices"));
+  status.setAttribute("role", "status");
+  const text = element("pre", "license-notice-text");
+  details.append(status, text);
+  let loaded = false;
+  details.addEventListener("toggle", async () => {
+    if (!details.open || loaded) return;
+    loaded = true;
+    try {
+      const response = await request(app.licenseNotices);
+      const body = await response.text();
+      if (!body.trim()) throw new Error("Empty notices");
+      text.textContent = body;
+      status.remove();
+    } catch {
+      status.textContent = t("noticesError");
+    }
+  });
+  return details;
+}
 async function request(url) {
   let response;
   try {
@@ -378,7 +401,9 @@ function renderDetail(app) {
   if (comparison) content.append(comparison);
   if (gallery) content.append(gallery);
   if (videos) content.append(videos);
-  content.append(featureSection, platforms, install, notice(t("responsible"), app.notice));
+  const legal = notice(t("responsible"), app.notice);
+  if (app.licenseNotices) legal.append(licenseNotices(app));
+  content.append(featureSection, platforms, install, legal);
 }
 // The first screenshot leads the gallery. Later landscape captures take a full
 // row, and small ones keep their natural size instead of being upscaled.

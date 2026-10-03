@@ -101,3 +101,20 @@ follow the publishing contract for Pages deployment and public URL verification.
 The one-line commands are `/install/zai-codex.sh | sh` and
 `/install/zai-codex.ps1 | iex`, using the full HTTPS site URL. Remove disposable
 staging/test artifacts and release both worktrees after the handoff.
+
+## Public license notices
+
+The app detail page loads `/apps/notices/zai-codex.txt` on request. This stable
+static text file contains the original license and attribution material from
+the verified packages, labeled with the release version and source commit.
+The release script extracts it from the final ZIPs and commits it together with
+the release manifest. Preserve original notice text; update the reviewed
+packaging input whenever dependency licenses change. Public notices supplement
+the copies bundled in each immutable versioned ZIP.
+
+Initial web-notice provenance (2026-10-03): copied only license/notice text from
+[the published 0.1.0 ZIP](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.0/zai-codex-0.1.0-x86_64-unknown-linux-gnu.zip),
+after matching its 125609206-byte size and SHA-256
+`a56fdc5917ab487a865da5e79bac24f1bb6295d46326e686e2817692198170a8`.
+The page uses the site's existing notice styling and native disclosure controls;
+no external design, private source, binaries or diagnostic logs are copied.
