@@ -1702,7 +1702,8 @@
         "The Linux x64 preview is available. Linux ARM64, macOS and Windows packages have not been published yet.",
         "Python 3.10+ is required. The installer verifies the package checksum, keeps its full bundle together, and installs this fork as the codex command.",
         "Add ~/.local/bin to PATH if needed, then run codex (codex.cmd on Windows). Sign in with your own eligible GitHub Copilot account."
-      ]
+      ],
+      "licenseNotices": "/apps/notices/zai-codex.txt"
     }
   ]
 }

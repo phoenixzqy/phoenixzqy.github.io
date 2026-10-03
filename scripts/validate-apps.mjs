@@ -19,6 +19,7 @@ async function regularFile(root, href, label) {
 async function validateMedia(root, catalog) {
   let bytes = 0;
   for (const app of catalog.apps) {
+    if (app.licenseNotices) await regularFile(root, app.licenseNotices, app.id);
     if (app.artwork) bytes += await regularFile(root, app.artwork.src, app.id);
     for (const screenshot of app.screenshots ?? []) bytes += await regularFile(root, screenshot.src, app.id);
     for (const video of app.videos ?? []) {

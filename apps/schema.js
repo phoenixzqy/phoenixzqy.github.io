@@ -120,6 +120,10 @@ export function validateCatalog(catalog) {
       list(app.uninstallation, `${app.id}.uninstallation`);
       app.uninstallation.forEach((item) => localizedText(item, `${app.id}.uninstallation item`));
     }
+    if (app.licenseNotices !== undefined) {
+      requireValue(app.licenseNotices === `/apps/notices/${app.id}.txt`,
+        "License notices must use the app's own static notice file.");
+    }
     if (app.documentation !== undefined) {
       requireValue(app.documentation === true, "Documentation must be true when present, or omitted.");
     }

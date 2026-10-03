@@ -22,6 +22,10 @@ def publish_website(runtime, site, entries):
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
         if name == 'zai-codex':
             update_codex_catalog(site, data)
+            notice_path = site / 'apps/notices/zai-codex.txt'
+            notice_path.parent.mkdir(parents=True, exist_ok=True)
+            notice_path.write_text(entry['notices'], encoding='utf-8')
+            runtime.run(['git', 'add', str(notice_path)], cwd=site)
         runtime.run(['git', 'add', str(path)], cwd=site)
         if name == 'zai-codex':
             runtime.run(['git', 'add', 'apps/catalog.json', 'install/templates/zai-codex.py.in',
