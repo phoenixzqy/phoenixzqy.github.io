@@ -139,6 +139,33 @@ def reconcile_latest(current, intended):
     return 'identical' if current == intended else 'publish'
 
 
+def update_codex_catalog(site, data):
+    """Describe only the verified targets in the manifest being published."""
+    path = site / 'apps/catalog.json'
+    catalog = json.loads(path.read_text())
+    apps = catalog if isinstance(catalog, list) else catalog['apps']
+    app = next(app for app in apps if app['id'] == 'zai-codex')
+    assets = data['release']['assets']
+    channel = data['release']['channel']
+    names = {'linux': 'Linux', 'macos': 'macOS', 'windows': 'Windows'}
+    targets = []
+    for platform in app['platforms']:
+        available = [asset for asset in assets if asset['platform'] == platform['id']]
+        if available:
+            architectures = ', '.join(sorted({asset['architecture'] for asset in available}))
+            targets.append(f'{names[platform["id"]]} {architectures}')
+            packages = ', '.join(f'{asset["architecture"]} ({asset["signing"]})'
+                                 for asset in available)
+            platform['status'] = (f'Available {channel} packages: {packages}. '
+                                  'See the download page for package requirements.')
+        else:
+            platform['status'] = 'No package is published for this release.'
+    app['stage'] = f'{", ".join(targets)} {channel}'
+    app['installation'][0] = (f'Available {channel} packages: {", ".join(targets)}. '
+                              'Other platform and architecture combinations are not published for this release.')
+    path.write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + '\n')
+
+
 def finish(runtime, data, output, site, journal_path, journal):
     name, repository = data['appId'], runtime.site_repository
     tag = journal['tag']
@@ -161,10 +188,12 @@ def finish(runtime, data, output, site, journal_path, journal):
     runtime.stage = f'{name}:website'
     path = site / f'releases/{name}/latest/manifest.json'
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+    if name == 'zai-codex':
+        update_codex_catalog(site, data)
     runtime.run(['npm', 'run', 'validate:apps'], cwd=site)
     runtime.run(['git', 'add', str(path)], cwd=site)
     if name == 'zai-codex':
-        runtime.run(['git', 'add', 'install/templates/zai-codex.py.in', 'install/zai-codex-source.json',
+        runtime.run(['git', 'add', 'apps/catalog.json', 'install/templates/zai-codex.py.in', 'install/zai-codex-source.json',
                      'install/zai-codex.sh', 'install/zai-codex.ps1'], cwd=site)
     if runtime.run(['git', 'diff', '--cached', '--name-only'], cwd=site):
         runtime.run(['git', 'commit', '-m', f'Publish {name} {data["release"]["version"]}'], cwd=site)
