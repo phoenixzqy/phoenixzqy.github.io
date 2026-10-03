@@ -68,6 +68,9 @@ characters; do not add another layer of quotes inside the argument.
 Invalid CLI positions are reported before terminal startup. Invalid palette
 positions keep the palette open so you can correct them.
 
+Installing this app exposes only `zai-editor`. Installing zai-cli exposes
+`zai`, `zai-editor`, and `zai-gitter`, which can also run independently.
+
 If your shell does not load `.profile`, `.bashrc`, or `.zshrc`, add the
 installation directory (normally `~/.zai`) to that shell's PATH yourself.
 
@@ -75,6 +78,25 @@ The packages are unsigned. macOS may quarantine the download, and Windows
 SmartScreen may warn about it. Follow your device and organization security
 policies rather than disabling them.
 
+
+## Select several tree entries
+
+Use Ctrl-click (Cmd-click when your terminal reports it) to toggle entries,
+or Shift-click for a visible range. Keyboard alternatives are Ctrl+E to focus
+the tree, Shift+Up/Down to select a range, Space to toggle an entry, and Ctrl+A
+to select all visible entries. Right-click a selected entry to keep the group
+and choose delete, move, duplicate, or copy names/paths. Ctrl+C in the tree
+copies relative paths, one per line.
+
+D duplicates selected files beside their originals with unique names such as
+`notes copy.txt`. Save dirty source files first; folders cannot be duplicated.
+Press Delete in the focused tree to delete the selected file or folder (or
+selected group). The confirmation box defaults to Cancel: Enter, N, or Esc
+cancels; select Delete and press Enter, click Delete, or press Y to confirm.
+Deletion is permanent, includes folder contents, and refuses unsaved buffers. Bulk operations stop on
+an error and report completed entries; completed operations remain applied.
+See tree selection and bulk actions
+for selection, move, and terminal-modifier details.
 
 ## Uninstall and remove local data
 
@@ -104,6 +126,7 @@ Editor cleanup includes managed language servers, profiler logs, and preview end
 
 - `Ctrl+P` opens Quick Open.
 - `Ctrl+F` finds text in the current buffer.
+- `Ctrl+H` opens **Replace in file** (also available from F1).
 - `Ctrl+S` saves.
 - `Ctrl+Shift+P` or `F1` opens the command palette.
 - `F2` opens Settings and the live theme picker.
@@ -133,12 +156,71 @@ configuration and session overrides.
 
 Open PNG, JPEG, or GIF files from the tree, Quick Open, or a launch argument to view them in read-only tabs. Kitty and Sixel terminals show the image; other terminals show file details. GIFs display their first frame. Images are limited to 8 MiB and 4 million pixels, with eight image tabs open at once. Ctrl+S never changes image files; F5 refreshes them.
 
+## Find and replace in a buffer
+
+Find defaults to literal, case-insensitive search. Use **Tab** to focus the
+query, replacement, **Case sensitive**, **Whole word**, **Regex**,
+**In selection**, or actions; **Space/Enter** activates a focused control.
+Options last for this editor session. **Enter/F3** finds the next match and
+**Shift+Enter/Shift+F3** the previous one; **Esc** returns to source.
+The underlined match is separate from your source selection.
+Enable **In selection** after selecting source text to capture those ranges.
+With no selection it explains what to select instead of searching elsewhere.
+
+**Replace** edits the active match and advances without finding inserted text.
+**Replace all** applies the complete snapshot as one undo step.
+**Review replacements** shows each match and its replacement preview:
+**Y Yes**, **S Skip**, **A All remaining**, **Q Quit** (or Tab/Enter).
+Yes is one undo step, All remaining one batch; Quit keeps accepted edits.
+Undo/redo restores source and mapped selections. An unrelated source change
+stops review; start a new search before continuing.
+
+Whole-word matching treats Unicode letters, marks, digits, and underscore as
+word characters: `count` matches `count`, not `counter`. Regex uses Go syntax
+with multiline line anchors; dot does not cross LF unless you request `(?s)`.
+Lookbehind and query backreferences are unsupported. Literal replacement
+inserts text verbatim. Regex replacement accepts `$1`, `${1}`, `${name}`, `$$`,
+and `\n`, `\t`, `\\` escapes. For example, query
+`(?P<name>[A-Za-z_]+)=([0-9]+)` and replacement `${name}: $2` changes
+`total=12` to `total: 12`. Invalid patterns or replacement references show
+an error before any edit.
+
+Fields are limited to 4 KiB. Above 10,000 matches the result is explicitly
+incomplete and replacement/review is disabled: narrow the query or scope.
+Stale results, invalid text, or output exceeding the 1 MiB editing limit
+cannot partially modify a buffer. Workspace search remains literal and unchanged.
+
+## Editor groups
+
+Use `Ctrl+\` or F1 > **Split Right** to create another editor group beside
+the focused group. `Ctrl+Shift+\` or **Split Down** places it below. Each
+group has its own tabs and displays one active document. The tab bar's **+**
+opens Quick Open in that group; the next two controls split right and down.
+
+Click a group to focus it, or use **Alt+PgDown / Alt+PgUp**. **Ctrl+Tab /
+Ctrl+Shift+Tab** switches tabs within the focused group. In Quick Open,
+**Ctrl+Enter** opens a chosen file to the right and **Ctrl+Shift+Enter** opens
+below; ordinary Enter opens it in the focused group. The file tree context
+menu offers these destinations too.
+
+Drag the divider to resize groups. F1 > **Move tab to next editor group**
+transfers the active tab; **Close editor group** closes its tabs with the usual
+unsaved-file protection. Splitting the same file shares edits, saves and undo
+history while keeping separate caret and scroll positions. Closing the last
+tab collapses an empty split group; the final group shows the start page.
+See editor groups and tabs for limits.
+
 ## Buffer indentation
 
 Use F1 > **Set indentation style** to choose Spaces or Tabs for the active
 buffer. **Set indent width** and **Set tab width** show the current value and
 accept integers 1–16; an invalid value shows an inline message without changing
 anything. Escape cancels. Defaults remain Spaces, indent width 4, tab width 4.
+Matching `.editorconfig` files inside the workspace set the buffer's base
+values when it opens or its path changes, including new named files. The
+palette shows `.editorconfig`, `default`, or `buffer override` as the origin.
+**Reload EditorConfig** rereads configuration for the active buffer without
+discarding manual choices. No configuration watcher or service is started.
 
 Tab inserts exactly indent-width spaces in Spaces mode, or one literal tab
 in Tabs mode, including at multiple carets. Literal tabs display at the next
@@ -148,8 +230,9 @@ Completion keeps priority over indentation when its menu is open.
 These choices never convert existing whitespace, dirty the file, or add undo
 steps. They survive reload and path changes while the buffer stays open, but
 are not saved across close/reopen or restart. **Reset buffer indentation
-overrides** restores the buffer's base values (currently the defaults unless
-a package host supplies others). See Buffer indentation
+overrides** restores the resolved file values (or defaults/host base values).
+Unreadable or invalid configuration produces one concise warning per
+resolution while editing stays available. See Buffer indentation
 for geometry and package integration.
 
 ## History, previews, and AI context

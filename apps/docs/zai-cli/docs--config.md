@@ -58,7 +58,7 @@ reuse `~/.zai/configs/<repo-slug>/`; non-forge projects store
 `config.json` under `~/.zai/configs/_project-<name>-<12-hex-sha256-prefix>/` with
 `schema_version` plus an optional `console_yolo` override.
 
-App-wide `console_yolo`, `console_scrollback_lines`, `console_device_status`,
+App-wide `temp_retention_days`, `console_yolo`, `console_scrollback_lines`, `console_device_status`,
 `console_device_status_interval_seconds`, `console_focus_back`, and
 `console_focus_forward` live in
 `~/.zai/settings.json` (under the active installation home). The left-rail
@@ -70,6 +70,10 @@ scrollback lines, with CPU/MEM status in the footer on and refreshing every five
 (accepted interval: 1–300 seconds). Saved device preferences apply immediately
 in the current console; Ctrl+R applies preferences saved by another console.
 No project preference is imported into the app setting.
+Edit `temp_retention_days` directly in that app settings file (default 7, range
+1–3650). Console and daemon startup plus local midnight share one daily cleanup
+attempt; each attempt reloads retention. Recent descendants and held leases
+protect temporary entries. See the app preference reference for the scope.
 Navigation bindings default to `alt+left` (Back) and `alt+right` (Forward).
 Edit them directly in `settings.json`, then press Ctrl+R in Settings to reload
 live, or restart the console to apply; see the

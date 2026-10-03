@@ -62,7 +62,9 @@ Follow [Install and configure zai](?id=zai-cli&doc=docs--install-and-config#conf
 Console activity icons are built in, with automatic readable text fallback when
 terminal images are unavailable. No font setup is required.
 
-The bundled Python installer creates `~/.zai` and installs `zai`, `zai-hook`, private `.zai-editor`/`.zai-gitter` companions, and package-owned files there. It installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it replaces unchanged package-owned files while handling locally edited prompts through the conflict policy described below. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai does not require a coding-agent CLI.
+The bundled Python installer creates `~/.zai` and installs `zai`, `zai-hook`, `zai-editor` and `zai-gitter` executables, and package-owned files there. It installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it replaces unchanged package-owned files while handling locally edited prompts through the conflict policy described below. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai exposes `zai`, `zai-editor`, and `zai-gitter` on PATH; each tool
+can also run independently. Installing either tool separately exposes only its
+own command. Installing zai does not require a coding-agent CLI.
 
 The installer also adds the install directory to your persistent user `PATH`
 (the Windows user environment, or your shell profile on macOS/Linux) so you can
@@ -106,7 +108,7 @@ For zai-cli outside the default `~/.zai` directory, an executable or installatio
 
 The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
 
-zai cleanup includes its packaged and derived agent homes, configs, service state, runs, logs, backups, private editor/viewer companions, and installer metadata. Standalone editor and viewer installations and their data remain. Git worktrees and their registry are retained because they contain project work.
+zai cleanup includes its packaged and derived agent homes, configs, service state, runs, logs, backups, legacy private editor/viewer companions, and installer metadata. Standalone editor and viewer installations and their data remain. Git worktrees and their registry are retained because they contain project work.
 
 ## The two run modes
 

@@ -28,6 +28,7 @@ Bounds and their rationale:
 | --- | --- | --- |
 | `poll_interval_seconds` | `30`–`86400` | Below 30s hammers the forge API; above 24h risks duration overflow and is effectively off. |
 | `interval_seconds` (housekeep) | `30`–`604800` | Same 30s floor; capped at 7 days for this low-urgency maintenance pass. |
+| `temp_retention_days` (app settings only) | `1`–`3650` | Defaults to seven days. Zero, negative, fractional and null values are rejected; invalid settings prevent automatic deletion. |
 | `console_scrollback_lines` (app settings; accepted in legacy project files) | `200`–`50000` | Below 200 a pane cannot scroll back past a screenful on a tall terminal; every retained line is live heap for the pane's life, so the cap bounds console memory. |
 | `console_device_status_interval_seconds` (app settings only) | `1`–`300` | A positive interval prevents a busy loop; the default five seconds balances freshness and idle sampling/rendering cost. |
 | `max_total_agents` | `1`–`80` | Zero would stall every service; the ceiling is the theoretical maximum of all five services running their own `agent_limit` ceiling at once, so a configured value can never promise more parallelism than the per-service contract allows. |

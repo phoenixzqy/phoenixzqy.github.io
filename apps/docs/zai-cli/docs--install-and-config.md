@@ -22,7 +22,7 @@ Windows PowerShell:
 irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex
 ```
 
-The bootstrap reads the public release manifest over anonymous HTTPS, verifies the archive's SHA-256, and runs **`install.py` from the archive root**. That Python entry point and its bundled installer modules create `~/.zai`, install `zai`, `zai-hook`, the private editor/viewer companions, and the packaged `.copilot` home, and update persistent user PATH. Downloads are removed on success or failure. `ZAI_INSTALL_DIR` selects another destination.
+The bootstrap reads the public release manifest over anonymous HTTPS, verifies the archive's SHA-256, and runs **`install.py` from the archive root**. That Python entry point and its bundled installer modules create `~/.zai`, install the public `zai`, `zai-editor`, and `zai-gitter` commands, `zai-hook`, and the packaged `.copilot` home, and update persistent user PATH. Downloads are removed on success or failure. `ZAI_INSTALL_DIR` selects another destination.
 
 Open a new terminal after installation, then verify:
 

@@ -424,8 +424,8 @@
           "zh-CN": "安装包未签名。macOS 会隔离未签名的下载文件，Windows SmartScreen 也会发出警告。请不要为了运行预览版本而关闭操作系统或组织的安全策略。"
         },
         {
-          "en": "The bundled Python installer creates ~/.zai and installs the executable and packaged home; extracting the archive alone does not install zai. Open a new terminal for the updated PATH, then run zai. From a supported repository, run zai config show to create or inspect defaults, zai config path to locate settings, and zai start all to start services.",
-          "zh-CN": "压缩包内的 Python 安装程序会创建 ~/.zai 并安装可执行文件与运行目录；仅解压并不等于安装。安装后请打开新终端，使 PATH 生效，再运行 zai。在受支持的仓库内，运行 zai config show 创建或查看默认配置，运行 zai config path 查找配置文件，再运行 zai start all 启动服务。"
+          "en": "The bundled Python installer creates ~/.zai and installs the public zai, zai-editor, and zai-gitter commands and packaged home; extracting the archive alone does not install zai. Open a new terminal for the updated PATH, then run zai, zai-editor, or zai-gitter. From a supported repository, run zai config show to create or inspect defaults, zai config path to locate settings, and zai start all to start services.",
+          "zh-CN": "压缩包内的 Python 安装程序会创建 ~/.zai 并安装公开命令 zai、zai-editor、zai-gitter 与运行目录；仅解压并不等于安装。安装后请打开新终端，使 PATH 生效，再运行 zai、zai-editor 或 zai-gitter。在受支持的仓库内，运行 zai config show 创建或查看默认配置，运行 zai config path 查找配置文件，再运行 zai start all 启动服务。"
         }
       ],
       "comparison": {
@@ -1026,8 +1026,8 @@
       ],
       "installation": [
         {
-          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles.",
-          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。"
+          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. This standalone installer exposes only zai-editor and preserves existing sibling apps.",
+          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。 此独立安装程序仅提供 zai-editor 命令，并保留已安装的同系列应用。"
         },
         {
           "en": "The macOS/Linux one-line installer requires Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai. Git and language servers stay optional and are never installed for you.",
@@ -1478,8 +1478,8 @@
       ],
       "installation": [
         {
-          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles.",
-          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。"
+          "en": "Run one of the commands above. The installer downloads the archive for your operating system and processor, verifies its SHA-256 checksum, places the executable in the .zai folder in your home directory, and updates the Windows user PATH or common macOS/Linux shell profiles. This standalone installer exposes only zai-gitter and preserves existing sibling apps.",
+          "zh-CN": "运行上面任意一条命令。安装脚本会下载与你的操作系统和处理器相匹配的压缩包，校验 SHA-256 值，把可执行文件放入主目录下的 .zai 文件夹，并更新 Windows 用户 PATH 或常见的 macOS/Linux shell 配置文件。 此独立安装程序仅提供 zai-gitter 命令，并保留已安装的同系列应用。"
         },
         {
           "en": "Git must already be installed and on PATH; the installer does not install it. The macOS/Linux one-line installer needs Python 3 to read the release manifest; the installed binary does not need Python, a Go toolchain, a Node.js runtime, or zai.",

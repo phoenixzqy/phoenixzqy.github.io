@@ -20,6 +20,7 @@ find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING
 ensure_on_path "$INSTALL_DIR"
 
 info ''
+info "Installed command: $EXECUTABLE"
 info "Installed $DISPLAY_NAME to $INSTALL_DIR/$EXECUTABLE"
 info "Licenses: $LICENSE_DIR"
 show_activation "$INSTALL_DIR" "$EXECUTABLE"
