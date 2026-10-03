@@ -7,12 +7,32 @@ import json
 import os
 from pathlib import Path
 import signal
+import shutil
 import subprocess
+import sys
 import time
 
 
 def timestamp():
     return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+def command_argv(args, environment):
+    """Run Windows npm's JavaScript entrypoint without a command-shell wrapper."""
+    if sys.platform != 'win32' or args[0].lower() not in ('npm', 'npx'):
+        return args
+    launcher = shutil.which(args[0], path=environment.get('PATH'))
+    if not launcher:
+        raise FileNotFoundError(f'Windows {args[0]} launcher is not on PATH')
+    launcher = Path(launcher).resolve()
+    if launcher.suffix.lower() not in ('.cmd', '.bat'):
+        return [str(launcher), *args[1:]]
+    entrypoint = launcher.parent / 'node_modules' / 'npm' / 'bin' / f'{args[0].lower()}-cli.js'
+    node = launcher.parent / 'node.exe'
+    executable = str(node) if node.is_file() else shutil.which('node', path=environment.get('PATH'))
+    if not entrypoint.is_file() or not executable:
+        raise FileNotFoundError(f'Windows {args[0]} requires Node.js and its standard npm CLI entrypoint beside {launcher}')
+    return [executable, str(entrypoint), *args[1:]]
 
 
 def write_json(path, value):
@@ -75,6 +95,7 @@ class Runtime:
             child_env.update(env)
             self.secrets.extend(value for key, value in env.items() if value and
                                 any(word in key.upper() for word in ('TOKEN', 'PASSWORD', 'SECRET')))
+        safe_args = command_argv(safe_args, child_env)
         metadata_path = path.with_suffix('.command.json')
         metadata = {'argv': safe_args, 'cwd': str(cwd) if cwd else None, 'stage': self.stage,
                     'started_at': timestamp(), 'timeout_seconds': timeout or self.timeout}
