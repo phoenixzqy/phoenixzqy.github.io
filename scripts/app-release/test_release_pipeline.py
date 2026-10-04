@@ -14,7 +14,7 @@ import stat
 import release_apps
 import release_bplayer
 from release_packages import inspect_archive, verify_file, digest, asset_name
-from release_publish import reconcile_latest, release_by_tag, recover
+from release_publish import reconcile_latest, release_by_tag, recover, publish
 from release_runtime import Runtime, exclusive_lock
 from release_sources import changed, clone, identity, provenance, remote_snapshot
 
@@ -119,6 +119,43 @@ class PackageTest(unittest.TestCase):
 
 
 class DraftRecoveryTest(unittest.TestCase):
+    def test_create_saves_response_id_without_reading_stale_collection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            journal = {}
+            snapshot = {'repository': 'owner/app', 'branch': 'custom', 'commit': 'a' * 40, 'dependencies': {}}
+            data = {'appId': 'app', 'release': {'version': '1.0.0', 'assets': []}}
+            class Fake:
+                site_repository = 'owner/site'
+                def pages(self, endpoint):
+                    raise AssertionError('A stale collection must not determine the created identity')
+                def run(self, args, **kwargs):
+                    if args[0] == 'git':
+                        return 'b' * 40
+                    if args[:3] == ['gh', 'api', '--method']:
+                        request = json.loads(Path(args[-1]).read_text())
+                        assert request['tag_name'] == 'app-v1.0.0'
+                        assert request['draft'] and request['prerelease']
+                        assert provenance(request['body']) == snapshot
+                        return json.dumps({'id': 10, 'tag_name': 'app-v1.0.0'})
+                    assert json.loads((root / 'journal.json').read_text())['release_id'] == 10
+                    return ''
+            with patch('release_publish.validate_metadata'), patch('release_publish.finish'):
+                publish(Fake(), snapshot, data, root, root, root / 'journal.json', journal)
+            self.assertEqual(journal['release_id'], 10)
+
+    def test_stored_id_reads_draft_directly_and_rejects_another_tag(self):
+        class Fake:
+            site_repository = 'owner/site'
+            def pages(self, endpoint):
+                raise AssertionError('Stored identity must not depend on a collection')
+            def api(self, endpoint):
+                assert endpoint == 'repos/owner/site/releases/10'
+                return {'id': 10, 'tag_name': 'app-v1', 'draft': True}
+        self.assertEqual(release_by_tag(Fake(), 'app-v1', 10)['id'], 10)
+        with self.assertRaisesRegex(ValueError, 'different tag'):
+            release_by_tag(Fake(), 'other-v1', 10)
+
     def test_release_collection_finds_unpublished_draft(self):
         class Fake:
             site_repository = 'owner/site'

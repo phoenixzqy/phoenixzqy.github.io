@@ -73,7 +73,10 @@ A process lock serializes runs sharing the state directory.
 
 An interrupted upload/publication keeps its app journal. The next invocation
 reconciles the same tag and verifies downloaded assets instead of allocating a
-duplicate release. Missing draft assets can be rebuilt only if the recorded source is still the
+duplicate release. The creation response's release ID is saved before uploading;
+subsequent reads use that ID even when GitHub's release list has not caught up.
+A lost create response is reconciled by tag and exact source provenance.
+Missing draft assets can be rebuilt only if the recorded source is still the
 remote default tip and rebuilt bytes match the journal exactly; existing assets
 are verified and never overwritten. A lost create response without a matching
 release, different rebuilt bytes, or interrupted Codex installer synchronization

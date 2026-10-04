@@ -11,7 +11,12 @@ from release_runtime import timestamp, write_json
 from release_sources import provenance
 
 
-def release_by_tag(runtime, tag):
+def release_by_tag(runtime, tag, release_id=None):
+    if release_id is not None:
+        release = runtime.api(f'repos/{runtime.site_repository}/releases/{release_id}')
+        if release['tag_name'] != tag:
+            raise ValueError('Stored release ID belongs to a different tag')
+        return release
     # GitHub's by-tag endpoint can omit an unpublished draft. The authenticated
     # release collection includes drafts even before their Git tag exists.
     matches = [release for release in runtime.pages(f'repos/{runtime.site_repository}/releases?per_page=100')
@@ -64,9 +69,15 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=
         # is reconciled by tag and exact provenance on the next invocation.
         journal['create_intent'] = True
         write_json(journal_path, journal)
-        runtime.run(['gh', 'release', 'create', tag, '--repo', repository, '--target', target,
-                     '--draft', '--prerelease', '--title', f'{name} {version}', '--notes-file', note])
-        release = release_by_tag(runtime, tag)
+        request = output / 'release-create.json'
+        write_json(request, {'tag_name': tag, 'target_commitish': target, 'draft': True,
+                            'prerelease': True, 'name': f'{name} {version}', 'body': note.read_text()})
+        # The creation response is authoritative; collection reads can lag behind
+        # a newly created draft and must not be required before saving its ID.
+        release = json.loads(runtime.run(['gh', 'api', '--method', 'POST',
+                             f'repos/{repository}/releases', '--input', request]))
+        if release.get('tag_name') != tag or type(release.get('id')) is not int or release['id'] <= 0:
+            raise ValueError('Release creation returned an invalid identity; reconcile the saved intent')
         journal['release_id'] = release['id']
         write_json(journal_path, journal)
     for asset in data['release']['assets']:
@@ -81,11 +92,12 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=
 def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=None):
     runtime.stage = f'{journal["app"]}:recover'
     repository, tag = runtime.site_repository, journal['tag']
-    release = release_by_tag(runtime, tag)
+    release = release_by_tag(runtime, tag, journal.get('release_id'))
     record = provenance(release['body'])
     if record['commit'] != journal['snapshot']['commit'] or record.get('dependencies', {}) != journal['snapshot']['dependencies']:
         raise ValueError('Release tag ownership/provenance differs from the interrupted journal')
     journal['release_id'] = release['id']
+    write_json(journal_path, journal)
     data = journal['manifest']
     if data['appId'] == 'zai-codex':
         raise RuntimeError('Interrupted codex release requires its installer synchronization to be restored; '
@@ -177,7 +189,7 @@ def finish(runtime, data, output, site, journal_path, journal, batch=None):
         write_json(journal_path, journal)
         runtime.event('Interrupted publication superseded by a newer remote release')
         return
-    release = release_by_tag(runtime, tag)
+    release = release_by_tag(runtime, tag, journal.get('release_id'))
     if release['draft']:
         runtime.run(['gh', 'release', 'edit', tag, '--repo', repository, '--draft=false', '--prerelease'])
     runtime.stage = f'{name}:public-downloads'
