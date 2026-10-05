@@ -280,7 +280,7 @@ fi
 
 # --- Download and verify --------------------------------------------------
 ARCHIVE="$WORK/$ASSET_FILE"
-info "Downloading $DISPLAY_NAME for $PLATFORM/$ARCHITECTURE…"
+info "Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
 download "$ASSET_URL" "$ARCHIVE"
 
 ACTUAL_SHA="$(checksum "$ARCHIVE")"
@@ -315,7 +315,7 @@ if [ -n "${ZAI_INSTALL_DIR:-}" ]; then
   set -- --install-dir "$INSTALL_DIR" "$@"
 fi
 
-info "Running the bundled package installer with $PYTHON…"
+info "Running the bundled package installer with ${PYTHON}…"
 # The script itself arrives on stdin when piped to sh, so reattach the terminal
 # where one is actually usable; the package installer may ask about locally modified
 # packaged prompts. Probe in a subshell: /dev/tty can exist and still not open,

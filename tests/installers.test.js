@@ -116,6 +116,9 @@ test("shell installers are self-contained, fail-safe, and honour the documented 
     assert.match(script, /unzip[\s\S]*bsdtar[\s\S]*\"\$PYTHON\" -m zipfile/, label);
     assert.match(script, /\"\$PYTHON\" - "\$MANIFEST"[\s\S]*json\.load\(manifest_file\)/, label);
     assert.match(script, /x86_64 \| amd64[\s\S]*aarch64 \| arm64/, label);
+    // macOS /bin/sh (Bash 3.2) includes adjacent UTF-8 bytes in unbraced
+    // variable names, so punctuation can trigger an unbound-variable error.
+    assert.doesNotMatch(script, /\$[A-Za-z_][A-Za-z_0-9]*[^\x00-\x7f]/, label);
     // A piped installer cannot read sibling files, and bash-only syntax breaks dash.
     assert.doesNotMatch(script, /^\s*(?:\.|source)\s+\S*templates/m, label);
     const shellOnly = script.replace(/awk -v[\s\S]*?\n' "\$MANIFEST"\)"/, "");
@@ -399,6 +402,47 @@ test("the zai installer runs install.py from the archive root and forwards argum
     assert.match(result.stdout, /installed: fixture/);
     assert.equal(await readFile(receipt, "utf8"), "--on-conflict keep");
   }));
+});
+
+test("piped shell installers download and install macOS packages under POSIX Bash", async () => {
+  for (const { appId, executable, mode } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
+    for (const [machine, architecture] of [["arm64", "arm64"], ["x86_64", "x64"]]) {
+      const bytes = createZip({
+        [executable]: "#!/bin/sh\necho macOS fixture\n",
+        ...(mode === "python" ? {
+          "install.py": "import os, pathlib\npathlib.Path(os.environ['HOME'], 'receipt').write_text('installed')\n",
+        } : {}),
+      });
+      const file = `${appId}-0.1.0-macos-${architecture}.zip`;
+      await withServer(new Map([
+        ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("macos", architecture, file, bytes)])))],
+        [`/${file}`, bytes],
+      ]), (origin) => withHome(async (home) => {
+        const bin = join(home, "bin");
+        await mkdir(bin);
+        await writeFile(join(bin, "uname"),
+          `#!/bin/sh\ncase "$1" in -s) echo Darwin ;; -m) echo ${machine} ;; esac\n`, { mode: 0o755 });
+        const installDir = join(home, "installed");
+        const { stdout } = await run("bash", ["--posix", "-c", 'cat "$1" | bash --posix', "bash", installerPath(`${appId}.sh`)], {
+          env: {
+            PATH: `${bin}:${process.env.PATH}`,
+            HOME: home,
+            SHELL: "/bin/zsh",
+            ZAI_INSTALL_DIR: installDir,
+            ZAI_RELEASE_MANIFEST_URL: `${origin}/manifest.json`,
+          },
+        });
+        assert.ok(stdout.includes(`for macos/${architecture}…`), stdout);
+        assert.match(stdout, /Verified SHA-256/);
+        if (mode === "python") {
+          assert.match(stdout, /Running the bundled package installer with python3…/);
+          assert.equal(await readFile(join(home, "receipt"), "utf8"), "installed");
+        } else {
+          assert.match(await readFile(join(installDir, executable), "utf8"), /macOS fixture/);
+        }
+      }));
+    }
+  }
 });
 
 test("the zai installer refuses an archive without install.py at its root", async () => {

@@ -227,7 +227,7 @@ fi
 
 # --- Download and verify --------------------------------------------------
 ARCHIVE="$WORK/$ASSET_FILE"
-info "Downloading $DISPLAY_NAME for $PLATFORM/$ARCHITECTURE…"
+info "Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
 download "$ASSET_URL" "$ARCHIVE"
 
 ACTUAL_SHA="$(checksum "$ARCHIVE")"
