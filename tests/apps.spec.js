@@ -174,8 +174,8 @@ test("zai-cli detail page presents its supplied screenshots and demos", async ({
   await page.goto("/apps/app/?id=zai-cli&lang=en");
 
   const screenshots = page.locator(".screenshot-card img");
-  await expect(screenshots).toHaveCount(3);
-  await expect(page.locator(".screenshot-card.screenshot-row")).toHaveCount(3);
+  await expect(screenshots).toHaveCount(4);
+  await expect(page.locator(".screenshot-card.screenshot-row")).toHaveCount(4);
   await expect(page.locator(".screenshot-card").nth(1)).toHaveClass(/screenshot-compact/);
   await screenshots.first().scrollIntoViewIfNeeded();
   await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 2560);

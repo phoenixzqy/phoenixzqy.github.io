@@ -198,17 +198,21 @@
         "zh-CN": "开发者工具"
       },
       "tagline": {
-        "en": "One terminal. Many agents. One delivery loop.",
-        "zh-CN": "一个终端，多个代理，一条交付闭环。"
+        "en": "Coding agents, an editor, and Git review in one terminal.",
+        "zh-CN": "在一个终端中使用编码代理、编辑器与 Git 审阅。"
       },
       "summary": {
-        "en": "Run coding agents, reusable worktrees, an editor, diff review, and project delivery services in one terminal-native control plane for GitHub and Azure DevOps.",
-        "zh-CN": "在一个终端原生控制平面中运行编码代理、可复用工作树、编辑器、差异审阅，以及面向 GitHub 与 Azure DevOps 的项目交付服务。"
+        "en": "Coding agents, an editor, Git review, and delivery services in one terminal workspace, with a persistent console server available from v0.1.394.",
+        "zh-CN": "在一个终端工作空间中运行编码代理、编辑器、Git 审阅与交付服务，v0.1.394 起提供持久控制台服务。"
       },
       "description": [
         {
           "en": "The whole workspace is a terminal UI, so it runs over plain SSH, inside tmux, and on headless machines without a desktop client. Projects hold tabs and split panes for coding agents, shells, the bundled editor, and the bundled Git viewer.",
           "zh-CN": "整个工作空间都是终端界面，因此可以直接在 SSH、tmux 和无图形界面的机器上运行，无需桌面客户端。项目内可以打开标签页和分屏，用于编码代理、终端、内置编辑器和内置 Git 查看器。"
+        },
+        {
+          "en": "From v0.1.394, a local console server keeps agents, shells, tabs, splits, and activated automation schedules running after detach or client closure, with reattachment on the same host and runtime home. Live processes require the host to stay awake and the server running; a server or machine restart ends them. Close completely stops the console-owned processes.",
+          "zh-CN": "从 v0.1.394 起，本地控制台服务在分离连接或关闭客户端后保持代理、终端、标签页、分屏与已激活的自动化计划运行，并支持在同一主机上使用相同的运行目录重新连接。保留原有进程需要主机保持唤醒且服务持续运行；服务或机器重启将终止这些进程。Close completely 会停止控制台所属的进程。"
         },
         {
           "en": "Every agent session shows a live status mark — running, waiting for you, or done — that rolls up from the pane to the tab, worktree, and project, so one waiting agent in a background project still flags that project. Updates are event-driven rather than polled.",
@@ -275,6 +279,19 @@
           },
           "width": 2560,
           "height": 1392
+        },
+        {
+          "src": "/apps/media/zai-cli/context-menu.png",
+          "alt": {
+            "en": "zai’s tab context menu open above an editor pane, offering rename, close, new tab, and vertical or horizontal splits.",
+            "zh-CN": "zai 的标签页右键菜单位于编辑器分屏上方，提供重命名、关闭、新建标签页与垂直或水平分屏。"
+          },
+          "caption": {
+            "en": "Shape your workspace from the tab menu. Captured terminal frame with demo content.",
+            "zh-CN": "通过标签页菜单调整工作空间。使用演示内容捕获的终端画面。"
+          },
+          "width": 1356,
+          "height": 900
         }
       ],
       "platforms": [
@@ -306,12 +323,32 @@
       "features": [
         {
           "title": {
+            "en": "Persistent console server",
+            "zh-CN": "持久控制台服务"
+          },
+          "description": {
+            "en": "Available from v0.1.394: Detach keeps live work running for reconnection on the same host and runtime home; Close completely stops it. The host must stay awake and the server running; a server or machine restart ends live processes.",
+            "zh-CN": "从 v0.1.394 起提供：Detach 保持任务运行，并支持在同一主机与运行目录重新连接；Close completely 停止任务。主机必须保持唤醒且服务持续运行；服务或机器重启会终止原有进程。"
+          }
+        },
+        {
+          "title": {
             "en": "Multiple agents, one project MUX",
             "zh-CN": "多个代理，一个项目 MUX"
           },
           "description": {
             "en": "Project-based tabs and split panes host Copilot CLI, Claude Code, Pi, Codex (codex-evo), OpenCode, shells, the editor, and the Git viewer side by side. The OpenCode integration preview adds delivery services, automations, live status, session resume, packaged guidance, and managed worktrees with isolated authentication. Open it with zai opencode or zai oc; OpenCode 1.18.33+ is required. This matches zai workflows, not identical native CLI features: Copilot extensions are not interchangeable, and OpenCode lacks blocking stop hooks; shared final review and result validation still gate service completion.",
             "zh-CN": "基于项目的标签页与分屏可并排承载 Copilot CLI、Claude Code、Pi、Codex（codex-evo）、OpenCode、终端、编辑器和 Git 查看器。OpenCode 集成预览支持交付服务、自动化、实时状态、会话恢复、内置指引和托管工作树，并使用独立的认证目录。通过 zai opencode 或 zai oc 打开，需要 OpenCode 1.18.33+。这是 zai 工作流层面的对齐，并非原生 CLI 功能完全相同：Copilot 扩展不能直接互换，OpenCode 也没有阻断式停止钩子；服务完成仍须通过共享的最终评审与结果校验。"
+          }
+        },
+        {
+          "title": {
+            "en": "Your workspace, one context menu away",
+            "zh-CN": "右键菜单，让工作空间触手可及"
+          },
+          "description": {
+            "en": "Right-click a tab to rename or close it, open a new tab, or split the workspace. Pane-title menus offer close, copy title or working directory, and split actions. Press Ctrl+\\, then m for the active tab menu or M for the focused pane menu.",
+            "zh-CN": "右键点击标签页即可重命名或关闭、新建标签页或拆分工作空间。分屏标题菜单提供关闭、复制标题或工作目录，以及分屏操作。按 Ctrl+\\ 后再按 m 打开当前标签页菜单，或按 M 打开焦点分屏菜单。"
           }
         },
         {
@@ -471,6 +508,31 @@
                 ]
               },
               {
+                "label": {
+                  "en": "Built-in server keeps live work running after detach",
+                  "zh-CN": "内置服务在分离连接后保持工作运行"
+                },
+                "values": [
+                  {
+                    "en": "✓ From v0.1.394 [7]",
+                    "zh-CN": "✓ v0.1.394 起提供 [7]"
+                  },
+                  {
+                    "en": "Not assessed [7]",
+                    "zh-CN": "未评估 [7]"
+                  },
+                  {
+                    "en": "Not assessed [7]",
+                    "zh-CN": "未评估 [7]"
+                  },
+                  {
+                    "en": "Not assessed [7]",
+                    "zh-CN": "未评估 [7]"
+                  },
+                  "✓ [7]"
+                ]
+              },
+              {
                 "label": "Built-in code editor",
                 "values": [
                   "✓",
@@ -529,6 +591,10 @@
               {
                 "en": "zai-cli (your pick of coding agent), Orca, and herdr host a separately installed coding-agent CLI. These workspace features do not include a coding model. Copilot app includes its Copilot CLI engine; VS Code needs an agent extension for AI coding. A fair working setup includes the chosen agent, runtime, language servers/extensions, and terminal host where applicable. The footprint table excludes separately installed agents as stated in each baseline.",
                 "zh-CN": "zai-cli（自选编码代理）、Orca 和 herdr 承载另行安装的编码代理 CLI；工作空间功能不包含编码模型。Copilot 应用包含 Copilot CLI 引擎，VS Code 的 AI 编码需要代理扩展。公平比较须计入所选代理、运行时、语言服务器或扩展及适用的终端宿主。资源表按各项基线说明，不包含另行安装的代理。"
+              },
+              {
+                "en": "Checked 2026-10-06: zai’s local console server is included in v0.1.394, whose public release provenance matches the console-server revision reviewed for this page. It reattaches on the same host and runtime home, with one active controller. herdr documents a background server that keeps terminals running when its client closes or an SSH connection drops. Both servers require the server and host to remain running for live processes to survive. This does not claim herdr’s combined multi-machine view for zai. This server lifecycle was not assessed for the other columns.",
+                "zh-CN": "核查于 2026-10-06：zai 的 v0.1.394 包含本地控制台服务，公开发布记录中的源代码修订版与本页核查的控制台服务版本一致。该服务在同一主机与运行目录重新连接，且只有一个活动控制端。herdr 文档说明其后台服务会在客户端关闭或 SSH 断连后保持终端运行。两种服务都需要服务与主机持续运行，才能保留原有进程。此处不声称 zai 具备 herdr 的多机器统一视图。其他列的此项服务生命周期未作评估。"
               }
             ]
           },
@@ -799,8 +865,8 @@
         "zh-CN": "你的终端，你的代码，不只是文本。"
       },
       "summary": {
-        "en": "A terminal editor for writing code, understanding its history, and seeing what you are building. Familiar shortcuts, mouse support, multi-cursor editing, browser previews, and live theme selection, in one native executable.",
-        "zh-CN": "一款终端编辑器，用来写代码、理解代码的来龙去脉，并直观地看到成果。熟悉的快捷键、鼠标支持、多光标编辑、浏览器预览和实时主题切换，全部集成在一个原生可执行文件中。"
+        "en": "Write code with familiar shortcuts, multi-cursor editing, and context menus right where you work. Git history, browser previews, and live themes complete the experience in one native terminal editor.",
+        "zh-CN": "在终端中使用熟悉的快捷键、多光标编辑与就地弹出的右键菜单编写代码。Git 历史、浏览器预览和实时主题，一并集成在一个原生终端编辑器中。"
       },
       "description": [
         {
@@ -810,6 +876,10 @@
         {
           "en": "Add carets or select the next occurrence, edit every cursor together, and undo the whole change in one step. Quick Open, literal workspace search, in-buffer Find, a lazy file tree, transient browsing tabs, and back/forward cursor history keep files and locations within reach.",
           "zh-CN": "可以添加光标或选中下一处匹配，同时编辑所有光标，并一步撤销整次修改。快速打开、工作区字面量搜索、缓冲区内查找、惰性加载的文件树、临时浏览标签页以及光标前进/后退历史，让文件和位置始终触手可及。"
+        },
+        {
+          "en": "Your next action is right at the cursor. Right-click source to copy, indent, navigate, add a comment, or open Ask AI; file-tree, document-tab, and search-result menus bring their own actions to the item you choose. Shift+F10 or the Menu key opens actions from keyboard focus, with F1 commands as a fallback.",
+          "zh-CN": "下一步操作就在光标旁。右键点击源码即可复制、缩进、导航、添加注释或打开 Ask AI；文件树、文档标签页和搜索结果菜单也提供与所选项目对应的操作。按 Shift+F10 或菜单键可从键盘焦点打开菜单，也可通过 F1 命令面板进入。"
         },
         {
           "en": "Git blame reads the unsaved buffer instead of stale line numbers on disk, and file history is rename-aware. Saves check for external changes and refuse detected conflicts: clean buffers reload supported text, while dirty buffers keep your edits and show the conflict.",
@@ -930,6 +1000,16 @@
           "description": {
             "en": "Add carets or select the next occurrence, edit them together, and undo the whole change in one step. Paste one line per cursor to distribute edits.",
             "zh-CN": "添加光标或选中下一处匹配，同时编辑并一步撤销整次修改。粘贴时可按行分配到各个光标。"
+          }
+        },
+        {
+          "title": {
+            "en": "Your next edit, right at the cursor",
+            "zh-CN": "下一次编辑，就在光标旁"
+          },
+          "description": {
+            "en": "Context menus put Copy, Cut, indentation, navigation, multi-cursor actions, comments, and Ask AI beside your source. Right-click inside a selection to keep it intact. Shift+F10 or the Menu key opens the same menu without reaching for the mouse; unavailable actions are dimmed.",
+            "zh-CN": "右键菜单把复制、剪切、缩进、导航、多光标操作、注释与 Ask AI 放到源码旁。在选区内右键可保留选区；按 Shift+F10 或菜单键可无需鼠标打开同一菜单，不可用的操作会显示为灰色。"
           }
         },
         {
@@ -1282,6 +1362,21 @@
           "en": "For a preview without deleting anything, set ZAI_UNINSTALL_DRY_RUN=1 before running the command. If installed elsewhere, set ZAI_INSTALL_DIR to that absolute directory. Editor cleanup also respects ZAI_EDITOR_LSP_HOME and ZAI_EDITOR_PREVIEW_HOME; shared theme cleanup respects ZAI_THEME_CONFIG. Review the script at the URL before running it.",
           "zh-CN": "仅预览、不删除：运行命令前设置 ZAI_UNINSTALL_DRY_RUN=1。若安装在其他位置，请将 ZAI_INSTALL_DIR 设置为该绝对路径。编辑器清理也会使用 ZAI_EDITOR_LSP_HOME 和 ZAI_EDITOR_PREVIEW_HOME；共享主题清理会使用 ZAI_THEME_CONFIG。运行前可打开脚本地址查看内容。"
         }
+      ],
+      "screenshots": [
+        {
+          "src": "/apps/media/zai-editor/context-menu.png",
+          "alt": {
+            "en": "The source context menu beside Go code, with editing, navigation, comment, and Ask AI actions.",
+            "zh-CN": "Go 代码旁的源码右键菜单，提供编辑、导航、注释与 Ask AI 操作。"
+          },
+          "caption": {
+            "en": "Your next edit, right at the cursor. Captured terminal frame with demo content.",
+            "zh-CN": "下一次编辑，就在光标旁。使用演示内容捕获的终端画面。"
+          },
+          "width": 1356,
+          "height": 948
+        }
       ]
     },
     {
@@ -1296,8 +1391,8 @@
         "zh-CN": "像审阅拉取请求一样审阅本地改动。"
       },
       "summary": {
-        "en": "A fast, read-only Git diff reviewer for your terminal. Side-by-side diffs, line-anchored review comments, one-key Ask AI export, and 25 built-in themes in a single small binary with no runtime to install.",
-        "zh-CN": "一款快速、只读的终端 Git 差异审阅工具。并排差异、可锚定到行的审阅批注、一键 Ask AI 导出以及 25 款内置主题，全部集成在一个体积很小的二进制文件中，无需安装运行时。"
+        "en": "Review Git changes without leaving your terminal. Context menus put code, file, and branch actions within reach, alongside side-by-side diffs, line-anchored comments, Ask AI export, and built-in themes.",
+        "zh-CN": "不离开终端即可审阅 Git 改动。右键菜单让代码、文件与分支操作触手可及，并提供并排差异、行锚定批注、Ask AI 导出和内置主题。"
       },
       "description": [
         {
@@ -1309,8 +1404,8 @@
           "zh-CN": "可以针对某一行或某段选区留下批注。草稿在刷新后仍保留锚点；可能已失效的锚点会被标记出来，而不会被悄悄移动。一键即可把你的问题、带文件/范围/版本信息的批注以及当前选区，导出为有边界、可直接复制的提示词，其中仓库文本会被标注为不可信数据。"
         },
         {
-          "en": "Viewing never writes the index or working tree and never runs external diff or textconv commands. Git actions stay behind an explicit command palette, with confirmation before anything destructive. Searchable branch and commit panels, guarded branch switching, and an all-ref graph view live in one sidebar.",
-          "zh-CN": "浏览过程绝不会写入索引或工作区，也不会调用外部 diff 或 textconv 命令。Git 操作全部收拢在显式的命令面板中，执行破坏性操作前会要求确认。可搜索的分支与提交面板、带保护的分支切换，以及包含全部引用的图形视图，都集中在同一个侧栏中。"
+          "en": "Viewing never writes the index or working tree and never runs external diff or textconv commands. Explicit Git actions are available from context menus and the command palette, with confirmation before destructive operations. Searchable branch and commit panels, guarded branch switching, and an all-ref graph view live in one sidebar.",
+          "zh-CN": "浏览过程不会写入索引或工作区，也不会调用外部 diff 或 textconv 命令。右键菜单与命令面板提供显式 Git 操作，破坏性操作前会要求确认。可搜索的分支与提交面板、带保护的分支切换，以及包含全部引用的图形视图，都集中在同一个侧栏中。"
         },
         {
           "en": "It runs anywhere Git does — Windows, Linux, macOS, WSL, and SSH sessions — and needs no forge account, server, or AI agent. Comparison figures in the project README were measured on one Linux machine; other tools were not independently assessed.",
@@ -1386,6 +1481,16 @@
         },
         {
           "title": {
+            "en": "Right-click. Review. Keep moving.",
+            "zh-CN": "右键，审阅，继续推进。"
+          },
+          "description": {
+            "en": "Open actions for a code line, selection, file, folder, commit, or branch. Copy context, comment, ask AI, or switch diff views where you are working. File and folder menus also offer scoped stage, unstage, stash, and discard actions with guarded execution. Shift+F10 or the Menu key opens the focused item’s menu.",
+            "zh-CN": "为代码行、选区、文件、文件夹、提交或分支打开对应操作。就地复制上下文、添加批注、询问 AI 或切换差异视图。文件与文件夹菜单还提供针对所选范围的暂存、取消暂存、贮藏和丢弃操作，并保留执行保护。按 Shift+F10 或菜单键可打开焦点项目的菜单。"
+          }
+        },
+        {
+          "title": {
             "en": "Line-anchored review comments",
             "zh-CN": "锚定到行的审阅批注"
           },
@@ -1420,8 +1525,8 @@
             "zh-CN": "默认安全"
           },
           "description": {
-            "en": "Viewing never writes the index or working tree and never runs external diff or textconv. Git actions stay behind a command palette with confirmation before destructive steps.",
-            "zh-CN": "浏览不会写入索引或工作区，也不会运行外部 diff 或 textconv。Git 操作收拢在命令面板中，破坏性步骤前会要求确认。"
+            "en": "Viewing never writes the index or working tree and never runs external diff or textconv. Explicit Git actions live in context menus and the command palette, with confirmation before destructive steps.",
+            "zh-CN": "浏览不会写入索引或工作区，也不会运行外部 diff 或 textconv。显式 Git 操作位于右键菜单与命令面板中，破坏性步骤前会要求确认。"
           }
         },
         {
@@ -1500,8 +1605,8 @@
       ],
       "comparison": {
         "intro": {
-          "en": "zai-gitter focuses on pull-request-style review in the terminal rather than staging or rebasing. The project README compares its review workflow with terminal Git tools and GitHub Desktop.",
-          "zh-CN": "zai-gitter 专注于终端中的拉取请求式审阅，而不是暂存或变基。项目 README 将其审阅工作流与终端 Git 工具及 GitHub Desktop 进行了对比。"
+          "en": "Built for line-by-line review, with explicit Git actions available when you need them. The project README compares its review workflow with terminal Git tools and GitHub Desktop.",
+          "zh-CN": "专为逐行审阅打造，并在需要时提供显式 Git 操作。项目 README 将其审阅工作流与终端 Git 工具及 GitHub Desktop 进行了对比。"
         },
         "groups": [
           {
@@ -1646,6 +1751,21 @@
         {
           "en": "For a preview without deleting anything, set ZAI_UNINSTALL_DRY_RUN=1 before running the command. If installed elsewhere, set ZAI_INSTALL_DIR to that absolute directory. Editor cleanup also respects ZAI_EDITOR_LSP_HOME and ZAI_EDITOR_PREVIEW_HOME; shared theme cleanup respects ZAI_THEME_CONFIG. Review the script at the URL before running it.",
           "zh-CN": "仅预览、不删除：运行命令前设置 ZAI_UNINSTALL_DRY_RUN=1。若安装在其他位置，请将 ZAI_INSTALL_DIR 设置为该绝对路径。编辑器清理也会使用 ZAI_EDITOR_LSP_HOME 和 ZAI_EDITOR_PREVIEW_HOME；共享主题清理会使用 ZAI_THEME_CONFIG。运行前可打开脚本地址查看内容。"
+        }
+      ],
+      "screenshots": [
+        {
+          "src": "/apps/media/zai-gitter/context-menu.png",
+          "alt": {
+            "en": "A context menu over a Git diff with Copy code, Comment on lines, Ask AI about lines, and view controls.",
+            "zh-CN": "Git 差异上的右键菜单，包含复制代码、行批注、询问 AI 与视图控制。"
+          },
+          "caption": {
+            "en": "Review actions where the change happens. Captured terminal frame with demo content.",
+            "zh-CN": "改动在哪里，审阅操作就在哪里。使用演示内容捕获的终端画面。"
+          },
+          "width": 1356,
+          "height": 948
         }
       ]
     },
