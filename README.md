@@ -262,6 +262,8 @@ The persistent console server allows reconnection to the same host and runtime h
 
 The three context-menu images are actual terminal frames captured from the running apps at 132 × 38 cells in Kanagawa Wave, then rendered to PNG for the site. They use a task-owned demo workspace with synthetic Go code and a synthetic Git diff, not private project code or real agent transcripts. The console image is cropped below its pane border to omit the temporary capture path in the footer. The author requested the captures and authorized their use on these pages; the existing galleries and release assets are retained.
 
+The October 6, 2026 installer-first page update follows the author’s request to make the existing install/uninstall commands the first content section after the app heading and the preferred setup path on introduction and release pages. The setup and checksum wording follows the [publishing contract](releases/README.md#one-line-installers), and the existing catalog retains app-specific prerequisites and removal warnings. Package links remain available for manual installation; no new packages or platform availability are claimed.
+
 ## Local validation
 
 Install the local gate with `npm run hooks:install`. The hook requires the

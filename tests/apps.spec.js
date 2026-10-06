@@ -234,3 +234,68 @@ test("homepage explains the JavaScript requirement without hiding fallback navig
   await expect(page.getByRole("link", { name: "Read About me." })).toHaveAttribute("href", "/about/");
   await context.close();
 });
+
+
+test("scripted apps lead with install and uninstall commands on details and releases", async ({ page }) => {
+  // Keep real catalog commands; omit videos unsupported by headless WebKit.
+  const apps = structuredClone(catalog.apps);
+  apps.forEach((app) => { delete app.videos; });
+  await page.route("**/apps/catalog.json", (route) => route.fulfill({ json: { schemaVersion: 1, apps } }));
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", { value: {
+      writeText: async (text) => { window.copiedCommand = text; },
+    } });
+  });
+  for (const app of apps.filter((app) => app.installCommands?.length)) {
+    const manifest = releaseFixture(app.id);
+    manifest.release.assets = [manifest.release.assets[0]];
+    await page.route(`**/releases/${app.id}/latest/manifest.json`, (route) => route.fulfill({ json: manifest }));
+    for (const path of ["app", "releases"]) {
+      await page.goto(`/apps/${path}/?id=${app.id}&lang=en`);
+      const section = page.locator("#installation");
+      await expect(page.locator("#app-content > :nth-child(2)")).toHaveAttribute("id", "installation");
+      const commands = [...app.installCommands, ...(app.uninstallCommands ?? [])];
+      await expect(section.locator(".command-text")).toHaveText(commands.map((entry) => entry.command));
+      await expect(section.getByRole("heading", { name: "Install (recommended)", exact: true })).toBeVisible();
+      await section.getByText("Requirements and installation notes", { exact: true }).click();
+      await expect(section.locator(".installation-list")).toBeVisible();
+      await section.getByText("Requirements and installation notes", { exact: true }).click();
+      if (app.uninstallCommands?.length) {
+        await expect(section).toContainText("These commands delete the app and its local data.");
+        await section.locator(".command-copy").last().click();
+        expect(await page.evaluate(() => window.copiedCommand)).toBe(commands.at(-1).command);
+      }
+      await section.locator(".command-copy").first().click();
+      expect(await page.evaluate(() => window.copiedCommand)).toBe(app.installCommands[0].command);
+      await expect(section.locator('[role="status"]').first()).toHaveText("Copied");
+      if (path === "app") {
+        await expect(page.locator(".app-actions .button-primary")).toHaveAttribute("href", "#installation");
+        await expect(page.locator(".app-actions .button-primary")).toHaveText("Install ↓");
+      } else {
+        await expect(page.getByText(/These packages are available for manual installation/)).toBeVisible();
+        await expect(page.locator(".package-card")).toHaveCount(1);
+      }
+    }
+  }
+});
+
+test("release commands localize, fit narrow screens, and explain unpublished installers", async ({ page }) => {
+  await page.route("**/releases/zai-cli/latest/manifest.json", (route) => route.fulfill({
+    json: { schemaVersion: 1, appId: "zai-cli", release: null },
+  }));
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/apps/releases/?id=zai-cli&lang=en");
+  await expect(page.locator("#installation")).toContainText("The installer cannot install this app until a build is published.");
+  await expect(page.getByRole("heading", { name: "Not released here. Yet.", exact: true })).toBeVisible();
+  await expect(page.locator(".download-link")).toHaveCount(0);
+  const commands = await page.locator(".command-text").allTextContents();
+  await page.getByLabel("Language", { exact: true }).selectOption("zh-CN");
+  await expect(page.getByRole("heading", { name: "安装与卸载", exact: true })).toBeVisible();
+  await expect(page.locator("#installation")).toContainText("在发布安装包之前，安装脚本无法安装此应用。");
+  await expect(page.locator(".command-text")).toHaveText(commands);
+  await expect(page.getByRole("heading", { name: "卸载并清理应用数据", exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(results.violations).toEqual([]);
+});
