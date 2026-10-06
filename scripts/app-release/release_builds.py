@@ -43,6 +43,17 @@ def native_target():
     return f'{architecture}-{suffix}'
 
 
+def validation_python(runtime, source, name):
+    if name != 'zai-cli':
+        return sys.executable
+    environment = source / '.venv-local-ci'
+    runtime.run([sys.executable, '-B', '-m', 'venv', environment], cwd=source)
+    interpreter = environment / ('Scripts/python.exe' if sys.platform == 'win32' else 'bin/python')
+    runtime.run([interpreter, '-B', '-m', 'pip', 'install', '-r',
+                 '.github/skills/performance-measurement/requirements.txt'], cwd=source)
+    return interpreter
+
+
 def build(runtime, source, snapshot, version, output, site, notices):
     name = snapshot['repository'].split('/')[1]
     output.mkdir(parents=True)
@@ -51,7 +62,8 @@ def build(runtime, source, snapshot, version, output, site, notices):
         raise ValueError('zai-codex requires --codex-notices with reviewed dependency notices')
     runtime.stage = f'{name}:validation'
     # These gates are the repositories' required local validation; no hosted CI.
-    runtime.run([sys.executable, '-B', '.github/scripts/local_ci.py'], cwd=source)
+    interpreter = validation_python(runtime, source, name)
+    runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
     runtime.stage = f'{name}:build'
     if name == 'zai-codex':
         if not notices or not notices.is_dir():

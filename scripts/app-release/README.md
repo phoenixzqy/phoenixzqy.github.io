@@ -38,6 +38,12 @@ The source packagers and version allocation functions remain authoritative.
 The source's full local validation runs before building. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
+For zai-cli, the adapter creates `.venv-local-ci` in the disposable source clone,
+installs its pinned performance-toolkit requirements, and runs the gate with
+that environment's Python. This keeps validation dependencies available when
+tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
+to the configured package index. Setup failures stop the release before packaging;
+the environment is removed with the clone.
 No source branch or source tag is pushed. All public release tags target website
 commits. Every final archive is inspected for debug maps, separate symbols,
 unsafe paths and credential files, and checked against its manifest checksum.
