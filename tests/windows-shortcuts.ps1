@@ -6,11 +6,13 @@ $originalPath = $env:Path
 $scratch = Join-Path ([IO.Path]::GetTempPath()) ('zai-shortcut-test-' + [guid]::NewGuid().ToString('N'))
 $directory = Join-Path $scratch "space ' quote `$literal & test"
 $cmd = Join-Path $env:SystemRoot 'System32\cmd.exe'
+$testPath = Join-Path $env:SystemRoot 'System32'
 $helper = Get-Content -LiteralPath (Join-Path $SiteRoot 'install/templates/shortcuts.ps1.in') -Raw
 
 try {
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
     Push-Location $scratch
+    $env:Path = $testPath
     $helper | Invoke-Expression
     foreach ($pair in @(@('ze', 'zai-editor'), @('zg', 'zai-gitter'))) {
         $name, $command = $pair
@@ -23,14 +25,14 @@ try {
         if ([Convert]::ToBase64String([IO.File]::ReadAllBytes($launcher)) -cne [Convert]::ToBase64String($bytes)) {
             throw "$name changed on a repeat install"
         }
-        $env:Path = $directory + ';' + $originalPath
+        $env:Path = $directory + ';' + $testPath
         $output = & $name /d /c "echo two words"
         if ($LASTEXITCODE -ne 0 -or $output -notcontains 'two words') { throw "$name failed in PowerShell" }
         & $name /d /c 'exit 7'
         if ($LASTEXITCODE -ne 7) { throw "$name lost the executable exit status" }
         $output = & $cmd /d /c "$name /d /c echo cmd-fixture"
         if ($LASTEXITCODE -ne 0 -or $output -notcontains 'cmd-fixture') { throw "$name failed in CMD" }
-        $env:Path = $originalPath
+        $env:Path = $testPath
         Remove-Item -LiteralPath $launcher
 
         # Functions and aliases in the calling PowerShell session are taken.
@@ -45,10 +47,10 @@ try {
 
         # Check files both on PATH and inside the not-yet-activated install directory.
         Copy-Item -LiteralPath $cmd -Destination (Join-Path $scratch "$name.exe")
-        $env:Path = $scratch + ';' + $originalPath
+        $env:Path = $scratch + ';' + $testPath
         Install-Shortcut $directory $name $command
         if (Test-Path -LiteralPath $launcher) { throw "$name shadowed another PATH executable" }
-        $env:Path = $originalPath
+        $env:Path = $testPath
         Install-Shortcut $directory $name $command
         if (Test-Path -LiteralPath $launcher) { throw "$name shadowed a CMD current-directory executable" }
         Remove-Item -LiteralPath (Join-Path $scratch "$name.exe")

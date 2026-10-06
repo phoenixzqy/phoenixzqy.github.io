@@ -418,8 +418,7 @@ test("piped shell installers download and install macOS packages under POSIX Bas
         ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("macos", architecture, file, bytes)])))],
         [`/${file}`, bytes],
       ]), (origin) => withHome(async (home) => {
-        const bin = join(home, "bin");
-        await mkdir(bin);
+        const bin = await installerToolPath(home);
         await writeFile(join(bin, "uname"),
           `#!/bin/sh\ncase "$1" in -s) echo Darwin ;; -m) echo ${machine} ;; esac\n`, { mode: 0o755 });
         const installDir = join(home, "installed");
@@ -611,6 +610,12 @@ async function withToolPath(home, names) {
     await symlink(target, join(bin, name));
   }
   return bin;
+}
+
+async function installerToolPath(home, extra = []) {
+  const checksumTool = (await run(shellPath, ["-c", "command -v sha256sum || command -v shasum"])).stdout.trim().split("/").at(-1);
+  return withToolPath(home, ["python3", "curl", "mktemp", "rm", "sed", "cut", "wc", "tr", "mkdir",
+    "find", "cp", "chmod", "mv", "grep", "unzip", "ps", "sh", "tail", "cat", checksumTool, ...extra]);
 }
 
 test("Python preflight rejects missing, old, and broken interpreters before downloads", async () => {
@@ -943,7 +948,8 @@ test("tool installers add only their own available shortcuts, preserve collision
       [`/${file}`, bytes],
     ]), (origin) => withHome(async (home) => {
       const installDir = join(home, "space ' quote $HOME");
-      const options = { manifestUrl: `${origin}/manifest.json`, home, installDir };
+      const toolPath = await installerToolPath(home, ["uname"]);
+      const options = { manifestUrl: `${origin}/manifest.json`, home, installDir, path: toolPath };
       const pairs = [["ze", "zai-editor"], ["zg", "zai-gitter"]];
       const expected = pairs.filter(([, command]) => mode === "python" || command === executable);
       const result = await runInstaller(`${appId}.sh`, options);
@@ -972,7 +978,7 @@ test("tool installers add only their own available shortcuts, preserve collision
       const occupied = join(home, "other-bin");
       await mkdir(occupied);
       for (const [name] of expected) await writeFile(join(occupied, name), "#!/bin/sh\necho unrelated\n", { mode: 0o755 });
-      const conflict = await runInstaller(`${appId}.sh`, { ...options, path: `${occupied}:${process.env.PATH}` });
+      const conflict = await runInstaller(`${appId}.sh`, { ...options, path: `${occupied}:${toolPath}` });
       assert.equal(conflict.code, 0, conflict.stderr);
       for (const [name] of expected) {
         await assert.rejects(stat(join(installDir, name)), /ENOENT/);
