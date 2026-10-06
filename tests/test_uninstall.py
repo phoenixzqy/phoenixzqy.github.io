@@ -28,6 +28,42 @@ APPS = list(load_app())
 
 
 class UninstallTests(unittest.TestCase):
+    def test_only_owned_shortcuts_for_removed_apps_are_deleted(self):
+        for app in APPS:
+            def body(home, directory):
+                for name, command in (("ze", "zai-editor"), ("zg", "zai-gitter")):
+                    (directory / command).write_text("binary")
+                    (directory / (command + ".exe")).write_text("binary")
+                    if os.name != "nt":
+                        (directory / name).symlink_to(command)
+                    content = (f'@echo off\r\nrem zai shortcut: {name} -> {command}\r\n'
+                               f'"%~dp0{command}.exe" %*\r\n').encode("ascii")
+                    (directory / (name + ".cmd")).write_bytes(content)
+                app.uninstall(directory, True)
+                self.assertTrue((directory / "ze.cmd").exists())
+                app.uninstall(directory)
+                for name, command in (("ze", "zai-editor"), ("zg", "zai-gitter")):
+                    retained = command != app.EXECUTABLE
+                    self.assertEqual((directory / (name + ".cmd")).exists(), retained)
+                    if os.name != "nt":
+                        self.assertEqual((directory / name).is_symlink(), retained)
+            self.run_case(app, body)
+
+    def test_unrelated_shortcuts_survive_uninstall(self):
+        for app in APPS:
+            def body(home, directory):
+                (directory / app.EXECUTABLE).write_text("binary")
+                for name in ("ze", "zg"):
+                    (directory / (name + ".cmd")).write_text("unrelated launcher")
+                    if os.name != "nt":
+                        (directory / name).symlink_to("unrelated-target")
+                app.uninstall(directory)
+                for name in ("ze", "zg"):
+                    self.assertEqual((directory / (name + ".cmd")).read_text(), "unrelated launcher")
+                    if os.name != "nt":
+                        self.assertEqual(os.readlink(directory / name), "unrelated-target")
+            self.run_case(app, body)
+
     def test_entrypoints_embed_same_implementation(self):
         for app in APPS:
             python = Path(app.__file__).read_text().rstrip()

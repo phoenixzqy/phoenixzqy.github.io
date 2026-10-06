@@ -26,5 +26,7 @@
             Write-Host "Installed command: $app"
         }
     }
+    Install-Shortcut $installDir 'ze' 'zai-editor'
+    Install-Shortcut $installDir 'zg' 'zai-gitter'
     Show-Activation $installDir '@EXECUTABLE@'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"

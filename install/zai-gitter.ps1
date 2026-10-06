@@ -155,6 +155,49 @@ function Show-Activation([string] $directory, [string] $command) {
     Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
     Write-Host ("  & " + $quotedCommand)
 }
+function Install-Shortcut([string] $directory, [string] $name, [string] $command) {
+    if (-not (Test-Path -LiteralPath (Join-Path $directory "$command.exe") -PathType Leaf)) { return }
+    $launcher = Join-Path $directory "$name.cmd"
+    $taken = (Get-Command $name -All -ErrorAction SilentlyContinue) -or
+        (Get-Item -LiteralPath $launcher -Force -ErrorAction SilentlyContinue)
+    # CMD also searches its current directory, unlike PowerShell.
+    $currentDirectories = @($directory, [Environment]::CurrentDirectory)
+    $location = Get-Location
+    if ($location.Provider.Name -eq 'FileSystem') { $currentDirectories += $location.ProviderPath }
+    $extensions = @('') + @($env:PATHEXT -split ';') + @('.exe', '.cmd', '.bat', '.com', '.ps1')
+    foreach ($currentDirectory in $currentDirectories) {
+        foreach ($extension in $extensions) {
+            if (Get-Item -LiteralPath (Join-Path $currentDirectory ($name + $extension)) -Force -ErrorAction SilentlyContinue) {
+                $taken = $true
+            }
+        }
+    }
+    # A PowerShell child of CMD shares the console's DOSKEY macros.
+    if ($env:OS -eq 'Windows_NT') {
+        $doskey = Join-Path $env:SystemRoot 'System32\doskey.exe'
+        if (Test-Path -LiteralPath $doskey) {
+            if (& $doskey /macros:cmd.exe | Where-Object { $_ -imatch ('^' + [regex]::Escape($name) + '=') }) {
+                $taken = $true
+            }
+        }
+    }
+    if ($taken) {
+        Write-Host "Skipped shortcut ${name}: the name is already taken."
+        return
+    }
+    # A relative CMD launcher works in both PowerShell and CMD, forwards all
+    # arguments, and always follows updates to the canonical executable.
+    $content = "@echo off`r`nrem zai shortcut: $name -> $command`r`n`"%~dp0$command.exe`" %*`r`n"
+    $bytes = [Text.Encoding]::ASCII.GetBytes($content)
+    try {
+        $stream = [IO.File]::Open($launcher, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    } catch [IO.IOException] {
+        Write-Host "Skipped shortcut ${name}: the launcher could not be created."
+        return
+    }
+    try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+    Write-Host "Installed shortcut: $name -> $command"
+}
 $architecture = Get-Architecture
 $work = Join-Path ([System.IO.Path]::GetTempPath()) ("zai-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
@@ -241,6 +284,7 @@ try {
         ForEach-Object { Copy-Item -Path $_.FullName -Destination $licenseDir -Force }
 
     Add-UserPath $installDir
+    Install-Shortcut $installDir 'zg' 'zai-gitter'
 
     Write-Host ''
     Write-Host 'Installed command: zai-gitter'

@@ -28,5 +28,7 @@ for app in zai zai-editor zai-gitter; do
     info "Installed command: $app"
   fi
 done
+install_shortcut ze zai-editor
+install_shortcut zg zai-gitter
 show_activation "$INSTALL_DIR" "$EXECUTABLE"
 info "Documentation: $SITE/apps/docs/?id=$APP_ID"
