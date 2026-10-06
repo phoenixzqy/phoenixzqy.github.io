@@ -104,6 +104,9 @@ html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style
 .platform-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 35px; }
 .platform-card { border-top: 1px solid var(--line); padding-block: 24px; }
 .platform-card h3 { font-size: 19px; margin-bottom: 10px; }
+.app-installation h3 { margin-bottom: 12px; }
+.installation-notes { margin-bottom: 30px; }
+.installation-notes summary { color: var(--accent); cursor: pointer; margin-bottom: 16px; }
 .installation-list { padding-left: 20px; max-width: 880px; color: var(--muted); font-size: 14px; }
 .installation-list li { padding-left: 10px; margin-bottom: 16px; }
 .installation-list li::marker { color: var(--accent); font-family: var(--mono); font-size: 11px; }

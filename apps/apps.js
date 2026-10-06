@@ -348,12 +348,49 @@ function comparisonSection(app) {
   section.append(source);
   return section;
 }
+function installationSection(app, available = true) {
+  const install = element("section", "app-section app-installation");
+  install.id = "installation";
+  const scripted = app.installCommands?.length || app.uninstallCommands?.length;
+  const title = scripted ? (app.uninstallCommands?.length ? "installationHeading" : "installOnlyHeading") : "context";
+  install.append(paragraph(t("beforeStart"), "eyebrow section-index"), element("h2", "", t(title)));
+  if (app.installCommands?.length) {
+    install.append(element("h3", "", t("installHeading")));
+    if (!available) install.append(paragraph(t("installerUnavailable"), "gallery-intro"));
+    install.append(paragraph(t("installCommandsIntro"), "gallery-intro"));
+    const commands = element("div", "command-list");
+    app.installCommands.forEach((entry) => commands.append(commandBlock(entry)));
+    install.append(commands);
+  }
+  const steps = element("ol", "installation-list");
+  app.installation.forEach((text) => steps.append(element("li", "", text)));
+  if (scripted) {
+    const notes = element("details", "installation-notes");
+    notes.append(element("summary", "", t("installationNotes")), steps);
+    install.append(notes);
+  } else install.append(steps);
+  if (app.uninstallCommands?.length) {
+    install.append(element("h3", "", t("uninstallHeading")), paragraph(t("uninstallCommandsIntro"), "gallery-intro"));
+    const commands = element("div", "command-list");
+    app.uninstallCommands.forEach((entry) => commands.append(commandBlock(entry)));
+    install.append(commands);
+    app.uninstallation?.forEach((text) => install.append(paragraph(text)));
+  }
+  if (app.documentation) {
+    const more = paragraph("");
+    more.className = "docs-pointer";
+    more.append(link(t("readDocumentation", { name: app.name }), docsHref(app.id)));
+    install.append(more);
+  }
+  return install;
+}
 function renderDetail(app) {
   const hero = element("section", "app-detail-hero");
   const intro = heading(`${app.category} / ${app.stage.toUpperCase()}`, app.name, app.tagline);
   intro.append(paragraph(app.summary, "app-summary"), tags(app));
   const actions = element("div", "app-actions");
-  actions.append(link(t("viewReleases"), releasesHref(app.id), "button button-primary"), link(t("allApps"), appsHref()));
+  if (app.installCommands?.length) actions.append(link(t("installAction"), "#installation", "button button-primary"));
+  actions.append(link(t("viewReleases"), releasesHref(app.id), app.installCommands?.length ? "button button-secondary" : "button button-primary"), link(t("allApps"), appsHref()));
   if (app.documentation) actions.append(link(t("documentation"), docsHref(app.id)));
   intro.append(actions);
   hero.append(intro, appArt(app, true));
@@ -373,37 +410,18 @@ function renderDetail(app) {
   });
   featureSection.append(features);
   const platforms = platformSection(app);
-  const install = element("section", "app-section");
-  install.append(paragraph(t("beforeStart"), "eyebrow section-index"), element("h2", "", t("context")));
-  if (app.installCommands?.length) {
-    install.append(paragraph(t("installCommandsIntro"), "gallery-intro"));
-    const commands = element("div", "command-list");
-    app.installCommands.forEach((entry) => commands.append(commandBlock(entry)));
-    install.append(commands);
-  }
-  const steps = element("ol", "installation-list");
-  app.installation.forEach((text) => steps.append(element("li", "", text)));
-  install.append(steps);
-  if (app.uninstallCommands?.length) {
-    install.append(element("h3", "", t("uninstallHeading")), paragraph(t("uninstallCommandsIntro"), "gallery-intro"));
-    const commands = element("div", "command-list");
-    app.uninstallCommands.forEach((entry) => commands.append(commandBlock(entry)));
-    install.append(commands);
-    app.uninstallation?.forEach((text) => install.append(paragraph(text)));
-  }
-  if (app.documentation) {
-    const more = paragraph("");
-    more.className = "docs-pointer";
-    more.append(link(t("readDocumentation", { name: app.name }), docsHref(app.id)));
-    install.append(more);
-  }
-  content.replaceChildren(hero, story);
+  content.replaceChildren(hero);
+  const install = installationSection(app);
+  if (app.installCommands?.length || app.uninstallCommands?.length) content.append(install);
+  content.append(story);
   if (comparison) content.append(comparison);
   if (gallery) content.append(gallery);
   if (videos) content.append(videos);
   const legal = notice(t("responsible"), app.notice);
   if (app.licenseNotices) legal.append(licenseNotices(app));
-  content.append(featureSection, platforms, install, legal);
+  content.append(featureSection, platforms);
+  if (!app.installCommands?.length && !app.uninstallCommands?.length) content.append(install);
+  content.append(legal);
 }
 // The first screenshot leads the gallery. Later landscape captures take a full
 // row, and small ones keep their natural size instead of being upscaled.
@@ -474,6 +492,7 @@ function renderReleases(app, manifest) {
   hero.append(link(t("aboutApp", { name: app.name }), detailHref(app.id)));
   content.replaceChildren(hero);
   const release = manifest.release;
+  if (app.installCommands?.length || app.uninstallCommands?.length) content.append(installationSection(app, release !== null));
   if (release === null) {
     const empty = element("section", "release-empty");
     empty.append(paragraph(t("awaiting"), "mono"), element("h2", "", t("emptyHeading")), paragraph(t("emptyText")));
@@ -492,6 +511,7 @@ function renderReleases(app, manifest) {
   content.append(summary, notice(t("beforeInstall"), t("signingHelp")));
   const downloads = element("section", "app-section");
   downloads.append(element("h2", "", t("choosePackage")));
+  if (app.installCommands?.length) downloads.append(paragraph(t("manualDownloadsIntro"), "gallery-intro"));
   const filters = element("div", "platform-filter");
   const label = element("label", "mono", t("platform"));
   label.htmlFor = "platform-filter";
