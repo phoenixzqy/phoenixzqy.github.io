@@ -86,6 +86,11 @@ testing.
 
 Run `npm run hooks:install` once per checkout to enable `.githooks/pre-push`
 locally. Commit intended changes and stop any preview server before pushing:
-the hook tests the current working tree, runs `npm test`, and blocks a failing
-push. It is not server-side CI and other clones or release automation must
+the hook requires a clean worktree and outgoing tips matching HEAD. Code or
+unclassified changes run `npm test`; contributor prose runs the hook tests,
+and mirrored docs additionally run metadata/integrity and privacy checks.
+Every selected check must pass, followed by a final HEAD/worktree check.
+Classification covers every outgoing commit; see
+[README](README.md#local-validation). It is not server-side CI and other clones
+or release automation must
 enable it separately.

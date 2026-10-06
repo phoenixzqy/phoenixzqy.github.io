@@ -253,3 +253,27 @@ privacy-reviewed revisions in `apps/docs/sources.json`. Repository-owned
 release scripts produce the six unsigned archives per app; byte counts and
 SHA-256 values come from the final packages. Cross-compilation does not
 establish native macOS or Windows behavior.
+
+## Local validation
+
+Install the local gate with `npm run hooks:install`. The hook requires the
+outgoing refs to resolve to the checked-out HEAD and a clean index/worktree,
+including untracked files, before and after validation. Direct `npm test`
+always runs the complete suite.
+
+Contributor prose (`README.md`, root agent guidance, `.github/**/*.md`, the
+release README files, and `scripts/app-release/README.md`) runs the hook
+regression tests without browser/PDF checks. Changes limited to Markdown,
+JSON, and PNG/JPEG/GIF/WebP assets under `apps/docs/` also run
+`npm run validate:apps` and `tests/docs-mirror.test.js`, retaining mirror
+integrity and privacy validation. Published docs are not excluded as prose.
+
+All other paths, symlink or executable-mode changes, and mixed code/docs
+pushes run `npm test`. The classifier examines every outgoing commit across
+all refs, includes both sides of renames and reverted source changes, and
+defaults to the full suite for missing history, non-ancestor updates, empty
+change sets, or more than 200 commits. Existing refs use the remote tip; new
+refs use the merge base with locally fetched `origin/main`. Without that
+history the full suite runs. Deletion-only pushes need no source validation.
+The hook prints the selected scope, outgoing HEAD, and final cleanliness result;
+a failed selected check blocks the push.
