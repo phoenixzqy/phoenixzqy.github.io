@@ -18,6 +18,7 @@ find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING
   -o -name 'THIRD-PARTY*' -o -name 'THIRD_PARTY*' \) -exec cp {} "$LICENSE_DIR/" \; 2>/dev/null || true
 
 ensure_on_path "$INSTALL_DIR"
+install_shortcut '@SHORTCUT@' "$EXECUTABLE"
 
 info ''
 info "Installed command: $EXECUTABLE"

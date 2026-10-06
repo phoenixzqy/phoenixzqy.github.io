@@ -439,6 +439,9 @@ test("piped shell installers download and install macOS packages under POSIX Bas
           assert.equal(await readFile(join(home, "receipt"), "utf8"), "installed");
         } else {
           assert.match(await readFile(join(installDir, executable), "utf8"), /macOS fixture/);
+          const shortcut = appId === "zai-editor" ? "ze" : "zg";
+          assert.equal(await readlink(join(installDir, shortcut)), executable);
+          assert.match((await run(join(installDir, shortcut))).stdout, /macOS fixture/);
         }
       }));
     }
@@ -917,6 +920,88 @@ if ($env:PATH -cne $env:ZAI_TEST_BIN) { throw 'Empty PATH activation failed.' }
     });
     for (const app of ["zai", "zai-editor", "zai-gitter"]) {
       assert.match(stdout, new RegExp(`${app} activated-fixture`));
+    }
+  });
+});
+
+test("tool installers add only their own available shortcuts, preserve collisions, and support upgrades", async () => {
+  for (const { appId, mode, executable } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
+    const file = `${appId}.zip`;
+    const binary = "#!/bin/sh\nprintf '%s\\n' \"$0\" \"$@\"\nexit 7\n";
+    const bytes = createZip(mode === "python" ? {
+      "install.py": [
+        "import pathlib, sys",
+        "directory = pathlib.Path(sys.argv[sys.argv.index('--install-dir') + 1])",
+        "directory.mkdir(parents=True, exist_ok=True)",
+        "for name in ('zai', 'zai-editor', 'zai-gitter'):",
+        `    (directory / name).write_text(${JSON.stringify(binary)})`,
+        "    (directory / name).chmod(0o755)",
+      ].join("\n"),
+    } : { [executable]: binary });
+    await withServer(new Map([
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", "x64", file, bytes)])))],
+      [`/${file}`, bytes],
+    ]), (origin) => withHome(async (home) => {
+      const installDir = join(home, "space ' quote $HOME");
+      const options = { manifestUrl: `${origin}/manifest.json`, home, installDir };
+      const pairs = [["ze", "zai-editor"], ["zg", "zai-gitter"]];
+      const expected = pairs.filter(([, command]) => mode === "python" || command === executable);
+      const result = await runInstaller(`${appId}.sh`, options);
+      assert.equal(result.code, 0, result.stderr);
+      for (const [name, command] of expected) {
+        assert.equal(await readlink(join(installDir, name)), command);
+        await assert.rejects(run(join(installDir, name), ["two words", "quote ' $HOME"]), (error) => {
+          assert.equal(error.code, 7);
+          assert.deepEqual(error.stdout.trimEnd().split("\n").slice(1), ["two words", "quote ' $HOME"]);
+          return true;
+        });
+      }
+      for (const [name] of pairs.filter((pair) => !expected.includes(pair))) {
+        await assert.rejects(stat(join(installDir, name)), /ENOENT/);
+      }
+      await assert.rejects(stat(join(installDir, "z")), /ENOENT/);
+      const repeat = await runInstaller(`${appId}.sh`, options);
+      assert.equal(repeat.code, 0, repeat.stderr);
+      assert.match(repeat.stdout, /Skipped shortcut .*already taken/);
+      // Relative links continue to launch the canonical executable after an upgrade.
+      for (const [name, command] of expected) {
+        await writeFile(join(installDir, command), "#!/bin/sh\necho upgraded\n");
+        assert.equal((await run(join(installDir, name))).stdout.trim(), "upgraded");
+        await rm(join(installDir, name));
+      }
+      const occupied = join(home, "other-bin");
+      await mkdir(occupied);
+      for (const [name] of expected) await writeFile(join(occupied, name), "#!/bin/sh\necho unrelated\n", { mode: 0o755 });
+      const conflict = await runInstaller(`${appId}.sh`, { ...options, path: `${occupied}:${process.env.PATH}` });
+      assert.equal(conflict.code, 0, conflict.stderr);
+      for (const [name] of expected) {
+        await assert.rejects(stat(join(installDir, name)), /ENOENT/);
+        assert.match(await readFile(join(occupied, name), "utf8"), /unrelated/);
+        await symlink("missing-user-target", join(installDir, name));
+      }
+      const dangling = await runInstaller(`${appId}.sh`, options);
+      assert.equal(dangling.code, 0, dangling.stderr);
+      for (const [name] of expected) assert.equal(await readlink(join(installDir, name)), "missing-user-target");
+    }));
+  }
+});
+
+test("shortcut helper respects functions and aliases visible to its shell", async () => {
+  const helper = await readFile(join(siteRoot, "install/templates/shortcuts.sh.in"), "utf8");
+  await withHome(async (home) => {
+    for (const shell of ["sh", "bash", ...(zshAvailable ? ["zsh"] : [])]) {
+      const installDir = join(home, shell);
+      await mkdir(installDir);
+      await writeFile(join(installDir, "zai-editor"), "fixture", { mode: 0o755 });
+      await writeFile(join(installDir, "zai-gitter"), "fixture", { mode: 0o755 });
+      const script = helper + '\ninfo() { printf "%s\\n" "$1"; }\n' +
+        'ze() { :; }\nalias zg="echo existing"\nINSTALL_DIR=$1\n' +
+        'install_shortcut ze zai-editor\ninstall_shortcut zg zai-gitter\n';
+      const result = await run(shell, ["-c", script, shell, installDir]);
+      assert.match(result.stdout, /Skipped shortcut ze: the name is already taken/);
+      assert.match(result.stdout, /Skipped shortcut zg: the name is already taken/);
+      await assert.rejects(stat(join(installDir, "ze")), /ENOENT/);
+      await assert.rejects(stat(join(installDir, "zg")), /ENOENT/);
     }
   });
 });

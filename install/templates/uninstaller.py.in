@@ -210,9 +210,27 @@ def config_home(home: Path) -> Path:
     return Path(os.environ.get("XDG_CONFIG_HOME", str(home / ".config")))
 
 
+def shortcut_paths(directory: Path, removals: list[Path]) -> list[Path]:
+    paths = []
+    for name, command in (("ze", "zai-editor"), ("zg", "zai-gitter")):
+        if not any(directory / (command + suffix) in removals for suffix in ("", ".exe")):
+            continue  # A retained sibling keeps its shortcut.
+        link = directory / name
+        if link.is_symlink() and os.readlink(link) == command:
+            paths.append(link)
+        launcher = directory / (name + ".cmd")
+        content = (f'@echo off\r\nrem zai shortcut: {name} -> {command}\r\n'
+                   f'"%~dp0{command}.exe" %*\r\n').encode("ascii")
+        if (not linked(launcher) and launcher.is_file() and launcher.stat().st_size == len(content)
+                and launcher.read_bytes() == content):
+            paths.append(launcher)
+    return paths
+
+
 def plan(home: Path, directory: Path) -> tuple[list[Path], list[tuple[Path, dict]]]:
     paths = [directory / (EXECUTABLE + suffix) for suffix in ("", ".exe")]
     paths.append(directory / "licenses" / APP_ID)
+    paths.extend(shortcut_paths(directory, paths))
     if APP_ID == "zai-cli":
         paths.extend(directory / name for name in CLI_PATHS if name != "releases")
         releases = directory / "releases"

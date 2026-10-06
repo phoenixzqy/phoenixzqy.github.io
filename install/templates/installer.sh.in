@@ -36,6 +36,7 @@ info() {
 }
 
 @ACTIVATION_HELPER@
+@SHORTCUT_HELPER@
 # --- Platform -------------------------------------------------------------
 case "$(uname -s)" in
   Linux*) PLATFORM=linux ;;

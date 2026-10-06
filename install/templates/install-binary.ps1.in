@@ -17,6 +17,7 @@
         ForEach-Object { Copy-Item -Path $_.FullName -Destination $licenseDir -Force }
 
     Add-UserPath $installDir
+    Install-Shortcut $installDir '@SHORTCUT@' '@EXECUTABLE@'
 
     Write-Host ''
     Write-Host 'Installed command: @EXECUTABLE@'

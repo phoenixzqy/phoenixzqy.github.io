@@ -89,6 +89,25 @@ show_activation() {
   esac
   printf '%s\n' 'Run the command above in your current shell; a child installer cannot update its parent shell.'
 }
+install_shortcut() {
+  shortcut_name=$1
+  shortcut_command=$2
+  shortcut_path="$INSTALL_DIR/$shortcut_name"
+  [ -x "$INSTALL_DIR/$shortcut_command" ] || return 0
+  # Also preserve non-executable files, directories, and dangling symlinks.
+  if command -v "$shortcut_name" >/dev/null 2>&1 || alias "$shortcut_name" >/dev/null 2>&1 ||
+      [ -e "$shortcut_path" ] || [ -L "$shortcut_path" ]; then
+    info "Skipped shortcut $shortcut_name: the name is already taken."
+    return 0
+  fi
+  # os.symlink creates exactly this path without replacing an existing entry,
+  # including when another installer creates it after the check above.
+  if "$PYTHON" -c 'import os, sys; os.symlink(sys.argv[1], sys.argv[2])' "$shortcut_command" "$shortcut_path"; then
+    info "Installed shortcut: $shortcut_name -> $shortcut_command"
+  else
+    info "Skipped shortcut $shortcut_name: the launcher could not be created."
+  fi
+}
 # --- Platform -------------------------------------------------------------
 case "$(uname -s)" in
   Linux*) PLATFORM=linux ;;
@@ -322,6 +341,7 @@ find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING
   -o -name 'THIRD-PARTY*' -o -name 'THIRD_PARTY*' \) -exec cp {} "$LICENSE_DIR/" \; 2>/dev/null || true
 
 ensure_on_path "$INSTALL_DIR"
+install_shortcut 'zg' "$EXECUTABLE"
 
 info ''
 info "Installed command: $EXECUTABLE"
