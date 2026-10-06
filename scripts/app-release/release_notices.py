@@ -8,6 +8,7 @@ from release_packages import verify_file
 def notices_text(data, output, expected_commit):
     version = data['release']['version']
     sections = [f"zai-codex {version} — license and third-party notices\nSource commit: {expected_commit}\n"]
+    notices = {}
     for asset in data['release']['assets']:
         package = output / asset['file']
         verify_file(package, asset)
@@ -21,7 +22,9 @@ def notices_text(data, output, expected_commit):
                 raise ValueError('Codex archive has no third-party notices')
             if sum(archive.getinfo(name).file_size for name in names) > 10 * 1024 * 1024:
                 raise ValueError('Codex license material exceeds the publication size limit')
-            sections.append(f"\nPackage: {asset['file']}\n")
             for name in names:
-                sections.append(f'\n===== {name} =====\n\n{archive.read(name).decode("utf-8")}\n')
+                body = archive.read(name).decode('utf-8')
+                notices.setdefault((name, body), []).append(asset['file'])
+    for (name, body), packages in notices.items():
+        sections.append(f'\n===== {name} =====\nPackages: {", ".join(packages)}\n\n{body}\n')
     return '\n'.join(sections)

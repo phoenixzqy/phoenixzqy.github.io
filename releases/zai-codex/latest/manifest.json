@@ -6,9 +6,9 @@
     "channel": "preview",
     "publishedAt": "2026-10-01T23:32:00Z",
     "notes": [
-      "First public Linux x64 preview with GitHub Copilot subscription support; telemetry and remote diagnostic uploads are disabled.",
+      "Linux x64, macOS ARM64 and Windows x64 preview packages with GitHub Copilot subscription support; telemetry and remote diagnostic uploads are disabled.",
       "Installs as codex. Internal package version matches the executable so normal background-server launch works.",
-      "macOS, Windows and Linux ARM64 packages have not been published. Live account login/inference and the full workspace test suite have not been completed."
+      "macOS ARM64 was cross-compiled locally and has not been run on a Mac. Windows x64 was built on the local Windows host and passed version and Copilot login-help checks. Live account login/inference and a passing full workspace test suite remain unverified. Other architecture combinations are not published."
     ],
     "assets": [
       {
@@ -21,6 +21,28 @@
         "signing": "unsigned",
         "installNotes": "Linux x64, glibc 2.39+, OpenSSL 3, libcap2, zlib, zstd and libtinfo6. Python 3.10+ is required for the installer. Run codex after installation. Unsigned preview; keep the complete bundle together. Alpine/musl is unsupported.",
         "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.0/zai-codex-0.1.0-x86_64-unknown-linux-gnu.zip"
+      },
+      {
+        "name": "zai-codex for macOS ARM64",
+        "platform": "macos",
+        "architecture": "arm64",
+        "file": "zai-codex-0.1.0-aarch64-apple-darwin.zip",
+        "bytes": 132594286,
+        "sha256": "899c0fac8f72198c474f19b10d324a12848a0288ddc10240e41d5291ef7b58d1",
+        "signing": "ad-hoc",
+        "installNotes": "Apple Silicon macOS 12+. Cross-compiled preview; native macOS execution has not been tested. Ad-hoc signed, not Developer ID signed or notarized. Python 3.10+ is required for the installer. Keep the complete bundle together and follow macOS security prompts.",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.0/zai-codex-0.1.0-aarch64-apple-darwin.zip"
+      },
+      {
+        "name": "zai-codex for Windows x64",
+        "platform": "windows",
+        "architecture": "x64",
+        "file": "zai-codex-0.1.0-x86_64-pc-windows-msvc.zip",
+        "bytes": 141892501,
+        "sha256": "6967e707638760d9b80da52d27599f70e9b44d06658ae5743067493f1f19982d",
+        "signing": "unsigned",
+        "installNotes": "Windows 10+ x64. Unsigned preview; follow Windows security prompts. Python 3.10+ is required for the installer. Keep the complete bundle together, then run codex.cmd from the launcher directory.",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.0/zai-codex-0.1.0-x86_64-pc-windows-msvc.zip"
       }
     ]
   }

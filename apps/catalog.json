@@ -1779,22 +1779,22 @@
         "Use your GitHub account and an eligible Copilot subscription in the Codex command-line coding agent.",
         "Telemetry and remote diagnostic uploads are disabled; local diagnostic logs remain available."
       ],
-      "stage": "Linux x64 preview",
+      "stage": "Linux x64, macOS arm64, Windows x64 preview",
       "platforms": [
         {
           "id": "linux",
           "name": "Linux",
-          "status": "Unsigned Linux x64 preview. Requires glibc 2.39+ and the runtime libraries listed on the download page."
+          "status": "Available preview packages: x64 (unsigned). See the download page for package requirements."
         },
         {
           "id": "macos",
           "name": "macOS",
-          "status": "No public package has been published yet."
+          "status": "Available preview packages: arm64 (ad-hoc). See the download page for package requirements."
         },
         {
           "id": "windows",
           "name": "Windows",
-          "status": "No public package has been published yet."
+          "status": "Available preview packages: x64 (unsigned). See the download page for package requirements."
         }
       ],
       "features": [
@@ -1819,7 +1819,7 @@
         }
       ],
       "installation": [
-        "The Linux x64 preview is available. Linux ARM64, macOS and Windows packages have not been published yet.",
+        "Available preview packages: Linux x64, macOS arm64, Windows x64. Other platform and architecture combinations are not published for this release.",
         "Python 3.10+ is required. The installer verifies the package checksum, keeps its full bundle together, and installs this fork as the codex command.",
         "Add ~/.local/bin to PATH if needed, then run codex (codex.cmd on Windows). Sign in with your own eligible GitHub Copilot account."
       ],
