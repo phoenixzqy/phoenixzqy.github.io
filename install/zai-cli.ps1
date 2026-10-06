@@ -134,11 +134,25 @@ function Add-UserPath([string] $directory) {
 }
 
 function Show-Activation([string] $directory, [string] $command) {
+    # irm | iex runs in the calling PowerShell process. The bundled Python
+    # installer and registry updates cannot change this process's environment.
+    $separator = [IO.Path]::PathSeparator
+    $normalized = $directory.TrimEnd([char[]]'\/')
+    $present = @($env:PATH -split [regex]::Escape([string]$separator) |
+        Where-Object { $_.TrimEnd([char[]]'\/') -ieq $normalized }).Count -gt 0
+    if (-not $present) {
+        if ([string]::IsNullOrEmpty($env:PATH)) { $env:PATH = $directory }
+        else { $env:PATH = $directory + $separator + $env:PATH }
+    }
+
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
     Write-Host ''
-    Write-Host 'To use the app in this PowerShell terminal, copy and run:'
-    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    Write-Host 'Ready in this PowerShell session. Run:'
     $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+    Write-Host ''
+    Write-Host 'If the installer ran in a separate process, activate your calling PowerShell terminal:'
+    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
     Write-Host ("  & " + $quotedCommand)
 }
 $architecture = Get-Architecture

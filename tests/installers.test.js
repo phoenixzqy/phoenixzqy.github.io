@@ -877,3 +877,46 @@ test("PowerShell activation quotes paths without executing their contents", {
     assert.ok(activated.stdout.startsWith(directory + (process.platform === "win32" ? ";" : ":")));
   });
 });
+
+test("PowerShell irm | iex activation exposes commands immediately and preserves PATH", {
+  skip: !powerShellPath && "PowerShell is unavailable on this host",
+}, async () => {
+  const helper = await readFile(join(siteRoot, "install/templates/activate-shell.ps1.in"), "utf8");
+  await withHome(async (home) => {
+    const directory = join(home, "space ' quote $HOME");
+    await mkdir(directory);
+    for (const app of ["zai", "zai-editor", "zai-gitter"]) {
+      await writeFile(join(directory, `${app}.ps1`), `Write-Output '${app} activated-fixture'`);
+    }
+    const bootstrap = join(home, "bootstrap.ps1");
+    await writeFile(bootstrap, helper + "\nShow-Activation $env:ZAI_TEST_BIN zai");
+    const driver = join(home, "driver.ps1");
+    await writeFile(driver, `
+$ErrorActionPreference = 'Stop'
+$original = $env:PATH
+$separator = [IO.Path]::PathSeparator
+$expected = $env:ZAI_TEST_BIN + $separator + $original
+# Invoke-Expression runs downloaded content in the calling PowerShell process.
+Get-Content -LiteralPath $env:ZAI_TEST_BOOTSTRAP -Raw | Invoke-Expression
+if ($env:PATH -cne $expected) { throw 'Current session PATH was not activated or original entries changed.' }
+& zai
+& zai-editor
+& zai-gitter
+Get-Content -LiteralPath $env:ZAI_TEST_BOOTSTRAP -Raw | Invoke-Expression
+if ($env:PATH -cne $expected) { throw 'Repeat installation duplicated the PATH entry.' }
+$env:PATH = $env:ZAI_TEST_BIN.ToUpperInvariant() + '/' + $separator + $original
+$existing = $env:PATH
+Get-Content -LiteralPath $env:ZAI_TEST_BOOTSTRAP -Raw | Invoke-Expression
+if ($env:PATH -cne $existing) { throw 'An equivalent directory was duplicated.' }
+$env:PATH = ''
+Get-Content -LiteralPath $env:ZAI_TEST_BOOTSTRAP -Raw | Invoke-Expression
+if ($env:PATH -cne $env:ZAI_TEST_BIN) { throw 'Empty PATH activation failed.' }
+`);
+    const { stdout } = await run(powerShellPath, ["-NoProfile", "-File", driver], {
+      env: { ...process.env, ZAI_TEST_BIN: directory, ZAI_TEST_BOOTSTRAP: bootstrap },
+    });
+    for (const app of ["zai", "zai-editor", "zai-gitter"]) {
+      assert.match(stdout, new RegExp(`${app} activated-fixture`));
+    }
+  });
+});
