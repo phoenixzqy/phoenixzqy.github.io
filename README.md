@@ -254,10 +254,34 @@ release scripts produce the six unsigned archives per app; byte counts and
 SHA-256 values come from the final packages. Cross-compilation does not
 establish native macOS or Windows behavior.
 
-The October 6, 2026 app-page refresh follows the author's request to feature context menus in zai-cli, zai-editor, and zai-gitter, and the local persistent console server in zai-cli. English and Simplified Chinese copy was checked against installed app help and the author's current console-server, editor, and Git viewer user guides. The console lifecycle evidence is for a forthcoming feature at source revision `9f30ab0043310c1133a37d73f0961cfbd815f003`, not a feature delivered by the current download; editor menu evidence is at `cb0431be93bacc8adcca005723906c66fcdc8cc3`, and Git viewer menu evidence is at `aedd68337cc36c8a388cdfcbe9de201f6b226702`. Only public-facing behavior is paraphrased here; no private source or internal runbook is copied.
+The October 6, 2026 app-page refresh follows the author's request to feature context menus in zai-cli, zai-editor, and zai-gitter, and the local persistent console server in zai-cli. English and Simplified Chinese copy was checked against installed app help and the author's current console-server, editor, and Git viewer user guides. The console lifecycle evidence is at source revision `9f30ab0043310c1133a37d73f0961cfbd815f003`; editor menu evidence is at `cb0431be93bacc8adcca005723906c66fcdc8cc3`, and Git viewer menu evidence is at `aedd68337cc36c8a388cdfcbe9de201f6b226702`. Only public-facing behavior is paraphrased here; no private source or internal runbook is copied.
 
-The current [zai-cli manifest](releases/zai-cli/latest/manifest.json), checked on October 6, 2026, delivers [v0.1.390](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.390), built from source revision `2bc5f92edea7be88dcc2376676ee994590b3261c`; it does not include the later console-server feature. In this release, restoring a saved workspace layout starts fresh shells, and live jobs do not survive closing the client. The English and Simplified Chinese catalog copy and comparison explicitly distinguish this released behavior from the forthcoming server; the app-page refresh does not publish a new release.
+The initial October 6, 2026 release-availability check found [v0.1.390](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.390), built from source revision `2bc5f92edea7be88dcc2376676ee994590b3261c`, which restored saved layout with fresh shells and did not preserve live jobs after client closure. A subsequent check on the same date found that the current [zai-cli manifest](releases/zai-cli/latest/manifest.json) delivers [v0.1.394](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.394). Its public release provenance identifies the exact console-server and bundled editor/Git viewer revisions cited above. All six archives were downloaded without authentication and their byte counts and SHA-256 values matched the manifest. The English and Simplified Chinese catalog copy and comparison therefore describe persistence as available from v0.1.394; this app-page refresh does not publish another release or claim native validation on every platform.
 
-The forthcoming persistent console server will allow reconnection to the same host and runtime home, including over SSH, while the host stays awake and the server remains running. Detach will preserve live console-owned processes; Close completely will stop them. This does not promise process survival after server or machine restart. The [herdr README](https://github.com/herdrdev/herdr#readme), read directly on October 6, 2026, documents its background-server detach/reattach behavior and informed the additional capability row. The comparison distinguishes the forthcoming zai feature from herdr's documented behavior without claiming herdr's combined multi-machine view for zai or inferring absence in other apps that were not assessed.
+The persistent console server allows reconnection to the same host and runtime home, including over SSH, while the host stays awake and the server remains running. Detach preserves live console-owned processes; Close completely stops them. This does not promise process survival after server or machine restart. The [herdr README](https://github.com/herdrdev/herdr#readme), read directly on October 6, 2026, documents its background-server detach/reattach behavior and informed the additional capability row. The comparison describes the released zai feature alongside herdr's documented behavior without claiming herdr's combined multi-machine view for zai or inferring absence in other apps that were not assessed.
 
 The three context-menu images are actual terminal frames captured from the running apps at 132 × 38 cells in Kanagawa Wave, then rendered to PNG for the site. They use a task-owned demo workspace with synthetic Go code and a synthetic Git diff, not private project code or real agent transcripts. The console image is cropped below its pane border to omit the temporary capture path in the footer. The author requested the captures and authorized their use on these pages; the existing galleries and release assets are retained.
+
+## Local validation
+
+Install the local gate with `npm run hooks:install`. The hook requires the
+outgoing refs to resolve to the checked-out HEAD and a clean index/worktree,
+including untracked files, before and after validation. Direct `npm test`
+always runs the complete suite.
+
+Contributor prose (`README.md`, root agent guidance, `.github/**/*.md`, the
+release README files, and `scripts/app-release/README.md`) runs the hook
+regression tests without browser/PDF checks. Changes limited to Markdown,
+JSON, and PNG/JPEG/GIF/WebP assets under `apps/docs/` also run
+`npm run validate:apps` and `tests/docs-mirror.test.js`, retaining mirror
+integrity and privacy validation. Published docs are not excluded as prose.
+
+All other paths, symlink or executable-mode changes, and mixed code/docs
+pushes run `npm test`. The classifier examines every outgoing commit across
+all refs, includes both sides of renames and reverted source changes, and
+defaults to the full suite for missing history, non-ancestor updates, empty
+change sets, or more than 200 commits. Existing refs use the remote tip; new
+refs use the merge base with locally fetched `origin/main`. Without that
+history the full suite runs. Deletion-only pushes need no source validation.
+The hook prints the selected scope, outgoing HEAD, and final cleanliness result;
+a failed selected check blocks the push.
