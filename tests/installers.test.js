@@ -418,13 +418,13 @@ test("piped shell installers download and install macOS packages under POSIX Bas
         ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("macos", architecture, file, bytes)])))],
         [`/${file}`, bytes],
       ]), (origin) => withHome(async (home) => {
-        const bin = await installerToolPath(home);
+        const bin = await installerToolPath(home, ["bash"]);
         await writeFile(join(bin, "uname"),
           `#!/bin/sh\ncase "$1" in -s) echo Darwin ;; -m) echo ${machine} ;; esac\n`, { mode: 0o755 });
         const installDir = join(home, "installed");
         const { stdout } = await run("bash", ["--posix", "-c", 'cat "$1" | bash --posix', "bash", installerPath(`${appId}.sh`)], {
           env: {
-            PATH: `${bin}:${process.env.PATH}`,
+            PATH: bin,
             HOME: home,
             SHELL: "/bin/zsh",
             ZAI_INSTALL_DIR: installDir,
