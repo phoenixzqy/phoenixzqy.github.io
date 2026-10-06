@@ -144,7 +144,22 @@ and installation; the bootstrap reports public commands present afterwards.
 Installing either standalone tool exposes only its own command and preserves
 existing sibling apps in the shared installation directory.
 
-After installation, each bootstrap prints commands to activate the executable in the current terminal. Shell installers detect a recognized parent shell, falling back to `SHELL`: bash/zsh suggest `source` for an existing profile mentioning the installation PATH; POSIX shells use `.`. These shells always receive an explicit `export PATH` command afterward, even when a profile is sourced, because matching profile text does not guarantee that it adds the actual launcher directory. Fish receives `set -gx PATH` with fish-specific literal escaping, PowerShell receives `$env:Path`, and unknown shells receive the quoted executable path. Run the printed commands in the calling terminal: a child installer cannot change its parent shell's environment. zai-codex activation respects its launcher override and defaults to `~/.local/bin`.
+After installation, each bootstrap prints commands to activate the executable in the current terminal. Shell installers detect a recognized parent shell, falling back to `SHELL`: bash/zsh suggest `source` for an existing profile mentioning the installation PATH; POSIX shells use `.`. These shells always receive an explicit `export PATH` command afterward, even when a profile is sourced, because matching profile text does not guarantee that it adds the actual launcher directory. Fish receives `set -gx PATH` with fish-specific literal escaping, and unknown shells receive the quoted executable path. PowerShell installers also add the launcher directory to the current process PATH after successful installation, without duplicating an existing entry, so `irm … | iex` makes the command available immediately in Windows PowerShell 5.1 and PowerShell 7. They retain copyable PowerShell activation commands for installers launched in a separate process. Run those commands in the calling terminal: a child installer cannot change its parent shell's environment. zai-codex activation respects its launcher override and defaults to `~/.local/bin`.
+
+From Windows Command Prompt (CMD), invoke the PowerShell bootstrap explicitly (replace `zai-cli` with `zai-editor` or `zai-gitter` for a standalone tool):
+
+```bat
+powershell.exe -NoProfile -Command "irm https://phoenixzqy.github.io/install/zai-cli.ps1 | iex"
+```
+
+The installed `.exe` commands work in both PowerShell and CMD. The installer retains the persistent user PATH registration. An already-open CMD window cannot receive environment changes from its child PowerShell process; activate the default installation directory in that CMD window with:
+
+```bat
+set "PATH=%USERPROFILE%\.zai;%PATH%"
+zai
+```
+
+Use the actual installation directory instead of `%USERPROFILE%\.zai` when `ZAI_INSTALL_DIR` overrides it, and run `zai-editor` or `zai-gitter` after installing the corresponding standalone app. A new shell launched from the activated PowerShell session inherits the updated PATH.
 
 An entry may advertise these commands on its detail page:
 
