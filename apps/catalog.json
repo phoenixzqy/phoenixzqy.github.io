@@ -1774,7 +1774,7 @@
       "name": "zai-codex",
       "category": "DEVELOPER TOOLS",
       "tagline": "Codex with your GitHub Copilot subscription.",
-      "summary": "A customized OpenAI Codex build with GitHub Copilot subscription support. Telemetry and remote diagnostic uploads are disabled.",
+      "summary": "A customized OpenAI Codex build with GitHub Copilot subscription support and CLI image rendering. Telemetry and remote diagnostic uploads are disabled.",
       "description": [
         "Use your GitHub account and an eligible Copilot subscription in the Codex command-line coding agent.",
         "Telemetry and remote diagnostic uploads are disabled; local diagnostic logs remain available."
@@ -1801,6 +1801,10 @@
         {
           "title": "GitHub Copilot subscriptions",
           "description": "Sign in with your own GitHub account and an eligible Copilot subscription."
+        },
+        {
+          "title": "CLI image rendering",
+          "description": "Preview viewed and generated images directly in the terminal with Kitty graphics, Sixel, or iTerm2 image support. Unsupported terminals retain text output."
         },
         {
           "title": "Remote telemetry and diagnostics disabled",
