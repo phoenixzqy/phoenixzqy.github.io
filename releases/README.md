@@ -177,6 +177,16 @@ An entry may advertise these commands on its detail page:
 
 Commands must be plain printable ASCII so they survive copy and paste.
 
+Installer and uninstaller diagnostics use `[ERROR]` for the reason, `[FAIL]`
+for the outcome, and `[NEXT]` for recovery or activation steps. `[OK]` marks
+success and `[WARN]` marks a non-fatal warning. Labels remain readable in
+redirected output; terminal diagnostics use colour unless `NO_COLOR` is set
+or `TERM=dumb`. Bundled installer stderr is streamed as `[DETAIL]` without
+interpreting it or delaying interactive prompts, and its exit code is retained.
+A string exit reason is printed as `[ERROR]` before the failure summary. Follow
+the reported reason before retrying; a partially completed operation is never
+reported as if nothing was changed.
+
 ## One-line uninstallers
 
 The zai apps also expose `uninstallCommands` and localized `uninstallation` notes on their detail pages. Generate `/uninstall/<app-id>.sh`, `.ps1`, and `.py` with `npm run build:installers` from `install/templates/uninstaller.*.in`; the source repositories carry matching standalone scripts. All cleanup logic is embedded in each shell entrypoint, with no additional network fetch or dependency on an installed app. Python 3.10+ is required on every platform.

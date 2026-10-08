@@ -1,8 +1,27 @@
 #!/bin/sh
 # Generated from install/templates/. Requires Python 3.10+; no network at runtime.
 set -eu
-command -v python3 >/dev/null 2>&1 || { printf '%s\n' 'Python 3.10+ is required to uninstall.' >&2; exit 1; }
-python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { printf '%s\n' 'Python 3.10+ is required to uninstall.' >&2; exit 1; }
+# Labels remain readable in pipes/logs; colour is only added to terminal stderr.
+message() {
+  message_level=$1
+  shift
+  message_colour=''
+  if [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${NO_COLOR+x}" != x ]; then
+    case "$message_level" in
+      ERROR | FAIL) message_colour='1;31' ;;
+      WARN) message_colour='1;33' ;;
+      NEXT) message_colour='1;36' ;;
+      OK) message_colour='1;32' ;;
+    esac
+  fi
+  if [ -n "$message_colour" ]; then
+    printf '\033[%sm[%s]\033[0m %s\n' "$message_colour" "$message_level" "$*" >&2
+  else
+    printf '[%s] %s\n' "$message_level" "$*" >&2
+  fi
+}
+command -v python3 >/dev/null 2>&1 || { message ERROR 'Python 3.10+ is required to uninstall.'; message FAIL 'Uninstallation did not start.'; message NEXT 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the uninstaller.'; exit 1; }
+python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { message ERROR 'Python 3.10+ is required to uninstall.'; message FAIL 'Uninstallation did not start.'; message NEXT 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the uninstaller.'; exit 1; }
 python3 - "$@" <<'ZAI_UNINSTALL_PYTHON'
 """Remove zai-editor and its user data without deleting sibling apps or worktrees."""
 
@@ -20,6 +39,19 @@ import stat
 import subprocess
 import sys
 
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)
+
 APP_ID = "zai-editor"
 EXECUTABLE = "zai-editor"
 MARKER = "# Added by zai installer"
@@ -32,6 +64,18 @@ CLI_PATHS = (
     ".opencode.lock", ".copilot.plugin-sync.lock", "locks", "agent-identity",
     "zai-temp", "copilot-tmp",
 )
+
+
+class AppRunningError(ValueError):
+    pass
+
+
+class UninstallArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        zai_message("ERROR", message)
+        zai_message("FAIL", f"{APP_ID} uninstallation did not start.")
+        zai_message("NEXT", "Run this uninstaller with --help to see valid options.")
+        raise SystemExit(2)
 
 
 def linked(path: Path) -> bool:
@@ -205,7 +249,7 @@ def clean_windows_path(directory: Path, dry_run: bool) -> None:
             ctypes.byref(ctypes.c_size_t()),
         )
         if not notified:
-            print("Windows environment notification timed out; open a new terminal.", file=sys.stderr)
+            zai_message("WARN", "Windows environment notification timed out; open a new terminal.")
 
 
 def config_home(home: Path) -> Path:
@@ -354,7 +398,7 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
     if not dry_run:
         running = active_apps(names)
         if running:
-            raise ValueError("Close zai apps and stop services before uninstalling: " + ", ".join(sorted(running)))
+            raise AppRunningError("Close zai apps and stop services before uninstalling: " + ", ".join(sorted(running)))
     planned = set(paths)
     # Unknown files and sibling executables can also depend on this PATH entry.
     survivors = [path for path in (directory.iterdir() if directory.exists() else []) if path not in planned
@@ -401,19 +445,30 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
         for path in directory.iterdir():
             if path not in planned:
                 print(f"Retained shared or unrelated path: {path}")
-    print("Dry run complete." if dry_run else f"Uninstalled {APP_ID}. Open a new terminal to refresh PATH.")
+    zai_message("OK", "Dry run complete." if dry_run else f"Uninstalled {APP_ID}.")
+    zai_message("NEXT", "Open a new terminal to refresh PATH." if not dry_run else "To remove the listed app data, rerun without --dry-run or ZAI_UNINSTALL_DRY_RUN=1.")
     print("Git worktrees, project files, independent coding-agent installations, and unrelated files are preserved.")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = UninstallArgumentParser(description=__doc__)
     parser.add_argument("--install-dir", type=Path, default=Path(os.environ.get("ZAI_INSTALL_DIR", str(Path.home() / ".zai"))))
     parser.add_argument("--dry-run", action="store_true", default=os.environ.get("ZAI_UNINSTALL_DRY_RUN") == "1")
     args = parser.parse_args()
     try:
         uninstall(args.install_dir, args.dry_run)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
-        print(f"{APP_ID} uninstall failed: {error}", file=sys.stderr)
+        zai_message("ERROR", str(error))
+        zai_message("FAIL", f"{APP_ID} uninstall failed.")
+        if isinstance(error, AppRunningError):
+            next_step = "Close the listed apps and stop their services, then rerun the uninstaller. For zai, attach with zai and choose Close completely."
+        elif isinstance(error, PermissionError):
+            next_step = "Check ownership and write permissions for the reported path, then rerun the uninstaller."
+        elif isinstance(error, ValueError):
+            next_step = "Check the reported path or metadata and your install-directory override. Use --dry-run to inspect the removal plan before retrying; do not bypass the safety check."
+        else:
+            next_step = "Resolve the reason above, then rerun the same uninstaller to finish cleanup. Any recovery marker is retained for retry."
+        zai_message("NEXT", next_step)
         return 1
     return 0
 

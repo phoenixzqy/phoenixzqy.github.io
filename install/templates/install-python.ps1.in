@@ -14,12 +14,27 @@
     $extraArgs = Get-ZaiEnv 'ZAI_INSTALL_ARGS'
     if ($extraArgs) { $forwarded += @($extraArgs -split '\s+' | Where-Object { $_ }) }
 
-    Write-Host "Running the bundled package installer with $python..."
-    & $python @pythonArgs $packageInstaller @forwarded
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Install "the bundled package installer exited with code $LASTEXITCODE." $LASTEXITCODE
+    Write-Host "[INFO] Running the bundled package installer with $python..."
+    $runner = @'
+@RUNNER@
+'@
+    # A file avoids Windows PowerShell 5.1 native -c argument quoting.
+    $runnerPath = Join-Path $work 'report-installer.py'
+    [IO.File]::WriteAllText($runnerPath, $runner, (New-Object Text.UTF8Encoding($false)))
+    # Windows PowerShell 5.1 may turn native stderr into ErrorRecords. Keep
+    # diagnostics live and determine failure from the program's actual status.
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $python @pythonArgs -B $runnerPath "$displayName installer" file $packageInstaller @forwarded
+        $installerExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = 'Stop'
+    }
+    if ($installerExitCode -ne 0) {
+        exit $installerExitCode
     }
 
+    Write-ZaiMessage 'OK' "$displayName installation complete."
     Write-Host ''
     foreach ($app in @('zai', 'zai-editor', 'zai-gitter')) {
         if (Test-Path -LiteralPath (Join-Path $installDir "$app.exe") -PathType Leaf) {

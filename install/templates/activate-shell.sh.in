@@ -27,7 +27,7 @@ show_activation() {
     bash) activation_profile="$HOME/.bashrc" ;;
     sh | dash | ksh) activation_profile="$HOME/.profile" ;;
   esac
-  printf '\n%s\n' 'To use the app in this terminal, copy and run:'
+  printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)

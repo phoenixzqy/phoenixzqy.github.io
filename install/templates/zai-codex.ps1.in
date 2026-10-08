@@ -4,14 +4,29 @@
 # Python 3.10+ required. ZAI_INSTALL_DIR and ZAI_RELEASE_MANIFEST_URL are supported.
 # irm https://phoenixzqy.github.io/install/zai-codex.ps1 | iex
 $ErrorActionPreference = 'Stop'
+@MESSAGES_HELPER@
 @ACTIVATION_HELPER@
 $python = Get-Command python -ErrorAction SilentlyContinue
-if (-not $python) { throw 'Python 3.10+ is required. Install Python and run this command again.' }
+if (-not $python) { Write-ZaiMessage 'ERROR' 'Python 3.10+ is required.'; Write-ZaiMessage 'FAIL' 'zai-codex installation did not start.'; Write-ZaiMessage 'NEXT' 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the installer.'; exit 1 }
 $installer = @'
 @PYTHON@
 '@
-$installer | & $python.Source -B -
-if ($LASTEXITCODE -ne 0) { throw "zai-codex installer failed (exit $LASTEXITCODE)." }
+$runner = @'
+@RUNNER@
+'@
+$runnerPath = [IO.Path]::GetTempFileName()
+try {
+    [IO.File]::WriteAllText($runnerPath, $runner, (New-Object Text.UTF8Encoding($false)))
+    # Native stderr is diagnostic output; the exit code determines failure.
+    $ErrorActionPreference = 'Continue'
+    $installer | & $python.Source -B $runnerPath 'zai-codex installer' stdin
+    $installerExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = 'Stop'
+    Remove-Item -LiteralPath $runnerPath -Force
+}
+if ($installerExitCode -ne 0) { exit $installerExitCode }
+Write-ZaiMessage 'OK' 'zai-codex installation complete.'
 $resolveLauncher = @'
 import os
 from pathlib import Path
@@ -20,5 +35,5 @@ print(launcher.parent.resolve())
 print(launcher.name)
 '@
 $launcherLocation = $resolveLauncher | & $python.Source -B -
-if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the installed launcher directory.' }
+if ($LASTEXITCODE -ne 0) { Write-ZaiMessage 'ERROR' 'Could not resolve the installed launcher directory.'; Write-ZaiMessage 'NEXT' 'Check ZAI_CODEX_BIN_LINK and ZAI_INSTALL_DIR, then rerun the installer.'; exit $LASTEXITCODE }
 Show-Activation $launcherLocation[0] $launcherLocation[1]

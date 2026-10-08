@@ -4,6 +4,25 @@
 # Python 3.10+ required. ZAI_INSTALL_DIR and ZAI_RELEASE_MANIFEST_URL are supported.
 # curl -fsSL https://phoenixzqy.github.io/install/zai-codex.sh | sh
 set -eu
+# Labels remain readable in pipes/logs; colour is only added to terminal stderr.
+message() {
+  message_level=$1
+  shift
+  message_colour=''
+  if [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${NO_COLOR+x}" != x ]; then
+    case "$message_level" in
+      ERROR | FAIL) message_colour='1;31' ;;
+      WARN) message_colour='1;33' ;;
+      NEXT) message_colour='1;36' ;;
+      OK) message_colour='1;32' ;;
+    esac
+  fi
+  if [ -n "$message_colour" ]; then
+    printf '\033[%sm[%s]\033[0m %s\n' "$message_colour" "$message_level" "$*" >&2
+  else
+    printf '[%s] %s\n' "$message_level" "$*" >&2
+  fi
+}
 # Detect the calling shell, not /bin/sh used to run this installer. SHELL is
 # the login-shell fallback when the parent is a wrapper or cannot be inspected.
 activation_shell=${SHELL:-}
@@ -33,7 +52,7 @@ show_activation() {
     bash) activation_profile="$HOME/.bashrc" ;;
     sh | dash | ksh) activation_profile="$HOME/.profile" ;;
   esac
-  printf '\n%s\n' 'To use the app in this terminal, copy and run:'
+  printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
@@ -58,8 +77,83 @@ show_activation() {
   esac
   printf '%s\n' 'Run the command above in your current shell; a child installer cannot update its parent shell.'
 }
-command -v python3 >/dev/null 2>&1 || { printf '%s\n' 'Python 3.10+ is required.' >&2; exit 1; }
-python3 -B - <<'ZAI_CODEX_PYTHON'
+command -v python3 >/dev/null 2>&1 || { message ERROR 'Python 3.10+ is required.'; message FAIL 'zai-codex installation did not start.'; message NEXT 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the installer.'; exit 1; }
+python3 -B -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { message ERROR 'A working Python 3.10+ is required.'; message FAIL 'zai-codex installation did not start.'; message NEXT 'Upgrade Python, open a new terminal, and rerun the installer.'; exit 1; }
+python3 -B -c '# Keep stdout and stdin live for interactive installers. Do not buffer output,
+# parse English messages, or guess whether a diagnostic is an error or warning.
+import sys
+import runpy
+import traceback
+
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)
+
+class ZaiDiagnostics:
+    def __init__(self, stream):
+        self.stream = stream
+        self.at_start = True
+
+    def write(self, text):
+        for part in text.splitlines(keepends=True):
+            if self.at_start and part.strip():
+                self.stream.write("[DETAIL] ")
+            self.stream.write(part)
+            self.at_start = part.endswith("\n")
+        self.stream.flush()
+        return len(text)
+
+    def flush(self):
+        self.stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+label, mode = sys.argv[1:3]
+sys.argv = sys.argv[3:]
+original_stderr = sys.stderr
+sys.stderr = ZaiDiagnostics(original_stderr)
+code = 0
+reason = None
+try:
+    if mode == "stdin":
+        # The reviewed source remains unchanged in its original here-document.
+        sys.argv.insert(0, "-")
+        exec(compile(sys.stdin.read(), "<stdin>", "exec"), {"__name__": "__main__", "__file__": "<stdin>"})
+    else:
+        sys.path.insert(0, str(__import__("pathlib").Path(sys.argv[0]).resolve().parent))
+        runpy.run_path(sys.argv[0], run_name="__main__")
+except SystemExit as error:
+    if error.code is None:
+        code = 0
+    elif isinstance(error.code, int):
+        code = error.code
+    else:
+        reason, code = str(error.code), 1
+except KeyboardInterrupt:
+    reason, code = "Installation interrupted.", 130
+except Exception as error:
+    traceback.print_exc()
+    reason, code = str(error), 1
+finally:
+    sys.stderr = original_stderr
+
+if code:
+    if reason:
+        zai_message("ERROR", reason)
+    zai_message("FAIL", f"{label}: the bundled package installer did not complete (exit {code}).")
+    zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
+raise SystemExit(code)
+' 'zai-codex installer' stdin <<'ZAI_CODEX_PYTHON'
 #!/usr/bin/env python3
 """Download a verified custom release and install the codex command."""
 
@@ -380,6 +474,7 @@ if __name__ == "__main__":
     ) as error:
         raise SystemExit(str(error))
 ZAI_CODEX_PYTHON
+message OK 'zai-codex installation complete.'
 # Resolve the same launcher override/default as the reviewed Python installer.
 launcher_path=$(python3 -B -c 'import os; from pathlib import Path; launcher = Path(os.environ.get("ZAI_CODEX_BIN_LINK", str(Path(os.environ.get("ZAI_INSTALL_DIR") or "~/.local/bin") / "codex"))).expanduser(); print(launcher.parent.resolve() / launcher.name)')
 show_activation "${launcher_path%/*}" "${launcher_path##*/}"

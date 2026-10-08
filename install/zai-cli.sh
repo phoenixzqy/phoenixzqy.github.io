@@ -27,9 +27,30 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
+# Labels remain readable in pipes/logs; colour is only added to terminal stderr.
+message() {
+  message_level=$1
+  shift
+  message_colour=''
+  if [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${NO_COLOR+x}" != x ]; then
+    case "$message_level" in
+      ERROR | FAIL) message_colour='1;31' ;;
+      WARN) message_colour='1;33' ;;
+      NEXT) message_colour='1;36' ;;
+      OK) message_colour='1;32' ;;
+    esac
+  fi
+  if [ -n "$message_colour" ]; then
+    printf '\033[%sm[%s]\033[0m %s\n' "$message_colour" "$message_level" "$*" >&2
+  else
+    printf '[%s] %s\n' "$message_level" "$*" >&2
+  fi
+}
 fail() {
-  printf '%s installer: %s\n' "$DISPLAY_NAME" "$1" >&2
-  exit 1
+  message ERROR "$1"
+  message FAIL "$DISPLAY_NAME installation did not complete."
+  message NEXT "${2:-Resolve the reason above and rerun the installer. Help: $SITE/apps/docs/?id=$APP_ID}"
+  exit "${3:-1}"
 }
 info() {
   printf '%s\n' "$1"
@@ -64,7 +85,7 @@ show_activation() {
     bash) activation_profile="$HOME/.bashrc" ;;
     sh | dash | ksh) activation_profile="$HOME/.profile" ;;
   esac
-  printf '\n%s\n' 'To use the app in this terminal, copy and run:'
+  printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
@@ -172,13 +193,13 @@ download() {
       case "$1" in
         https://*) curl -fsSL --proto '=https' --proto-redir '=https' -o "$2" "$1" ;;
         *) curl -fsSL --proto '=http' --max-redirs 0 -o "$2" "$1" ;;
-      esac || fail "download failed: $1"
+      esac || fail "download failed: $1" "Check your network connection and the release URL, then rerun the installer."
       ;;
     wget)
       case "$1" in
         https://*) wget -q --https-only -O "$2" "$1" ;;
         *) wget -q --max-redirect=0 -O "$2" "$1" ;;
-      esac || fail "download failed: $1"
+      esac || fail "download failed: $1" "Check your network connection and the release URL, then rerun the installer."
       ;;
   esac
 }
@@ -275,11 +296,9 @@ PY
 else
   status=$?
   if [ "$status" -eq 2 ]; then
-    printf '%s\n' "No public release of $DISPLAY_NAME has been published yet." >&2
-    printf '%s\n' "Watch $SITE/apps/app/?id=$APP_ID for the first build." >&2
-    exit 2
+    fail "No public release of $DISPLAY_NAME has been published yet." "Watch $SITE/apps/app/?id=$APP_ID for the first build." 2
   fi
-  fail "the release manifest at $MANIFEST_URL could not be read as valid JSON."
+  fail "the release manifest at $MANIFEST_URL could not be read as valid JSON." "Retry later. If it still fails, report this manifest URL to the app publisher."
 fi
 
 [ -n "$ASSET" ] ||
@@ -299,7 +318,7 @@ fi
 
 # --- Download and verify --------------------------------------------------
 ARCHIVE="$WORK/$ASSET_FILE"
-info "Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
+info "[INFO] Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
 download "$ASSET_URL" "$ARCHIVE"
 
 ACTUAL_SHA="$(checksum "$ARCHIVE")"
@@ -307,7 +326,7 @@ if [ "$ACTUAL_SHA" != "$ASSET_SHA" ]; then
   fail "SHA-256 verification failed for $ASSET_FILE.
   expected: $ASSET_SHA
   actual:   $ACTUAL_SHA
-The download was discarded and nothing was installed."
+The download was discarded and nothing was installed." "Retry the download. If verification still fails, report the expected and actual checksums to the publisher; do not install the unverified package."
 fi
 if [ -n "$ASSET_BYTES" ]; then
   ACTUAL_BYTES="$(wc -c <"$ARCHIVE" | tr -d ' ')"
@@ -315,10 +334,10 @@ if [ -n "$ASSET_BYTES" ]; then
     fail "the downloaded package is $ACTUAL_BYTES bytes but the manifest declares $ASSET_BYTES. Nothing was installed."
   fi
 fi
-info "Verified SHA-256 $ASSET_SHA"
+info "[OK] Verified SHA-256 $ASSET_SHA"
 
 EXTRACT="$WORK/extract"
-mkdir -p "$EXTRACT"
+mkdir -p "$EXTRACT" || fail "the extraction directory could not be created: $EXTRACT"
 extract "$ARCHIVE" "$EXTRACT"
 
 # --- Install --------------------------------------------------------------
@@ -334,17 +353,95 @@ if [ -n "${ZAI_INSTALL_DIR:-}" ]; then
   set -- --install-dir "$INSTALL_DIR" "$@"
 fi
 
-info "Running the bundled package installer with ${PYTHON}…"
+info "[INFO] Running the bundled package installer with ${PYTHON}…"
 # The script itself arrives on stdin when piped to sh, so reattach the terminal
 # where one is actually usable; the package installer may ask about locally modified
 # packaged prompts. Probe in a subshell: /dev/tty can exist and still not open,
 # and a redirection error on a compound command would end this script.
+run_package_installer() {
+  "$PYTHON" -B -c '# Keep stdout and stdin live for interactive installers. Do not buffer output,
+# parse English messages, or guess whether a diagnostic is an error or warning.
+import sys
+import runpy
+import traceback
+
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)
+
+class ZaiDiagnostics:
+    def __init__(self, stream):
+        self.stream = stream
+        self.at_start = True
+
+    def write(self, text):
+        for part in text.splitlines(keepends=True):
+            if self.at_start and part.strip():
+                self.stream.write("[DETAIL] ")
+            self.stream.write(part)
+            self.at_start = part.endswith("\n")
+        self.stream.flush()
+        return len(text)
+
+    def flush(self):
+        self.stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+label, mode = sys.argv[1:3]
+sys.argv = sys.argv[3:]
+original_stderr = sys.stderr
+sys.stderr = ZaiDiagnostics(original_stderr)
+code = 0
+reason = None
+try:
+    if mode == "stdin":
+        # The reviewed source remains unchanged in its original here-document.
+        sys.argv.insert(0, "-")
+        exec(compile(sys.stdin.read(), "<stdin>", "exec"), {"__name__": "__main__", "__file__": "<stdin>"})
+    else:
+        sys.path.insert(0, str(__import__("pathlib").Path(sys.argv[0]).resolve().parent))
+        runpy.run_path(sys.argv[0], run_name="__main__")
+except SystemExit as error:
+    if error.code is None:
+        code = 0
+    elif isinstance(error.code, int):
+        code = error.code
+    else:
+        reason, code = str(error.code), 1
+except KeyboardInterrupt:
+    reason, code = "Installation interrupted.", 130
+except Exception as error:
+    traceback.print_exc()
+    reason, code = str(error), 1
+finally:
+    sys.stderr = original_stderr
+
+if code:
+    if reason:
+        zai_message("ERROR", reason)
+    zai_message("FAIL", f"{label}: the bundled package installer did not complete (exit {code}).")
+    zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
+raise SystemExit(code)
+' "$DISPLAY_NAME installer" file "$PACKAGE_INSTALLER" "$@"
+}
 if (exec 3</dev/tty) 2>/dev/null; then
-  "$PYTHON" "$PACKAGE_INSTALLER" "$@" </dev/tty || fail 'the bundled package installer did not complete.'
+  run_package_installer "$@" </dev/tty
 else
-  "$PYTHON" "$PACKAGE_INSTALLER" "$@" || fail 'the bundled package installer did not complete.'
+  run_package_installer "$@"
 fi
 
+message OK "$DISPLAY_NAME installation complete."
 info ''
 for app in zai zai-editor zai-gitter; do
   if [ -f "$INSTALL_DIR/$app" ]; then

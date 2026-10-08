@@ -39,6 +39,11 @@ function indentLike(block, marker, shell) {
 
 export async function buildInstallers() {
   const files = new Map();
+  const messagesPython = await readFile(join(templates, "messages.py.in"), "utf8");
+  const runner = (await readFile(join(templates, "run-installer.py.in"), "utf8"))
+    .replace("@MESSAGES_PYTHON@", () => messagesPython.trimEnd());
+  const shellRunner = "'" + runner.replaceAll("'", "'\\''") + "'";
+
   for (const installer of INSTALLERS) {
     if (installer.mode === "codex") {
       const python = await readFile(join(templates, "zai-codex.py.in"), "utf8");
@@ -49,9 +54,10 @@ export async function buildInstallers() {
         throw new Error("zai-codex installer drifted; sync its reviewed source before generating.");
       }
       for (const extension of ["sh", "ps1"]) {
+        const messages = await readFile(join(templates, `messages.${extension}.in`), "utf8");
         const activation = await readFile(join(templates, `activate-shell.${extension}.in`), "utf8");
         const wrapper = await readFile(join(templates, `zai-codex.${extension}.in`), "utf8");
-        files.set(`install/zai-codex.${extension}`, wrapper.replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SOURCE_COMMIT@", source.commit)
+        files.set(`install/zai-codex.${extension}`, wrapper.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@RUNNER@", () => extension === "sh" ? shellRunner : runner.trimEnd()).replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SOURCE_COMMIT@", source.commit)
           .replace("@PYTHON@", () => python.trimEnd()));
       }
       continue;
@@ -65,6 +71,7 @@ export async function buildInstallers() {
       PYTHON_VERSION: installer.mode === "python" ? "3.10" : "3",
     };
     for (const [extension, indented] of [["sh", false], ["ps1", true]]) {
+      const messages = await readFile(join(templates, `messages.${extension}.in`), "utf8");
       const activation = await readFile(join(templates, `activate-shell.${extension}.in`), "utf8");
       const shortcuts = await readFile(join(templates, `shortcuts.${extension}.in`), "utf8");
       const shell = await readFile(join(templates, `installer.${extension}.in`), "utf8");
@@ -72,20 +79,20 @@ export async function buildInstallers() {
       const label = `${installer.appId}.${extension}`;
       const prerequisite = extension === "ps1" && installer.mode === "python"
         ? await readFile(join(templates, "prerequisites-python.ps1.in"), "utf8") : "";
-      const body = expand(step, values, label).replace(/\n+$/, "");
+      const body = expand(step.replaceAll("@RUNNER@", () => extension === "sh" ? shellRunner : runner.trimEnd()), values, label).replace(/\n+$/, "");
       const content = expand(
         // A function replacer keeps `$$`, `$&`, and friends literal: the shell
         // step uses `$$` for a per-process staging name.
-        shell.replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SHORTCUT_HELPER@", () => shortcuts.trimEnd()).replace("@PREREQUISITE_STEP@\n", () => prerequisite ? prerequisite.trimEnd() + "\n" : "").replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
+        shell.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SHORTCUT_HELPER@", () => shortcuts.trimEnd()).replace("@PREREQUISITE_STEP@\n", () => prerequisite ? prerequisite.trimEnd() + "\n" : "").replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
         values,
         label,
       );
       if (PLACEHOLDER.test(content.replace(PLACEHOLDER, ""))) throw new Error(`${label}: unexpanded placeholder.`);
       files.set(`install/${installer.appId}.${extension}`, content);
-      const python = expand(await readFile(join(templates, "uninstaller.py.in"), "utf8"), values, label);
+      const python = expand((await readFile(join(templates, "uninstaller.py.in"), "utf8")).replace("@MESSAGES_PYTHON@", () => messagesPython.trimEnd()), values, label);
       files.set(`uninstall/${installer.appId}.py`, python);
       const uninstall = await readFile(join(templates, `uninstaller.${extension}.in`), "utf8");
-      files.set(`uninstall/${installer.appId}.${extension}`, uninstall.replace("@PYTHON@", () => python.trimEnd()));
+      files.set(`uninstall/${installer.appId}.${extension}`, uninstall.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@PYTHON@", () => python.trimEnd()));
     }
   }
   return files;

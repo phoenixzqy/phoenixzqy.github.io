@@ -35,10 +35,33 @@ test("POSIX uninstallers parse and support one-fetch piping", async () => {
       for (const key of Object.keys(env)) if (key.startsWith("ZAI_")) delete env[key];
       const result = await run("sh", ["-c", 'cat "$1" | sh -s -- --dry-run', "uninstall-test", `uninstall/${id}.sh`], { cwd: root, env });
       assert.match(result.stdout, /Would remove/);
-      assert.match(result.stdout, /Dry run complete/);
+      assert.match(result.stderr, /\[OK\] Dry run complete/);
+      assert.match(result.stderr, /\[NEXT\].*rerun without --dry-run/);
       assert.equal(await readFile(join(home, ".zai", executable), "utf8"), "fixture");
     } finally {
       await rm(home, { recursive: true, force: true });
     }
+  }
+});
+
+test("all uninstaller entrypoints label unsafe-path failures and offer safe recovery", async () => {
+  const home = await mkdtemp(join(tmpdir(), "zai-uninstall-message-"));
+  try {
+    const env = { ...process.env, HOME: home, USERPROFILE: home, NO_COLOR: "1" };
+    for (const key of Object.keys(env)) if (key.startsWith("ZAI_")) delete env[key];
+    for (const id of ["zai-cli", "zai-editor", "zai-gitter"]) {
+      for (const [command, path] of [["sh", `uninstall/${id}.sh`], ["python3", `uninstall/${id}.py`]]) {
+        await assert.rejects(run(command, [path, "--install-dir", home], { cwd: root, env }), (error) => {
+          assert.equal(error.code, 1);
+          assert.match(error.stderr, /\[ERROR\] Refusing unsafe cleanup path:/);
+          assert.match(error.stderr, /\[FAIL\].*uninstall failed/);
+          assert.match(error.stderr, /\[NEXT\].*--dry-run.*do not bypass/);
+          assert.doesNotMatch(error.stderr, /\x1b|\[OK\]/);
+          return true;
+        });
+      }
+    }
+  } finally {
+    await rm(home, { recursive: true, force: true });
   }
 });

@@ -29,8 +29,30 @@ function Get-ZaiEnv([string] $name) {
     return $value
 }
 
-function Stop-Install([string] $message, [int] $code = 1) {
-    [Console]::Error.WriteLine("$displayName installer: $message")
+# Console.Error keeps diagnostics out of the success pipeline, including irm | iex.
+function Write-ZaiMessage([string] $level, [string] $message) {
+    $colour = ''
+    if (-not [Console]::IsErrorRedirected -and $env:TERM -ne 'dumb' -and
+        $null -eq [Environment]::GetEnvironmentVariable('NO_COLOR')) {
+        switch ($level) {
+            'ERROR' { $colour = '1;31' }
+            'FAIL' { $colour = '1;31' }
+            'WARN' { $colour = '1;33' }
+            'NEXT' { $colour = '1;36' }
+            'OK' { $colour = '1;32' }
+        }
+    }
+    if ($colour) {
+        $escape = [char]27
+        [Console]::Error.WriteLine("$escape[${colour}m[$level]$escape[0m $message")
+    } else {
+        [Console]::Error.WriteLine("[$level] $message")
+    }
+}
+function Stop-Install([string] $message, [int] $code = 1, [string] $next = "Resolve the reason above and rerun the installer. Help: $site/apps/docs/?id=$appId") {
+    Write-ZaiMessage 'ERROR' $message
+    Write-ZaiMessage 'FAIL' "$displayName installation did not complete."
+    Write-ZaiMessage 'NEXT' $next
     exit $code
 }
 
@@ -147,7 +169,7 @@ function Show-Activation([string] $directory, [string] $command) {
 
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
     Write-Host ''
-    Write-Host 'Ready in this PowerShell session. Run:'
+    Write-Host '[NEXT] Ready in this PowerShell session. Run:'
     $quotedCommand = "'" + $command.Replace("'", "''") + "'"
     Write-Host ("  & " + $quotedCommand)
     Write-Host ''
@@ -235,9 +257,7 @@ try {
     }
 
     if ($null -eq $manifest.release) {
-        [Console]::Error.WriteLine("No public release of $displayName has been published yet.")
-        [Console]::Error.WriteLine("Watch $site/apps/app/?id=$appId for the first build.")
-        exit 2
+        Stop-Install "No public release of $displayName has been published yet." 2 "Watch $site/apps/app/?id=$appId for the first build."
     }
 
     $assets = @($manifest.release.assets |
@@ -264,7 +284,7 @@ try {
     }
 
     $archive = Join-Path $work $asset.file
-    Write-Host "Downloading $displayName for windows/$architecture..."
+    Write-Host "[INFO] Downloading $displayName for windows/$architecture..."
     Save-Download $assetUrl $archive
 
     $actualHash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -278,7 +298,7 @@ try {
     if ($expectedBytes -and $actualBytes -ne $expectedBytes) {
         Stop-Install "the downloaded package is $actualBytes bytes but the manifest declares $expectedBytes. Nothing was installed."
     }
-    Write-Host "Verified SHA-256 $expectedHash"
+    Write-Host "[OK] Verified SHA-256 $expectedHash"
 
     $extract = Join-Path $work 'extract'
     New-Item -ItemType Directory -Path $extract -Force | Out-Null
@@ -304,12 +324,100 @@ try {
     $extraArgs = Get-ZaiEnv 'ZAI_INSTALL_ARGS'
     if ($extraArgs) { $forwarded += @($extraArgs -split '\s+' | Where-Object { $_ }) }
 
-    Write-Host "Running the bundled package installer with $python..."
-    & $python @pythonArgs $packageInstaller @forwarded
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Install "the bundled package installer exited with code $LASTEXITCODE." $LASTEXITCODE
+    Write-Host "[INFO] Running the bundled package installer with $python..."
+    $runner = @'
+# Keep stdout and stdin live for interactive installers. Do not buffer output,
+# parse English messages, or guess whether a diagnostic is an error or warning.
+import sys
+import runpy
+import traceback
+
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)
+
+class ZaiDiagnostics:
+    def __init__(self, stream):
+        self.stream = stream
+        self.at_start = True
+
+    def write(self, text):
+        for part in text.splitlines(keepends=True):
+            if self.at_start and part.strip():
+                self.stream.write("[DETAIL] ")
+            self.stream.write(part)
+            self.at_start = part.endswith("\n")
+        self.stream.flush()
+        return len(text)
+
+    def flush(self):
+        self.stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+label, mode = sys.argv[1:3]
+sys.argv = sys.argv[3:]
+original_stderr = sys.stderr
+sys.stderr = ZaiDiagnostics(original_stderr)
+code = 0
+reason = None
+try:
+    if mode == "stdin":
+        # The reviewed source remains unchanged in its original here-document.
+        sys.argv.insert(0, "-")
+        exec(compile(sys.stdin.read(), "<stdin>", "exec"), {"__name__": "__main__", "__file__": "<stdin>"})
+    else:
+        sys.path.insert(0, str(__import__("pathlib").Path(sys.argv[0]).resolve().parent))
+        runpy.run_path(sys.argv[0], run_name="__main__")
+except SystemExit as error:
+    if error.code is None:
+        code = 0
+    elif isinstance(error.code, int):
+        code = error.code
+    else:
+        reason, code = str(error.code), 1
+except KeyboardInterrupt:
+    reason, code = "Installation interrupted.", 130
+except Exception as error:
+    traceback.print_exc()
+    reason, code = str(error), 1
+finally:
+    sys.stderr = original_stderr
+
+if code:
+    if reason:
+        zai_message("ERROR", reason)
+    zai_message("FAIL", f"{label}: the bundled package installer did not complete (exit {code}).")
+    zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
+raise SystemExit(code)
+'@
+    # A file avoids Windows PowerShell 5.1 native -c argument quoting.
+    $runnerPath = Join-Path $work 'report-installer.py'
+    [IO.File]::WriteAllText($runnerPath, $runner, (New-Object Text.UTF8Encoding($false)))
+    # Windows PowerShell 5.1 may turn native stderr into ErrorRecords. Keep
+    # diagnostics live and determine failure from the program's actual status.
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $python @pythonArgs -B $runnerPath "$displayName installer" file $packageInstaller @forwarded
+        $installerExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = 'Stop'
+    }
+    if ($installerExitCode -ne 0) {
+        exit $installerExitCode
     }
 
+    Write-ZaiMessage 'OK' "$displayName installation complete."
     Write-Host ''
     foreach ($app in @('zai', 'zai-editor', 'zai-gitter')) {
         if (Test-Path -LiteralPath (Join-Path $installDir "$app.exe") -PathType Leaf) {
@@ -320,6 +428,8 @@ try {
     Install-Shortcut $installDir 'zg' 'zai-gitter'
     Show-Activation $installDir 'zai'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"
+} catch {
+    Stop-Install $_.Exception.Message
 } finally {
     Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue
 }

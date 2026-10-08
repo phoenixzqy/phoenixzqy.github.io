@@ -1,6 +1,7 @@
 # Generated from install/templates/. Requires Python 3.10+; no network at runtime.
 & {
     $ErrorActionPreference = 'Stop'
+@MESSAGES_HELPER@
     $python = $null
     $prefix = @()
     foreach ($name in @('py', 'python', 'python3')) {
@@ -11,12 +12,19 @@
             if ($LASTEXITCODE -eq 0) { $python = $name; $prefix = $candidatePrefix; break }
         }
     }
-    if (-not $python) { throw 'Python 3.10+ is required to uninstall.' }
+    if (-not $python) { Write-ZaiMessage 'ERROR' 'Python 3.10+ is required to uninstall.'; Write-ZaiMessage 'FAIL' 'Uninstallation did not start.'; Write-ZaiMessage 'NEXT' 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the uninstaller.'; exit 1 }
     $program = @'
 @PYTHON@
 '@
-    $program | & $python @prefix - @args
-    if ($LASTEXITCODE -ne 0) { throw "Uninstaller failed with exit code $LASTEXITCODE" }
+    # Native stderr is diagnostic output; the exit code determines failure.
+    try {
+        $ErrorActionPreference = 'Continue'
+        $program | & $python @prefix - @args
+        $uninstallerExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = 'Stop'
+    }
+    if ($uninstallerExitCode -ne 0) { exit $uninstallerExitCode }
     # Refresh only this entry; preserve session-only tools and virtual environments.
     if ($env:ZAI_UNINSTALL_DRY_RUN -ne '1' -and $args -notcontains '--dry-run') {
         $directory = $env:ZAI_INSTALL_DIR
