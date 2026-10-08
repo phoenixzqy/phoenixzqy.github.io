@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import platform
 import sys
@@ -54,6 +55,28 @@ def validation_python(runtime, source, name):
     return interpreter
 
 
+def prepare_codex_validation(runtime, source):
+    # The gate builds SDK executables at codex-rs/target even when Cargo uses an
+    # operator-selected shared cache. Keep those paths pointing at the same bytes.
+    target = runtime.environment.get('CARGO_TARGET_DIR', os.environ.get('CARGO_TARGET_DIR'))
+    if target:
+        target = Path(target).expanduser()
+        if not target.is_absolute():
+            raise ValueError('zai-codex release CARGO_TARGET_DIR must be absolute')
+        target.mkdir(parents=True, exist_ok=True)
+        (source / 'codex-rs/target').symlink_to(target, target_is_directory=True)
+    # Use the source's trusted V8 checksum pins for validation as well as packaging.
+    code = '''import json,sys
+sys.path.insert(0, "scripts")
+from codex_package.targets import TARGET_SPECS
+from codex_package.v8 import resolve_codex_v8_cargo_env
+print(json.dumps(resolve_codex_v8_cargo_env(TARGET_SPECS[sys.argv[1]])))
+'''
+    runtime.environment.update(json.loads(runtime.run(
+        [sys.executable, '-B', '-c', code, native_target()], cwd=source)))
+    runtime.run(['pnpm', 'install', '--frozen-lockfile'], cwd=source)
+
+
 def build(runtime, source, snapshot, version, output, site, notices):
     name = snapshot['repository'].split('/')[1]
     output.mkdir(parents=True)
@@ -63,6 +86,8 @@ def build(runtime, source, snapshot, version, output, site, notices):
     runtime.stage = f'{name}:validation'
     # These gates are the repositories' required local validation; no hosted CI.
     interpreter = validation_python(runtime, source, name)
+    if name == 'zai-codex':
+        prepare_codex_validation(runtime, source)
     runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
     runtime.stage = f'{name}:build'
     if name == 'zai-codex':

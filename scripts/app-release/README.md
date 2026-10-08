@@ -47,6 +47,12 @@ that environment's Python. This keeps validation dependencies available when
 tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
 to the configured package index. Setup failures stop the release before packaging;
 the environment is removed with the clone.
+For zai-codex, validation first resolves V8 through the source repository's
+trusted checksum pins and installs SDK dependencies with `pnpm install
+--frozen-lockfile`. Native development libraries remain host prerequisites.
+An absolute `CARGO_TARGET_DIR` can retain the compiler cache across disposable
+clones; the adapter links the gate's executable paths to that same cache.
+Use disk-backed temporary storage with sufficient space for native builds.
 No source branch or source tag is pushed. All public release tags target website
 commits. Every final archive is inspected for debug maps, separate symbols,
 unsafe paths and credential files, and checked against its manifest checksum.
