@@ -242,6 +242,12 @@ availability determined by verified release assets. Future maintainers should
 follow [the zai-codex instructions](releases/zai-codex/README.md), which reuse the
 source packager and installer and record the `zai-codex` branch exception.
 
+The October 8, 2026 feature refresh uses the author's authorized CLI image-rendering
+update and customization source at `0494086573b61be7f361b94002bd87f243c876e0`.
+Viewed and generated image previews use Kitty graphics, Sixel, or iTerm2 image
+support; unsupported terminals retain text output. This describes the fork's
+capability without changing the published release metadata.
+
 The October 3, 2026 release refresh uses the author's authorized merged-main
 updates for [zai-cli 0.1.341](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-cli-v0.1.341),
 [zai-editor 0.3.5](https://github.com/phoenixzqy/phoenixzqy.github.io/releases/tag/zai-editor-v0.3.5),
