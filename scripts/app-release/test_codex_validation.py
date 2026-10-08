@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from release_builds import prepare_codex_validation
+from release_runtime import Runtime
 
 
 class CodexValidationTest(unittest.TestCase):
@@ -33,6 +34,33 @@ class CodexValidationTest(unittest.TestCase):
         self.assertEqual(calls[1], (['pnpm', 'install', '--frozen-lockfile'], source, environment))
         self.assertEqual(environment['EXISTING'], 'preserved')
         self.assertEqual(environment['RUSTY_V8_ARCHIVE'], 'verified-archive')
+        self.assertEqual(environment['CODEX_REPO_ROOT'], str(source.resolve()))
+
+    def test_source_import_receives_its_required_repository_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source'
+            package = source / 'scripts/codex_package'
+            package.mkdir(parents=True)
+            (package / 'targets.py').write_text(
+                'import os\nfrom pathlib import Path\n'
+                'assert Path(os.environ["CODEX_REPO_ROOT"]) == Path.cwd()\n'
+                'TARGET_SPECS = {"native-target": "fixture"}\n')
+            (package / 'v8.py').write_text(
+                'def resolve_codex_v8_cargo_env(spec):\n'
+                '    assert spec == "fixture"\n'
+                '    return {"RUSTY_V8_ARCHIVE": "verified-archive"}\n')
+
+            class SourceRuntime(Runtime):
+                def run(self, args, **kwargs):
+                    if args[0] == 'pnpm':
+                        return ''
+                    return super().run(args, **kwargs)
+
+            runtime = SourceRuntime(root / 'logs')
+            with patch.dict(os.environ, {'CARGO_TARGET_DIR': ''}), patch('release_builds.native_target', return_value='native-target'):
+                prepare_codex_validation(runtime, source)
+            self.assertEqual(runtime.environment['RUSTY_V8_ARCHIVE'], 'verified-archive')
 
     def test_requested_cargo_cache_matches_gate_executable_paths(self):
         with tempfile.TemporaryDirectory() as directory:

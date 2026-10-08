@@ -56,6 +56,7 @@ def validation_python(runtime, source, name):
 
 
 def prepare_codex_validation(runtime, source):
+    runtime.environment['CODEX_REPO_ROOT'] = str(source.resolve())
     # The gate builds SDK executables at codex-rs/target even when Cargo uses an
     # operator-selected shared cache. Keep those paths pointing at the same bytes.
     target = runtime.environment.get('CARGO_TARGET_DIR', os.environ.get('CARGO_TARGET_DIR'))
