@@ -1,0 +1,19 @@
+# Labels remain readable in pipes/logs; colour is only added to terminal stderr.
+message() {
+  message_level=$1
+  shift
+  message_colour=''
+  if [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${NO_COLOR+x}" != x ]; then
+    case "$message_level" in
+      ERROR | FAIL) message_colour='1;31' ;;
+      WARN) message_colour='1;33' ;;
+      NEXT) message_colour='1;36' ;;
+      OK) message_colour='1;32' ;;
+    esac
+  fi
+  if [ -n "$message_colour" ]; then
+    printf '\033[%sm[%s]\033[0m %s\n' "$message_colour" "$message_level" "$*" >&2
+  else
+    printf '[%s] %s\n' "$message_level" "$*" >&2
+  fi
+}

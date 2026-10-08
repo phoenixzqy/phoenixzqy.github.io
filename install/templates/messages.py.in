@@ -1,0 +1,12 @@
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)

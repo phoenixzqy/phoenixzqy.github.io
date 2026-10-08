@@ -29,8 +29,11 @@ function Get-ZaiEnv([string] $name) {
     return $value
 }
 
-function Stop-Install([string] $message, [int] $code = 1) {
-    [Console]::Error.WriteLine("$displayName installer: $message")
+@MESSAGES_HELPER@
+function Stop-Install([string] $message, [int] $code = 1, [string] $next = "Resolve the reason above and rerun the installer. Help: $site/apps/docs/?id=$appId") {
+    Write-ZaiMessage 'ERROR' $message
+    Write-ZaiMessage 'FAIL' "$displayName installation did not complete."
+    Write-ZaiMessage 'NEXT' $next
     exit $code
 }
 
@@ -150,9 +153,7 @@ try {
     }
 
     if ($null -eq $manifest.release) {
-        [Console]::Error.WriteLine("No public release of $displayName has been published yet.")
-        [Console]::Error.WriteLine("Watch $site/apps/app/?id=$appId for the first build.")
-        exit 2
+        Stop-Install "No public release of $displayName has been published yet." 2 "Watch $site/apps/app/?id=$appId for the first build."
     }
 
     $assets = @($manifest.release.assets |
@@ -179,7 +180,7 @@ try {
     }
 
     $archive = Join-Path $work $asset.file
-    Write-Host "Downloading $displayName for windows/$architecture..."
+    Write-Host "[INFO] Downloading $displayName for windows/$architecture..."
     Save-Download $assetUrl $archive
 
     $actualHash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -193,7 +194,7 @@ try {
     if ($expectedBytes -and $actualBytes -ne $expectedBytes) {
         Stop-Install "the downloaded package is $actualBytes bytes but the manifest declares $expectedBytes. Nothing was installed."
     }
-    Write-Host "Verified SHA-256 $expectedHash"
+    Write-Host "[OK] Verified SHA-256 $expectedHash"
 
     $extract = Join-Path $work 'extract'
     New-Item -ItemType Directory -Path $extract -Force | Out-Null
@@ -204,6 +205,8 @@ try {
     }
 
 @INSTALL_STEP@
+} catch {
+    Stop-Install $_.Exception.Message
 } finally {
     Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue
 }

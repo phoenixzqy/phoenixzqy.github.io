@@ -19,6 +19,7 @@
     Add-UserPath $installDir
     Install-Shortcut $installDir '@SHORTCUT@' '@EXECUTABLE@'
 
+    Write-ZaiMessage 'OK' "$displayName installation complete."
     Write-Host ''
     Write-Host 'Installed command: @EXECUTABLE@'
     Write-Host "Installed $displayName to $target"

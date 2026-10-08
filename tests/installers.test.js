@@ -1011,3 +1011,41 @@ test("shortcut helper respects functions and aliases visible to its shell", asyn
     }
   });
 });
+
+test("bundled installer failure highlights the original reason and preserves its exit code", async () => {
+  for (const program of [
+    'raise SystemExit("Attach with zai and choose Close completely before installing or updating.")\n',
+    'import sys\nsys.stderr.write("Service still running\\n")\nraise SystemExit(7)\n',
+  ]) {
+    const file = "zai-test-linux-x64.zip";
+    const bytes = createZip({ "install.py": program });
+    await withServer(new Map([
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)])))],
+      [`/${file}`, bytes],
+    ]), (origin) => withHome(async (home) => {
+      const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });
+      assert.equal(result.code, program.includes("SystemExit(7)") ? 7 : 1);
+      assert.match(result.stderr, program.includes("SystemExit(7)")
+        ? /\[DETAIL\] Service still running/
+        : /\[ERROR\] Attach with zai and choose Close completely/);
+      assert.match(result.stderr, /\[FAIL\] zai installer:.*exit [17]/);
+      assert.match(result.stderr, /\[NEXT\].*rerun.*Close completely/);
+      assert.doesNotMatch(result.stderr, /\x1b|installation complete|Nothing was installed/);
+      assert.doesNotMatch(result.stdout, /Installed command:/);
+      assert.deepEqual(await readdir(home), []);
+    }));
+  }
+});
+
+test("every bootstrap highlights an unpublished release without offering a futile retry", async () => {
+  for (const { appId } of INSTALLERS.filter(({ mode }) => mode !== "codex")) {
+    await withServer(new Map([["/manifest.json", Buffer.from(JSON.stringify({ release: null }))]]), (origin) => withHome(async (home) => {
+      const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home });
+      assert.equal(result.code, 2);
+      assert.match(result.stderr, /\[ERROR\] No public release/);
+      assert.match(result.stderr, /\[FAIL\]/);
+      assert.match(result.stderr, /\[NEXT\] Watch https:\/\//);
+      assert.doesNotMatch(result.stderr, /\x1b/);
+    }));
+  }
+});

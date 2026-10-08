@@ -27,9 +27,30 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
+# Labels remain readable in pipes/logs; colour is only added to terminal stderr.
+message() {
+  message_level=$1
+  shift
+  message_colour=''
+  if [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${NO_COLOR+x}" != x ]; then
+    case "$message_level" in
+      ERROR | FAIL) message_colour='1;31' ;;
+      WARN) message_colour='1;33' ;;
+      NEXT) message_colour='1;36' ;;
+      OK) message_colour='1;32' ;;
+    esac
+  fi
+  if [ -n "$message_colour" ]; then
+    printf '\033[%sm[%s]\033[0m %s\n' "$message_colour" "$message_level" "$*" >&2
+  else
+    printf '[%s] %s\n' "$message_level" "$*" >&2
+  fi
+}
 fail() {
-  printf '%s installer: %s\n' "$DISPLAY_NAME" "$1" >&2
-  exit 1
+  message ERROR "$1"
+  message FAIL "$DISPLAY_NAME installation did not complete."
+  message NEXT "${2:-Resolve the reason above and rerun the installer. Help: $SITE/apps/docs/?id=$APP_ID}"
+  exit "${3:-1}"
 }
 info() {
   printf '%s\n' "$1"
@@ -64,7 +85,7 @@ show_activation() {
     bash) activation_profile="$HOME/.bashrc" ;;
     sh | dash | ksh) activation_profile="$HOME/.profile" ;;
   esac
-  printf '\n%s\n' 'To use the app in this terminal, copy and run:'
+  printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
@@ -172,13 +193,13 @@ download() {
       case "$1" in
         https://*) curl -fsSL --proto '=https' --proto-redir '=https' -o "$2" "$1" ;;
         *) curl -fsSL --proto '=http' --max-redirs 0 -o "$2" "$1" ;;
-      esac || fail "download failed: $1"
+      esac || fail "download failed: $1" "Check your network connection and the release URL, then rerun the installer."
       ;;
     wget)
       case "$1" in
         https://*) wget -q --https-only -O "$2" "$1" ;;
         *) wget -q --max-redirect=0 -O "$2" "$1" ;;
-      esac || fail "download failed: $1"
+      esac || fail "download failed: $1" "Check your network connection and the release URL, then rerun the installer."
       ;;
   esac
 }
@@ -275,11 +296,9 @@ PY
 else
   status=$?
   if [ "$status" -eq 2 ]; then
-    printf '%s\n' "No public release of $DISPLAY_NAME has been published yet." >&2
-    printf '%s\n' "Watch $SITE/apps/app/?id=$APP_ID for the first build." >&2
-    exit 2
+    fail "No public release of $DISPLAY_NAME has been published yet." "Watch $SITE/apps/app/?id=$APP_ID for the first build." 2
   fi
-  fail "the release manifest at $MANIFEST_URL could not be read as valid JSON."
+  fail "the release manifest at $MANIFEST_URL could not be read as valid JSON." "Retry later. If it still fails, report this manifest URL to the app publisher."
 fi
 
 [ -n "$ASSET" ] ||
@@ -299,7 +318,7 @@ fi
 
 # --- Download and verify --------------------------------------------------
 ARCHIVE="$WORK/$ASSET_FILE"
-info "Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
+info "[INFO] Downloading $DISPLAY_NAME for $PLATFORM/${ARCHITECTURE}…"
 download "$ASSET_URL" "$ARCHIVE"
 
 ACTUAL_SHA="$(checksum "$ARCHIVE")"
@@ -307,7 +326,7 @@ if [ "$ACTUAL_SHA" != "$ASSET_SHA" ]; then
   fail "SHA-256 verification failed for $ASSET_FILE.
   expected: $ASSET_SHA
   actual:   $ACTUAL_SHA
-The download was discarded and nothing was installed."
+The download was discarded and nothing was installed." "Retry the download. If verification still fails, report the expected and actual checksums to the publisher; do not install the unverified package."
 fi
 if [ -n "$ASSET_BYTES" ]; then
   ACTUAL_BYTES="$(wc -c <"$ARCHIVE" | tr -d ' ')"
@@ -315,10 +334,10 @@ if [ -n "$ASSET_BYTES" ]; then
     fail "the downloaded package is $ACTUAL_BYTES bytes but the manifest declares $ASSET_BYTES. Nothing was installed."
   fi
 fi
-info "Verified SHA-256 $ASSET_SHA"
+info "[OK] Verified SHA-256 $ASSET_SHA"
 
 EXTRACT="$WORK/extract"
-mkdir -p "$EXTRACT"
+mkdir -p "$EXTRACT" || fail "the extraction directory could not be created: $EXTRACT"
 extract "$ARCHIVE" "$EXTRACT"
 
 # --- Install --------------------------------------------------------------
@@ -329,20 +348,21 @@ BIN="$(find "$EXTRACT" -type f -name "$EXECUTABLE" -print 2>/dev/null | sed -n 1
 mkdir -p "$INSTALL_DIR" || fail "the installation directory could not be created: $INSTALL_DIR"
 STAGED="$INSTALL_DIR/.$EXECUTABLE.$$"
 cp "$BIN" "$STAGED" || fail "the executable could not be written to $INSTALL_DIR."
-chmod 0755 "$STAGED"
+chmod 0755 "$STAGED" || fail "the executable permissions could not be set: $STAGED"
 # Replace by rename so a running copy is never written in place.
 mv -f "$STAGED" "$INSTALL_DIR/$EXECUTABLE" ||
   fail "the executable could not be installed into $INSTALL_DIR."
 
 LICENSE_DIR="$INSTALL_DIR/licenses/$APP_ID"
-rm -rf "$LICENSE_DIR"
-mkdir -p "$LICENSE_DIR"
+rm -rf "$LICENSE_DIR" || fail "the old license directory could not be removed: $LICENSE_DIR"
+mkdir -p "$LICENSE_DIR" || fail "the license directory could not be created: $LICENSE_DIR"
 find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING*' \
   -o -name 'THIRD-PARTY*' -o -name 'THIRD_PARTY*' \) -exec cp {} "$LICENSE_DIR/" \; 2>/dev/null || true
 
 ensure_on_path "$INSTALL_DIR"
 install_shortcut 'zg' "$EXECUTABLE"
 
+message OK "$DISPLAY_NAME installation complete."
 info ''
 info "Installed command: $EXECUTABLE"
 info "Installed $DISPLAY_NAME to $INSTALL_DIR/$EXECUTABLE"

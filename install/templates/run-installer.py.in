@@ -1,0 +1,63 @@
+# Keep stdout and stdin live for interactive installers. Do not buffer output,
+# parse English messages, or guess whether a diagnostic is an error or warning.
+import sys
+import runpy
+import traceback
+
+@MESSAGES_PYTHON@
+
+class ZaiDiagnostics:
+    def __init__(self, stream):
+        self.stream = stream
+        self.at_start = True
+
+    def write(self, text):
+        for part in text.splitlines(keepends=True):
+            if self.at_start and part.strip():
+                self.stream.write("[DETAIL] ")
+            self.stream.write(part)
+            self.at_start = part.endswith("\n")
+        self.stream.flush()
+        return len(text)
+
+    def flush(self):
+        self.stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+label, mode = sys.argv[1:3]
+sys.argv = sys.argv[3:]
+original_stderr = sys.stderr
+sys.stderr = ZaiDiagnostics(original_stderr)
+code = 0
+reason = None
+try:
+    if mode == "stdin":
+        # The reviewed source remains unchanged in its original here-document.
+        sys.argv.insert(0, "-")
+        exec(compile(sys.stdin.read(), "<stdin>", "exec"), {"__name__": "__main__", "__file__": "<stdin>"})
+    else:
+        sys.path.insert(0, str(__import__("pathlib").Path(sys.argv[0]).resolve().parent))
+        runpy.run_path(sys.argv[0], run_name="__main__")
+except SystemExit as error:
+    if error.code is None:
+        code = 0
+    elif isinstance(error.code, int):
+        code = error.code
+    else:
+        reason, code = str(error.code), 1
+except KeyboardInterrupt:
+    reason, code = "Installation interrupted.", 130
+except Exception as error:
+    traceback.print_exc()
+    reason, code = str(error), 1
+finally:
+    sys.stderr = original_stderr
+
+if code:
+    if reason:
+        zai_message("ERROR", reason)
+    zai_message("FAIL", f"{label}: the bundled package installer did not complete (exit {code}).")
+    zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
+raise SystemExit(code)

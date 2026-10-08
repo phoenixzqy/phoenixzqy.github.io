@@ -1,6 +1,26 @@
 # Generated from install/templates/. Requires Python 3.10+; no network at runtime.
 & {
     $ErrorActionPreference = 'Stop'
+# Console.Error keeps diagnostics out of the success pipeline, including irm | iex.
+function Write-ZaiMessage([string] $level, [string] $message) {
+    $colour = ''
+    if (-not [Console]::IsErrorRedirected -and $env:TERM -ne 'dumb' -and
+        $null -eq [Environment]::GetEnvironmentVariable('NO_COLOR')) {
+        switch ($level) {
+            'ERROR' { $colour = '1;31' }
+            'FAIL' { $colour = '1;31' }
+            'WARN' { $colour = '1;33' }
+            'NEXT' { $colour = '1;36' }
+            'OK' { $colour = '1;32' }
+        }
+    }
+    if ($colour) {
+        $escape = [char]27
+        [Console]::Error.WriteLine("$escape[${colour}m[$level]$escape[0m $message")
+    } else {
+        [Console]::Error.WriteLine("[$level] $message")
+    }
+}
     $python = $null
     $prefix = @()
     foreach ($name in @('py', 'python', 'python3')) {
@@ -11,7 +31,7 @@
             if ($LASTEXITCODE -eq 0) { $python = $name; $prefix = $candidatePrefix; break }
         }
     }
-    if (-not $python) { throw 'Python 3.10+ is required to uninstall.' }
+    if (-not $python) { Write-ZaiMessage 'ERROR' 'Python 3.10+ is required to uninstall.'; Write-ZaiMessage 'FAIL' 'Uninstallation did not start.'; Write-ZaiMessage 'NEXT' 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the uninstaller.'; exit 1 }
     $program = @'
 """Remove zai-cli and its user data without deleting sibling apps or worktrees."""
 
@@ -29,6 +49,19 @@ import stat
 import subprocess
 import sys
 
+# Shared presentation only: installation/removal decisions belong to the app.
+def zai_message(level, text):
+    import os
+    import sys
+
+    colours = {"ERROR": "1;31", "FAIL": "1;31", "WARN": "1;33", "NEXT": "1;36", "OK": "1;32"}
+    label = f"[{level}]"
+    if sys.stderr.isatty() and os.environ.get("TERM") != "dumb" and "NO_COLOR" not in os.environ:
+        colour = colours.get(level)
+        if colour:
+            label = f"\033[{colour}m{label}\033[0m"
+    print(f"{label} {text}", file=sys.stderr, flush=True)
+
 APP_ID = "zai-cli"
 EXECUTABLE = "zai"
 MARKER = "# Added by zai installer"
@@ -41,6 +74,18 @@ CLI_PATHS = (
     ".opencode.lock", ".copilot.plugin-sync.lock", "locks", "agent-identity",
     "zai-temp", "copilot-tmp",
 )
+
+
+class AppRunningError(ValueError):
+    pass
+
+
+class UninstallArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        zai_message("ERROR", message)
+        zai_message("FAIL", f"{APP_ID} uninstallation did not start.")
+        zai_message("NEXT", "Run this uninstaller with --help to see valid options.")
+        raise SystemExit(2)
 
 
 def linked(path: Path) -> bool:
@@ -214,7 +259,7 @@ def clean_windows_path(directory: Path, dry_run: bool) -> None:
             ctypes.byref(ctypes.c_size_t()),
         )
         if not notified:
-            print("Windows environment notification timed out; open a new terminal.", file=sys.stderr)
+            zai_message("WARN", "Windows environment notification timed out; open a new terminal.")
 
 
 def config_home(home: Path) -> Path:
@@ -363,7 +408,7 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
     if not dry_run:
         running = active_apps(names)
         if running:
-            raise ValueError("Close zai apps and stop services before uninstalling: " + ", ".join(sorted(running)))
+            raise AppRunningError("Close zai apps and stop services before uninstalling: " + ", ".join(sorted(running)))
     planned = set(paths)
     # Unknown files and sibling executables can also depend on this PATH entry.
     survivors = [path for path in (directory.iterdir() if directory.exists() else []) if path not in planned
@@ -410,19 +455,30 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
         for path in directory.iterdir():
             if path not in planned:
                 print(f"Retained shared or unrelated path: {path}")
-    print("Dry run complete." if dry_run else f"Uninstalled {APP_ID}. Open a new terminal to refresh PATH.")
+    zai_message("OK", "Dry run complete." if dry_run else f"Uninstalled {APP_ID}.")
+    zai_message("NEXT", "Open a new terminal to refresh PATH." if not dry_run else "To remove the listed app data, rerun without --dry-run or ZAI_UNINSTALL_DRY_RUN=1.")
     print("Git worktrees, project files, independent coding-agent installations, and unrelated files are preserved.")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = UninstallArgumentParser(description=__doc__)
     parser.add_argument("--install-dir", type=Path, default=Path(os.environ.get("ZAI_INSTALL_DIR", str(Path.home() / ".zai"))))
     parser.add_argument("--dry-run", action="store_true", default=os.environ.get("ZAI_UNINSTALL_DRY_RUN") == "1")
     args = parser.parse_args()
     try:
         uninstall(args.install_dir, args.dry_run)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
-        print(f"{APP_ID} uninstall failed: {error}", file=sys.stderr)
+        zai_message("ERROR", str(error))
+        zai_message("FAIL", f"{APP_ID} uninstall failed.")
+        if isinstance(error, AppRunningError):
+            next_step = "Close the listed apps and stop their services, then rerun the uninstaller. For zai, attach with zai and choose Close completely."
+        elif isinstance(error, PermissionError):
+            next_step = "Check ownership and write permissions for the reported path, then rerun the uninstaller."
+        elif isinstance(error, ValueError):
+            next_step = "Check the reported path or metadata and your install-directory override. Use --dry-run to inspect the removal plan before retrying; do not bypass the safety check."
+        else:
+            next_step = "Resolve the reason above, then rerun the same uninstaller to finish cleanup. Any recovery marker is retained for retry."
+        zai_message("NEXT", next_step)
         return 1
     return 0
 
@@ -430,8 +486,15 @@ def main() -> int:
 if __name__ == "__main__":
     sys.exit(main())
 '@
-    $program | & $python @prefix - @args
-    if ($LASTEXITCODE -ne 0) { throw "Uninstaller failed with exit code $LASTEXITCODE" }
+    # Native stderr is diagnostic output; the exit code determines failure.
+    try {
+        $ErrorActionPreference = 'Continue'
+        $program | & $python @prefix - @args
+        $uninstallerExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = 'Stop'
+    }
+    if ($uninstallerExitCode -ne 0) { exit $uninstallerExitCode }
     # Refresh only this entry; preserve session-only tools and virtual environments.
     if ($env:ZAI_UNINSTALL_DRY_RUN -ne '1' -and $args -notcontains '--dry-run') {
         $directory = $env:ZAI_INSTALL_DIR

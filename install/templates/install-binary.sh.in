@@ -6,20 +6,21 @@ BIN="$(find "$EXTRACT" -type f -name "$EXECUTABLE" -print 2>/dev/null | sed -n 1
 mkdir -p "$INSTALL_DIR" || fail "the installation directory could not be created: $INSTALL_DIR"
 STAGED="$INSTALL_DIR/.$EXECUTABLE.$$"
 cp "$BIN" "$STAGED" || fail "the executable could not be written to $INSTALL_DIR."
-chmod 0755 "$STAGED"
+chmod 0755 "$STAGED" || fail "the executable permissions could not be set: $STAGED"
 # Replace by rename so a running copy is never written in place.
 mv -f "$STAGED" "$INSTALL_DIR/$EXECUTABLE" ||
   fail "the executable could not be installed into $INSTALL_DIR."
 
 LICENSE_DIR="$INSTALL_DIR/licenses/$APP_ID"
-rm -rf "$LICENSE_DIR"
-mkdir -p "$LICENSE_DIR"
+rm -rf "$LICENSE_DIR" || fail "the old license directory could not be removed: $LICENSE_DIR"
+mkdir -p "$LICENSE_DIR" || fail "the license directory could not be created: $LICENSE_DIR"
 find "$EXTRACT" -type f \( -name 'LICENSE*' -o -name 'NOTICE*' -o -name 'COPYING*' \
   -o -name 'THIRD-PARTY*' -o -name 'THIRD_PARTY*' \) -exec cp {} "$LICENSE_DIR/" \; 2>/dev/null || true
 
 ensure_on_path "$INSTALL_DIR"
 install_shortcut '@SHORTCUT@' "$EXECUTABLE"
 
+message OK "$DISPLAY_NAME installation complete."
 info ''
 info "Installed command: $EXECUTABLE"
 info "Installed $DISPLAY_NAME to $INSTALL_DIR/$EXECUTABLE"

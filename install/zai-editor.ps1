@@ -29,8 +29,30 @@ function Get-ZaiEnv([string] $name) {
     return $value
 }
 
-function Stop-Install([string] $message, [int] $code = 1) {
-    [Console]::Error.WriteLine("$displayName installer: $message")
+# Console.Error keeps diagnostics out of the success pipeline, including irm | iex.
+function Write-ZaiMessage([string] $level, [string] $message) {
+    $colour = ''
+    if (-not [Console]::IsErrorRedirected -and $env:TERM -ne 'dumb' -and
+        $null -eq [Environment]::GetEnvironmentVariable('NO_COLOR')) {
+        switch ($level) {
+            'ERROR' { $colour = '1;31' }
+            'FAIL' { $colour = '1;31' }
+            'WARN' { $colour = '1;33' }
+            'NEXT' { $colour = '1;36' }
+            'OK' { $colour = '1;32' }
+        }
+    }
+    if ($colour) {
+        $escape = [char]27
+        [Console]::Error.WriteLine("$escape[${colour}m[$level]$escape[0m $message")
+    } else {
+        [Console]::Error.WriteLine("[$level] $message")
+    }
+}
+function Stop-Install([string] $message, [int] $code = 1, [string] $next = "Resolve the reason above and rerun the installer. Help: $site/apps/docs/?id=$appId") {
+    Write-ZaiMessage 'ERROR' $message
+    Write-ZaiMessage 'FAIL' "$displayName installation did not complete."
+    Write-ZaiMessage 'NEXT' $next
     exit $code
 }
 
@@ -147,7 +169,7 @@ function Show-Activation([string] $directory, [string] $command) {
 
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
     Write-Host ''
-    Write-Host 'Ready in this PowerShell session. Run:'
+    Write-Host '[NEXT] Ready in this PowerShell session. Run:'
     $quotedCommand = "'" + $command.Replace("'", "''") + "'"
     Write-Host ("  & " + $quotedCommand)
     Write-Host ''
@@ -212,9 +234,7 @@ try {
     }
 
     if ($null -eq $manifest.release) {
-        [Console]::Error.WriteLine("No public release of $displayName has been published yet.")
-        [Console]::Error.WriteLine("Watch $site/apps/app/?id=$appId for the first build.")
-        exit 2
+        Stop-Install "No public release of $displayName has been published yet." 2 "Watch $site/apps/app/?id=$appId for the first build."
     }
 
     $assets = @($manifest.release.assets |
@@ -241,7 +261,7 @@ try {
     }
 
     $archive = Join-Path $work $asset.file
-    Write-Host "Downloading $displayName for windows/$architecture..."
+    Write-Host "[INFO] Downloading $displayName for windows/$architecture..."
     Save-Download $assetUrl $archive
 
     $actualHash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -255,7 +275,7 @@ try {
     if ($expectedBytes -and $actualBytes -ne $expectedBytes) {
         Stop-Install "the downloaded package is $actualBytes bytes but the manifest declares $expectedBytes. Nothing was installed."
     }
-    Write-Host "Verified SHA-256 $expectedHash"
+    Write-Host "[OK] Verified SHA-256 $expectedHash"
 
     $extract = Join-Path $work 'extract'
     New-Item -ItemType Directory -Path $extract -Force | Out-Null
@@ -286,12 +306,15 @@ try {
     Add-UserPath $installDir
     Install-Shortcut $installDir 'ze' 'zai-editor'
 
+    Write-ZaiMessage 'OK' "$displayName installation complete."
     Write-Host ''
     Write-Host 'Installed command: zai-editor'
     Write-Host "Installed $displayName to $target"
     Write-Host "Licenses: $licenseDir"
     Show-Activation $installDir 'zai-editor'
     Write-Host "Documentation: $site/apps/docs/?id=$appId"
+} catch {
+    Stop-Install $_.Exception.Message
 } finally {
     Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue
 }

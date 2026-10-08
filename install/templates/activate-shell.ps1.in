@@ -12,7 +12,7 @@ function Show-Activation([string] $directory, [string] $command) {
 
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
     Write-Host ''
-    Write-Host 'Ready in this PowerShell session. Run:'
+    Write-Host '[NEXT] Ready in this PowerShell session. Run:'
     $quotedCommand = "'" + $command.Replace("'", "''") + "'"
     Write-Host ("  & " + $quotedCommand)
     Write-Host ''
