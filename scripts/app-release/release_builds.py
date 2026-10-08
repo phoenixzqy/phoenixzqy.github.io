@@ -65,7 +65,11 @@ def prepare_codex_validation(runtime, source):
         if not target.is_absolute():
             raise ValueError('zai-codex release CARGO_TARGET_DIR must be absolute')
         target.mkdir(parents=True, exist_ok=True)
-        (source / 'codex-rs/target').symlink_to(target, target_is_directory=True)
+        # Git ignores the target directory, but a symlink replacing that directory
+        # is untracked. Link only the SDK's debug path inside a real directory.
+        local_target = source / 'codex-rs/target'
+        local_target.mkdir()
+        (local_target / 'debug').symlink_to(target / 'debug', target_is_directory=True)
     # Use the source's trusted V8 checksum pins for validation as well as packaging.
     code = '''import json,sys
 sys.path.insert(0, "scripts")

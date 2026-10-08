@@ -80,7 +80,8 @@ class CodexValidationTest(unittest.TestCase):
             executable.parent.mkdir()
             executable.write_bytes(b'fixture executable')
             self.assertEqual((source / 'codex-rs/target/debug/codex').read_bytes(), b'fixture executable')
-            self.assertEqual((source / 'codex-rs/target').resolve(), cache)
+            self.assertFalse((source / 'codex-rs/target').is_symlink())
+            self.assertEqual((source / 'codex-rs/target/debug').resolve(), cache / 'debug')
 
     def test_unverified_v8_stops_before_sdk_install(self):
         calls = []
