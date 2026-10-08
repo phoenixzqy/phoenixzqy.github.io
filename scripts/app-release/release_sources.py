@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+import shutil
 
 APPS = ('zai-editor', 'zai-gitter', 'zai-cli', 'zai-codex', 'BPlayer')
 EXCLUDED = {'zai-claude', 'zai-claude-code', 'zai-design-system'}
@@ -47,15 +48,26 @@ def clone(runtime, snapshot, workspace, root):
     name = repository.split('/')[1]
     destination = root / name
     local = workspace / name
-    args = ['git', 'clone', '--no-checkout']
+    if destination.exists() or destination.is_symlink():
+        raise FileExistsError(f'Clone destination already exists: {destination}')
+    args = ['git', 'clone', '--no-checkout', f'https://github.com/{repository}.git', destination]
     if local.exists():
         origin = runtime.run(['git', '-C', local, 'remote', 'get-url', 'origin'])
         if identity(origin).lower() != repository.lower():
             raise ValueError(f'Local checkout identity mismatch: {local}')
-        # Reuse local objects, not its branch/worktree; dissociate makes cleanup safe.
-        args += ['--reference-if-able', local, '--dissociate']
-    args += [f'https://github.com/{repository}.git', destination]
-    runtime.run(args)
+        # A shared checkout's objects can change during maintenance. This cache
+        # is only an optimization; retry independently if cloning with it fails.
+        try:
+            runtime.run(args[:3] + ['--reference-if-able', local, '--dissociate'] + args[3:])
+        except RuntimeError:
+            runtime.event('Local-reference clone failed; retrying from the remote without the object cache')
+            if destination.is_symlink():
+                raise ValueError(f'Unexpected linked clone destination: {destination}')
+            if destination.exists():
+                shutil.rmtree(destination)
+            runtime.run(args)
+    else:
+        runtime.run(args)
     runtime.run(['git', 'fetch', 'origin', f'+refs/heads/{snapshot["branch"]}:refs/remotes/origin/{snapshot["branch"]}'], cwd=destination)
     tip = runtime.run(['git', 'rev-parse', f'origin/{snapshot["branch"]}'], cwd=destination)
     if tip != snapshot['commit']:

@@ -31,8 +31,11 @@ never the local checkout branch. This selects `zai-codex` for the Codex fork.
 Local clones under the configurable workspace directory provide Git object
 caches. Each build uses a fresh disposable clone, fetches the remote branch,
 and rejects a changed snapshot. Local branches and dirty worktrees are preserved.
-A missing local clone falls back to the remote. All temporary clones and package
-staging directories are removed when the invocation exits.
+A missing local clone falls back to the remote. If cloning with the local object
+cache fails, the script removes only that attempt's temporary destination and
+retries once without the cache. Remote clone failures still stop the release.
+All temporary clones and package staging directories are removed when the
+invocation exits.
 
 The source packagers and version allocation functions remain authoritative.
 The source's full local validation runs before building. Go dependencies are
