@@ -227,6 +227,26 @@ class RuntimeTest(unittest.TestCase):
             release_apps.main(['--force'])
         self.assertEqual(error.exception.code, 2)
 
+    def test_children_receive_temporary_storage_outside_source_staging(self):
+        paths = []
+
+        def process(runtime, args, staging):
+            source = staging / 'source'
+            source.mkdir()
+            child_temporary = Path(runtime.run([sys.executable, '-B', '-c',
+                'import tempfile;print(tempfile.gettempdir())'], cwd=source).strip())
+            self.assertTrue(child_temporary.is_dir())
+            self.assertFalse(source.is_relative_to(child_temporary))
+            self.assertFalse(child_temporary.is_relative_to(staging))
+            self.assertEqual({runtime.environment[key] for key in ('TMPDIR', 'TMP', 'TEMP')},
+                             {str(child_temporary)})
+            paths.extend([staging, child_temporary])
+            return []
+
+        with tempfile.TemporaryDirectory() as directory, patch.object(release_apps, 'process', process):
+            self.assertEqual(release_apps.main(['--state-dir', directory]), 0)
+            self.assertTrue(all(not path.exists() for path in paths))
+
 
 
 

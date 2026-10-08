@@ -192,7 +192,11 @@ def main(argv=None):
     signal.signal(signal.SIGTERM, interrupt)
     try:
         with exclusive_lock(args.state_dir / 'release.lock'):
-            with tempfile.TemporaryDirectory(prefix='app-release-') as temporary:
+            # Sandboxes allow TMPDIR writes; source staging must stay outside
+            # that grant so validation can exercise filesystem boundaries.
+            with tempfile.TemporaryDirectory(prefix='app-release-') as temporary, \
+                    tempfile.TemporaryDirectory(prefix='t-') as child_temporary:
+                runtime.environment.update({key: child_temporary for key in ('TMPDIR', 'TMP', 'TEMP')})
                 report['apps'] = process(runtime, args, Path(temporary))
         return_code = int(any(app['status'] == 'failed' for app in report['apps']))
     except (OSError, ValueError, RuntimeError, KeyError, zipfile.BadZipFile, subprocess.TimeoutExpired, KeyboardInterrupt) as error:

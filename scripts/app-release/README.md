@@ -53,6 +53,8 @@ trusted checksum pins and installs SDK dependencies with `pnpm install
 An absolute `CARGO_TARGET_DIR` can retain the compiler cache across disposable
 clones; the adapter links the gate's executable paths to that same cache.
 Use disk-backed temporary storage with sufficient space for native builds.
+Validation children receive a separate temporary directory outside the source
+staging tree, so sandbox grants for `TMPDIR` do not make source paths writable.
 No source branch or source tag is pushed. All public release tags target website
 commits. Every final archive is inspected for debug maps, separate symbols,
 unsafe paths and credential files, and checked against its manifest checksum.
