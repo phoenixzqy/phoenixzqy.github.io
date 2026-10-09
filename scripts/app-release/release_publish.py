@@ -92,7 +92,7 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=
     finish(runtime, data, output, site, journal_path, journal, batch=batch)
 
 
-def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=None):
+def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=None, restore_installer=None):
     runtime.stage = f'{journal["app"]}:recover'
     repository, tag = runtime.site_repository, journal['tag']
     release = release_by_tag(runtime, tag, journal.get('release_id'))
@@ -102,14 +102,13 @@ def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=No
     journal['release_id'] = release['id']
     write_json(journal_path, journal)
     data = journal['manifest']
-    if data['appId'] == 'zai-codex':
-        raise RuntimeError('Interrupted codex release requires its installer synchronization to be restored; '
-                           f'inspect {journal_path} before resuming')
     expected = {asset['file'] for asset in data['release']['assets']}
     existing = {asset['name'] for asset in release['assets']}
     if existing - expected:
         raise ValueError('Interrupted draft has unexpected assets; inspect it before resuming')
     if expected - existing:
+        if data['appId'] == 'zai-codex':
+            raise RuntimeError('Interrupted codex release lacks required assets; inspect the draft before resuming')
         if not release['draft'] or not rebuild:
             raise RuntimeError('Interrupted release lacks required assets; repair the draft without overwriting published bytes')
         rebuild()
@@ -132,6 +131,10 @@ def recover(runtime, site, journal_path, journal, output, rebuild=None, batch=No
                  *[arg for a in data['release']['assets'] for arg in ('--pattern', a['file'])]])
     for asset in data['release']['assets']:
         verify_file(output / asset['file'], asset)
+    if data['appId'] == 'zai-codex':
+        if not restore_installer:
+            raise RuntimeError('Interrupted codex release requires installer restoration')
+        restore_installer()
     finish(runtime, data, output, site, journal_path, journal, batch=batch)
 
 

@@ -17,7 +17,12 @@ const file = "scripts/install_zai_codex.py";
 if (git("status", "--porcelain")) throw new Error("Sync from a clean, committed customization checkout.");
 const commit = git("rev-parse", "HEAD");
 // PR commits may be reviewed before merge; releases themselves must use origin/zai-codex.
-git("merge-base", "--is-ancestor", "origin/zai-codex", "HEAD");
+if (process.argv[3] === "--release") {
+  // Recovery may use an older, already merged customization revision.
+  git("merge-base", "--is-ancestor", "HEAD", "origin/zai-codex");
+} else {
+  git("merge-base", "--is-ancestor", "origin/zai-codex", "HEAD");
+}
 const installer = await readFile(join(resolve(source), file), "utf8");
 await writeFile(join(root, "install/templates/zai-codex.py.in"), installer);
 await writeFile(join(root, "install/zai-codex-source.json"), JSON.stringify({

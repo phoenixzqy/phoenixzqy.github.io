@@ -58,6 +58,31 @@ class CloneTest(unittest.TestCase):
             logs = list(runtime.directory.glob('*.log'))
             self.assertTrue(any('unable to read' in path.read_text() for path in logs))
 
+    def test_recovery_checks_out_only_a_recorded_ancestor_of_the_fetched_branch(self):
+        for recovery, ancestor in ((False, True), (True, True), (True, False)):
+            with self.subTest(recovery=recovery, ancestor=ancestor), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                snapshot = {'repository': 'owner/app', 'branch': 'custom', 'commit': 'a' * 40}
+                calls = []
+
+                class Runtime:
+                    def run(self, args, **kwargs):
+                        calls.append(args)
+                        if args[:2] == ['git', 'rev-parse']:
+                            return 'b' * 40
+                        if args[:3] == ['git', 'merge-base', '--is-ancestor'] and not ancestor:
+                            raise RuntimeError('not a merged revision')
+                        return ''
+
+                if recovery and ancestor:
+                    clone(Runtime(), snapshot, root / 'workspace', root, recovery=True)
+                    self.assertIn(['git', 'merge-base', '--is-ancestor', 'a' * 40, 'b' * 40], calls)
+                    self.assertEqual(calls[-1], ['git', 'checkout', '--detach', 'a' * 40])
+                else:
+                    with self.assertRaises(RuntimeError):
+                        clone(Runtime(), snapshot, root / 'workspace', root, recovery=recovery)
+                    self.assertFalse(any(args[:2] == ['git', 'checkout'] for args in calls))
+
     def test_remote_retry_failure_propagates_after_removing_partial_clone(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -214,3 +214,12 @@ Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
 sequential. Ctrl+C or termination cancels and joins owned workers before
 temporary clones and staging are removed. Existing release locks, checksums,
 per-app validation described above and website hooks still apply to every outgoing release.
+
+### Codex publication recovery
+
+When a Codex package was uploaded but website publication failed, rerunning the
+Codex automation resumes the recorded version. It downloads and verifies the
+existing immutable assets, restores the public installer from the recorded
+merged customization commit, and retries website publication. It does not
+rebuild Codex or rerun source tests. Missing or changed assets and mismatched
+provenance stop recovery; published package bytes are never overwritten.

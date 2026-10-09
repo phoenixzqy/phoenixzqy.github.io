@@ -43,7 +43,7 @@ def discover(runtime, owner, selected=None):
     return [remote_snapshot(runtime, f'{owner}/{name}') for name in APPS if name in requested]
 
 
-def clone(runtime, snapshot, workspace, root):
+def clone(runtime, snapshot, workspace, root, *, recovery=False):
     repository = snapshot['repository']
     name = repository.split('/')[1]
     destination = root / name
@@ -70,9 +70,13 @@ def clone(runtime, snapshot, workspace, root):
         runtime.run(args)
     runtime.run(['git', 'fetch', 'origin', f'+refs/heads/{snapshot["branch"]}:refs/remotes/origin/{snapshot["branch"]}'], cwd=destination)
     tip = runtime.run(['git', 'rev-parse', f'origin/{snapshot["branch"]}'], cwd=destination)
-    if tip != snapshot['commit']:
+    if recovery:
+        # Interrupted publication must restore its immutable source, even after
+        # the customization branch advances. Reject revisions outside that branch.
+        runtime.run(['git', 'merge-base', '--is-ancestor', snapshot['commit'], tip], cwd=destination)
+    elif tip != snapshot['commit']:
         raise RuntimeError(f'{repository} changed during discovery; retry with a fresh snapshot')
-    runtime.run(['git', 'checkout', '--detach', tip], cwd=destination)
+    runtime.run(['git', 'checkout', '--detach', snapshot['commit']], cwd=destination)
     return destination
 
 

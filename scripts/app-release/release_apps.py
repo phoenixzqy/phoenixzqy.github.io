@@ -86,6 +86,12 @@ def detect_tasks(runtime, args, snapshots, site, root):
     return tasks, reports
 
 
+def restore_codex_installer(runtime, args, task, root, site):
+    source = clone(runtime, task['snapshot'], args.workspace, root, recovery=True)
+    runtime.run(['node', 'scripts/sync-zai-codex-installer.mjs', source, '--release'], cwd=site)
+    runtime.run(['npm', 'run', 'build:installers'], cwd=site)
+
+
 def outcome(task, error=None, stage=None):
     if error:
         return {'app': task['name'], 'status': 'failed', 'stage': stage, 'error': str(error)}
@@ -148,7 +154,9 @@ def process(runtime, args, root):
                 run_bplayer(runtime, task['snapshot'], site, task['journal_path'], task['journal'], task['output'])
             elif task['pending']:
                 recover(runtime, site, task['journal_path'], task['journal'], task['output'],
-                        lambda: prepare(runtime, args, task, root, site))
+                        lambda: prepare(runtime, args, task, root, site),
+                        restore_installer=(lambda: restore_codex_installer(runtime, args, task, root, site))
+                        if task['name'] == 'zai-codex' else None)
             else:
                 data = prepare(runtime, args, task, root, site)
                 publish(runtime, task['snapshot'], data, task['output'], site, task['journal_path'], task['journal'])
