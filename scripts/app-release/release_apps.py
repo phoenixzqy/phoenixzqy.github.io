@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check remote app revisions; build, verify and publish approved app releases."""
+"""Check and publish app releases other than zai-codex."""
 from __future__ import annotations
 
 import argparse
@@ -21,6 +21,8 @@ from release_publish import publish, recover, release_for_manifest
 from release_runtime import Runtime, exclusive_lock, write_json
 from release_website import publish_website
 from release_sources import APPS, changed, clone, discover, provenance, remote_snapshot
+
+OTHER_APPS = tuple(app for app in APPS if app != 'zai-codex')
 
 
 def configure_site(runtime, site):
@@ -99,7 +101,7 @@ def process(runtime, args, root):
             runtime.environment[key] = ','.join(dict.fromkeys([*filter(None, value.split(',')), f'github.com/{args.owner}/*']))
     site_snapshot = remote_snapshot(runtime, runtime.site_repository)
     runtime.site_branch = site_snapshot['branch']
-    snapshots = discover(runtime, args.owner, args.apps)
+    snapshots = discover(runtime, args.owner, args.apps or args.allowed_apps)
     site = clone(runtime, site_snapshot, args.workspace, root)
     tasks, reports = detect_tasks(runtime, args, snapshots, site, root)
     if not tasks:
@@ -162,13 +164,19 @@ def process(runtime, args, root):
     return reports
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(argv=None, *, allowed_apps=OTHER_APPS):
+    description = 'Check and publish zai-codex releases.' if allowed_apps == ('zai-codex',) else __doc__
+    parser = argparse.ArgumentParser(description=description)
+    parser.set_defaults(allowed_apps=allowed_apps, publish=False)
     parser.add_argument('--jobs', type=int, choices=(1, 2, 3), default=2,
                         help='Concurrent Go validation/build jobs (default: 2). Publishing is serialized.')
-    parser.add_argument('--publish', action='store_true', help='Build and publish; default is read-only detection.')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--publish', action='store_true', help='Build and publish; default is read-only detection.')
+    mode.add_argument('--dry-run', action='store_false', dest='publish',
+                      help='Detect updates without building or publishing (default).')
     parser.add_argument('--force', action='store_true', help='Release selected apps even when already current.')
-    parser.add_argument('--apps', nargs='+', choices=APPS)
+    parser.add_argument('--apps', nargs='+', choices=allowed_apps,
+                        help='Limit releases within this script\'s app group.')
     parser.add_argument('--owner', default='phoenixzqy')
     parser.add_argument('--workspace', type=Path, default=Path.home() / 'workspace')
     parser.add_argument('--state-dir', type=Path, default=Path.home() / '.local/state/app-release')

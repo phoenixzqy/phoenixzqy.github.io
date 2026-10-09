@@ -15,13 +15,21 @@ explicit prerequisite error; install the standard Node.js toolchain.
 python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
 python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 2
+python3 -B scripts/app-release/release_codex.py --dry-run
+python3 -B scripts/app-release/release_codex.py --publish --codex-notices /path/to/reviewed-notices
 ```
 
-The default checks for unpublished updates without building or writing to GitHub.
+`release_apps.py` handles zai-cli, zai-editor, zai-gitter and BPlayer;
+`release_codex.py` handles only zai-codex. Each rejects `--apps` targets belonging
+to the other group. Both reuse the same validation, packaging and publication
+pipeline, and keep their existing per-app recovery journals.
+
+The default (or explicit `--dry-run`) checks for unpublished updates without
+building or writing to GitHub. `--dry-run` cannot be combined with `--publish`.
 `--publish` authorizes builds, public release assets and website pushes. `--force`
 requires explicit `--apps` and allocates a new version even if already current.
 
-The approved adapters cover zai-cli, zai-editor, zai-gitter, zai-codex and BPlayer.
+Together the approved adapters cover zai-cli, zai-editor, zai-gitter, zai-codex and BPlayer.
 zai-claude-code and zai-design-system are excluded as release targets. A new
 zai repository needs an explicit adapter before it can publish. Design-system
 and bundled-tool revisions still participate in consumer update detection.
@@ -148,8 +156,8 @@ or website metadata were published; it is not evidence that nothing was written.
 Uncertain release ownership, missing approved metadata, checksum differences or
 an unreconciled partial publication require operator repair before either path.
 
-After zai-cli's Script automation support is installed, preserve the existing
-schedule/id and replace its prompt execution with:
+Use two Script automations. Preserve the existing app automation's schedule/id
+and select the other-app entry point:
 
 ```json
 {
@@ -159,8 +167,24 @@ schedule/id and replace its prompt execution with:
 }
 ```
 
-Use `python` on Windows. Add the absolute reviewed Codex notice-directory option
-in the local automation configuration when releasing Codex. zai must remain open
+Create a separate enabled Codex Script automation with a new ID and the same
+trigger, schedule and logging settings:
+
+```json
+{
+  "kind": "script",
+  "command": "python3 -B scripts/app-release/release_codex.py --publish --codex-notices /path/to/reviewed-notices",
+  "skip_log": false
+}
+```
+
+Use `python` on Windows. Keep host-specific launchers and native environment
+settings outside the website. Only the Codex launcher needs its native toolchain
+and reviewed notice-directory option. Test the other-app command normally and
+use `--dry-run` for a short Codex discovery check; this does not validate a Codex
+build or package. Both scripts share the state-directory release lock, so local
+launchers must queue overlapping runs rather than fail or bypass that lock.
+zai must remain open
 for scheduled execution; an OS scheduler can also invoke this command. Detailed
 logs remain private and are never copied to the public site.
 
