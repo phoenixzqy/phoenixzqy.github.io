@@ -46,7 +46,7 @@ All temporary clones and package staging directories are removed when the
 invocation exits.
 
 The source packagers and version allocation functions remain authoritative.
-The source's full local validation runs before building. Go dependencies are
+For the Go apps, the source's full local validation runs before building. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
 For zai-cli, the adapter creates `.venv-local-ci` in the disposable source clone,
@@ -55,11 +55,16 @@ that environment's Python. This keeps validation dependencies available when
 tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
 to the configured package index. Setup failures stop the release before packaging;
 the environment is removed with the clone.
-For zai-codex, validation first resolves V8 through the source repository's
-trusted checksum pins and installs SDK dependencies with `pnpm install
---frozen-lockfile`. Native development libraries remain host prerequisites.
+For zai-codex, release automation calls the native packager directly without
+rerunning the full source test suite or installing SDK test dependencies.
+The packager resolves V8 through the source repository's trusted checksum pins,
+builds native binaries, checks clean source provenance, and smoke-tests package
+version and Copilot login help. Its failures stop publication. Release notes
+explicitly disclose that the full source suite was not rerun; release success
+does not establish a passing source suite. Source pre-push hooks are unchanged.
+Native development libraries remain host prerequisites.
 An absolute `CARGO_TARGET_DIR` can retain the compiler cache across disposable
-clones; the adapter links the gate's executable paths to that same cache.
+clones; the native packager uses that cache directly.
 Use disk-backed temporary storage with sufficient space for native builds.
 Validation children receive a separate temporary directory outside the source
 staging tree, so sandbox grants for `TMPDIR` do not make source paths writable.
@@ -208,4 +213,4 @@ A newer remote manifest is checked again before the combined commit.
 Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
 sequential. Ctrl+C or termination cancels and joins owned workers before
 temporary clones and staging are removed. Existing release locks, checksums,
-source validation and website hooks still apply to every outgoing release.
+per-app validation described above and website hooks still apply to every outgoing release.

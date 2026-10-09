@@ -60,9 +60,12 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=
         target = runtime.run(['git', 'rev-parse', 'HEAD'], cwd=site)
         note = output / 'release-notes.md'
         record = {key: snapshot[key] for key in ('repository', 'branch', 'commit', 'dependencies')}
+        validation = ('Native build and package smoke checks passed on the build host. '
+                      'Release automation did not rerun the full source test suite. '
+                      if name == 'zai-codex' else 'Native validation passed on the build host; ')
         note.write_text(f'Unsigned preview built from source revision `{snapshot["commit"]}`.\n\n'
                         'Final archives exclude debug maps and separate debug companions. '
-                        'Native validation passed on the build host; cross-compilation does not '
+                        f'{validation}Cross-compilation does not '
                         'establish native behavior on other hosts.\n\n'
                         f'<!-- app-release-provenance {json.dumps(record, sort_keys=True)} -->\n')
         # Record intent BEFORE the irreversible release create: a lost API response

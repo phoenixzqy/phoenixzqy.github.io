@@ -14,6 +14,12 @@ Follow the source repository's `RELEASING.md` for native prerequisites, local
 validation, dependency notices and smoke checks. Hosted Actions are disabled
 there; publication does not enable them.
 
+The local release automation invokes the native packager without rerunning the
+full source test suite. It retains native builds, package smoke checks, reviewed
+notices, provenance, archive and checksum verification, and the website pre-push
+gate. Source pre-push hooks remain unchanged. Release notes disclose this
+validation scope; successful packaging is not full-suite validation evidence.
+
 On each advertised native host, use the same source commit and custom version:
 
 ```sh
