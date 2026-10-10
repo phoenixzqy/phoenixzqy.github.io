@@ -80,28 +80,33 @@ function Save-Download([string] $url, [string] $destination) {
         if ($uri.Scheme -ne 'https' -and -not $localFixture) {
             Stop-Install "refusing to download over a non-HTTPS URL: $url"
         }
+        # Windows PowerShell 5.1's Invoke-WebRequest can fail before returning
+        # a response when MaximumRedirection is zero. Use the .NET transport
+        # directly so every redirect is checked before the next request.
+        $response = $null
         try {
-            $response = Invoke-WebRequest -Uri $uri -OutFile $destination -UseBasicParsing -MaximumRedirection 0 -PassThru
+            $request = [Net.HttpWebRequest]::Create($uri)
+            $request.AllowAutoRedirect = $false
+            $response = $request.GetResponse()
             $status = [int] $response.StatusCode
-            if ($status -lt 300 -or $status -ge 400) { return }
+            if ($status -ge 300 -and $status -lt 400) {
+                if ($localFixture) { Stop-Install "refusing to follow a plaintext redirect: $url" }
+                $location = [string] $response.Headers['Location']
+                if (-not $location) { Stop-Install "redirect without a Location: $url" }
+                $url = [Uri]::new($uri, $location).AbsoluteUri
+            } else {
+                $stream = $response.GetResponseStream()
+                try {
+                    $file = [IO.File]::Create($destination)
+                    try { $stream.CopyTo($file) } finally { $file.Dispose() }
+                } finally { $stream.Dispose() }
+                return
+            }
         } catch {
-            $response = $_.Exception.Response
-            if ($null -eq $response) {
-                Stop-Install "download failed: $url ($($_.Exception.Message))"
-            }
-            $status = [int] $response.StatusCode
-            if ($status -lt 300 -or $status -ge 400) {
-                Stop-Install "download failed: $url ($($_.Exception.Message))"
-            }
+            Stop-Install "download failed: $url ($($_.Exception.Message))"
+        } finally {
+            if ($null -ne $response) { $response.Close() }
         }
-        if ($localFixture) { Stop-Install "refusing to follow a plaintext redirect: $url" }
-        if ($response -is [System.Net.Http.HttpResponseMessage]) {
-            $location = [string] $response.Headers.Location
-        } else {
-            $location = [string] $response.Headers['Location']
-        }
-        if (-not $location) { Stop-Install "redirect without a Location: $url" }
-        $url = [Uri]::new($uri, $location).AbsoluteUri
     }
     Stop-Install "too many download redirects: $url"
 }
