@@ -226,7 +226,7 @@ export function validateManifest(manifest, app) {
         !url.username && !url.password && !url.search && !url.hash &&
         url.href === asset.url &&
         url.pathname.startsWith(pathnamePrefix),
-      "External assets must use approved public GitHub Release download URLs.");
+      "External assets must use public GitHub Release download URLs in an approved repository.");
       const path = url.pathname.slice(pathnamePrefix.length).split("/");
       requireValue(path.length === 2 && /^[A-Za-z0-9][A-Za-z0-9._+-]*$/.test(path[0]) &&
         decodeURIComponent(path[1]) === asset.file &&
