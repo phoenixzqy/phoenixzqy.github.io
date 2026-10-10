@@ -482,7 +482,8 @@ test("installer metadata overrides reject non-loopback HTTP and plaintext redire
     const ps = await readFile(installerPath(`${appId}.ps1`), "utf8");
     assert.match(shell, /--proto '=https' --proto-redir '=https'/);
     assert.match(shell, /wget -q --https-only/);
-    assert.match(ps, /-MaximumRedirection 0 -PassThru/);
+    assert.match(ps, /\$request\.AllowAutoRedirect = \$false/);
+    assert.doesNotMatch(ps, /System\.Net\.Http\.HttpResponseMessage|Invoke-WebRequest -Uri/);
     assert.match(ps, /127\\\.0\\\.0\\\.1/);
     assert.match(ps, /refusing to follow a plaintext redirect/);
   }
