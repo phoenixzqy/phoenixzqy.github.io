@@ -16,6 +16,7 @@ import uuid
 import signal
 
 from release_bplayer import run_bplayer
+from release_codex_workflow import run_codex
 from release_jobs import GO_APPS, FAILURES, history, parallel_prepare, prepare
 from release_publish import publish, recover, release_for_manifest
 from release_runtime import Runtime, exclusive_lock, write_json
@@ -75,7 +76,7 @@ def detect_tasks(runtime, args, snapshots, site, root):
             if pending and (journal['app'] != app or journal['snapshot']['repository'] != snapshot['repository']):
                 raise ValueError('Journal identity mismatch')
             resumable = pending and (journal.get('create_intent') or
-                        (app == 'bplayer' and (journal.get('dispatch_intent') or journal.get('run_id'))))
+                        (app in ('bplayer', 'zai-codex') and (journal.get('dispatch_intent') or journal.get('run_id'))))
             if not resumable:
                 journal = {'app': app, 'snapshot': snapshot, 'complete': False}
             tasks.append({'name': name, 'snapshot': journal['snapshot'], 'journal': journal,
@@ -152,6 +153,9 @@ def process(runtime, args, root):
             if task['name'] == 'BPlayer':
                 write_json(task['journal_path'], task['journal'])
                 run_bplayer(runtime, task['snapshot'], site, task['journal_path'], task['journal'], task['output'])
+            elif task['name'] == 'zai-codex' and not task['journal'].get('create_intent'):
+                write_json(task['journal_path'], task['journal'])
+                run_codex(runtime, args, task, root, site)
             elif task['pending']:
                 recover(runtime, site, task['journal_path'], task['journal'], task['output'],
                         lambda: prepare(runtime, args, task, root, site),
@@ -188,7 +192,7 @@ def main(argv=None, *, allowed_apps=OTHER_APPS):
     parser.add_argument('--owner', default='phoenixzqy')
     parser.add_argument('--workspace', type=Path, default=Path.home() / 'workspace')
     parser.add_argument('--state-dir', type=Path, default=Path.home() / '.local/state/app-release')
-    parser.add_argument('--codex-notices', type=Path, help='Previously reviewed third-party notice directory.')
+    parser.add_argument('--codex-notices', type=Path, help='Legacy native recovery notice directory; new Codex releases use the workflow notice pin.')
     parser.add_argument('--timeout', type=int, default=7200, help='Maximum seconds per build/workflow.')
     args = parser.parse_args(argv)
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9-]*', args.owner) or args.timeout <= 0:

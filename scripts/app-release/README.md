@@ -16,7 +16,7 @@ python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
 python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 2
 python3 -B scripts/app-release/release_codex.py --dry-run
-python3 -B scripts/app-release/release_codex.py --publish --codex-notices /path/to/reviewed-notices
+python3 -B scripts/app-release/release_codex.py --publish
 ```
 
 `release_apps.py` handles zai-cli, zai-editor, zai-gitter and BPlayer;
@@ -55,30 +55,11 @@ that environment's Python. This keeps validation dependencies available when
 tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
 to the configured package index. Setup failures stop the release before packaging;
 the environment is removed with the clone.
-For zai-codex, release automation calls the native packager directly without
-rerunning the full source test suite or installing SDK test dependencies.
-The packager resolves V8 through the source repository's trusted checksum pins,
-builds native binaries, checks clean source provenance, and smoke-tests package
-version and Copilot login help. Its failures stop publication. Release notes
-explicitly disclose that the full source suite was not rerun; release success
-does not establish a passing source suite. Source pre-push hooks are unchanged.
-Native development libraries remain host prerequisites.
-An absolute `CARGO_TARGET_DIR` can retain the compiler cache across disposable
-clones; the native packager uses that cache directly.
-Use disk-backed temporary storage with sufficient space for native builds.
-Validation children receive a separate temporary directory outside the source
-staging tree, so sandbox grants for `TMPDIR` do not make source paths writable.
-No source branch or source tag is pushed. All public release tags target website
-commits. Every final archive is inspected for debug maps, separate symbols,
-unsafe paths and credential files, and checked against its manifest checksum.
-Only explicitly listed final package assets are uploaded.
+For zai-codex, release automation dispatches the public source repository's manual `zai-codex-release.yml` workflow on its default `zai-codex` branch. Six native GitHub runners build Linux GNU, macOS and Windows MSVC packages for x64 and ARM64 using the existing packager. Each job verifies version, Copilot login help and isolated installation; publication requires the complete matrix and checksums/provenance. The full source suite and interactive login are not run by this release workflow. Local source pre-push hooks remain unchanged.
 
-zai-codex builds only on its native host and requires `--codex-notices` pointing
-to reviewed third-party notices. Native prerequisites and release verification
-remain governed by the source's RELEASING.md and the site's Codex release guide.
-Only the built target is advertised; existing other-platform assets are not
-carried into a new source version. Dependency changes may require updated notice
-review before an unattended release can proceed.
+The workflow uses checksum-pinned previously reviewed notices and rejects changes to the recorded dependency inputs until reviewed. `--codex-notices` remains only as a legacy CLI compatibility option; new releases obtain notices from that workflow pin. The adapter verifies the exact workflow/source revision, all six assets, public downloads, bundle provenance and SHA-256 before syncing the installer and publishing website links directly to the source release. Old website-hosted releases remain immutable and readable.
+
+Dispatch intent and unique request ID are saved before dispatch; the run ID and terminal result are retained for recovery. An uncertain dispatch is never repeated blindly. Remote runs continue after local interruption. Rerunning resumes monitoring and website publication; a failed workflow requires inspecting/reconciling its draft or assets before retiring its journal and allocating a new version. Never overwrite a versioned package or clear an uncertain journal to force another dispatch.
 
 BPlayer dispatches the remote-default-branch Release workflow and verifies its
 run, source revision and public downloads. It refuses to dispatch until the
@@ -178,7 +159,7 @@ trigger, schedule and logging settings:
 ```json
 {
   "kind": "script",
-  "command": "python3 -B scripts/app-release/release_codex.py --publish --codex-notices /path/to/reviewed-notices",
+  "command": "python3 -B scripts/app-release/release_codex.py --publish",
   "skip_log": false
 }
 ```

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, rm, symlink } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { validateCatalog, validateManifest, assetHref, MAX_LOCAL_BYTES } from "../apps/schema.js";
@@ -187,4 +187,16 @@ test("unpublished folders cannot silently publish stray packages", async () => {
     await writeFile(join(folder, "manifest.json"), JSON.stringify({ schemaVersion: 1, appId: "bplayer", release: null }));
     await assert.rejects(validateSite(root), /unlisted files/);
   });
+});
+
+
+test("only zai-codex can link its own public source releases", async () => {
+  const catalog = JSON.parse(await readFile(new URL("../apps/catalog.json", import.meta.url), "utf8"));
+  const codex = catalog.apps.find((app) => app.id === "zai-codex");
+  const release = JSON.parse(await readFile(new URL("../releases/zai-codex/latest/manifest.json", import.meta.url), "utf8"));
+  const asset = release.release.assets[0];
+  asset.url = `https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v${release.release.version}/${asset.file}`;
+  assert.equal(validateManifest(release, codex), release);
+  asset.url = asset.url.replace("zai-codex-v", "wrong-v");
+  assert.throws(() => validateManifest(release, codex));
 });

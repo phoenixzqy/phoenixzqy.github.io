@@ -1,7 +1,7 @@
 {
   "repository": "phoenixzqy/zai-codex",
   "branch": "zai-codex",
-  "commit": "9b4c7c0bb8fb212a7369fc2d144691fc79bace89",
+  "commit": "1cca747cf793d9ea3c382c487761d24ebdc834f8",
   "file": "scripts/install_zai_codex.py",
-  "sha256": "1ed924459a1cc331242b2e82659f06fb885aaa319360361b33b9e9232ab2c87a"
+  "sha256": "78a8b11be8a8c366f862df36e1e2705a304910f96075579560f07fa02a4db515"
 }

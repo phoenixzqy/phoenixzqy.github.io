@@ -32,7 +32,11 @@ def release_for_manifest(runtime, site, app):
     if manifest['release'] is None:
         return None
     version = manifest['release']['version']
-    return runtime.api(f'repos/{runtime.site_repository}/releases/tags/{app}-v{version}')
+    repository = runtime.site_repository
+    if app == 'zai-codex' and any(asset.get('url', '').startswith(
+            'https://github.com/phoenixzqy/zai-codex/releases/download/') for asset in manifest['release']['assets']):
+        repository = 'phoenixzqy/zai-codex'
+    return runtime.api(f'repos/{repository}/releases/tags/{app}-v{version}')
 
 
 def validate_metadata(runtime, site, data):

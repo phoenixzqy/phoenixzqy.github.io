@@ -1,7 +1,6 @@
 # Publishing app releases
 
-This is a **public, binary-distribution surface**. Source repositories stay
-private. Publish only app descriptions and final packages explicitly cleared
+This is a **public, binary-distribution surface**. Private source repositories stay private; zai-codex is an explicitly public fork. Publish only app descriptions and final packages explicitly cleared
 for public distribution. Never copy a private checkout, credentials, signing
 keys, user data, logs, debugging symbols, source maps, or source archives here.
 Review the contents of each package, not just its filename.
@@ -365,7 +364,7 @@ Keep the per-app `latest/manifest.json` folder, but add `url` to the asset:
 ```
 
 Do not also copy that file into `latest/`. All other asset fields remain
-required; the URL must match `file`. Only this website repository's HTTPS
+required; the URL must match `file`. This website repository's HTTPS
 release-download URLs are accepted: no private repository URLs, tokens,
 query strings, or arbitrary third-party download hosts.
 
@@ -374,3 +373,7 @@ release, and confirm unauthenticated downloads work **before** publishing the
 manifest. Local validation cannot verify a remote binary's existence, bytes,
 hash, signing, licensing, or public visibility; your pipeline must do so.
 Using a release URL does not grant distribution rights.
+
+### Public zai-codex source releases
+
+The public `phoenixzqy/zai-codex` fork is the approved exception to website-hosted release assets. Its manual `zai-codex-release.yml` workflow publishes immutable `zai-codex-v<version>` tags, six native ZIPs, checksum sidecars and `manifest.json`. The website dispatcher verifies the exact source commit, successful workflow run, complete Linux/macOS/Windows x64/ARM64 matrix, package provenance, public byte counts and hashes before publishing links. Only zai-codex manifests may link `https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v<version>/<file>`; the tag must match the manifest version. Other apps retain website-hosted release URLs. Existing website-hosted Codex releases remain supported and immutable. No source archive, private source, build cache or credentials belong in this website.

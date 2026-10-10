@@ -11,14 +11,11 @@ Claim separate worktrees for `phoenixzqy/zai-codex` and this website. After the
 source release tools merge, fetch `origin/zai-codex` in the source worktree and
 build from its clean HEAD. Do not copy the source checkout into the public site.
 Follow the source repository's `RELEASING.md` for native prerequisites, local
-validation, dependency notices and smoke checks. Hosted Actions are disabled
-there; publication does not enable them.
+validation, dependency notices and smoke checks. Only the manually triggered `zai-codex-release.yml` workflow is enabled there. Local source pre-push validation remains required.
 
-The local release automation invokes the native packager without rerunning the
-full source test suite. It retains native builds, package smoke checks, reviewed
-notices, provenance, archive and checksum verification, and the website pre-push
-gate. Source pre-push hooks remain unchanged. Release notes disclose this
-validation scope; successful packaging is not full-suite validation evidence.
+The website's `scripts/app-release/release_codex.py --publish` dispatches the source default branch workflow with the allocated version, exact source commit and unique request ID. It journals dispatch intent and the run ID before waiting, so interrupted invocations resume without creating duplicate releases. All six native jobs must pass package and installation smoke checks; a successful workflow is not evidence that the full source suite or interactive Copilot login ran.
+
+For manual local preparation, use the existing native packager:
 
 On each advertised native host, use the same source commit and custom version:
 
@@ -36,7 +33,7 @@ native macOS or Windows correctness.
 Review archive contents, Apache LICENSE/NOTICE, modification attribution,
 applicable third-party notices and `zai-release.json` provenance. The packager
 requires notices but cannot certify their completeness. Check all packages name
-the same `zai-codex` commit, version and `zai-codex-v<version>` website release tag.
+the same `zai-codex` commit, version and `zai-codex-v<version>` source release tag.
 Smoke-test version, interactive Copilot login and launch on the native targets.
 Report actual signing/notarization status and fulfill bundled dependency licenses.
 
@@ -79,24 +76,12 @@ version embedded in the executable. Keep `codex-package.json.version` equal to
 the executable version; record the public version in `zai-release.json.version`.
 The normal background-server launch rejects a mismatched internal version. Subsequent releases repeat this workflow.
 
-Upload reviewed final ZIPs to a draft release on
-`phoenixzqy/phoenixzqy.github.io`, tagged **`zai-codex-v<version>`** and targeting a
-website commit. Never create a source-repo release as the website download source.
-For example, pass explicit verified paths to:
-
-```sh
-gh release create zai-codex-v0.1.0 --repo phoenixzqy/phoenixzqy.github.io --target <website-commit> --draft --title 'zai-codex 0.1.0' --notes-file /path/to/release-notes.md /path/to/release-assets/zai-codex-0.1.0-x86_64-unknown-linux-gnu.zip
-```
-
-Include all verified targets. Release notes identify the source commit, platform
-requirements, signing state, verification and known limitations. Review the draft
-before publishing, then verify unauthenticated downloads and recompute their
-hashes. SHA-256 verifies bytes, not publisher signing.
+The manual source workflow publishes reviewed final ZIPs, checksum sidecars and `manifest.json` on **`phoenixzqy/zai-codex`**, tagged `zai-codex-v<version>` at its dispatch commit. Its pinned notices must match the recorded dependency inputs. All Linux GNU, macOS and Windows MSVC x64/ARM64 packages must be present and verified before publication. Packages are unsigned; macOS is not notarized. The website adapter checks successful-run identity, release provenance and every public ZIP's size/hash/archive contents before publishing metadata. Failed or ambiguous dispatches retain the journal and never redispatch blindly; inspect failed runs and any draft without replacing versioned bytes.
 
 Populate `latest/manifest.json` with actual version, UTC publication time, notes
 and assets. Map targets to `linux`/`macos`/`windows` and `x64`/`arm64`; use final
 ZIP sizes/hashes, honest signing states and installation notes. Asset URLs use
-`https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v<version>/<filename>`.
+`https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v<version>/<filename>`.
 Keep sidecars in release staging or release assets, not `latest/`. Update the
 catalog's stage/platform readiness when packages become available. Keep the
 intro focused on Copilot subscription support and disabled remote telemetry/

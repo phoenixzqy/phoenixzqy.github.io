@@ -219,14 +219,18 @@ export function validateManifest(manifest, app) {
     if (asset.url !== undefined) {
       text(asset.url, "Asset URL", 2048);
       const url = new URL(asset.url);
-      requireValue(asset.url.startsWith(RELEASE_PREFIX) && url.origin === "https://github.com" &&
+      const prefix = app.id === "zai-codex" && asset.url.startsWith("https://github.com/phoenixzqy/zai-codex/releases/download/")
+        ? "https://github.com/phoenixzqy/zai-codex/releases/download/" : RELEASE_PREFIX;
+      const pathnamePrefix = new URL(prefix).pathname;
+      requireValue(asset.url.startsWith(prefix) && url.origin === "https://github.com" &&
         !url.username && !url.password && !url.search && !url.hash &&
         url.href === asset.url &&
-        url.pathname.startsWith("/phoenixzqy/phoenixzqy.github.io/releases/download/"),
-      "External assets must use public GitHub Release download URLs in this website repository.");
-      const path = url.pathname.slice("/phoenixzqy/phoenixzqy.github.io/releases/download/".length).split("/");
+        url.pathname.startsWith(pathnamePrefix),
+      "External assets must use approved public GitHub Release download URLs.");
+      const path = url.pathname.slice(pathnamePrefix.length).split("/");
       requireValue(path.length === 2 && /^[A-Za-z0-9][A-Za-z0-9._+-]*$/.test(path[0]) &&
-        decodeURIComponent(path[1]) === asset.file, "Release URL must contain a simple tag and the matching package filename.");
+        decodeURIComponent(path[1]) === asset.file &&
+        (prefix === RELEASE_PREFIX || path[0] === `zai-codex-v${release.version}`), "Release URL must contain a simple tag and the matching package filename.");
     } else {
       requireValue(asset.bytes <= MAX_LOCAL_BYTES, "Packages larger than 100 MiB must use a public GitHub Release URL.");
     }
