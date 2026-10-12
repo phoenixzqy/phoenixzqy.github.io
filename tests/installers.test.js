@@ -135,7 +135,7 @@ test("PowerShell installers stay compatible with Windows PowerShell 5.1", async 
     const label = `${appId}.ps1`;
     assert.match(script, /#Requires -Version 5\.1/, label);
     assert.match(script, /SecurityProtocolType\]::Tls12/, label);
-    assert.match(script, /Get-FileHash -Path \$archive -Algorithm SHA256/, label);
+    assert.match(script, /\$actualHash = Get-ZaiFileSha256 \$archive/, label);
     assert.match(script, /Expand-Archive/, label);
     // The user PATH is edited through the registry so REG_EXPAND_SZ entries
     // such as %USERPROFILE%\bin keep their unexpanded form and value kind.
@@ -662,6 +662,81 @@ test("the selected Python fallback handles metadata, ZIP extraction, and package
 });
 
 const powerShellPath = await run(shellPath, ["-c", "command -v pwsh"]).then((result) => result.stdout.trim()).catch(() => "");
+
+test("PowerShell SHA-256 works without module autoload and treats paths literally", {
+  skip: !powerShellPath && "PowerShell is unavailable on this host",
+}, async () => {
+  const template = await readFile(join(siteRoot, "install/templates/installer.ps1.in"), "utf8");
+  const helper = template.match(/^function Get-ZaiFileSha256[\s\S]*?^}/m)?.[0];
+  assert.ok(helper);
+  await withHome(async (home) => {
+    const script = join(home, "hash.ps1");
+    await writeFile(script, `
+$ErrorActionPreference = 'Stop'
+$PSModuleAutoLoadingPreference = 'None'
+${helper}
+$hash = Get-ZaiFileSha256 $env:ZAI_TEST_ARCHIVE
+[Console]::Write($hash)
+# Both the file stream and the hash must be disposed before callers continue.
+$stream = [IO.File]::Open($env:ZAI_TEST_ARCHIVE, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+$stream.Dispose()
+`);
+    const archive = join(home, "package [literal] ' 中文.zip");
+    for (const bytes of [Buffer.alloc(0), Buffer.from([0, 255, 128, 13, 10]), Buffer.alloc(2 * 1024 * 1024, 165)]) {
+      await writeFile(archive, bytes);
+      const result = await run(powerShellPath, ["-NoProfile", "-File", script], {
+        env: { ...process.env, ZAI_TEST_ARCHIVE: archive },
+      });
+      assert.equal(result.stdout, sha256(bytes));
+    }
+  });
+});
+
+test("PowerShell installer verifies downloads when Get-FileHash is unavailable", {
+  skip: !powerShellPath && "PowerShell is unavailable on this host",
+}, async () => {
+  const bytes = createZip({ "zai-editor.exe": "test-only fixture" });
+  const file = "zai-editor-0.1.0-windows-x64.zip";
+  const files = new Map([[`/${file}`, bytes]]);
+  await withServer(files, (origin) => withHome(async (home) => {
+    const driver = join(home, "verify.ps1");
+    const receipt = join(home, "extraction-reached");
+    await writeFile(driver, `
+$ErrorActionPreference = 'Stop'
+function Get-FileHash { throw 'Get-FileHash is unavailable in this update process' }
+# Stop before extraction/installation so this test never changes the user's apps or PATH.
+function Expand-Archive {
+    [IO.File]::WriteAllText($env:ZAI_TEST_RECEIPT, $work)
+    throw 'fixture reached extraction after checksum verification'
+}
+. $env:ZAI_TEST_INSTALLER
+exit $LASTEXITCODE
+`);
+    for (const corrupt of [true, false]) {
+      const packageAsset = asset("windows", "x64", file, bytes);
+      if (corrupt) packageAsset.sha256 = "0".repeat(64);
+      files.set("/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [packageAsset]))));
+      const result = await run(powerShellPath, ["-NoProfile", "-File", driver], {
+        env: { ...process.env, USERPROFILE: home, ZAI_INSTALL_DIR: join(home, "installed"),
+          ZAI_RELEASE_MANIFEST_URL: `${origin}/manifest.json`, ZAI_TEST_RECEIPT: receipt,
+          ZAI_TEST_INSTALLER: installerPath("zai-editor.ps1") },
+      }).then((value) => ({ code: 0, ...value })).catch((error) => error);
+      assert.notEqual(result.code, 0);
+      const output = result.stdout + result.stderr;
+      assert.doesNotMatch(output, /Get-FileHash is unavailable/);
+      if (corrupt) {
+        assert.match(output, /SHA-256 verification failed/);
+        assert.equal(await stat(receipt).catch(() => null), null);
+      } else {
+        assert.match(output, new RegExp(`Verified SHA-256 ${sha256(bytes)}`));
+        assert.match(output, /fixture reached extraction/);
+        const work = await readFile(receipt, "utf8");
+        assert.equal(await stat(work).catch(() => null), null, "download scratch directory was removed");
+      }
+      assert.equal(await stat(join(home, "installed")).catch(() => null), null);
+    }
+  }));
+});
 
 test("PowerShell Python preflight skips broken launchers and accepts only Python 3.10+", {
   skip: !powerShellPath && "PowerShell is unavailable on this host",

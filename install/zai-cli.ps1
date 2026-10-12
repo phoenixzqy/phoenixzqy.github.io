@@ -160,6 +160,18 @@ function Add-UserPath([string] $directory) {
     }
 }
 
+function Get-ZaiFileSha256([string] $path) {
+    # Updates may inherit a module search path that cannot resolve Get-FileHash.
+    # Use the .NET API directly and stream packages without buffering them.
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [IO.File]::OpenRead($path)
+        try {
+            return [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+        } finally { $stream.Dispose() }
+    } finally { $sha256.Dispose() }
+}
+
 function Show-Activation([string] $directory, [string] $command) {
     # irm | iex runs in the calling PowerShell process. The bundled Python
     # installer and registry updates cannot change this process's environment.
@@ -292,7 +304,7 @@ try {
     Write-Host "[INFO] Downloading $displayName for windows/$architecture..."
     Save-Download $assetUrl $archive
 
-    $actualHash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+    $actualHash = Get-ZaiFileSha256 $archive
     $expectedHash = ([string] $asset.sha256).ToLowerInvariant()
     if ($actualHash -ne $expectedHash) {
         Stop-Install "SHA-256 verification failed for $($asset.file).`n  expected: $expectedHash`n  actual:   $actualHash`nThe download was discarded and nothing was installed."
