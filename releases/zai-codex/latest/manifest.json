@@ -1,26 +1,82 @@
 {
+  "schemaVersion": 1,
   "appId": "zai-codex",
+  "sourceCommit": "ef97d7e12893891ff3d1b2ce3cfe7d6661f244c9",
   "release": {
-    "assets": [
-      {
-        "architecture": "x64",
-        "bytes": 385495683,
-        "file": "zai-codex-0.1.1-x86_64-unknown-linux-gnu.zip",
-        "installNotes": "Unsigned native preview. Use the checksum-verifying one-line installer. Linux requires compatible glibc and native libraries; see release notes.",
-        "name": "zai-codex linux x64",
-        "platform": "linux",
-        "sha256": "a62248f2d6cad548749a97b2deecb2902a0f9691484bbde906e9e312fee42f51",
-        "signing": "unsigned",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-codex-v0.1.1/zai-codex-0.1.1-x86_64-unknown-linux-gnu.zip"
-      }
-    ],
+    "version": "0.1.2",
     "channel": "preview",
     "notes": [
-      "Native preview built and package-smoke-tested on the advertised host. Packages are unsigned.",
-      "Release automation does not rerun the full source test suite; a successful release is not full-suite validation evidence."
+      "All six packages built and smoke-tested on native GitHub runners. Packages are unsigned; macOS is not notarized.",
+      "Package verification covers version, Copilot login help and isolated installation; the full source test suite and interactive login were not run."
     ],
-    "publishedAt": "2026-10-09T03:57:13Z",
-    "version": "0.1.1"
-  },
-  "schemaVersion": 1
+    "assets": [
+      {
+        "name": "zai-codex linux x64",
+        "platform": "linux",
+        "architecture": "x64",
+        "file": "zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip",
+        "bytes": 147744544,
+        "sha256": "dff69a9a889eb612980d6615f4fb7d584d1ddadf391158a604a608cb1d9cb127",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      },
+      {
+        "name": "zai-codex linux arm64",
+        "platform": "linux",
+        "architecture": "arm64",
+        "file": "zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip",
+        "bytes": 146563584,
+        "sha256": "aade0017cca8906e6bddd96d78d24b2658322e6b32a4d4e943f4f39f8009e0ba",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      },
+      {
+        "name": "zai-codex macos x64",
+        "platform": "macos",
+        "architecture": "x64",
+        "file": "zai-codex-0.1.2-x86_64-apple-darwin.zip",
+        "bytes": 136938873,
+        "sha256": "f1b8504000eb71614ee9099e833c79bfa277aeacdb53ea2badc46bcd272bf40e",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-x86_64-apple-darwin.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      },
+      {
+        "name": "zai-codex macos arm64",
+        "platform": "macos",
+        "architecture": "arm64",
+        "file": "zai-codex-0.1.2-aarch64-apple-darwin.zip",
+        "bytes": 129900025,
+        "sha256": "380f535fcb64dc4ae8e5aa84ac1ce3af8b38b24a5c7bec3b19be12496a28359e",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-aarch64-apple-darwin.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      },
+      {
+        "name": "zai-codex windows x64",
+        "platform": "windows",
+        "architecture": "x64",
+        "file": "zai-codex-0.1.2-x86_64-pc-windows-msvc.zip",
+        "bytes": 142197579,
+        "sha256": "02cb3f9ae7c0fa2095ade282343902115011d8043cfff4f52802cdf5d861e538",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-x86_64-pc-windows-msvc.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      },
+      {
+        "name": "zai-codex windows arm64",
+        "platform": "windows",
+        "architecture": "arm64",
+        "file": "zai-codex-0.1.2-aarch64-pc-windows-msvc.zip",
+        "bytes": 131876325,
+        "sha256": "c63eaf8e497123bc12fdda00813b7c5555b2e0a06579f0e3be3f41ac3ccfa810",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v0.1.2/zai-codex-0.1.2-aarch64-pc-windows-msvc.zip",
+        "installNotes": "Unsigned native preview. Linux requires compatible glibc; macOS is not notarized."
+      }
+    ],
+    "publishedAt": "2026-10-12T18:41:45Z"
+  }
 }
