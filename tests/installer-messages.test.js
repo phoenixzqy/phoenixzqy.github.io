@@ -93,6 +93,99 @@ test("uncaught package exceptions retain the traceback and fail without claiming
   assert.match(stderr, /\[NEXT\]/);
 });
 
+async function runBundled(program, mode = "stdin") {
+  const directory = await mkdtemp(join(tmpdir(), "zai-message-exit-test-"));
+  let child;
+  try {
+    const args = ["-B", "-c", runner, "fixture installer", mode];
+    if (mode === "file") {
+      const script = join(directory, "install.py");
+      await writeFile(script, program);
+      args.push(script);
+    }
+    child = spawn("python3", args);
+    let stdout = "", stderr = "";
+    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.stdin.end(mode === "stdin" ? program : undefined);
+    const code = await new Promise((resolve, reject) => {
+      child.once("error", reject);
+      child.once("close", resolve);
+    });
+    return { code, stdout, stderr };
+  } finally {
+    if (child && child.exitCode === null) child.kill();
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+
+test("codex staged rename permission failures retain recovery guidance through its real SystemExit boundary", { timeout: 10000 }, async () => {
+  const codex = await template("zai-codex.py");
+  const boundary = '\nif __name__ == "__main__":\n';
+  const index = codex.lastIndexOf(boundary);
+  assert.ok(index > 0, "Codex installer has its expected main exception boundary");
+  // Exercise the real install() rename and the unchanged source catch/rethrow.
+  // Package verification is outside this diagnostics regression's scope.
+  const program = codex.slice(0, index) + `
+from unittest.mock import patch
+
+def main():
+    with tempfile.TemporaryDirectory(prefix="zai-message-codex-") as temporary:
+        root = Path(temporary)
+        with patch.dict(globals(), {
+            "verified_extract": lambda *args: None,
+            "validate_package": lambda *args: None,
+        }), patch.object(Path, "rename", side_effect=PermissionError("fixture staged rename denied")) as rename:
+            try:
+                install(root / "fixture.zip", "0" * 64, "zai-codex-v0.1.0",
+                        "x86_64-pc-windows-msvc", root / "releases", root / "bin/codex.cmd")
+            finally:
+                assert rename.call_count == 1
+` + codex.slice(index);
+  const result = await runBundled(program);
+  assert.equal(result.code, 1, result.stderr);
+  assert.match(result.stderr, /\[ERROR\] fixture staged rename denied/);
+  assert.match(result.stderr, /\[FAIL\].*exit 1/);
+  assert.match(result.stderr, /\[WARN\].*Windows Defender/);
+  assert.match(result.stderr, /\[NEXT\] Wait a minute and rerun/);
+  assert.doesNotMatch(result.stderr, /\[DETAIL\] Traceback|\[OK\]/);
+  assert.equal(result.stdout, "");
+});
+
+test("typed exception-chain diagnostics preserve other installer exit behavior", { timeout: 20000 }, async (t) => {
+  const cases = [
+    { name: "success", program: "raise SystemExit()", code: 0 },
+    { name: "integer exit", program: "raise SystemExit(7)", code: 7 },
+    { name: "string exit is not classified by wording", program: 'raise SystemExit("PermissionError: access denied")', code: 1, reason: "PermissionError: access denied" },
+    { name: "other caught OSError", program: 'try:\n    raise FileNotFoundError("missing package")\nexcept OSError as error:\n    raise SystemExit(str(error))', code: 1, reason: "missing package" },
+    { name: "interruption", program: "raise KeyboardInterrupt()", code: 130, reason: "Installation interrupted." },
+    { name: "uncaught permission error", program: 'raise PermissionError("direct denial")', code: 1, permission: true, reason: "direct denial", traceback: true },
+    { name: "explicit permission cause", program: 'raise SystemExit(9) from PermissionError("explicit denial")', code: 9, permission: true },
+    { name: "wrapped permission context", program: 'try:\n    try:\n        raise PermissionError("wrapped denial")\n    except PermissionError:\n        raise RuntimeError("wrapper")\nexcept RuntimeError:\n    raise SystemExit("wrapped failure")', code: 1, permission: true, reason: "wrapped failure" },
+    { name: "cyclic unrelated chain", program: 'error = RuntimeError("cyclic failure")\nerror.__context__ = error\nraise SystemExit(4) from error', code: 4 },
+  ];
+  for (const mode of ["stdin", "file"]) {
+    for (const fixture of cases) {
+      await t.test(`${mode}: ${fixture.name}`, async () => {
+        const { code, stdout, stderr } = await runBundled(fixture.program, mode);
+        assert.equal(code, fixture.code, stderr);
+        assert.equal(stdout, "");
+        assert.doesNotMatch(stderr, /\[OK\]/);
+        if (code === 0) assert.equal(stderr, "");
+        else assert.match(stderr, new RegExp(`\\[FAIL\\].*exit ${fixture.code}`));
+        if (fixture.reason) assert.ok(stderr.includes(`[ERROR] ${fixture.reason}`), stderr);
+        else assert.doesNotMatch(stderr, /\[ERROR\]/);
+        if (fixture.permission) {
+          assert.match(stderr, /\[WARN\].*Windows Defender/);
+          assert.match(stderr, /\[NEXT\] Wait a minute and rerun/);
+        } else assert.doesNotMatch(stderr, /Windows Defender|Wait a minute/);
+        if (fixture.traceback) assert.match(stderr, /\[DETAIL\] Traceback/);
+        else assert.doesNotMatch(stderr, /\[DETAIL\] Traceback/);
+      });
+    }
+  }
+});
+
 
 test("PowerShell wrappers restore strict error handling and check native program status", async () => {
   for (const name of ["install-python.ps1", "uninstaller.ps1", "zai-codex.ps1"]) {
