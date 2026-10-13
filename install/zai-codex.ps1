@@ -418,6 +418,7 @@ original_stderr = sys.stderr
 sys.stderr = ZaiDiagnostics(original_stderr)
 code = 0
 reason = None
+access_denied = False
 try:
     if mode == "stdin":
         # The reviewed source remains unchanged in its original here-document.
@@ -438,6 +439,7 @@ except KeyboardInterrupt:
 except Exception as error:
     traceback.print_exc()
     reason, code = str(error), 1
+    access_denied = isinstance(error, PermissionError)
 finally:
     sys.stderr = original_stderr
 
@@ -445,6 +447,9 @@ if code:
     if reason:
         zai_message("ERROR", reason)
     zai_message("FAIL", f"{label}: the bundled package installer did not complete (exit {code}).")
+    if access_denied:
+        zai_message("WARN", "Windows denied access to files the installer just extracted. This is almost always Windows Defender (or another antivirus) scanning the new files and locking them, not a problem with this package.")
+        zai_message("NEXT", "Wait a minute and rerun the install command. If it keeps failing, add the install folder (for example %USERPROFILE%\\.local\\lib\\zai-codex) to Windows Security > Virus & threat protection > Exclusions, then rerun.")
     zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
 raise SystemExit(code)
 '@
