@@ -33,7 +33,7 @@ function Show-Activation([string] $directory, [string] $command) {
         Where-Object { $_.TrimEnd([char[]]'\/') -ieq $normalized }).Count -gt 0
     if (-not $present) {
         if ([string]::IsNullOrEmpty($env:PATH)) { $env:PATH = $directory }
-        else { $env:PATH = $directory + $separator + $env:PATH }
+        else { $env:PATH = $env:PATH + $separator + $directory }
     }
 
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
@@ -43,8 +43,61 @@ function Show-Activation([string] $directory, [string] $command) {
     Write-Host ("  & " + $quotedCommand)
     Write-Host ''
     Write-Host 'If the installer ran in a separate process, activate your calling PowerShell terminal:'
-    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    Write-Host ('  $env:Path = $env:Path + [IO.Path]::PathSeparator + ' + $quotedDirectory)
     Write-Host ("  & " + $quotedCommand)
+}
+function Add-UserPath([string] $directory) {
+    # The user PATH is read and written through the registry rather than
+    # [Environment]::GetEnvironmentVariable/SetEnvironmentVariable: those expand
+    # %VARIABLE% references on read and always write a plain string, which would
+    # permanently freeze entries such as %USERPROFILE%\bin to today's value and
+    # downgrade REG_EXPAND_SZ to REG_SZ.
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+    if ($null -eq $key) {
+        $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
+    }
+    try {
+        $current = $key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $kind = if ($null -eq $key.GetValue('Path')) { [Microsoft.Win32.RegistryValueKind]::ExpandString } else { $key.GetValueKind('Path') }
+        if ($null -eq $current) { $current = '' }
+        $entries = @([string]$current -split ';' | Where-Object { $_ })
+        $normalized = $directory.TrimEnd('\')
+        foreach ($entry in $entries) {
+            if ([Environment]::ExpandEnvironmentVariables($entry).TrimEnd('\') -ieq $normalized) {
+                Write-Host "$directory is already on your user PATH."
+                return
+            }
+        }
+        $updated = if ([string]::IsNullOrEmpty($current)) { $directory } else { [string]$current + ';' + $directory }
+        $key.SetValue('Path', $updated, $kind)
+        Write-Host "Added $directory to your user PATH."
+    } finally {
+        $key.Close()
+    }
+    # Let Explorer pick up the saved PATH for terminals opened afterwards.
+    try {
+        if (-not ('ZaiInstaller.PathEnvironment' -as [type])) {
+            Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace ZaiInstaller {
+    public static class PathEnvironment {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr SendMessageTimeout(IntPtr window, uint message,
+            UIntPtr wparam, string lparam, uint flags, uint timeout, out UIntPtr result);
+        public static void Notify() {
+            UIntPtr result;
+            SendMessageTimeout(new IntPtr(0xffff), 0x001a, UIntPtr.Zero,
+                "Environment", 2, 5000, out result);
+        }
+    }
+}
+'@
+        }
+        [ZaiInstaller.PathEnvironment]::Notify()
+    } catch {
+        Write-ZaiMessage 'WARN' 'User PATH was saved, but Windows could not be notified. Restart your terminal application to load it.'
+    }
 }
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) { Write-ZaiMessage 'ERROR' 'Python 3.10+ is required.'; Write-ZaiMessage 'FAIL' 'zai-codex installation did not start.'; Write-ZaiMessage 'NEXT' 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the installer.'; exit 1 }
@@ -485,4 +538,5 @@ print(launcher.name)
 '@
 $launcherLocation = $resolveLauncher | & $python.Source -B -
 if ($LASTEXITCODE -ne 0) { Write-ZaiMessage 'ERROR' 'Could not resolve the installed launcher directory.'; Write-ZaiMessage 'NEXT' 'Check ZAI_CODEX_BIN_LINK and ZAI_INSTALL_DIR, then rerun the installer.'; exit $LASTEXITCODE }
+Add-UserPath $launcherLocation[0]
 Show-Activation $launcherLocation[0] $launcherLocation[1]

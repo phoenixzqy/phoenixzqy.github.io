@@ -1,0 +1,42 @@
+persist_path_profile() {
+  path_profile=$1
+  if [ -f "$path_profile" ] && grep -Fqx -- "$path_line" "$path_profile"; then
+    return
+  fi
+  if {
+    if [ -f "$path_profile" ] && [ -n "$(tail -c 1 "$path_profile")" ]; then
+      printf '\n'
+    fi
+    printf '%s\n' "$path_line"
+  } >>"$path_profile"; then
+    printf 'Added %s to PATH in %s. New terminals will use it automatically.\n' "$path_directory" "$path_profile"
+  else
+    message WARN "Could not update PATH in $path_profile. Add $path_directory to PATH in your shell settings."
+  fi
+}
+
+ensure_on_path() {
+  path_directory=$1
+  quoted_path_directory=$(quote_shell "$path_directory")
+  # Startup files can be loaded together; append only when the directory is absent.
+  path_line="case \":\$PATH:\" in *:$quoted_path_directory:*) ;; *) export PATH=\"\$PATH\":$quoted_path_directory ;; esac  # Added by zai installer"
+  persist_path_profile "$HOME/.profile"
+  case "$activation_shell" in
+    zsh) persist_path_profile "$HOME/.zshrc" ;;
+    bash)
+      persist_path_profile "$HOME/.bashrc"
+      # Bash login shells read only the first available login startup file.
+      if [ -f "$HOME/.bash_profile" ]; then
+        persist_path_profile "$HOME/.bash_profile"
+      elif [ -f "$HOME/.bash_login" ]; then
+        persist_path_profile "$HOME/.bash_login"
+      fi
+      ;;
+    sh | dash | ksh) ;;
+    *)
+      persist_path_profile "$HOME/.bashrc"
+      persist_path_profile "$HOME/.zshrc"
+      message WARN 'Shell not recognized for persistent PATH setup. Check your shell settings before opening a new terminal.'
+      ;;
+  esac
+}

@@ -162,12 +162,13 @@ def profile_lines(directory: Path) -> set[str]:
     return {
         f'export PATH="{target}:$PATH"  {MARKER}',
         f"export PATH='{quoted}':\"$PATH\"  {MARKER}",
+        f'case ":$PATH:" in *:\'{quoted}\':*) ;; *) export PATH="$PATH":\'{quoted}\' ;; esac  {MARKER}',
     }
 
 
 def clean_profiles(home: Path, directory: Path, dry_run: bool) -> None:
     owned = profile_lines(directory)
-    for name in (".profile", ".bashrc", ".bash_profile", ".zshrc", ".zprofile"):
+    for name in (".profile", ".bashrc", ".bash_profile", ".bash_login", ".zshrc", ".zprofile"):
         path = home / name
         if not path.exists():
             continue
@@ -382,7 +383,7 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
                                      or os.access(path, os.X_OK)) for path in survivors)
     if not keep_path and os.name != "nt":
         # Preflight linked profiles before any deletion.
-        for name in (".profile", ".bashrc", ".bash_profile", ".zshrc", ".zprofile"):
+        for name in (".profile", ".bashrc", ".bash_profile", ".bash_login", ".zshrc", ".zprofile"):
             if linked(home / name):
                 raise ValueError(f"Refusing linked shell profile: {home / name}")
     if not dry_run and directory.exists():

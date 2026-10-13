@@ -39,6 +39,7 @@ info() {
 }
 
 @ACTIVATION_HELPER@
+@PATH_HELPER@
 @SHORTCUT_HELPER@
 # --- Platform -------------------------------------------------------------
 case "$(uname -s)" in
@@ -135,30 +136,6 @@ extract() {
   else
     "$PYTHON" -m zipfile -e "$1" "$2" || fail 'the downloaded archive could not be extracted with Python.'
   fi
-}
-
-ensure_on_path() {
-  marker='# Added by zai installer'
-  quoted_dir="$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
-  line="export PATH='$quoted_dir':\"\$PATH\"  $marker"
-  profiles="$HOME/.profile"
-  case "$activation_shell" in
-    zsh) profiles="$profiles $HOME/.zshrc" ;;
-    bash) profiles="$profiles $HOME/.bashrc" ;;
-    *) profiles="$profiles $HOME/.bashrc $HOME/.zshrc" ;;
-  esac
-  for profile in $profiles; do
-    # Match the exact line, not the marker: an earlier install into a
-    # different directory must not make this one think PATH is already set.
-    if [ -f "$profile" ] && grep -Fqx "$line" "$profile"; then
-      continue
-    fi
-    if [ -f "$profile" ] && [ -n "$(tail -c 1 "$profile" 2>/dev/null)" ]; then
-      printf '\n' >>"$profile" || continue
-    fi
-    printf '%s\n' "$line" >>"$profile" 2>/dev/null || continue
-    info "Added $1 to PATH in $profile"
-  done
 }
 
 # --- Manifest -------------------------------------------------------------

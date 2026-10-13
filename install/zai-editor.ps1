@@ -130,6 +130,40 @@ function Save-Download([string] $url, [string] $destination) {
     Stop-Install "too many download redirects: $url"
 }
 
+function Get-ZaiFileSha256([string] $path) {
+    # Updates may inherit a module search path that cannot resolve Get-FileHash.
+    # Use the .NET API directly and stream packages without buffering them.
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [IO.File]::OpenRead($path)
+        try {
+            return [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+        } finally { $stream.Dispose() }
+    } finally { $sha256.Dispose() }
+}
+
+function Show-Activation([string] $directory, [string] $command) {
+    # irm | iex runs in the calling PowerShell process. The bundled Python
+    # installer and registry updates cannot change this process's environment.
+    $separator = [IO.Path]::PathSeparator
+    $normalized = $directory.TrimEnd([char[]]'\/')
+    $present = @($env:PATH -split [regex]::Escape([string]$separator) |
+        Where-Object { $_.TrimEnd([char[]]'\/') -ieq $normalized }).Count -gt 0
+    if (-not $present) {
+        if ([string]::IsNullOrEmpty($env:PATH)) { $env:PATH = $directory }
+        else { $env:PATH = $env:PATH + $separator + $directory }
+    }
+
+    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
+    Write-Host ''
+    Write-Host '[NEXT] Ready in this PowerShell session. Run:'
+    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
+    Write-Host ("  & " + $quotedCommand)
+    Write-Host ''
+    Write-Host 'If the installer ran in a separate process, activate your calling PowerShell terminal:'
+    Write-Host ('  $env:Path = $env:Path + [IO.Path]::PathSeparator + ' + $quotedDirectory)
+    Write-Host ("  & " + $quotedCommand)
+}
 function Add-UserPath([string] $directory) {
     # The user PATH is read and written through the registry rather than
     # [Environment]::GetEnvironmentVariable/SetEnvironmentVariable: those expand
@@ -152,47 +186,36 @@ function Add-UserPath([string] $directory) {
                 return
             }
         }
-        $updated = (@($entries) + $directory) -join ';'
+        $updated = if ([string]::IsNullOrEmpty($current)) { $directory } else { [string]$current + ';' + $directory }
         $key.SetValue('Path', $updated, $kind)
         Write-Host "Added $directory to your user PATH."
     } finally {
         $key.Close()
     }
-}
-
-function Get-ZaiFileSha256([string] $path) {
-    # Updates may inherit a module search path that cannot resolve Get-FileHash.
-    # Use the .NET API directly and stream packages without buffering them.
-    $sha256 = [Security.Cryptography.SHA256]::Create()
+    # Let Explorer pick up the saved PATH for terminals opened afterwards.
     try {
-        $stream = [IO.File]::OpenRead($path)
-        try {
-            return [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
-        } finally { $stream.Dispose() }
-    } finally { $sha256.Dispose() }
-}
-
-function Show-Activation([string] $directory, [string] $command) {
-    # irm | iex runs in the calling PowerShell process. The bundled Python
-    # installer and registry updates cannot change this process's environment.
-    $separator = [IO.Path]::PathSeparator
-    $normalized = $directory.TrimEnd([char[]]'\/')
-    $present = @($env:PATH -split [regex]::Escape([string]$separator) |
-        Where-Object { $_.TrimEnd([char[]]'\/') -ieq $normalized }).Count -gt 0
-    if (-not $present) {
-        if ([string]::IsNullOrEmpty($env:PATH)) { $env:PATH = $directory }
-        else { $env:PATH = $directory + $separator + $env:PATH }
+        if (-not ('ZaiInstaller.PathEnvironment' -as [type])) {
+            Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace ZaiInstaller {
+    public static class PathEnvironment {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr SendMessageTimeout(IntPtr window, uint message,
+            UIntPtr wparam, string lparam, uint flags, uint timeout, out UIntPtr result);
+        public static void Notify() {
+            UIntPtr result;
+            SendMessageTimeout(new IntPtr(0xffff), 0x001a, UIntPtr.Zero,
+                "Environment", 2, 5000, out result);
+        }
     }
-
-    $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
-    Write-Host ''
-    Write-Host '[NEXT] Ready in this PowerShell session. Run:'
-    $quotedCommand = "'" + $command.Replace("'", "''") + "'"
-    Write-Host ("  & " + $quotedCommand)
-    Write-Host ''
-    Write-Host 'If the installer ran in a separate process, activate your calling PowerShell terminal:'
-    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
-    Write-Host ("  & " + $quotedCommand)
+}
+'@
+        }
+        [ZaiInstaller.PathEnvironment]::Notify()
+    } catch {
+        Write-ZaiMessage 'WARN' 'User PATH was saved, but Windows could not be notified. Restart your terminal application to load it.'
+    }
 }
 function Install-Shortcut([string] $directory, [string] $name, [string] $command) {
     if (-not (Test-Path -LiteralPath (Join-Path $directory "$command.exe") -PathType Leaf)) { return }

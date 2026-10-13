@@ -6,6 +6,7 @@
 $ErrorActionPreference = 'Stop'
 @MESSAGES_HELPER@
 @ACTIVATION_HELPER@
+@PATH_HELPER@
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) { Write-ZaiMessage 'ERROR' 'Python 3.10+ is required.'; Write-ZaiMessage 'FAIL' 'zai-codex installation did not start.'; Write-ZaiMessage 'NEXT' 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the installer.'; exit 1 }
 $installer = @'
@@ -36,4 +37,5 @@ print(launcher.name)
 '@
 $launcherLocation = $resolveLauncher | & $python.Source -B -
 if ($LASTEXITCODE -ne 0) { Write-ZaiMessage 'ERROR' 'Could not resolve the installed launcher directory.'; Write-ZaiMessage 'NEXT' 'Check ZAI_CODEX_BIN_LINK and ZAI_INSTALL_DIR, then rerun the installer.'; exit $LASTEXITCODE }
+Add-UserPath $launcherLocation[0]
 Show-Activation $launcherLocation[0] $launcherLocation[1]

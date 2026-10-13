@@ -178,7 +178,7 @@ test("the shell installer verifies, extracts, and installs a published package",
     assert.match(await readFile(join(installDir, "licenses/zai-editor/LICENSE"), "utf8"), /Apache License/);
 
     const profile = join(home, ".profile");
-    const line = `export PATH='${installDir}':"$PATH"  # Added by zai installer`;
+    const line = `case ":$PATH:" in *:'${installDir}':*) ;; *) export PATH="$PATH":'${installDir}' ;; esac  # Added by zai installer`;
     assert.equal((await readFile(profile, "utf8")).split("\n").filter((entry) => entry === line).length, 1);
     const second = await runInstaller("zai-editor.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir });
     assert.equal(second.code, 0, second.stderr);
@@ -279,7 +279,7 @@ test("the shell installer quotes metacharacters before updating startup PATH", a
       cwd: home,
       env: { PATH: process.env.PATH, HOME: home },
     });
-    assert.equal(updatedPath.split(":")[0], installDir);
+    assert.equal(updatedPath, process.env.PATH + ":" + installDir);
     await assert.rejects(stat(join(home, "pwned")), /ENOENT/,
       "sourcing the generated profile must not execute install-path metacharacters");
   }));
@@ -553,6 +553,9 @@ test("zai-codex rejects corrupt archives on a fresh installation", { skip: proce
     assert.notEqual(result.code, 0);
     assert.match(result.stderr, /SHA-256 mismatch/);
     await assert.rejects(stat(join(home, ".local/bin/codex")), { code: "ENOENT" });
+    for (const profile of [".profile", ".bashrc", ".zshrc"]) {
+      await assert.rejects(stat(join(home, profile)), { code: "ENOENT" });
+    }
   }));
 });
 
@@ -798,7 +801,9 @@ test("all zai shell installers print activation commands that expose the install
         [`/${file}`, bytes],
       ]), (origin) => withHome(async (home) => {
         const installDir = join(home, "installed");
-        const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home, installDir, shell });
+        const actualShell = shell.endsWith("/zsh") && zshAvailable ? "zsh" : shell.endsWith("/sh") ? "sh" : "bash";
+        const toolPath = await installerToolPath(home, ["uname", ...(actualShell === "sh" ? [] : [actualShell])]);
+        const result = await runInstaller(`${appId}.sh`, { manifestUrl: `${origin}/manifest.json`, home, installDir, shell, path: toolPath });
         assert.equal(result.code, 0, `${appId}/${shell}: ${result.stderr}`);
         if (mode !== "codex") {
           const expected = mode === "python" ? ["zai", "zai-editor", "zai-gitter"] : [executable];
@@ -814,18 +819,93 @@ test("all zai shell installers print activation commands that expose the install
         }
 
         const commands = result.stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
-        assert.equal(commands.length, mode === "codex" ? 2 : 3, result.stdout);
-        if (mode === "codex") assert.equal(commands[0], `export PATH='${installDir}':"$PATH"`);
-        else assert.match(commands[0], shell.endsWith("/sh") ? /^\. / : /^source /);
-        assert.equal(commands.at(-2), `export PATH='${installDir}':"$PATH"`);
+        assert.equal(commands.length, 2, result.stdout);
+        assert.equal(commands[0], `export PATH="$PATH":'${installDir}'`);
         // The installer is a child process: only running its printed command
         // in the calling shell makes the installed executable available.
-        const actualShell = shell.endsWith("/zsh") && zshAvailable ? "zsh" : shell.endsWith("/sh") ? "sh" : "bash";
-        const activated = await run(actualShell, ["-c", commands.join("\n")], { env: { HOME: home, PATH: process.env.PATH } });
+        const activated = await run(actualShell, ["-c", commands.join("\n")], { env: { HOME: home, PATH: toolPath } });
         assert.match(activated.stdout, mode === "codex" ? /codex-cli 0\.0\.0/ : /activated-fixture/);
       }));
     }
   }
+});
+
+test("zai-codex persists its default launcher for fresh Bash and zsh terminals", { skip: process.platform !== "linux" }, async () => {
+  const { file, bytes, architecture } = codexPackage();
+  for (const shell of ["bash", ...(zshAvailable ? ["zsh"] : [])]) {
+    await withServer(new Map([
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-codex", [asset("linux", architecture, file, bytes)])))],
+      [`/${file}`, bytes],
+    ]), (origin) => withHome(async (root) => {
+      const home = join(root, "home with spaces");
+      await mkdir(home);
+      const toolPath = await installerToolPath(home, [shell]);
+      const profile = join(home, shell === "zsh" ? ".zshrc" : ".bashrc");
+      const original = "export INSTALLER_TEST_KEEP='user config'\n# Keep existing configuration without a trailing newline";
+      await writeFile(profile, original);
+      const options = { manifestUrl: `${origin}/manifest.json`, home, shell: `/bin/${shell}`, path: toolPath };
+      for (let install = 0; install < 2; install++) {
+        const result = await runInstaller("zai-codex.sh", options);
+        assert.equal(result.code, 0, result.stderr);
+        if (install === 0) assert.match(result.stdout, /New terminals will use it automatically/);
+        const fresh = await run(shell, ["-ic", 'codex --version; printf "KEEP=%s\\nPATH=%s\\n" "$INSTALLER_TEST_KEEP" "$PATH"'], {
+          env: { HOME: home, PATH: toolPath },
+        });
+        assert.match(fresh.stdout, /codex-cli 0\.0\.0/);
+        assert.match(fresh.stdout, /KEEP=user config\n/);
+        assert.ok(fresh.stdout.includes(`PATH=${toolPath}:${home}/.local/bin\n`), fresh.stdout);
+      }
+      const content = await readFile(profile, "utf8");
+      assert.ok(content.startsWith(original + "\n"));
+      assert.equal(content.split("# Added by zai installer").length - 1, 1);
+      const loadedTwice = await run("sh", ["-c", '. "$HOME/.profile"; . "$1"; . "$1"; printf %s "$PATH"', "sh", profile], {
+        env: { HOME: home, PATH: toolPath },
+      });
+      assert.equal(loadedTwice.stdout, `${toolPath}:${home}/.local/bin`);
+    }));
+  }
+});
+
+test("persistent PATH covers Bash login profiles and preserves earlier commands", async () => {
+  const activation = await readFile(join(siteRoot, "install/templates/activate-shell.sh.in"), "utf8");
+  const persistence = await readFile(join(siteRoot, "install/templates/persist-path.sh.in"), "utf8");
+  for (const loginProfile of [".bash_profile", ".bash_login", ".profile"]) {
+    await withHome(async (home) => {
+      const bin = join(home, "bin ' quote $(touch pwned) [*]");
+      const earlier = join(home, "earlier");
+      await mkdir(bin);
+      await mkdir(earlier);
+      await writeFile(join(bin, "fixture"), "#!/bin/sh\necho installed\n", { mode: 0o755 });
+      await writeFile(join(earlier, "fixture"), "#!/bin/sh\necho earlier\n", { mode: 0o755 });
+      await writeFile(join(home, loginProfile), "# user settings");
+      const helper = activation + persistence + '\nensure_on_path "$1"';
+      await run("sh", ["-c", helper, "sh", bin], { env: { HOME: home, PATH: process.env.PATH, SHELL: "/bin/bash" } });
+      const originalPath = `${earlier}:${process.env.PATH}`;
+      const fresh = await run("bash", ["--noprofile", "--norc", "-c", '. "$1"; . "$HOME/.bashrc"; fixture; printf "PATH=%s\\n" "$PATH"', "bash", join(home, loginProfile)], {
+        cwd: home, env: { HOME: home, PATH: originalPath },
+      });
+      assert.equal(fresh.stdout, `earlier\nPATH=${originalPath}:${bin}\n`);
+      await assert.rejects(stat(join(home, "pwned")), /ENOENT/);
+      const alreadyPresent = await run("sh", ["-c", '. "$1"; printf %s "$PATH"', "sh", join(home, loginProfile)], {
+        env: { HOME: home, PATH: `${originalPath}:${bin}` },
+      });
+      assert.equal(alreadyPresent.stdout, `${originalPath}:${bin}`);
+    });
+  }
+});
+
+test("an unwritable startup profile reports a PATH warning and updates other profiles", async () => {
+  const messages = await readFile(join(siteRoot, "install/templates/messages.sh.in"), "utf8");
+  const activation = await readFile(join(siteRoot, "install/templates/activate-shell.sh.in"), "utf8");
+  const persistence = await readFile(join(siteRoot, "install/templates/persist-path.sh.in"), "utf8");
+  await withHome(async (home) => {
+    await mkdir(join(home, ".profile"));
+    const result = await run("sh", ["-c", messages + activation + persistence + '\nensure_on_path "$HOME/bin"'], {
+      env: { HOME: home, PATH: process.env.PATH, SHELL: "/bin/zsh" },
+    });
+    assert.match(result.stderr, /\[WARN\] Could not update PATH in .*\.profile/);
+    assert.match(await readFile(join(home, ".zshrc"), "utf8"), /Added by zai installer/);
+  });
 });
 
 test("calling shell detection takes precedence over the login shell", async () => {
@@ -839,7 +919,8 @@ test("calling shell detection takes precedence over the login shell", async () =
       manifestUrl: `${origin}/manifest.json`, home, shell: "/bin/zsh", parentShell: "bash",
     });
     assert.equal(result.code, 0, result.stderr);
-    assert.ok(result.stdout.includes(`source '${home}/.bashrc'`), result.stdout);
+    assert.match(await readFile(join(home, ".bashrc"), "utf8"), /Added by zai installer/);
+    await assert.rejects(stat(join(home, ".zshrc")), /ENOENT/);
   }));
 });
 
@@ -866,7 +947,7 @@ test("activation fallback quotes custom paths and handles fish and unknown shell
   });
 });
 
-test("activation prepends the launcher directory despite misleading profile contents", async () => {
+test("activation appends the launcher directory despite misleading profile contents", async () => {
   const helper = await readFile(join(siteRoot, "install/templates/activate-shell.sh.in"), "utf8");
   for (const [shell, profile] of [["bash", ".bashrc"], ["zsh", ".zshrc"], ["sh", ".profile"]]) {
     for (const misleading of ["prefix", "comment"]) {
@@ -903,7 +984,7 @@ test("fish activation escapes literal backslashes and apostrophes in paths and c
     });
     const commands = stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
     const literal = (value) => "'" + value.replaceAll("\\", "\\\\").replaceAll("'", "\\'") + "'";
-    assert.deepEqual(commands, [`set -gx PATH ${literal(directory)} $PATH`, literal(executable)]);
+    assert.deepEqual(commands, [`set -gx PATH $PATH ${literal(directory)}`, literal(executable)]);
     if (fishAvailable) {
       const activated = await run("fish", ["--no-config", "-c", commands.join("\n")], {
         cwd: home, env: { HOME: home, PATH: process.env.PATH },
@@ -935,9 +1016,11 @@ test("zai-codex activation uses the overridden launcher directory and filename",
       assert.equal(result.code, 0, result.stderr);
       const commands = result.stdout.split("\n").filter((line) => line.startsWith("  ")).map((line) => line.slice(2));
       assert.equal(commands.at(-1), "'custom codex'");
-      if (profile !== "missing") assert.match(commands[0], /^source /);
+      assert.match(commands[0], /^export PATH="\$PATH":/);
       const activated = await run("bash", ["-c", commands.join("\n")], { env: { HOME: home, PATH: process.env.PATH } });
       assert.match(activated.stdout, /codex-cli 0\.0\.0/, profile);
+      const fresh = await run("bash", ["-ic", "'custom codex' --version"], { env: { HOME: home, PATH: process.env.PATH } });
+      assert.match(fresh.stdout, /codex-cli 0\.0\.0/, profile);
     }));
   }
 });
@@ -958,7 +1041,7 @@ test("PowerShell activation quotes paths without executing their contents", {
     assert.ok(command, stdout);
     await writeFile(script, command + '\n[Console]::Write($env:Path)');
     const activated = await run(powerShellPath, ["-NoProfile", "-File", script]);
-    assert.ok(activated.stdout.startsWith(directory + (process.platform === "win32" ? ";" : ":")));
+    assert.ok(activated.stdout.endsWith((process.platform === "win32" ? ";" : ":") + directory));
   });
 });
 
@@ -979,7 +1062,7 @@ test("PowerShell irm | iex activation exposes commands immediately and preserves
 $ErrorActionPreference = 'Stop'
 $original = $env:PATH
 $separator = [IO.Path]::PathSeparator
-$expected = $env:ZAI_TEST_BIN + $separator + $original
+$expected = $original + $separator + $env:ZAI_TEST_BIN
 # Invoke-Expression runs downloaded content in the calling PowerShell process.
 Get-Content -LiteralPath $env:ZAI_TEST_BOOTSTRAP -Raw | Invoke-Expression
 if ($env:PATH -cne $expected) { throw 'Current session PATH was not activated or original entries changed.' }

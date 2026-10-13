@@ -21,28 +21,15 @@ quote_fish() {
 show_activation() {
   activation_dir=$1
   activation_executable=$2
-  activation_profile=''
-  case "$activation_shell" in
-    zsh) activation_profile="$HOME/.zshrc" ;;
-    bash) activation_profile="$HOME/.bashrc" ;;
-    sh | dash | ksh) activation_profile="$HOME/.profile" ;;
-  esac
   printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
-      # A profile text match is only a hint; always activate the actual directory.
-      if [ -n "$activation_profile" ] && [ -f "$activation_profile" ] &&
-          { grep -Fq -- "$activation_dir" "$activation_profile" ||
-            grep -Fq -- "$quoted_activation_dir" "$activation_profile"; }; then
-        case "$activation_shell" in bash | zsh) source_command=source ;; *) source_command=. ;; esac
-        printf '  %s %s\n' "$source_command" "$(quote_shell "$activation_profile")"
-      fi
-      printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
+      printf '  export PATH="$PATH":%s\n' "$quoted_activation_dir"
       printf '  %s\n' "$(quote_shell "$activation_executable")"
       ;;
     fish)
-      printf '  set -gx PATH %s $PATH\n' "$(quote_fish "$activation_dir")"
+      printf '  set -gx PATH $PATH %s\n' "$(quote_fish "$activation_dir")"
       printf '  %s\n' "$(quote_fish "$activation_executable")"
       ;;
     *)

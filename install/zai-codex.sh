@@ -46,28 +46,15 @@ quote_fish() {
 show_activation() {
   activation_dir=$1
   activation_executable=$2
-  activation_profile=''
-  case "$activation_shell" in
-    zsh) activation_profile="$HOME/.zshrc" ;;
-    bash) activation_profile="$HOME/.bashrc" ;;
-    sh | dash | ksh) activation_profile="$HOME/.profile" ;;
-  esac
   printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
-      # A profile text match is only a hint; always activate the actual directory.
-      if [ -n "$activation_profile" ] && [ -f "$activation_profile" ] &&
-          { grep -Fq -- "$activation_dir" "$activation_profile" ||
-            grep -Fq -- "$quoted_activation_dir" "$activation_profile"; }; then
-        case "$activation_shell" in bash | zsh) source_command=source ;; *) source_command=. ;; esac
-        printf '  %s %s\n' "$source_command" "$(quote_shell "$activation_profile")"
-      fi
-      printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
+      printf '  export PATH="$PATH":%s\n' "$quoted_activation_dir"
       printf '  %s\n' "$(quote_shell "$activation_executable")"
       ;;
     fish)
-      printf '  set -gx PATH %s $PATH\n' "$(quote_fish "$activation_dir")"
+      printf '  set -gx PATH $PATH %s\n' "$(quote_fish "$activation_dir")"
       printf '  %s\n' "$(quote_fish "$activation_executable")"
       ;;
     *)
@@ -76,6 +63,48 @@ show_activation() {
       ;;
   esac
   printf '%s\n' 'Run the command above in your current shell; a child installer cannot update its parent shell.'
+}
+persist_path_profile() {
+  path_profile=$1
+  if [ -f "$path_profile" ] && grep -Fqx -- "$path_line" "$path_profile"; then
+    return
+  fi
+  if {
+    if [ -f "$path_profile" ] && [ -n "$(tail -c 1 "$path_profile")" ]; then
+      printf '\n'
+    fi
+    printf '%s\n' "$path_line"
+  } >>"$path_profile"; then
+    printf 'Added %s to PATH in %s. New terminals will use it automatically.\n' "$path_directory" "$path_profile"
+  else
+    message WARN "Could not update PATH in $path_profile. Add $path_directory to PATH in your shell settings."
+  fi
+}
+
+ensure_on_path() {
+  path_directory=$1
+  quoted_path_directory=$(quote_shell "$path_directory")
+  # Startup files can be loaded together; append only when the directory is absent.
+  path_line="case \":\$PATH:\" in *:$quoted_path_directory:*) ;; *) export PATH=\"\$PATH\":$quoted_path_directory ;; esac  # Added by zai installer"
+  persist_path_profile "$HOME/.profile"
+  case "$activation_shell" in
+    zsh) persist_path_profile "$HOME/.zshrc" ;;
+    bash)
+      persist_path_profile "$HOME/.bashrc"
+      # Bash login shells read only the first available login startup file.
+      if [ -f "$HOME/.bash_profile" ]; then
+        persist_path_profile "$HOME/.bash_profile"
+      elif [ -f "$HOME/.bash_login" ]; then
+        persist_path_profile "$HOME/.bash_login"
+      fi
+      ;;
+    sh | dash | ksh) ;;
+    *)
+      persist_path_profile "$HOME/.bashrc"
+      persist_path_profile "$HOME/.zshrc"
+      message WARN 'Shell not recognized for persistent PATH setup. Check your shell settings before opening a new terminal.'
+      ;;
+  esac
 }
 command -v python3 >/dev/null 2>&1 || { message ERROR 'Python 3.10+ is required.'; message FAIL 'zai-codex installation did not start.'; message NEXT 'Install Python from https://www.python.org/downloads/, open a new terminal, and rerun the installer.'; exit 1; }
 python3 -B -c 'import sys; sys.exit(sys.version_info < (3, 10))' || { message ERROR 'A working Python 3.10+ is required.'; message FAIL 'zai-codex installation did not start.'; message NEXT 'Upgrade Python, open a new terminal, and rerun the installer.'; exit 1; }
@@ -495,4 +524,5 @@ ZAI_CODEX_PYTHON
 message OK 'zai-codex installation complete.'
 # Resolve the same launcher override/default as the reviewed Python installer.
 launcher_path=$(python3 -B -c 'import os; from pathlib import Path; launcher = Path(os.environ.get("ZAI_CODEX_BIN_LINK", str(Path(os.environ.get("ZAI_INSTALL_DIR") or "~/.local/bin") / "codex"))).expanduser(); print(launcher.parent.resolve() / launcher.name)')
+ensure_on_path "${launcher_path%/*}"
 show_activation "${launcher_path%/*}" "${launcher_path##*/}"

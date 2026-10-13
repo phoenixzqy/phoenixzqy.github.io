@@ -56,9 +56,10 @@ export async function buildInstallers() {
       for (const extension of ["sh", "ps1"]) {
         const messages = await readFile(join(templates, `messages.${extension}.in`), "utf8");
         const activation = await readFile(join(templates, `activate-shell.${extension}.in`), "utf8");
+        const pathHelper = await readFile(join(templates, `persist-path.${extension}.in`), "utf8");
         const wrapper = await readFile(join(templates, `zai-codex.${extension}.in`), "utf8");
         files.set(`install/zai-codex.${extension}`, wrapper.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@RUNNER@", () => extension === "sh" ? shellRunner : runner.trimEnd()).replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SOURCE_COMMIT@", source.commit)
-          .replace("@PYTHON@", () => python.trimEnd()));
+          .replace("@PATH_HELPER@", () => pathHelper.trimEnd()).replace("@PYTHON@", () => python.trimEnd()));
       }
       continue;
     }
@@ -73,6 +74,7 @@ export async function buildInstallers() {
     for (const [extension, indented] of [["sh", false], ["ps1", true]]) {
       const messages = await readFile(join(templates, `messages.${extension}.in`), "utf8");
       const activation = await readFile(join(templates, `activate-shell.${extension}.in`), "utf8");
+      const pathHelper = await readFile(join(templates, `persist-path.${extension}.in`), "utf8");
       const shortcuts = await readFile(join(templates, `shortcuts.${extension}.in`), "utf8");
       const shell = await readFile(join(templates, `installer.${extension}.in`), "utf8");
       const step = await readFile(join(templates, `install-${installer.mode}.${extension}.in`), "utf8");
@@ -83,7 +85,7 @@ export async function buildInstallers() {
       const content = expand(
         // A function replacer keeps `$$`, `$&`, and friends literal: the shell
         // step uses `$$` for a per-process staging name.
-        shell.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@SHORTCUT_HELPER@", () => shortcuts.trimEnd()).replace("@PREREQUISITE_STEP@\n", () => prerequisite ? prerequisite.trimEnd() + "\n" : "").replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
+        shell.replace("@MESSAGES_HELPER@", () => messages.trimEnd()).replace("@ACTIVATION_HELPER@", () => activation.trimEnd()).replace("@PATH_HELPER@", () => pathHelper.trimEnd()).replace("@SHORTCUT_HELPER@", () => shortcuts.trimEnd()).replace("@PREREQUISITE_STEP@\n", () => prerequisite ? prerequisite.trimEnd() + "\n" : "").replace("@INSTALL_STEP@", () => (indented ? indentLike(body, "@INSTALL_STEP@", shell) : body)),
         values,
         label,
       );

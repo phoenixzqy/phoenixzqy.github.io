@@ -66,7 +66,9 @@ They retain complete old bundles and install the fork as `codex`. Defaults are
 `ZAI_CODEX_INSTALL_ROOT` and `ZAI_CODEX_BIN_LINK` remain supported.
 `ZAI_RELEASE_MANIFEST_URL` overrides metadata for isolated checks; only literal
 `127.0.0.1` permits HTTP and test downloads must not redirect. Test installation
-and upgrades with isolated paths; add the launcher directory to PATH if needed.
+and upgrades with isolated paths. The site bootstraps append the launcher directory
+to persistent shell startup files or Windows user PATH. Open a new terminal
+or run the printed activation command once in the current terminal.
 
 ## Publish packages and metadata
 

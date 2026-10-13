@@ -79,28 +79,15 @@ quote_fish() {
 show_activation() {
   activation_dir=$1
   activation_executable=$2
-  activation_profile=''
-  case "$activation_shell" in
-    zsh) activation_profile="$HOME/.zshrc" ;;
-    bash) activation_profile="$HOME/.bashrc" ;;
-    sh | dash | ksh) activation_profile="$HOME/.profile" ;;
-  esac
   printf '\n%s\n' '[NEXT] To use the app in this terminal, copy and run:'
   quoted_activation_dir=$(quote_shell "$activation_dir")
   case "$activation_shell" in
     bash | zsh | sh | dash | ksh)
-      # A profile text match is only a hint; always activate the actual directory.
-      if [ -n "$activation_profile" ] && [ -f "$activation_profile" ] &&
-          { grep -Fq -- "$activation_dir" "$activation_profile" ||
-            grep -Fq -- "$quoted_activation_dir" "$activation_profile"; }; then
-        case "$activation_shell" in bash | zsh) source_command=source ;; *) source_command=. ;; esac
-        printf '  %s %s\n' "$source_command" "$(quote_shell "$activation_profile")"
-      fi
-      printf '  export PATH=%s:"$PATH"\n' "$quoted_activation_dir"
+      printf '  export PATH="$PATH":%s\n' "$quoted_activation_dir"
       printf '  %s\n' "$(quote_shell "$activation_executable")"
       ;;
     fish)
-      printf '  set -gx PATH %s $PATH\n' "$(quote_fish "$activation_dir")"
+      printf '  set -gx PATH $PATH %s\n' "$(quote_fish "$activation_dir")"
       printf '  %s\n' "$(quote_fish "$activation_executable")"
       ;;
     *)
@@ -109,6 +96,48 @@ show_activation() {
       ;;
   esac
   printf '%s\n' 'Run the command above in your current shell; a child installer cannot update its parent shell.'
+}
+persist_path_profile() {
+  path_profile=$1
+  if [ -f "$path_profile" ] && grep -Fqx -- "$path_line" "$path_profile"; then
+    return
+  fi
+  if {
+    if [ -f "$path_profile" ] && [ -n "$(tail -c 1 "$path_profile")" ]; then
+      printf '\n'
+    fi
+    printf '%s\n' "$path_line"
+  } >>"$path_profile"; then
+    printf 'Added %s to PATH in %s. New terminals will use it automatically.\n' "$path_directory" "$path_profile"
+  else
+    message WARN "Could not update PATH in $path_profile. Add $path_directory to PATH in your shell settings."
+  fi
+}
+
+ensure_on_path() {
+  path_directory=$1
+  quoted_path_directory=$(quote_shell "$path_directory")
+  # Startup files can be loaded together; append only when the directory is absent.
+  path_line="case \":\$PATH:\" in *:$quoted_path_directory:*) ;; *) export PATH=\"\$PATH\":$quoted_path_directory ;; esac  # Added by zai installer"
+  persist_path_profile "$HOME/.profile"
+  case "$activation_shell" in
+    zsh) persist_path_profile "$HOME/.zshrc" ;;
+    bash)
+      persist_path_profile "$HOME/.bashrc"
+      # Bash login shells read only the first available login startup file.
+      if [ -f "$HOME/.bash_profile" ]; then
+        persist_path_profile "$HOME/.bash_profile"
+      elif [ -f "$HOME/.bash_login" ]; then
+        persist_path_profile "$HOME/.bash_login"
+      fi
+      ;;
+    sh | dash | ksh) ;;
+    *)
+      persist_path_profile "$HOME/.bashrc"
+      persist_path_profile "$HOME/.zshrc"
+      message WARN 'Shell not recognized for persistent PATH setup. Check your shell settings before opening a new terminal.'
+      ;;
+  esac
 }
 install_shortcut() {
   shortcut_name=$1
@@ -224,30 +253,6 @@ extract() {
   else
     "$PYTHON" -m zipfile -e "$1" "$2" || fail 'the downloaded archive could not be extracted with Python.'
   fi
-}
-
-ensure_on_path() {
-  marker='# Added by zai installer'
-  quoted_dir="$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
-  line="export PATH='$quoted_dir':\"\$PATH\"  $marker"
-  profiles="$HOME/.profile"
-  case "$activation_shell" in
-    zsh) profiles="$profiles $HOME/.zshrc" ;;
-    bash) profiles="$profiles $HOME/.bashrc" ;;
-    *) profiles="$profiles $HOME/.bashrc $HOME/.zshrc" ;;
-  esac
-  for profile in $profiles; do
-    # Match the exact line, not the marker: an earlier install into a
-    # different directory must not make this one think PATH is already set.
-    if [ -f "$profile" ] && grep -Fqx "$line" "$profile"; then
-      continue
-    fi
-    if [ -f "$profile" ] && [ -n "$(tail -c 1 "$profile" 2>/dev/null)" ]; then
-      printf '\n' >>"$profile" || continue
-    fi
-    printf '%s\n' "$line" >>"$profile" 2>/dev/null || continue
-    info "Added $1 to PATH in $profile"
-  done
 }
 
 # --- Manifest -------------------------------------------------------------

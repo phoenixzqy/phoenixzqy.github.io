@@ -111,36 +111,6 @@ function Save-Download([string] $url, [string] $destination) {
     Stop-Install "too many download redirects: $url"
 }
 
-function Add-UserPath([string] $directory) {
-    # The user PATH is read and written through the registry rather than
-    # [Environment]::GetEnvironmentVariable/SetEnvironmentVariable: those expand
-    # %VARIABLE% references on read and always write a plain string, which would
-    # permanently freeze entries such as %USERPROFILE%\bin to today's value and
-    # downgrade REG_EXPAND_SZ to REG_SZ.
-    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
-    if ($null -eq $key) {
-        $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
-    }
-    try {
-        $current = $key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
-        $kind = if ($null -eq $key.GetValue('Path')) { [Microsoft.Win32.RegistryValueKind]::ExpandString } else { $key.GetValueKind('Path') }
-        if ($null -eq $current) { $current = '' }
-        $entries = @([string]$current -split ';' | Where-Object { $_ })
-        $normalized = $directory.TrimEnd('\')
-        foreach ($entry in $entries) {
-            if ([Environment]::ExpandEnvironmentVariables($entry).TrimEnd('\') -ieq $normalized) {
-                Write-Host "$directory is already on your user PATH."
-                return
-            }
-        }
-        $updated = (@($entries) + $directory) -join ';'
-        $key.SetValue('Path', $updated, $kind)
-        Write-Host "Added $directory to your user PATH."
-    } finally {
-        $key.Close()
-    }
-}
-
 function Get-ZaiFileSha256([string] $path) {
     # Updates may inherit a module search path that cannot resolve Get-FileHash.
     # Use the .NET API directly and stream packages without buffering them.
@@ -154,6 +124,7 @@ function Get-ZaiFileSha256([string] $path) {
 }
 
 @ACTIVATION_HELPER@
+@PATH_HELPER@
 @SHORTCUT_HELPER@
 $architecture = Get-Architecture
 @PREREQUISITE_STEP@

@@ -7,7 +7,7 @@ function Show-Activation([string] $directory, [string] $command) {
         Where-Object { $_.TrimEnd([char[]]'\/') -ieq $normalized }).Count -gt 0
     if (-not $present) {
         if ([string]::IsNullOrEmpty($env:PATH)) { $env:PATH = $directory }
-        else { $env:PATH = $directory + $separator + $env:PATH }
+        else { $env:PATH = $env:PATH + $separator + $directory }
     }
 
     $quotedDirectory = "'" + $directory.Replace("'", "''") + "'"
@@ -17,6 +17,6 @@ function Show-Activation([string] $directory, [string] $command) {
     Write-Host ("  & " + $quotedCommand)
     Write-Host ''
     Write-Host 'If the installer ran in a separate process, activate your calling PowerShell terminal:'
-    Write-Host ('  $env:Path = ' + $quotedDirectory + ' + [IO.Path]::PathSeparator + $env:Path')
+    Write-Host ('  $env:Path = $env:Path + [IO.Path]::PathSeparator + ' + $quotedDirectory)
     Write-Host ("  & " + $quotedCommand)
 }

@@ -1,0 +1,53 @@
+function Add-UserPath([string] $directory) {
+    # The user PATH is read and written through the registry rather than
+    # [Environment]::GetEnvironmentVariable/SetEnvironmentVariable: those expand
+    # %VARIABLE% references on read and always write a plain string, which would
+    # permanently freeze entries such as %USERPROFILE%\bin to today's value and
+    # downgrade REG_EXPAND_SZ to REG_SZ.
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+    if ($null -eq $key) {
+        $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
+    }
+    try {
+        $current = $key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $kind = if ($null -eq $key.GetValue('Path')) { [Microsoft.Win32.RegistryValueKind]::ExpandString } else { $key.GetValueKind('Path') }
+        if ($null -eq $current) { $current = '' }
+        $entries = @([string]$current -split ';' | Where-Object { $_ })
+        $normalized = $directory.TrimEnd('\')
+        foreach ($entry in $entries) {
+            if ([Environment]::ExpandEnvironmentVariables($entry).TrimEnd('\') -ieq $normalized) {
+                Write-Host "$directory is already on your user PATH."
+                return
+            }
+        }
+        $updated = if ([string]::IsNullOrEmpty($current)) { $directory } else { [string]$current + ';' + $directory }
+        $key.SetValue('Path', $updated, $kind)
+        Write-Host "Added $directory to your user PATH."
+    } finally {
+        $key.Close()
+    }
+    # Let Explorer pick up the saved PATH for terminals opened afterwards.
+    try {
+        if (-not ('ZaiInstaller.PathEnvironment' -as [type])) {
+            Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace ZaiInstaller {
+    public static class PathEnvironment {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr SendMessageTimeout(IntPtr window, uint message,
+            UIntPtr wparam, string lparam, uint flags, uint timeout, out UIntPtr result);
+        public static void Notify() {
+            UIntPtr result;
+            SendMessageTimeout(new IntPtr(0xffff), 0x001a, UIntPtr.Zero,
+                "Environment", 2, 5000, out result);
+        }
+    }
+}
+'@
+        }
+        [ZaiInstaller.PathEnvironment]::Notify()
+    } catch {
+        Write-ZaiMessage 'WARN' 'User PATH was saved, but Windows could not be notified. Restart your terminal application to load it.'
+    }
+}
