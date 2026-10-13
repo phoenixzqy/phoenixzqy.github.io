@@ -118,6 +118,15 @@ class ZaiDiagnostics:
     def __getattr__(self, name):
         return getattr(self.stream, name)
 
+def has_permission_error(error):
+    seen = set()
+    while error is not None and id(error) not in seen:
+        seen.add(id(error))
+        if isinstance(error, PermissionError):
+            return True
+        error = error.__cause__ or error.__context__
+    return False
+
 label, mode = sys.argv[1:3]
 sys.argv = sys.argv[3:]
 original_stderr = sys.stderr
@@ -134,6 +143,7 @@ try:
         sys.path.insert(0, str(__import__("pathlib").Path(sys.argv[0]).resolve().parent))
         runpy.run_path(sys.argv[0], run_name="__main__")
 except SystemExit as error:
+    access_denied = has_permission_error(error)
     if error.code is None:
         code = 0
     elif isinstance(error.code, int):
@@ -145,7 +155,7 @@ except KeyboardInterrupt:
 except Exception as error:
     traceback.print_exc()
     reason, code = str(error), 1
-    access_denied = isinstance(error, PermissionError)
+    access_denied = has_permission_error(error)
 finally:
     sys.stderr = original_stderr
 
