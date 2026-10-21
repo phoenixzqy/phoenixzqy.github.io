@@ -6,6 +6,7 @@ from release_runtime import write_json
 
 def publish_website(runtime, site, entries):
     from release_publish import reconcile_latest, update_codex_catalog, verify_pages
+    from release_retention import prune_releases
     runtime.stage = 'website:batch'
     runtime.run(['git', 'fetch', 'origin', runtime.site_branch], cwd=site)
     runtime.run(['git', 'merge', '--ff-only', f'origin/{runtime.site_branch}'], cwd=site)
@@ -55,5 +56,6 @@ def publish_website(runtime, site, entries):
     for entry in active:
         data = entry['data']
         verify_pages(runtime, site, data['appId'], data)
+        prune_releases(runtime, data)
         entry['journal']['complete'] = True
         write_json(entry['journal_path'], entry['journal'])

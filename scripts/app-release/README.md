@@ -57,7 +57,7 @@ to the configured package index. Setup failures stop the release before packagin
 the environment is removed with the clone.
 For zai-codex, release automation dispatches the public source repository's manual `zai-codex-release.yml` workflow on its default `zai-codex` branch. Six native GitHub runners build Linux GNU, macOS and Windows MSVC packages for x64 and ARM64 using the existing packager. Each job verifies version, Copilot login help and isolated installation; publication requires the complete matrix and checksums/provenance. The full source suite and interactive login are not run by this release workflow. Local source pre-push hooks remain unchanged.
 
-The workflow uses checksum-pinned previously reviewed notices and rejects changes to the recorded dependency inputs until reviewed. `--codex-notices` remains only as a legacy CLI compatibility option; new releases obtain notices from that workflow pin. The adapter verifies the exact workflow/source revision, all six assets, public downloads, bundle provenance and SHA-256 before syncing the installer and publishing website links directly to the source release. Old website-hosted releases remain immutable and readable.
+The workflow uses checksum-pinned previously reviewed notices and rejects changes to the recorded dependency inputs until reviewed. `--codex-notices` remains only as a legacy CLI compatibility option; new releases obtain notices from that workflow pin. The adapter verifies the exact workflow/source revision, all six assets, public downloads, bundle provenance and SHA-256 before syncing the installer and publishing website links directly to the source release. Obsolete website-hosted releases follow the retention policy below.
 
 Dispatch intent and unique request ID are saved before dispatch; the run ID and terminal result are retained for recovery. An uncertain dispatch is never repeated blindly. Remote runs continue after local interruption. Rerunning resumes monitoring and website publication; a failed workflow requires inspecting/reconciling its draft or assets before retiring its journal and allocating a new version. Never overwrite a versioned package or clear an uncertain journal to force another dispatch.
 
@@ -93,8 +93,45 @@ are verified and never overwritten. A lost create response without a matching
 release, different rebuilt bytes, or interrupted Codex installer synchronization
 needs operator repair;
 the script reports the exact journal rather than replacing versioned bytes or
-deleting someone else's release. Published releases are never rolled back or
-pruned. Keep the same state directory across scheduled invocations.
+deleting someone else's release. Published bytes are never overwritten and the
+latest manifest is never rolled back. Keep the same state directory across
+scheduled invocations.
+
+### Latest-release retention
+
+After public downloads and the deployed manifest are verified, the shared Go
+and Codex publisher removes older app-prefixed releases and their tags from
+the website and the app's source repository. The manifest's version is the
+retained version, including Codex releases hosted in its source repository.
+Obsolete source-only builds and legacy website-hosted Codex builds are removed
+too. Legacy source releases named `vX.Y.Z` lose their release assets but retain
+their Git tags because those tags identify Go module versions. Package bytes
+for a retained version are never replaced.
+
+Drafts, newer versions, unrecognized tags and other apps' releases are preserved.
+An active workflow, changed manifest, missing current package, or API failure
+stops cleanup. A failed cleanup leaves the publication journal resumable;
+completion is recorded only after retention succeeds. BPlayer keeps its own
+latest-only workflow policy. The older source-hosted Go workflows are separate
+manual entrypoints; this policy belongs to the scheduled shared publisher.
+Release deletion and app-prefixed tag deletion are reconciled independently,
+so a retry also removes leftover build tags from an interrupted cleanup.
+
+To inspect or apply retention to existing builds without publishing a new one:
+
+```sh
+python3 -B scripts/app-release/release_retention.py
+python3 -B scripts/app-release/release_retention.py --apply
+```
+
+Use `--apps zai-cli zai-editor zai-gitter zai-codex` to select apps and
+`--state-dir` to use the same private state directory as scheduled releases.
+The command holds their existing release lock. Apply mode verifies the deployed
+manifest and downloads every current package to check its size, SHA-256 and
+archive contents before deleting older releases. Temporary downloads are removed
+on success or failure; command evidence stays in the private run logs.
+GitHub Release assets and temporary Actions artifacts are separate storage;
+this policy removes release history and does not change Actions retention.
 
 The script does not mirror changed user documentation or infer translated
 release claims. Those still follow the documentation privacy review workflow.
@@ -118,8 +155,9 @@ or website metadata were published; it is not evidence that nothing was written.
    every existing package for the attempt and verify its checksum, size, contents
    and signing status against the workflow's approved metadata. Include partial
    drafts and packages not yet referenced by the latest manifest. Preserve
-   existing versioned bytes, releases and tags; never overwrite, delete or roll
-   back published assets, and never downgrade a newer latest manifest.
+   existing versioned bytes, releases and tags during reconciliation; never
+   overwrite published bytes or downgrade a newer latest manifest. Only the
+   verified latest-release retention step may remove obsolete zai releases.
 3. If the same attempt can finish safely, repair its missing publication steps
    under the publishing contract. A GitHub rerun of the recorded run ID may be
    used only after verifying the selected jobs can reuse existing assets without

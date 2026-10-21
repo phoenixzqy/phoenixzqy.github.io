@@ -90,9 +90,11 @@ class CodexCatalogTest(unittest.TestCase):
                 runtime = Fake()
                 journal = {'tag': 'zai-codex-v0.1.1', 'snapshot': {'commit': 'a' * 40}}
                 with patch('release_publish.download') as download, patch('release_publish.verify_pages'), \
+                        patch('release_retention.prune_releases') as retention, \
                         patch('release_notices.notices_text', return_value='Original license fixture'):
                     finish(runtime, data, output, site, site / 'journal.json', journal)
                 download.assert_called_once()
+                retention.assert_called_once_with(runtime, data)
                 staged = [str(arg) for args in runtime.commands if args[:2] == ['git', 'add']
                           for arg in args[2:]]
                 self.assertIn('apps/catalog.json', staged)

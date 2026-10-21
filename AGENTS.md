@@ -58,7 +58,7 @@ the files as-is.
 - Reuse the source repository's `scripts/prepare_zai_codex_release.py` and sync
   its `scripts/install_zai_codex.py` with `scripts/sync-zai-codex-installer.mjs`,
   then regenerate installers. Do not replace the packager with ad hoc builds.
-- New public assets and `zai-codex-v<version>` tags belong to the public zai-codex source repository; the website links its verified manual-workflow release. Legacy website assets remain immutable.
+- New public assets and `zai-codex-v<version>` tags belong to the public zai-codex source repository; the website links its verified manual-workflow release. Never overwrite versioned package bytes; obsolete zai releases follow the publishing contract's latest-release retention policy.
   Keep source, build caches, logs and credentials outside the public tree.
 - Publish only actual verified packages. Keep `release: null` before the first
   release; do not promise platform availability from unbuilt artifacts.

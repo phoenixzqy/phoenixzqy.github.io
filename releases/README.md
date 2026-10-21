@@ -297,6 +297,17 @@ The optional operator scripts in [`scripts/app-release/`](../scripts/app-release
 orchestrate releases in a private local environment. Signing setup, credentials,
 source clones and diagnostic logs remain outside the public site.
 
+The shared zai-cli, zai-editor, zai-gitter and zai-codex publisher retains only
+the release referenced by the verified deployed latest manifest. After public
+package and deployment verification, it removes older app-prefixed releases
+and tags from the website and source repositories, including obsolete
+website-hosted Codex builds. Drafts, newer versions, unrelated tags and other
+apps are protected. Legacy `vX.Y.Z` source releases are removed while their Go
+module Git tags are preserved. A changing manifest or active workflow stops cleanup;
+retention failures remain recoverable through the publication journal. Use
+the documented `release_retention.py` dry run or apply mode for existing
+releases. Never overwrite the bytes of a retained versioned asset.
+
 ### Populated manifest example
 
 The size and checksum below are illustrative. **Replace them with real values**;
@@ -378,4 +389,4 @@ Using a release URL does not grant distribution rights.
 
 ### Public zai-codex source releases
 
-The public `phoenixzqy/zai-codex` fork is the approved exception to website-hosted release assets. Its manual `zai-codex-release.yml` workflow publishes immutable `zai-codex-v<version>` tags, six native ZIPs, checksum sidecars and `manifest.json`. The website dispatcher verifies the exact source commit, successful workflow run, complete Linux/macOS/Windows x64/ARM64 matrix, package provenance, public byte counts and hashes before publishing links. Only zai-codex manifests may link `https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v<version>/<file>`; the tag must match the manifest version. Other apps retain website-hosted release URLs. Existing website-hosted Codex releases remain supported and immutable. No source archive, private source, build cache or credentials belong in this website.
+The public `phoenixzqy/zai-codex` fork is the approved exception to website-hosted release assets. Its manual `zai-codex-release.yml` workflow publishes versioned `zai-codex-v<version>` tags, six native ZIPs, checksum sidecars and `manifest.json`. The website dispatcher verifies the exact source commit, successful workflow run, complete Linux/macOS/Windows x64/ARM64 matrix, package provenance, public byte counts and hashes before publishing links. Only zai-codex manifests may link `https://github.com/phoenixzqy/zai-codex/releases/download/zai-codex-v<version>/<file>`; the tag must match the manifest version. Other apps retain website-hosted release URLs. The validator supports legacy website-hosted Codex URLs, while obsolete releases follow latest-release retention. No source archive, private source, build cache or credentials belong in this website.
