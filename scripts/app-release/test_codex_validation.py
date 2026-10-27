@@ -86,20 +86,13 @@ class CodexValidationTest(unittest.TestCase):
 
                 def run(self, args, cwd=None):
                     calls.append((args, cwd, self.stage))
-                    if '.github/scripts/local_ci.py' in args:
-                        raise RuntimeError('source gate failed')
+                    raise RuntimeError('source gate failed')
 
             with self.subTest(app=name), tempfile.TemporaryDirectory() as directory, patch('release_builds.validation_python', return_value='gate-python'), self.assertRaisesRegex(RuntimeError, 'source gate failed'):
                 root = Path(directory)
                 build(Runtime(), root / 'source', {'repository': f'owner/{name}'},
                       '0.1.1', root / 'output', root / 'site', None)
-            expected = []
-            if name == 'zai-cli':
-                expected.append((['npm', 'ci', '--no-audit', '--no-fund'],
-                                 root / 'source/src/web-ui', f'{name}:validation'))
-            expected.append((['gate-python', '-B', '.github/scripts/local_ci.py'],
-                             root / 'source', f'{name}:validation'))
-            self.assertEqual(calls, expected)
+            self.assertEqual(calls, [(['gate-python', '-B', '.github/scripts/local_ci.py'], root / 'source', f'{name}:validation')])
 
     def test_recovery_reuses_uploaded_bytes_and_restores_installer_without_build(self):
         for failure in (None, 'hash', 'missing', 'provenance', 'installer'):

@@ -91,7 +91,6 @@ class CodexCatalogTest(unittest.TestCase):
                 journal = {'tag': 'zai-codex-v0.1.1', 'snapshot': {'commit': 'a' * 40}}
                 with patch('release_publish.download') as download, patch('release_publish.verify_pages'), \
                         patch('release_retention.prune_releases') as retention, \
-                        patch('release_artifact_retention.prune_pages_artifacts'), \
                         patch('release_notices.notices_text', return_value='Original license fixture'):
                     finish(runtime, data, output, site, site / 'journal.json', journal)
                 download.assert_called_once()

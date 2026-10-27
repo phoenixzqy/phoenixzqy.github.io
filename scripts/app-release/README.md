@@ -49,25 +49,12 @@ The source packagers and version allocation functions remain authoritative.
 For the Go apps, the source's full local validation runs before building. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
-For zai-cli, the adapter dispatches the source's manual `release.yml` workflow
-only after finding unpublished source or bundled-dependency main revisions.
-Unchanged inputs do not allocate a version or start Actions; dependency-only
-updates do. The existing source allocator still chooses the version.
-Preparation resolves/locks the discovered Go and frontend dependency commits,
-installs locked npm dependencies and the performance-toolkit Python environment,
-and runs the complete source gate. Six matching native runners build GUI packages
-for Linux, macOS and Windows, x64 and ARM64, using the existing source packager.
-Frontend/native Rust tests and a native CLI version smoke check precede upload.
-Assembly fails unless all six GUI payloads and their hashes/provenance match.
-
-The source workflow needs only `RELEASE_MODULES_TOKEN`, a fine-grained token
-with Contents: read on the three private producer repositories; it receives no
-website-write credential. It returns a private `native-release` Actions artifact
-with seven-day retention. The local adapter downloads the exact successful run,
-checks every archive's public command set, desktop inventory, CLI binding,
-source/dependency/request identity and final sizes/hashes, then uses the existing
-website publication/retention path. No private source archive is published.
-Installed GUI behavior on physical hardware is not established by these checks.
+For zai-cli, the adapter creates `.venv-local-ci` in the disposable source clone,
+installs its pinned performance-toolkit requirements, and runs the gate with
+that environment's Python. This keeps validation dependencies available when
+tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
+to the configured package index. Setup failures stop the release before packaging;
+the environment is removed with the clone.
 For zai-codex, release automation dispatches the public source repository's manual `zai-codex-release.yml` workflow on its default `zai-codex` branch. Six native GitHub runners build Linux GNU, macOS and Windows MSVC packages for x64 and ARM64 using the existing packager. Each job verifies version, Copilot login help and isolated installation; publication requires the complete matrix and checksums/provenance. The full source suite and interactive login are not run by this release workflow. Local source pre-push hooks remain unchanged.
 
 The workflow uses checksum-pinned previously reviewed notices and rejects changes to the recorded dependency inputs until reviewed. `--codex-notices` remains only as a legacy CLI compatibility option; new releases obtain notices from that workflow pin. The adapter verifies the exact workflow/source revision, all six assets, public downloads, bundle provenance and SHA-256 before syncing the installer and publishing website links directly to the source release. Obsolete website-hosted releases follow the retention policy below.
@@ -100,10 +87,7 @@ reconciles the same tag and verifies downloaded assets instead of allocating a
 duplicate release. The creation response's release ID is saved before uploading;
 subsequent reads use that ID even when GitHub's release list has not caught up.
 A lost create response is reconciled by tag and exact source provenance.
-For native zai-cli workflow releases, missing draft assets are downloaded from
-the original run and must exactly match the saved manifest; they are never
-rebuilt or redispatched. Expired artifacts require operator reconciliation.
-Legacy local-build draft assets can be rebuilt only if the recorded source is still the
+Missing draft assets can be rebuilt only if the recorded source is still the
 remote default tip and rebuilt bytes match the journal exactly; existing assets
 are verified and never overwritten. A lost create response without a matching
 release, different rebuilt bytes, or interrupted Codex installer synchronization
@@ -146,24 +130,8 @@ The command holds their existing release lock. Apply mode verifies the deployed
 manifest and downloads every current package to check its size, SHA-256 and
 archive contents before deleting older releases. Temporary downloads are removed
 on success or failure; command evidence stays in the private run logs.
-GitHub Release assets and Actions artifacts use separate storage. After public
-packages and the deployed manifest are verified, the publisher also deletes
-the consumed zai-cli run's `release-inputs`, `package-*`, `native-release` and
-validation artifacts. The exact journal-owned source, request and successful
-attempt must match; failed, active and unpublished runs are preserved. Recovery
-after cleanup downloads the immutable public packages, not deleted workflow
-artifacts. An interrupted deletion is retried before completion is recorded.
-
-Pages retains only its latest successfully deployed main build's `github-pages`
-artifact; older completed built-in deployment copies are removed. Newer, active,
-other-branch and unrelated artifacts are preserved. Both scheduled publication
-and the standalone retention command perform this cleanup, using paginated
-inventories and identity checks before deleting exact artifact IDs.
-Seven-day workflow retention remains a recovery backstop, not latest-only
-cleanup. The native matrix temporarily stores intermediate and assembled
-packages, so its peak storage can exceed one published package set. Actions
-storage accounting can lag deletion; this command neither changes billing nor
-purges caches, and cannot guarantee an immediate quota reset.
+GitHub Release assets and temporary Actions artifacts are separate storage;
+this policy removes release history and does not change Actions retention.
 
 The script does not mirror changed user documentation or infer translated
 release claims. Those still follow the documentation privacy review workflow.
@@ -212,22 +180,19 @@ or website metadata were published; it is not evidence that nothing was written.
 Uncertain release ownership, missing approved metadata, checksum differences or
 an unreconciled partial publication require operator repair before either path.
 
-Use Script automations. Keep the existing app automation's ID and command
-launcher; schedule it once daily (`0 0 * * *`, local console timezone), not every
-12 hours. The command performs update detection before any release dispatch.
-An equivalent direct command configuration is:
+Use two Script automations. Preserve the existing app automation's schedule/id
+and select the other-app entry point:
 
 ```json
 {
   "kind": "script",
-  "cron": "0 0 * * *",
   "command": "python3 -B scripts/app-release/release_apps.py --publish",
   "skip_log": false
 }
 ```
 
-A separate Codex Script automation can use the other entry point. Do not enable
-or change an existing disabled Codex automation merely to update app releases:
+Create a separate enabled Codex Script automation with a new ID and the same
+trigger, schedule and logging settings:
 
 ```json
 {
@@ -238,8 +203,8 @@ or change an existing disabled Codex automation merely to update app releases:
 ```
 
 Use `python` on Windows. Keep host-specific launchers and native environment
-settings outside the website. Native zai-cli and Codex builds run in their source workflows, not on this
-machine; the standalone Go tools still need their local toolchains. Test the other-app command normally and
+settings outside the website. Only the Codex launcher needs its native toolchain
+and reviewed notice-directory option. Test the other-app command normally and
 use `--dry-run` for a short Codex discovery check; this does not validate a Codex
 build or package. Both scripts share the state-directory release lock, so local
 launchers must queue overlapping runs rather than fail or bypass that lock.
@@ -249,10 +214,9 @@ logs remain private and are never copied to the public site.
 
 ## Parallel Go builds and combined publishing
 
-zai-editor and zai-gitter validate and build in isolated clones with
-two concurrent jobs by default. `--jobs 1` runs them sequentially. The legacy
-`--jobs 3` option remains accepted but does not add native workflow concurrency.
-Each local job has its own log directory under the run
+zai-cli, zai-editor and zai-gitter validate and build in isolated clones with
+two concurrent jobs by default. `--jobs 1` runs them sequentially; `--jobs 3`
+permits all three at once. Each job has its own log directory under the run
 report and bounded Go compiler/test parallelism (at most four processes per
 job, reduced further for small CPU counts or a lower existing GOMAXPROCS).
 All consumers resolve shared producer revisions before jobs start.
@@ -265,7 +229,7 @@ and reports the failure. A combined website failure leaves every unfinished
 app journal recoverable and stops later releases from using dirty site state.
 A newer remote manifest is checked again before the combined commit.
 
-zai-cli, Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
+Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
 sequential. Ctrl+C or termination cancels and joins owned workers before
 temporary clones and staging are removed. Existing release locks, checksums,
 per-app validation described above and website hooks still apply to every outgoing release.

@@ -62,8 +62,6 @@ def build(runtime, source, snapshot, version, output, site, notices):
     if name != 'zai-codex':
         runtime.stage = f'{name}:validation'
         interpreter = validation_python(runtime, source, name)
-        if name == 'zai-cli':
-            runtime.run(['npm', 'ci', '--no-audit', '--no-fund'], cwd=source / 'src/web-ui')
         runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
     runtime.stage = f'{name}:build'
     if name == 'zai-codex':

@@ -8,7 +8,7 @@ from release_builds import allocate, build, refresh_dependencies
 from release_runtime import write_json
 from release_sources import clone
 
-GO_APPS = {'zai-editor', 'zai-gitter'}
+GO_APPS = {'zai-cli', 'zai-editor', 'zai-gitter'}
 FAILURES = (OSError, ValueError, RuntimeError, KeyError, zipfile.BadZipFile, subprocess.TimeoutExpired)
 
 

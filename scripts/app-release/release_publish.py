@@ -64,10 +64,7 @@ def publish(runtime, snapshot, data, output, site, journal_path, journal, batch=
         target = runtime.run(['git', 'rev-parse', 'HEAD'], cwd=site)
         note = output / 'release-notes.md'
         record = {key: snapshot[key] for key in ('repository', 'branch', 'commit', 'dependencies')}
-        validation = ('All six Linux/macOS/Windows x64/ARM64 packages include their native desktop GUI. '
-                      'The complete source gate passed before the native build matrix; '
-                      if name == 'zai-cli' and journal.get('dispatch_intent') else
-                      'Native build and package smoke checks passed on the build host. '
+        validation = ('Native build and package smoke checks passed on the build host. '
                       'Release automation did not rerun the full source test suite. '
                       if name == 'zai-codex' else 'Native validation passed on the build host; ')
         note.write_text(f'Unsigned preview built from source revision `{snapshot["commit"]}`.\n\n'
