@@ -319,6 +319,17 @@ retention failures remain recoverable through the publication journal. Use
 the documented `release_retention.py` dry run or apply mode for existing
 releases. Never overwrite the bytes of a retained versioned asset.
 
+After those checks, native zai-cli workflow artifacts are consumed: the local
+publisher deletes only that journal-owned successful run's known build and
+validation artifacts. Recovery uses the verified immutable public release;
+failed, active and unpublished workflow runs retain their artifacts. Older
+completed built-in Pages deployment artifacts are also removed, preserving the
+latest successful main deployment and unrelated or unfinished runs. Cleanup
+errors leave publication resumable; seven-day Actions retention remains the
+backstop for unconsumed builds. Release assets, Actions artifacts and Actions
+caches are distinct storage; latest-only cleanup does not promise that native
+builds fit the account allowance or that quota accounting updates immediately.
+
 ### Populated manifest example
 
 The size and checksum below are illustrative. **Replace them with real values**;

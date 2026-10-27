@@ -146,8 +146,24 @@ The command holds their existing release lock. Apply mode verifies the deployed
 manifest and downloads every current package to check its size, SHA-256 and
 archive contents before deleting older releases. Temporary downloads are removed
 on success or failure; command evidence stays in the private run logs.
-GitHub Release assets and temporary Actions artifacts are separate storage;
-this policy removes release history and does not change Actions retention.
+GitHub Release assets and Actions artifacts use separate storage. After public
+packages and the deployed manifest are verified, the publisher also deletes
+the consumed zai-cli run's `release-inputs`, `package-*`, `native-release` and
+validation artifacts. The exact journal-owned source, request and successful
+attempt must match; failed, active and unpublished runs are preserved. Recovery
+after cleanup downloads the immutable public packages, not deleted workflow
+artifacts. An interrupted deletion is retried before completion is recorded.
+
+Pages retains only its latest successfully deployed main build's `github-pages`
+artifact; older completed built-in deployment copies are removed. Newer, active,
+other-branch and unrelated artifacts are preserved. Both scheduled publication
+and the standalone retention command perform this cleanup, using paginated
+inventories and identity checks before deleting exact artifact IDs.
+Seven-day workflow retention remains a recovery backstop, not latest-only
+cleanup. The native matrix temporarily stores intermediate and assembled
+packages, so its peak storage can exceed one published package set. Actions
+storage accounting can lag deletion; this command neither changes billing nor
+purges caches, and cannot guarantee an immediate quota reset.
 
 The script does not mirror changed user documentation or infer translated
 release claims. Those still follow the documentation privacy review workflow.

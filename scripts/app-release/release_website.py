@@ -5,6 +5,7 @@ from release_runtime import write_json
 
 
 def publish_website(runtime, site, entries):
+    from release_artifact_retention import prune_native_artifacts, prune_pages_artifacts
     from release_publish import reconcile_latest, update_codex_catalog, verify_pages
     from release_retention import prune_releases
     runtime.stage = 'website:batch'
@@ -57,5 +58,9 @@ def publish_website(runtime, site, entries):
         data = entry['data']
         verify_pages(runtime, site, data['appId'], data)
         prune_releases(runtime, data)
+        if data['appId'] == 'zai-cli' and entry['journal'].get('dispatch_intent'):
+            prune_native_artifacts(runtime, data, entry['journal'])
+    prune_pages_artifacts(runtime, commit)
+    for entry in active:
         entry['journal']['complete'] = True
         write_json(entry['journal_path'], entry['journal'])
