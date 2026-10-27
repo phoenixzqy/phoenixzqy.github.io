@@ -17,6 +17,7 @@ import signal
 
 from release_bplayer import run_bplayer
 from release_codex_workflow import run_codex
+from release_cli_workflow import prepare_cli, run_cli
 from release_jobs import GO_APPS, FAILURES, history, parallel_prepare, prepare
 from release_publish import publish, recover, release_for_manifest
 from release_runtime import Runtime, exclusive_lock, write_json
@@ -76,7 +77,7 @@ def detect_tasks(runtime, args, snapshots, site, root):
             if pending and (journal['app'] != app or journal['snapshot']['repository'] != snapshot['repository']):
                 raise ValueError('Journal identity mismatch')
             resumable = pending and (journal.get('create_intent') or
-                        (app in ('bplayer', 'zai-codex') and (journal.get('dispatch_intent') or journal.get('run_id'))))
+                        (app in ('bplayer', 'zai-codex', 'zai-cli') and (journal.get('dispatch_intent') or journal.get('run_id'))))
             if not resumable:
                 journal = {'app': app, 'snapshot': snapshot, 'complete': False}
             tasks.append({'name': name, 'snapshot': journal['snapshot'], 'journal': journal,
@@ -156,9 +157,14 @@ def process(runtime, args, root):
             elif task['name'] == 'zai-codex' and not task['journal'].get('create_intent'):
                 write_json(task['journal_path'], task['journal'])
                 run_codex(runtime, args, task, root, site)
+            elif task['name'] == 'zai-cli' and not task['journal'].get('create_intent'):
+                write_json(task['journal_path'], task['journal'])
+                run_cli(runtime, args, task, root, site)
             elif task['pending']:
                 recover(runtime, site, task['journal_path'], task['journal'], task['output'],
-                        lambda: prepare(runtime, args, task, root, site),
+                        (lambda: prepare_cli(runtime, args, task, root, site))
+                        if task['name'] == 'zai-cli' and task['journal'].get('dispatch_intent')
+                        else (lambda: prepare(runtime, args, task, root, site)),
                         restore_installer=(lambda: restore_codex_installer(runtime, args, task, root, site))
                         if task['name'] == 'zai-codex' else None)
             else:
