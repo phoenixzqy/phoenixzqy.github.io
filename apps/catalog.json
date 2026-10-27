@@ -844,8 +844,8 @@
       ],
       "uninstallation": [
         {
-          "en": "Removes this app’s executable, licenses, settings, and local data. Other apps and Git worktrees are preserved. The shared installation directory stays on PATH while another executable needs it; otherwise installer-added shell profile lines or the Windows user PATH entry are removed. Open a new terminal afterwards.",
-          "zh-CN": "删除此应用的可执行文件、许可证、设置和本地数据，保留其他应用和 Git 工作树。只要其他可执行文件仍需要共享安装目录，就保留其 PATH；否则删除安装脚本添加的 shell 配置行或 Windows 用户 PATH 项。完成后请打开新终端。"
+          "en": "Removes this app’s executable, licenses, settings, and local data, plus the desktop app and its launcher when they were installed and are unchanged. Other apps and Git worktrees are preserved. The shared installation directory stays on PATH while another executable needs it; otherwise installer-added shell profile lines or the Windows user PATH entry are removed. Open a new terminal afterwards.",
+          "zh-CN": "删除此应用的可执行文件、许可证、设置和本地数据；若已安装桌面应用及其启动器且未被修改，也会一并删除。保留其他应用和 Git 工作树。只要其他可执行文件仍需要共享安装目录，就保留其 PATH；否则删除安装脚本添加的 shell 配置行或 Windows 用户 PATH 项。完成后请打开新终端。"
         },
         {
           "en": "For a preview without deleting anything, set ZAI_UNINSTALL_DRY_RUN=1 before running the command. If installed elsewhere, set ZAI_INSTALL_DIR to that absolute directory. Editor cleanup also respects ZAI_EDITOR_LSP_HOME and ZAI_EDITOR_PREVIEW_HOME; shared theme cleanup respects ZAI_THEME_CONFIG. Review the script at the URL before running it.",

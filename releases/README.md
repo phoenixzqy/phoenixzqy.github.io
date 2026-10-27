@@ -204,6 +204,8 @@ These are destructive app removals: close the apps and services first. Set `ZAI_
 
 Uninstalling a tool also removes its shortcut only when it is the exact installer-created relative symlink or unchanged `.cmd` launcher. Modified launchers, unrelated links, and shortcuts for retained sibling tools are preserved.
 
+The zai-cli uninstaller also removes the bundled desktop app when one is present: unchanged files listed in `desktop/.installed-files.json`, and the menu or Start launcher recorded in `.desktop-shortcut.json` when it is at the expected per-installation location and unchanged. Desktop cleanup is optional. Installations without a desktop are unaffected, modified files are kept, and a missing, linked, or unrecognized desktop record produces a `[WARN]` and keeps the desktop files without failing the rest of the uninstall. The desktop's per-user browser data folder is shared by installations and is kept.
+
 Uninstaller content provenance: the owner requested per-app cleanup on 2026-10-01. The published templates and disposable-home regression fixtures define and verify the behavior described here and in the catalog; no private application source or release package is copied into the public site.
 
 ## App comparison tables

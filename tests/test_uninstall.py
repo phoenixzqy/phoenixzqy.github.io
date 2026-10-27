@@ -5,6 +5,7 @@ import importlib.util
 import io
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -62,6 +63,67 @@ class UninstallTests(unittest.TestCase):
                     self.assertEqual((directory / (name + ".cmd")).read_text(), "unrelated launcher")
                     if os.name != "nt":
                         self.assertEqual(os.readlink(directory / name), "unrelated-target")
+            self.run_case(app, body)
+
+    def install_desktop(self, home, directory):
+        import hashlib
+        desktop = directory / "desktop"
+        (desktop / "licenses").mkdir(parents=True)
+        files = {}
+        for name in ("zai-desktop", "zai-desktop-runtime", "licenses/NOTICE"):
+            (desktop / name).write_bytes(name.encode())
+            files[name] = hashlib.sha256(name.encode()).hexdigest()
+        (desktop / ".installed-files.json").write_text(json.dumps({"schema_version": 1, "files": files}))
+        identity = hashlib.sha256(os.path.normcase(os.path.realpath(directory)).encode()).hexdigest()[:16]
+        launcher = home / ".local" / "share" / "applications" / f"zai-{identity}.desktop"
+        launcher.parent.mkdir(parents=True)
+        launcher.write_bytes(b"[Desktop Entry]\n")
+        record = {"schema_version": 1, "platform": sys.platform, "path": str(launcher),
+                  "sha256": hashlib.sha256(b"[Desktop Entry]\n").hexdigest()}
+        (directory / ".desktop-shortcut.json").write_text(json.dumps(record))
+        return desktop, launcher
+
+    def test_cli_removes_only_unchanged_desktop_files_and_launcher(self):
+        if sys.platform in ("win32", "darwin"):
+            self.skipTest("launcher fixture uses the Linux location")
+        for app in APPS:
+            if app.APP_ID != "zai-cli":
+                continue
+            def body(home, directory):
+                (directory / "zai").write_text("binary")
+                desktop, launcher = self.install_desktop(home, directory)
+                (desktop / "zai-desktop-runtime").write_text("user edit")
+                with mock.patch.object(app, "active_apps", return_value={"zai-desktop"}):
+                    with self.assertRaisesRegex(ValueError, "Close zai"):
+                        app.uninstall(directory)
+                app.uninstall(directory)
+                self.assertFalse(launcher.exists())
+                self.assertFalse((directory / ".desktop-shortcut.json").exists())
+                self.assertEqual(sorted(path.name for path in desktop.rglob("*")), ["zai-desktop-runtime"])
+            self.run_case(app, body)
+
+    def test_cli_skips_unrecognized_desktop_data_without_failing(self):
+        if sys.platform in ("win32", "darwin"):
+            self.skipTest("launcher fixture uses the Linux location")
+        for app in APPS:
+            if app.APP_ID != "zai-cli":
+                continue
+            def body(home, directory):
+                (directory / "zai").write_text("binary")
+                desktop, launcher = self.install_desktop(home, directory)
+                (desktop / ".installed-files.json").write_text("not json")
+                record = json.loads((directory / ".desktop-shortcut.json").read_text())
+                other = home / "other.desktop"
+                other.write_bytes(b"[Desktop Entry]\n")
+                (directory / ".desktop-shortcut.json").write_text(json.dumps({**record, "path": str(other)}))
+                stderr = io.StringIO()
+                with contextlib.redirect_stderr(stderr):
+                    app.uninstall(directory)
+                self.assertFalse((directory / "zai").exists())
+                self.assertTrue((desktop / "zai-desktop").exists())
+                self.assertTrue(launcher.exists() and other.exists())
+                self.assertIn("Preserving the desktop app files", stderr.getvalue())
+                self.assertIn("another location", stderr.getvalue())
             self.run_case(app, body)
 
     def test_entrypoints_embed_same_implementation(self):

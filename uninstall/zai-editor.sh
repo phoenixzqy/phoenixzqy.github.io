@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from contextlib import contextmanager
 import json
 import os
@@ -278,6 +279,100 @@ def shortcut_paths(directory: Path, removals: list[Path]) -> list[Path]:
     return paths
 
 
+def file_digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(65536), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def desktop_paths(home: Path, directory: Path) -> list[Path]:
+    """Return unchanged files the zai-cli installer recorded under desktop/."""
+    root = directory / "desktop"
+    marker = root / ".installed-files.json"
+    if not root.exists() and not linked(root):
+        return []  # Installations from before the desktop app have nothing to remove.
+    try:
+        if linked(root) or linked(marker):
+            raise ValueError(f"linked desktop folder or record: {root}")
+        if not marker.is_file():
+            raise ValueError(f"no ownership record in {root}")
+        if marker.stat().st_size > 1024 * 1024:
+            raise ValueError(f"oversized ownership record: {marker}")
+        payload = read_object(marker)
+        files = payload.get("files")
+        if payload.get("schema_version") != 1 or not isinstance(files, dict):
+            raise ValueError(f"unsupported ownership record: {marker}")
+        owned = []
+        for name, checksum in files.items():
+            if (not isinstance(name, str) or not name or "\\" in name or ":" in name
+                    or any(part in ("", ".", "..") for part in name.split("/"))
+                    or name == marker.name or not isinstance(checksum, str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", checksum)):
+                raise ValueError(f"invalid ownership entry in {marker}")
+            owned.append((check_path(root / Path(*name.split("/")), home), checksum))
+    except (OSError, ValueError) as error:
+        zai_message("WARN", f"Preserving the desktop app files; {error}.")
+        return []
+    paths = [marker]
+    for path, checksum in owned:
+        if not path.exists() and not linked(path):
+            continue
+        if not linked(path) and path.is_file() and file_digest(path) == checksum:
+            paths.append(path)
+        else:
+            zai_message("WARN", f"Preserving modified desktop file: {path}")
+    return paths
+
+
+def desktop_shortcut_path(home: Path, directory: Path) -> Path:
+    identity = hashlib.sha256(os.path.normcase(os.path.realpath(directory)).encode("utf-8")).hexdigest()[:16]
+    name = "zai-" + identity
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", str(home / "AppData" / "Roaming")))
+        return base / "Microsoft" / "Windows" / "Start Menu" / "Programs" / (name + ".lnk")
+    if sys.platform == "darwin":
+        return home / "Applications" / (name + ".app")
+    base = Path(os.environ.get("XDG_DATA_HOME", str(home / ".local" / "share")))
+    return base / "applications" / (name + ".desktop")
+
+
+def desktop_shortcut_paths(home: Path, directory: Path) -> list[Path]:
+    """Return the desktop launcher only when it still matches its install record."""
+    marker = directory / ".desktop-shortcut.json"
+    if not marker.exists() and not linked(marker):
+        return []  # No desktop launcher was registered.
+    try:
+        if linked(marker) or marker.stat().st_size > 16384:
+            raise ValueError(f"unsupported launcher record: {marker}")
+        payload = read_object(marker)
+        checksum = payload.get("sha256")
+        if (payload.get("schema_version") != 1 or payload.get("platform") != sys.platform
+                or not isinstance(checksum, str) or not re.fullmatch(r"[a-f0-9]{64}", checksum)):
+            raise ValueError(f"unsupported launcher record: {marker}")
+        expected = desktop_shortcut_path(home, directory)
+        if payload.get("path") != str(expected):
+            zai_message("WARN", f"Preserving desktop launcher recorded at another location: {payload.get('path')}")
+            return [marker]
+        path = check_path(expected, home)
+    except (OSError, ValueError) as error:
+        zai_message("WARN", f"Preserving the desktop launcher; {error}.")
+        return []
+    if not path.exists() and not linked(path):
+        return [marker]
+    if sys.platform == "darwin" and path.is_symlink():
+        data = os.readlink(path).encode("utf-8")
+    elif sys.platform != "darwin" and not linked(path) and path.is_file() and path.stat().st_size <= 1024 * 1024:
+        data = path.read_bytes()
+    else:
+        data = None
+    if data is not None and hashlib.sha256(data).hexdigest() == checksum:
+        return [marker, path]
+    zai_message("WARN", f"Preserving modified or unowned desktop launcher: {path}")
+    return [marker]
+
+
 def plan(home: Path, directory: Path) -> tuple[list[Path], list[tuple[Path, dict]]]:
     paths = [directory / (EXECUTABLE + suffix) for suffix in ("", ".exe")]
     paths.append(directory / "licenses" / APP_ID)
@@ -303,6 +398,8 @@ def plan(home: Path, directory: Path) -> tuple[list[Path], list[tuple[Path, dict
         paths.extend(directory / (name + suffix)
                      for name in ("zai-hook", ".zai-editor", ".zai-gitter")
                      for suffix in ("", ".exe"))
+        paths.extend(desktop_paths(home, directory))
+        paths.extend(desktop_shortcut_paths(home, directory))
     else:
         paths.append(home / ("." + APP_ID))
     if APP_ID == "zai-editor":
@@ -395,7 +492,8 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
             raise ValueError(f"Refusing overlapping cleanup path: {path}")
         protect_repositories(path)
     names = {name + suffix for name in ("zai", "zai-editor", "zai-gitter", "zai-hook",
-                                        ".zai-editor", ".zai-gitter") for suffix in ("", ".exe")}
+                                        ".zai-editor", ".zai-gitter", "zai-desktop",
+                                        "zai-desktop-runtime") for suffix in ("", ".exe")}
     if not dry_run:
         running = active_apps(names)
         if running:
