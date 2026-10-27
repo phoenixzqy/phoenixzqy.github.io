@@ -119,6 +119,33 @@ class PackageTest(unittest.TestCase):
 
 
 class DraftRecoveryTest(unittest.TestCase):
+    def test_consumed_workflow_artifacts_are_not_needed_to_recover_verified_public_packages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'package.zip'
+            with zipfile.ZipFile(source, 'w') as archive:
+                archive.writestr('binary', b'approved')
+            asset = {'file': source.name, 'bytes': source.stat().st_size, 'sha256': digest(source)}
+            snapshot = {'commit': 'a' * 40, 'dependencies': {}}
+            journal = {'app': 'zai-cli', 'tag': 'zai-cli-v1.0.0', 'snapshot': snapshot,
+                       'manifest': {'appId': 'zai-cli', 'release': {'assets': [asset]}}}
+            class Fake:
+                site_repository = 'owner/site'
+                def pages(self, endpoint):
+                    return [{'tag_name': journal['tag'], 'id': 10, 'draft': False,
+                             'body': '<!-- app-release-provenance ' + json.dumps(snapshot) + ' -->',
+                             'assets': [{'name': source.name}]}]
+                def run(self, args, **kwargs):
+                    assert args[:3] == ['gh', 'release', 'download']
+                    output = Path(args[args.index('--dir') + 1])
+                    (output / source.name).write_bytes(source.read_bytes())
+                    return ''
+            def unavailable():
+                raise AssertionError('Consumed workflow artifacts must not be downloaded or rebuilt')
+            with patch('release_publish.finish') as finish:
+                recover(Fake(), root, root / 'journal.json', journal, root / 'output', unavailable)
+            finish.assert_called_once()
+
     def test_create_saves_response_id_without_reading_stale_collection(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
