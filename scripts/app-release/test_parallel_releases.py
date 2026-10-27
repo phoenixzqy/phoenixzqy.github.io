@@ -12,7 +12,6 @@ import unittest
 from unittest.mock import patch
 
 import release_jobs
-import release_artifact_retention
 import release_publish
 import release_retention
 from release_runtime import Runtime
@@ -113,13 +112,11 @@ class WebsiteBatchTest(unittest.TestCase):
                 self.assertIn(data['appId'], verified)
                 self.assertFalse(entries[verified.index(data['appId'])]['journal']['complete'])
             with patch.object(release_publish, 'verify_pages', side_effect=verified_pages) as verification, \
-                    patch.object(release_retention, 'prune_releases', side_effect=prune) as retention, \
-                    patch.object(release_artifact_retention, 'prune_pages_artifacts') as artifacts:
+                    patch.object(release_retention, 'prune_releases', side_effect=prune) as retention:
                 publish_website(runtime, root, entries)
             self.assertEqual(sum(command[:2] == ['git', 'commit'] for command in runtime.commands), 1)
             self.assertEqual(verification.call_count, 2)
             self.assertEqual(retention.call_count, 2)
-            artifacts.assert_called_once_with(runtime, 'a' * 40)
             for entry in entries:
                 journal = json.loads(entry['journal_path'].read_text())
                 self.assertTrue(journal['complete'])
@@ -144,16 +141,14 @@ class WebsiteBatchTest(unittest.TestCase):
             self.assertFalse(entry['journal']['complete'])
 
     def test_failed_verification_or_retention_keeps_journal_resumable(self):
-        for stage in ('verification', 'retention', 'artifacts', 'native artifacts'):
+        for stage in ('verification', 'retention'):
             with self.subTest(stage=stage), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
-                app = 'zai-cli' if stage == 'native artifacts' else 'zai-editor'
-                data = {'appId': app, 'release': {'version': '0.3.7'}}
-                path = root / f'releases/{app}/latest/manifest.json'
+                data = {'appId': 'zai-editor', 'release': {'version': '0.3.7'}}
+                path = root / 'releases/zai-editor/latest/manifest.json'
                 path.parent.mkdir(parents=True)
                 path.write_text(json.dumps(data))
-                entry = {'data': data, 'journal': {'complete': False, 'dispatch_intent': True},
-                         'journal_path': root / 'journal.json'}
+                entry = {'data': data, 'journal': {'complete': False}, 'journal_path': root / 'journal.json'}
                 class Fake:
                     site_branch = 'main'
                     def run(self, args, **kwargs):
@@ -161,15 +156,10 @@ class WebsiteBatchTest(unittest.TestCase):
                 with patch.object(release_publish, 'verify_pages',
                                   side_effect=RuntimeError('verification failed') if stage == 'verification' else None), \
                         patch.object(release_retention, 'prune_releases',
-                                     side_effect=RuntimeError('retention failed') if stage == 'retention' else None) as retention, \
-                        patch.object(release_artifact_retention, 'prune_pages_artifacts',
-                                     side_effect=RuntimeError('artifacts failed') if stage == 'artifacts' else None), \
-                        patch.object(release_artifact_retention, 'prune_native_artifacts',
-                                     side_effect=RuntimeError('native artifacts failed')
-                                     if stage == 'native artifacts' else None):
+                                     side_effect=RuntimeError('retention failed') if stage == 'retention' else None) as retention:
                     with self.assertRaisesRegex(RuntimeError, stage + ' failed'):
                         publish_website(Fake(), root, [entry])
-                self.assertEqual(retention.call_count, int(stage != 'verification'))
+                self.assertEqual(retention.call_count, int(stage == 'retention'))
                 self.assertFalse(json.loads(entry['journal_path'].read_text())['complete'])
 
     def test_superseded_app_is_excluded_from_combined_push(self):

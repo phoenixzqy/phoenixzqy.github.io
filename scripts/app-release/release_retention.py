@@ -112,12 +112,10 @@ def prune_releases(runtime, data, *, apply=True):
 
 
 def main(argv=None):
-    from release_artifact_retention import prune_native_artifacts, prune_pages_artifacts
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apps', nargs='+', choices=APPS, default=list(APPS))
     parser.add_argument('--owner', default='phoenixzqy')
-    parser.add_argument('--apply', action='store_true',
-                        help='Delete obsolete releases/tags, consumed native artifacts and older Pages copies.')
+    parser.add_argument('--apply', action='store_true', help='Delete older releases and their app-prefixed tags.')
     parser.add_argument('--state-dir', type=Path, default=Path.home() / '.local/state/app-release')
     args = parser.parse_args(argv)
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9-]*', args.owner):
@@ -127,8 +125,7 @@ def main(argv=None):
     runtime = Runtime(state / 'runs' / run_id)
     runtime.site_repository = f'{args.owner}/phoenixzqy.github.io'
     with exclusive_lock(state / 'release.lock'):
-        site_snapshot = remote_snapshot(runtime, runtime.site_repository)
-        runtime.site_branch = site_snapshot['branch']
+        runtime.site_branch = remote_snapshot(runtime, runtime.site_repository)['branch']
         for app in dict.fromkeys(args.apps):
             data = remote_manifest(runtime, app)
             if data['appId'] != app:
@@ -148,12 +145,6 @@ def main(argv=None):
             candidates = prune_releases(runtime, data, apply=args.apply)
             runtime.event(f'{len(candidates)} older releases {"removed" if args.apply else "eligible"}; '
                           f'{sum(item["bytes"] for item in candidates)} package bytes')
-            journal_path = state / f'{app}.json'
-            if app == 'zai-cli' and journal_path.exists():
-                journal = json.loads(journal_path.read_text())
-                if journal.get('dispatch_intent') and journal.get('manifest') == data:
-                    prune_native_artifacts(runtime, data, journal, apply=args.apply)
-        prune_pages_artifacts(runtime, site_snapshot['commit'], apply=args.apply)
     return 0
 
 

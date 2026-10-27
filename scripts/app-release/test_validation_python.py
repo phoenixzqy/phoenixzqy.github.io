@@ -56,45 +56,6 @@ class ValidationPythonTest(unittest.TestCase):
         for name in ('zai-editor', 'zai-gitter', 'zai-codex'):
             self.assertEqual(validation_python(Runtime(), Path('source'), name), sys.executable)
 
-    def test_cli_installs_locked_frontend_dependencies_before_gate(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            calls = []
-
-            class Runtime:
-                def run(self, args, cwd=None):
-                    calls.append((args, cwd))
-                    if '.github/scripts/local_ci.py' in args:
-                        raise RuntimeError('gate reached')
-
-            with self.assertRaisesRegex(RuntimeError, 'gate reached'):
-                build(Runtime(), root, {'repository': 'owner/zai-cli'}, '1.0.0',
-                      root / 'output', root / 'site', None)
-            self.assertEqual(calls[-2:], [
-                (['npm', 'ci', '--no-audit', '--no-fund'], root / 'src/web-ui'),
-                ([root / '.venv-local-ci' / (
-                    'Scripts/python.exe' if sys.platform == 'win32' else 'bin/python'),
-                  '-B', '.github/scripts/local_ci.py'], root),
-            ])
-
-    def test_frontend_setup_failure_stops_before_gate_or_packaging(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            calls = []
-
-            class Runtime:
-                def run(self, args, cwd=None):
-                    calls.append(args)
-                    if args[0] == 'npm':
-                        raise RuntimeError('frontend dependency setup failed')
-
-            runtime = Runtime()
-            with self.assertRaisesRegex(RuntimeError, 'frontend dependency setup failed'):
-                build(runtime, root, {'repository': 'owner/zai-cli'}, '1.0.0',
-                      root / 'output', root / 'site', None)
-            self.assertEqual(runtime.stage, 'zai-cli:validation')
-            self.assertEqual(len(calls), 3)
-
     def test_environment_packages_survive_isolated_home(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

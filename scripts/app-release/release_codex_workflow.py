@@ -1,13 +1,16 @@
 """Dispatch native Codex builds and publish verified source-release links."""
 import json
+import time
+import uuid
 from urllib.parse import quote
 import zipfile
 
+from release_builds import allocate
+from release_jobs import history
 from release_packages import download
 from release_runtime import write_json
 from release_sources import clone, provenance
 from release_website import publish_website
-from release_workflow import workflow_run as dispatch_workflow
 
 TARGETS = {
     'x86_64-unknown-linux-gnu': ('linux', 'x64'),
@@ -42,8 +45,54 @@ def verify_manifest(data, snapshot, version, release):
 
 
 def workflow_run(runtime, snapshot, journal_path, journal, source):
-    return dispatch_workflow(runtime, snapshot, journal_path, journal, source,
-                             app='zai-codex', workflow='zai-codex-release.yml')
+    endpoint = f'repos/{snapshot["repository"]}/actions/workflows/zai-codex-release.yml'
+    if not journal.get('run_id'):
+        runs = runtime.api(f'{endpoint}/runs?per_page=100')['workflow_runs']
+        if not journal.get('dispatch_intent'):
+            if any(run['status'] != 'completed' for run in runs):
+                raise RuntimeError('A Codex release is already active; retry after it finishes')
+            versions = history(runtime, snapshot['repository']) + history(runtime, runtime.site_repository)
+            version = allocate(runtime, source, 'zai-codex', versions)
+            journal.update(version=version, tag=f'zai-codex-v{version}', dispatch_intent=True,
+                           before_run_ids=[r['id'] for r in runs], request_id=uuid.uuid4().hex)
+            write_json(journal_path, journal)
+            # Save intent first: uncertain dispatch responses must never be retried blindly.
+            runtime.run(['gh', 'api', '--method', 'POST', f'{endpoint}/dispatches',
+                         '-f', f'ref={snapshot["branch"]}', '-f', f'inputs[version]={version}',
+                         '-f', f'inputs[source_commit]={snapshot["commit"]}',
+                         '-f', f'inputs[automation_request_id]={journal["request_id"]}'])
+        deadline = time.monotonic() + 120
+        while time.monotonic() < deadline:
+            runs = runtime.api(f'{endpoint}/runs?per_page=100')['workflow_runs']
+            candidates = [r for r in runs if r['id'] not in journal['before_run_ids'] and
+                          r['event'] == 'workflow_dispatch' and
+                          r['display_title'] == f'zai-codex release {journal["request_id"]}']
+            if len(candidates) > 1:
+                raise RuntimeError('Ambiguous Codex dispatch; inspect runs without dispatching again')
+            if candidates:
+                run = candidates[0]
+                if run['head_sha'] != snapshot['commit'] or run['head_branch'] != snapshot['branch']:
+                    raise ValueError('Codex dispatch resolved a different source revision')
+                journal['run_id'] = run['id']
+                write_json(journal_path, journal)
+                break
+            time.sleep(5)
+        else:
+            raise RuntimeError('Codex dispatch not identified; intent retained to prevent duplicate releases')
+    deadline = time.monotonic() + runtime.timeout
+    while time.monotonic() < deadline:
+        run = runtime.api(f'repos/{snapshot["repository"]}/actions/runs/{journal["run_id"]}')
+        if run['head_sha'] != snapshot['commit'] or run['head_branch'] != snapshot['branch']:
+            raise ValueError('Stored Codex workflow run has different source provenance')
+        if run['status'] == 'completed':
+            journal['workflow_terminal'] = {key: run.get(key) for key in ('id', 'run_attempt', 'conclusion', 'html_url')}
+            write_json(journal_path, journal)
+            if run['conclusion'] != 'success':
+                raise RuntimeError(f'Codex release {run["html_url"]} concluded {run["conclusion"]}; '
+                                   'inspect the run and any draft before resuming; no redispatch was attempted')
+            return
+        time.sleep(15)
+    raise RuntimeError('Codex workflow timed out; remote run remains active and journal retained')
 
 
 def run_codex(runtime, args, task, root, site):

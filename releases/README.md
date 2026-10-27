@@ -297,17 +297,6 @@ The optional operator scripts in [`scripts/app-release/`](../scripts/app-release
 orchestrate releases in a private local environment. Signing setup, credentials,
 source clones and diagnostic logs remain outside the public site.
 
-For zai-cli, the local publisher checks source and bundled dependency main
-revisions before dispatching its private source workflow. Unchanged inputs
-start no Actions run. Its manual-only workflow returns all six native
-Linux/macOS/Windows x64/ARM64 GUI packages as a private artifact; it has no
-website-write credential. The local publisher verifies the exact successful run,
-complete GUI inventories, provenance and final hashes before uploading approved
-ZIPs here. Missing matrix targets fail the release, rather than replacing latest
-with a partial set. Interrupted uploads reuse that run's immutable artifacts.
-The host's app-release Script automation runs once daily; the workflow itself
-has no schedule trigger.
-
 The shared zai-cli, zai-editor, zai-gitter and zai-codex publisher retains only
 the release referenced by the verified deployed latest manifest. After public
 package and deployment verification, it removes older app-prefixed releases
@@ -318,17 +307,6 @@ module Git tags are preserved. A changing manifest or active workflow stops clea
 retention failures remain recoverable through the publication journal. Use
 the documented `release_retention.py` dry run or apply mode for existing
 releases. Never overwrite the bytes of a retained versioned asset.
-
-After those checks, native zai-cli workflow artifacts are consumed: the local
-publisher deletes only that journal-owned successful run's known build and
-validation artifacts. Recovery uses the verified immutable public release;
-failed, active and unpublished workflow runs retain their artifacts. Older
-completed built-in Pages deployment artifacts are also removed, preserving the
-latest successful main deployment and unrelated or unfinished runs. Cleanup
-errors leave publication resumable; seven-day Actions retention remains the
-backstop for unconsumed builds. Release assets, Actions artifacts and Actions
-caches are distinct storage; latest-only cleanup does not promise that native
-builds fit the account allowance or that quota accounting updates immediately.
 
 ### Populated manifest example
 
