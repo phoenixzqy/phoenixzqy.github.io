@@ -49,12 +49,26 @@ The source packagers and version allocation functions remain authoritative.
 For the Go apps, the source's full local validation runs before building. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
-For zai-cli, the adapter creates `.venv-local-ci` in the disposable source clone,
+For zai-cli, the adapter installs the locked frontend dependencies with
+`npm ci --no-audit --no-fund` in `src/web-ui` before the full source gate. It
+creates `.venv-local-ci` in the disposable source clone,
 installs its pinned performance-toolkit requirements, and runs the gate with
 that environment's Python. This keeps validation dependencies available when
 tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access
 to the configured package index. Setup failures stop the release before packaging;
 the environment is removed with the clone.
+The source packager runs with `--locked-tools --require-desktop`, builds the
+production web assets once, and cross-compiles the Go browser launcher and
+server for all six Linux/macOS/Windows x64/ARM64 targets locally. No native
+six-runner Actions workflow is required. New releases fail unless every archive
+contains its target-matching GUI, complete hashed desktop inventory bound to
+the packaged CLI, production JavaScript/CSS, font licenses and macOS app bundle
+where applicable. Download/recovery verification also validates a GUI whenever
+it is present; existing Tauri inventories remain verifiable without requiring
+browser assets, and already published CLI-only versions remain valid for immutable
+recovery and retention. Cross-compilation does not establish native GUI behavior
+on other operating systems. Before manual installation/removal, run
+`zai gui stop`; closing the browser leaves the GUI server running.
 For zai-codex, release automation dispatches the public source repository's manual `zai-codex-release.yml` workflow on its default `zai-codex` branch. Six native GitHub runners build Linux GNU, macOS and Windows MSVC packages for x64 and ARM64 using the existing packager. Each job verifies version, Copilot login help and isolated installation; publication requires the complete matrix and checksums/provenance. The full source suite and interactive login are not run by this release workflow. Local source pre-push hooks remain unchanged.
 
 The workflow uses checksum-pinned previously reviewed notices and rejects changes to the recorded dependency inputs until reviewed. `--codex-notices` remains only as a legacy CLI compatibility option; new releases obtain notices from that workflow pin. The adapter verifies the exact workflow/source revision, all six assets, public downloads, bundle provenance and SHA-256 before syncing the installer and publishing website links directly to the source release. Obsolete website-hosted releases follow the retention policy below.

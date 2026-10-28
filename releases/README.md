@@ -137,7 +137,10 @@ a pure data change to `manifest.json`.
 Prerequisites are checked before release downloads. The zai-cli bootstrap requires a working Python 3.10+ interpreter (`python3`/`python` on macOS/Linux; `py -3`/`python`/`python3` on Windows), then runs `install.py` from the verified archive root. macOS/Linux bootstraps for the standalone tools require Python 3 for metadata parsing. Shell installers also check for `curl` or `wget` and `sha256sum` or `shasum`; ZIP extraction can fall back to the selected Python interpreter. Missing, old, or broken Python fails with installation guidance before the bundled installer creates `~/.zai`. Coding-agent CLIs, Git, and Node.js/npm are runtime dependencies where needed, not prerequisites for installing the zai archive.
 
 Installing zai-cli exposes the public `zai`, `zai-editor`, and `zai-gitter`
-commands. Its archive contains all three public binaries at the root
+commands. New releases also contain the local browser GUI launcher, server and
+production web assets for each target; `zai gui` starts or reuses the GUI server
+and opens a browser. Run `zai gui stop` before manual installation or removal:
+closing the browser leaves the server running. Its archive contains all three public binaries at the root
 (with `.exe` on Windows). The bundled `install.py` owns executable validation
 and installation; the bootstrap reports public commands present afterwards.
 Installing either standalone tool exposes only its own command and preserves

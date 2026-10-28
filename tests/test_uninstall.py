@@ -3,9 +3,13 @@
 import contextlib
 import importlib.util
 import io
+import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -150,6 +154,164 @@ class UninstallTests(unittest.TestCase):
                         app.uninstall(directory)
                 self.assertEqual(binary.read_text(), "unchanged")
             self.run_case(app, body)
+
+    def test_browser_server_blocks_cli_removal_until_explicit_stop(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        def body(home, directory):
+            binary = directory / app.EXECUTABLE
+            binary.write_text("unchanged")
+            for name in ("zai-desktop", "zai-desktop-runtime", "zai-desktop.exe", "zai-desktop-runtime.exe"):
+                def active(names):
+                    return {name} & names
+                with self.subTest(process=name), mock.patch.object(app, "active_apps", side_effect=active):
+                    with self.assertRaisesRegex(app.AppRunningError, name):
+                        app.uninstall(directory)
+                    self.assertEqual(binary.read_text(), "unchanged")
+                    errors = io.StringIO()
+                    with mock.patch.object(app.sys, "argv", ["uninstall", "--install-dir", str(directory)]), contextlib.redirect_stderr(errors):
+                        self.assertEqual(app.main(), 1)
+                    self.assertIn("zai gui stop", errors.getvalue())
+                    self.assertIn("closing the browser leaves its server running", errors.getvalue())
+        self.run_case(app, body)
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux comm truncation regression")
+    def test_real_background_gui_basename_is_detected_after_linux_comm_truncation(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+        with tempfile.TemporaryDirectory() as directory:
+            binary = Path(directory) / "zai-desktop-runtime"
+            interpreter = Path(sys.executable).resolve()
+            shutil.copy2(interpreter, binary)
+            child = subprocess.Popen([str(binary), "-c", "import time; print('ready', flush=True); time.sleep(30)"],
+                env=dict(os.environ, PYTHONHOME=str(interpreter.parent.parent)),
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            try:
+                self.assertEqual(child.stdout.readline().strip(), "ready")
+                self.assertIsNone(child.poll())
+                self.assertIn("zai-desktop-runtime", app.active_apps({"zai-desktop-runtime"}))
+                self.assertIsNone(child.poll())
+            finally:
+                child.terminate()
+                child.wait(timeout=5)
+                child.stdout.close()
+                child.stderr.close()
+
+    def test_gui_inventory_removes_only_unchanged_owned_files(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        def body(home, directory):
+            desktop = directory / "desktop"
+            desktop.mkdir()
+            owned, modified, unknown = (desktop / name for name in ("zai-desktop", "zai-desktop-runtime", "user.txt"))
+            for path in (owned, modified, unknown):
+                path.write_bytes(b"original")
+            marker = desktop / ".installed-files.json"
+            marker.write_text(json.dumps({"schema_version": 1, "files": {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in (owned, modified)}}))
+            modified.write_bytes(b"user changes")
+            app.uninstall(directory)
+            self.assertFalse(owned.exists())
+            self.assertFalse(marker.exists())
+            self.assertEqual(modified.read_bytes(), b"user changes")
+            self.assertEqual(unknown.read_bytes(), b"original")
+        self.run_case(app, body)
+
+    def test_gui_inventory_rejects_escaping_paths_before_removal(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        def body(home, directory):
+            desktop = directory / "desktop"
+            desktop.mkdir()
+            (directory / "zai").write_text("preserved")
+            (desktop / ".installed-files.json").write_text(json.dumps({"schema_version": 1,
+                "files": {"../outside": "a" * 64}}))
+            with self.assertRaisesRegex(ValueError, "Invalid desktop ownership entry"):
+                app.uninstall(directory)
+            self.assertEqual((directory / "zai").read_text(), "preserved")
+        self.run_case(app, body)
+
+    def test_gui_ownership_records_survive_partial_failure_and_retry(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        for failure in ("inventory", "shortcut"):
+            for modify_on_retry in (False, True):
+                with self.subTest(failure=failure, modify_on_retry=modify_on_retry):
+                    def body(home, directory):
+                        custom = home / "deep" / "custom" / "install" / "with" / "many" / "parents"
+                        desktop = custom / "desktop"
+                        (desktop / "nested").mkdir(parents=True)
+                        (custom / app.EXECUTABLE).write_bytes(b"binary")
+                        removed = desktop / "nested" / "already-removed"
+                        owned = desktop / "zai-desktop-runtime"
+                        modified = desktop / "zai-desktop"
+                        unknown = desktop / "user.txt"
+                        for path in (removed, owned, modified, unknown):
+                            path.write_bytes(b"owned")
+                        inventory = desktop / ".installed-files.json"
+                        inventory.write_text(json.dumps({"schema_version": 1, "files": {
+                            path.relative_to(desktop).as_posix(): hashlib.sha256(b"owned").hexdigest()
+                            for path in (removed, owned, modified)}}))
+                        modified.write_bytes(b"user changes")
+                        identity = hashlib.sha256(os.path.normcase(os.path.realpath(custom)).encode()).hexdigest()[:16]
+                        shortcut = home / ".local" / "share" / "applications" / ("zai-" + identity + ".desktop")
+                        shortcut.parent.mkdir(parents=True)
+                        shortcut.write_bytes(b"owned shortcut")
+                        marker = custom / ".desktop-shortcut.json"
+                        marker.write_text(json.dumps({"schema_version": 1, "platform": "linux",
+                            "path": str(shortcut), "sha256": hashlib.sha256(shortcut.read_bytes()).hexdigest()}))
+                        records = {path: path.read_bytes() for path in (inventory, marker)}
+                        failed = owned if failure == "inventory" else shortcut
+                        remove = app.remove
+
+                        def fail_removal(path, dry_run):
+                            if path == failed:
+                                raise PermissionError(str(path))
+                            remove(path, dry_run)
+
+                        with mock.patch.object(app.sys, "platform", "linux"):
+                            with mock.patch.object(app, "remove", side_effect=fail_removal):
+                                with self.assertRaises(PermissionError):
+                                    app.uninstall(custom)
+                            self.assertFalse(removed.exists())
+                            self.assertTrue(failed.exists())
+                            for path, content in records.items():
+                                self.assertTrue(path.is_file(), f"Retry ownership record was removed: {path}")
+                                self.assertEqual(path.read_bytes(), content)
+                            recovery = custom / ".uninstall-zai-cli.json"
+                            self.assertTrue(recovery.exists())
+                            if modify_on_retry:
+                                failed.write_bytes(b"changed after failure")
+                            app.uninstall(custom)
+                            app.uninstall(custom)
+                        self.assertEqual(failed.exists(), modify_on_retry)
+                        if modify_on_retry:
+                            self.assertEqual(failed.read_bytes(), b"changed after failure")
+                        self.assertEqual(modified.read_bytes(), b"user changes")
+                        self.assertEqual(unknown.read_bytes(), b"owned")
+                        for path in (*records, recovery):
+                            self.assertFalse(path.exists())
+                    self.run_case(app, body)
+
+    def test_gui_shortcut_cleanup_preserves_modified_and_unexpected_locations(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        def body(home, directory):
+            identity = hashlib.sha256(os.path.normcase(os.path.realpath(directory)).encode()).hexdigest()[:16]
+            target = home / ".local" / "share" / "applications" / ("zai-" + identity + ".desktop")
+            target.parent.mkdir(parents=True)
+            marker = directory / ".desktop-shortcut.json"
+            for changed, expected_location in ((False, True), (True, True), (False, False)):
+                target.write_bytes(b"owned")
+                marker.write_text(json.dumps({"schema_version": 1, "platform": "linux",
+                    "path": str(target if expected_location else home / "unowned.desktop"),
+                    "sha256": hashlib.sha256(b"owned").hexdigest()}))
+                if changed:
+                    target.write_bytes(b"modified")
+                with mock.patch.object(app.sys, "platform", "linux"):
+                    app.uninstall(directory)
+                self.assertEqual(target.exists(), changed or not expected_location)
+                self.assertFalse(marker.exists())
+        self.run_case(app, body)
 
     def test_invalid_paths_and_linked_parents(self):
         for app in APPS:
