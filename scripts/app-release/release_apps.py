@@ -180,8 +180,8 @@ def main(argv=None, *, allowed_apps=OTHER_APPS):
     description = 'Check and publish zai-codex releases.' if allowed_apps == ('zai-codex',) else __doc__
     parser = argparse.ArgumentParser(description=description)
     parser.set_defaults(allowed_apps=allowed_apps, publish=False)
-    parser.add_argument('--jobs', type=int, choices=(1, 2, 3), default=2,
-                        help='Concurrent Go validation/build jobs (default: 2). Publishing is serialized.')
+    parser.add_argument('--jobs', type=int, choices=(1, 2, 3), default=3,
+                        help='Concurrent Go validation/build jobs (default: 3). Publishing is serialized.')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--publish', action='store_true', help='Build and publish; default is read-only detection.')
     mode.add_argument('--dry-run', action='store_false', dest='publish',
