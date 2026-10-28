@@ -54,11 +54,13 @@ def asset_name(asset):
     return name
 
 
-def verify_file(path, asset):
+def verify_file(path, asset, *, require_browser_gui=False):
     asset_name(asset)
     if path.stat().st_size != asset['bytes'] or digest(path) != asset['sha256']:
         raise ValueError(f'Package checksum/size mismatch: {path.name}')
     inspect_archive(path)
+    from release_cli_packages import verify_browser_gui_archive
+    verify_browser_gui_archive(path, asset, required=require_browser_gui)
 
 
 class HTTPSOnly(urllib.request.HTTPRedirectHandler):

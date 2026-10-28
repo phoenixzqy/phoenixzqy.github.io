@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from contextlib import contextmanager
 import json
 import os
@@ -142,7 +143,9 @@ def active_apps(names: set[str]) -> set[str]:
         running = {row[0].lower() for row in csv.reader(result.stdout.splitlines()) if row}
     else:
         running = {Path(line.strip()).name for line in result.stdout.splitlines()}
-    return running & names
+    # Linux comm truncates executable basenames to 15 bytes; app names here are ASCII.
+    return {name for name in names if name in running
+            or (sys.platform.startswith("linux") and name[:15] in running)}
 
 
 def profile_lines(directory: Path) -> set[str]:
@@ -242,11 +245,88 @@ def shortcut_paths(directory: Path, removals: list[Path]) -> list[Path]:
     return paths
 
 
+def desktop_paths(home: Path, directory: Path) -> list[Path]:
+    root = directory / "desktop"
+    marker = root / ".installed-files.json"
+    if linked(root) or linked(marker):
+        raise ValueError(f"Refusing linked desktop ownership: {root}")
+    if not marker.exists():
+        return []
+    if marker.stat().st_size > 1024 * 1024:
+        raise ValueError(f"Invalid desktop ownership: {marker}")
+    payload = read_object(marker)
+    files = payload.get("files")
+    if payload.get("schema_version") != 1 or not isinstance(files, dict) or len(files) > 4096:
+        raise ValueError(f"Invalid desktop ownership: {marker}")
+    paths = [marker]
+    for name, checksum in files.items():
+        if (not isinstance(name, str) or not name or "\\" in name or ":" in name
+                or any(part in ("", ".", "..") for part in name.split("/"))
+                or name == marker.name or not isinstance(checksum, str)
+                or not re.fullmatch(r"[a-f0-9]{64}", checksum)):
+            raise ValueError("Invalid desktop ownership entry")
+        path = check_path(root / Path(*name.split("/")), home)
+        if not path.exists() and not linked(path):
+            continue
+        matches = False
+        if not linked(path) and path.is_file():
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(65536), b""):
+                    digest.update(block)
+            matches = digest.hexdigest() == checksum
+        if matches:
+            paths.append(path)
+        else:
+            print(f"[WARN] Preserving modified or unowned desktop entry: {path}")
+    return paths
+
+
+def desktop_shortcut_paths(home: Path, directory: Path) -> list[Path]:
+    marker = directory / ".desktop-shortcut.json"
+    if not marker.exists() and not linked(marker):
+        return []
+    if linked(marker) or marker.stat().st_size > 16384:
+        raise ValueError(f"Invalid desktop shortcut ownership: {marker}")
+    payload = read_object(marker)
+    identity = hashlib.sha256(os.path.normcase(os.path.realpath(directory)).encode("utf-8")).hexdigest()[:16]
+    name = "zai-" + identity
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", str(home / "AppData" / "Roaming")))
+        expected = base / "Microsoft" / "Windows" / "Start Menu" / "Programs" / (name + ".lnk")
+    elif sys.platform == "darwin":
+        expected = home / "Applications" / (name + ".app")
+    else:
+        base = Path(os.environ.get("XDG_DATA_HOME", str(home / ".local" / "share")))
+        expected = base / "applications" / (name + ".desktop")
+    checksum = payload.get("sha256")
+    if (payload.get("schema_version") != 1 or payload.get("platform") != sys.platform
+            or not isinstance(checksum, str) or not re.fullmatch(r"[a-f0-9]{64}", checksum)):
+        raise ValueError(f"Invalid desktop shortcut ownership: {marker}")
+    paths = [marker]
+    if payload.get("path") != str(expected):
+        print(f"[WARN] Preserving shortcut recorded at another location: {payload.get('path')}")
+        return paths
+    path = check_path(expected, home)
+    data = None
+    if sys.platform == "darwin" and path.is_symlink():
+        data = os.readlink(path).encode("utf-8")
+    elif sys.platform != "darwin" and not linked(path) and path.is_file() and path.stat().st_size <= 1024 * 1024:
+        data = path.read_bytes()
+    if data is not None and hashlib.sha256(data).hexdigest() == checksum:
+        paths.append(path)
+    elif path.exists() or linked(path):
+        print(f"[WARN] Preserving modified or unowned desktop shortcut: {path}")
+    return paths
+
+
 def plan(home: Path, directory: Path) -> tuple[list[Path], list[tuple[Path, dict]]]:
     paths = [directory / (EXECUTABLE + suffix) for suffix in ("", ".exe")]
     paths.append(directory / "licenses" / APP_ID)
     paths.extend(shortcut_paths(directory, paths))
     if APP_ID == "zai-cli":
+        paths.extend(desktop_paths(home, directory))
+        paths.extend(desktop_shortcut_paths(home, directory))
         paths.extend(directory / name for name in CLI_PATHS if name != "releases")
         releases = directory / "releases"
         if releases.exists():
@@ -360,6 +440,8 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
         protect_repositories(path)
     names = {name + suffix for name in ("zai", "zai-editor", "zai-gitter", "zai-hook",
                                         ".zai-editor", ".zai-gitter") for suffix in ("", ".exe")}
+    if APP_ID == "zai-cli":
+        names.update(name + suffix for name in ("zai-desktop", "zai-desktop-runtime") for suffix in ("", ".exe"))
     if not dry_run:
         running = active_apps(names)
         if running:
@@ -427,6 +509,8 @@ def main() -> int:
         zai_message("FAIL", f"{APP_ID} uninstall failed.")
         if isinstance(error, AppRunningError):
             next_step = "Close the listed apps and stop their services, then rerun the uninstaller. For zai, attach with zai and choose Close completely."
+            if APP_ID == "zai-cli":
+                next_step += " For the browser GUI, run zai gui stop first; closing the browser leaves its server running."
         elif isinstance(error, PermissionError):
             next_step = "Check ownership and write permissions for the reported path, then rerun the uninstaller."
         elif isinstance(error, ValueError):

@@ -74,5 +74,8 @@ if code:
     if access_denied:
         zai_message("WARN", "Windows denied access to files the installer just extracted. This is almost always Windows Defender (or another antivirus) scanning the new files and locking them, not a problem with this package.")
         zai_message("NEXT", "Wait a minute and rerun the install command. If it keeps failing, add the install folder (for example %USERPROFILE%\\.local\\lib\\zai-codex) to Windows Security > Virus & threat protection > Exclusions, then rerun.")
-    zai_message("NEXT", "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely.")
+    next_step = "Resolve the reason shown above, then rerun the install/update command. If an app is running, close it completely first; for zai, attach with zai and choose Close completely."
+    if label == "zai installer":
+        next_step += " For the browser GUI, run zai gui stop first; closing the browser leaves its server running."
+    zai_message("NEXT", next_step)
 raise SystemExit(code)

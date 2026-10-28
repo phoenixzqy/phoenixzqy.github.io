@@ -1188,7 +1188,7 @@ test("bundled installer failure highlights the original reason and preserves its
         ? /\[DETAIL\] Service still running/
         : /\[ERROR\] Attach with zai and choose Close completely/);
       assert.match(result.stderr, /\[FAIL\] zai installer:.*exit [17]/);
-      assert.match(result.stderr, /\[NEXT\].*rerun.*Close completely/);
+      assert.match(result.stderr, /\[NEXT\].*rerun.*Close completely.*zai gui stop.*closing the browser leaves its server running/);
       assert.doesNotMatch(result.stderr, /\x1b|installation complete|Nothing was installed/);
       assert.doesNotMatch(result.stdout, /Installed command:/);
       assert.deepEqual(await readdir(home), []);

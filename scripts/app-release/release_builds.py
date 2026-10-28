@@ -6,6 +6,7 @@ import platform
 import sys
 
 from release_packages import digest, inspect_archive
+from release_cli_packages import verify_browser_gui_release
 from release_runtime import timestamp
 
 
@@ -62,6 +63,8 @@ def build(runtime, source, snapshot, version, output, site, notices):
     if name != 'zai-codex':
         runtime.stage = f'{name}:validation'
         interpreter = validation_python(runtime, source, name)
+        if name == 'zai-cli':
+            runtime.run(['npm', 'ci', '--no-audit', '--no-fund'], cwd=source / 'src/web-ui')
         runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
     runtime.stage = f'{name}:build'
     if name == 'zai-codex':
@@ -91,7 +94,7 @@ def build(runtime, source, snapshot, version, output, site, notices):
         prefix = 'src/' if name == 'zai-cli' else ''
         args = [sys.executable, '-B', f'{prefix}scripts/release_build.py', '--version', version, '--output', output]
         if name == 'zai-cli':
-            args.append('--locked-tools')
+            args += ['--locked-tools', '--require-desktop']
         runtime.run(args, cwd=source)
         args = [sys.executable, '-B', f'{prefix}scripts/release_manifest.py', '--version', version,
                 '--tag', f'{name}-v{version}', '--dir', output, '--output', manifest]
@@ -99,6 +102,8 @@ def build(runtime, source, snapshot, version, output, site, notices):
             args += ['--catalog', site / 'apps/catalog.json']
         runtime.run(args, cwd=source)
         data = json.loads(manifest.read_text())
+    if name == 'zai-cli':
+        verify_browser_gui_release(data, output)
     for asset in data['release']['assets']:
         from release_packages import verify_file
         verify_file(output / asset['file'], asset)

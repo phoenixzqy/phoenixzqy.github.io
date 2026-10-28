@@ -56,6 +56,43 @@ class ValidationPythonTest(unittest.TestCase):
         for name in ('zai-editor', 'zai-gitter', 'zai-codex'):
             self.assertEqual(validation_python(Runtime(), Path('source'), name), sys.executable)
 
+    def test_frontend_setup_precedes_full_gate_and_gui_required_packager(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calls = []
+
+            class Runtime:
+                def run(self, args, cwd=None):
+                    calls.append((args, cwd))
+                    if 'src/scripts/release_manifest.py' in args:
+                        (root / 'output/manifest.json').write_text('{"release":{"assets":[]}}')
+
+            with patch('release_builds.verify_browser_gui_release') as verify:
+                build(Runtime(), root, {'repository': 'owner/zai-cli'}, '1.0.0',
+                      root / 'output', root / 'site', None)
+            self.assertEqual(calls[2], (['npm', 'ci', '--no-audit', '--no-fund'], root / 'src/web-ui'))
+            self.assertEqual(calls[3][0][-1], '.github/scripts/local_ci.py')
+            self.assertEqual(calls[4][0], [sys.executable, '-B', 'src/scripts/release_build.py',
+                '--version', '1.0.0', '--output', root / 'output', '--locked-tools', '--require-desktop'])
+            verify.assert_called_once()
+
+    def test_frontend_or_gate_failure_never_reaches_packaging(self):
+        for failing in ('ci', '.github/scripts/local_ci.py'):
+            with self.subTest(failing=failing), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                calls = []
+
+                class Runtime:
+                    def run(self, args, cwd=None):
+                        calls.append(args)
+                        if failing in args:
+                            raise RuntimeError('validation failed')
+
+                with self.assertRaisesRegex(RuntimeError, 'validation failed'):
+                    build(Runtime(), root, {'repository': 'owner/zai-cli'}, '1.0.0',
+                          root / 'output', root / 'site', None)
+                self.assertFalse(any('src/scripts/release_build.py' in args for args in calls))
+
     def test_environment_packages_survive_isolated_home(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
