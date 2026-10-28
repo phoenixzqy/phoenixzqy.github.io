@@ -47,7 +47,9 @@ def parallel_prepare(runtime, args, tasks, root, site):
     futures = {}
     results = {}
     try:
-        for task in tasks:
+        # The CLI validates and packages its bundled tools and desktop assets,
+        # so start it before standalone tools when there are fewer build slots.
+        for task in sorted(tasks, key=lambda task: task['name'] != 'zai-cli'):
             child = runtime.fork(task['name'])
             # Go's own compiler/tests are parallel too. Cap each worker without
             # changing the operator's persisted environment/toolchain settings.

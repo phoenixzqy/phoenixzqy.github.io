@@ -14,7 +14,7 @@ explicit prerequisite error; install the standard Node.js toolchain.
 ```sh
 python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
-python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 2
+python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 3
 python3 -B scripts/app-release/release_codex.py --dry-run
 python3 -B scripts/app-release/release_codex.py --publish
 ```
@@ -229,8 +229,13 @@ logs remain private and are never copied to the public site.
 ## Parallel Go builds and combined publishing
 
 zai-cli, zai-editor and zai-gitter validate and build in isolated clones with
-two concurrent jobs by default. `--jobs 1` runs them sequentially; `--jobs 3`
-permits all three at once. Each job has its own log directory under the run
+three concurrent jobs by default, so none waits for another app to finish.
+`--jobs 1` runs them sequentially; `--jobs 2` limits builds to two at once.
+The CLI starts first when build slots are limited because it also validates
+and packages bundled tools and desktop assets. Host-specific automation launchers
+should omit an explicit `--jobs` override to inherit this default, or select
+`--jobs 3`; an existing `--jobs 2` override still limits concurrency.
+Each job has its own log directory under the run
 report and bounded Go compiler/test parallelism (at most four processes per
 job, reduced further for small CPU counts or a lower existing GOMAXPROCS).
 All consumers resolve shared producer revisions before jobs start.

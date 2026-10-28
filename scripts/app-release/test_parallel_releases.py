@@ -12,6 +12,7 @@ import unittest
 from unittest.mock import patch
 
 import release_jobs
+import release_apps
 import release_publish
 import release_retention
 from release_runtime import Runtime
@@ -25,6 +26,64 @@ class ParallelJobsTest(unittest.TestCase):
         runtime.site_branch = 'custom'
         runtime.environment = {'GOPRIVATE': 'github.com/owner/*'}
         return runtime
+
+    def test_default_jobs_start_all_three_apps_together(self):
+        with tempfile.TemporaryDirectory() as directory:
+            barrier = threading.Barrier(3)
+            started = []
+            guard = threading.Lock()
+            tasks = [{'name': name} for name in ('zai-editor', 'zai-gitter', 'zai-cli')]
+            def prepare(child, args, task, *_):
+                with guard:
+                    started.append(task['name'])
+                barrier.wait(timeout=5)
+                return task['name']
+            def process(runtime, args, root):
+                runtime.site_repository = 'owner/site'
+                runtime.site_branch = 'main'
+                results = release_jobs.parallel_prepare(runtime, args, tasks, root, root)
+                self.assertEqual(set(results), release_jobs.GO_APPS)
+                self.assertTrue(all('data' in result for result in results.values()))
+                return []
+            with patch.object(release_jobs, 'prepare', side_effect=prepare), \
+                    patch.object(release_apps, 'process', side_effect=process):
+                self.assertEqual(release_apps.main(['--publish', '--state-dir', directory]), 0)
+            self.assertEqual(set(started), release_jobs.GO_APPS)
+
+    def test_two_job_limit_starts_cli_in_the_first_wave(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = self.runtime(root)
+            barrier = threading.Barrier(2)
+            started = []
+            guard = threading.Lock()
+            def prepare(child, args, task, *_):
+                with guard:
+                    started.append(task['name'])
+                if task['name'] != 'zai-gitter':
+                    barrier.wait(timeout=5)
+                return task['name']
+            tasks = [{'name': name} for name in ('zai-editor', 'zai-gitter', 'zai-cli')]
+            with patch.object(release_jobs, 'prepare', side_effect=prepare):
+                release_jobs.parallel_prepare(runtime, SimpleNamespace(jobs=2), tasks, root, root)
+            self.assertEqual(set(started[:2]), {'zai-cli', 'zai-editor'})
+            self.assertEqual([task['name'] for task in tasks], ['zai-editor', 'zai-gitter', 'zai-cli'])
+
+    def test_three_jobs_keep_cpu_limits_and_respect_lower_operator_limit(self):
+        for cpus, requested, expected in ((16, '8', '4'), (16, '2', '2'), (4, '8', '1')):
+            with self.subTest(cpus=cpus, requested=requested), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                runtime = self.runtime(root)
+                runtime.environment.update(GOMAXPROCS=requested, GOFLAGS='-mod=readonly')
+                environment = dict(runtime.environment)
+                tasks = [{'name': name} for name in ('zai-editor', 'zai-gitter', 'zai-cli')]
+                with patch.object(release_jobs.os, 'cpu_count', return_value=cpus), \
+                        patch.object(release_jobs, 'prepare', side_effect=lambda child, *_: child.environment):
+                    results = release_jobs.parallel_prepare(runtime, SimpleNamespace(jobs=3), tasks, root, root)
+                for result in results.values():
+                    self.assertEqual(result['data']['GOMAXPROCS'], expected)
+                    self.assertEqual(result['data']['GOFLAGS'], f'-mod=readonly -p={expected}')
+                self.assertEqual(runtime.environment, environment)
 
     def test_two_jobs_overlap_with_isolated_logs_and_failure_does_not_hide_success(self):
         with tempfile.TemporaryDirectory() as directory:
