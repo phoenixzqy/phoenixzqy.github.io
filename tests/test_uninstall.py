@@ -230,6 +230,68 @@ class UninstallTests(unittest.TestCase):
             self.assertEqual((directory / "zai").read_text(), "preserved")
         self.run_case(app, body)
 
+    def test_gui_ownership_records_survive_partial_failure_and_retry(self):
+        app = next(app for app in APPS if app.APP_ID == "zai-cli")
+
+        for failure in ("inventory", "shortcut"):
+            for modify_on_retry in (False, True):
+                with self.subTest(failure=failure, modify_on_retry=modify_on_retry):
+                    def body(home, directory):
+                        custom = home / "deep" / "custom" / "install" / "with" / "many" / "parents"
+                        desktop = custom / "desktop"
+                        (desktop / "nested").mkdir(parents=True)
+                        (custom / app.EXECUTABLE).write_bytes(b"binary")
+                        removed = desktop / "nested" / "already-removed"
+                        owned = desktop / "zai-desktop-runtime"
+                        modified = desktop / "zai-desktop"
+                        unknown = desktop / "user.txt"
+                        for path in (removed, owned, modified, unknown):
+                            path.write_bytes(b"owned")
+                        inventory = desktop / ".installed-files.json"
+                        inventory.write_text(json.dumps({"schema_version": 1, "files": {
+                            path.relative_to(desktop).as_posix(): hashlib.sha256(b"owned").hexdigest()
+                            for path in (removed, owned, modified)}}))
+                        modified.write_bytes(b"user changes")
+                        identity = hashlib.sha256(os.path.normcase(os.path.realpath(custom)).encode()).hexdigest()[:16]
+                        shortcut = home / ".local" / "share" / "applications" / ("zai-" + identity + ".desktop")
+                        shortcut.parent.mkdir(parents=True)
+                        shortcut.write_bytes(b"owned shortcut")
+                        marker = custom / ".desktop-shortcut.json"
+                        marker.write_text(json.dumps({"schema_version": 1, "platform": "linux",
+                            "path": str(shortcut), "sha256": hashlib.sha256(shortcut.read_bytes()).hexdigest()}))
+                        records = {path: path.read_bytes() for path in (inventory, marker)}
+                        failed = owned if failure == "inventory" else shortcut
+                        remove = app.remove
+
+                        def fail_removal(path, dry_run):
+                            if path == failed:
+                                raise PermissionError(str(path))
+                            remove(path, dry_run)
+
+                        with mock.patch.object(app.sys, "platform", "linux"):
+                            with mock.patch.object(app, "remove", side_effect=fail_removal):
+                                with self.assertRaises(PermissionError):
+                                    app.uninstall(custom)
+                            self.assertFalse(removed.exists())
+                            self.assertTrue(failed.exists())
+                            for path, content in records.items():
+                                self.assertTrue(path.is_file(), f"Retry ownership record was removed: {path}")
+                                self.assertEqual(path.read_bytes(), content)
+                            recovery = custom / ".uninstall-zai-cli.json"
+                            self.assertTrue(recovery.exists())
+                            if modify_on_retry:
+                                failed.write_bytes(b"changed after failure")
+                            app.uninstall(custom)
+                            app.uninstall(custom)
+                        self.assertEqual(failed.exists(), modify_on_retry)
+                        if modify_on_retry:
+                            self.assertEqual(failed.read_bytes(), b"changed after failure")
+                        self.assertEqual(modified.read_bytes(), b"user changes")
+                        self.assertEqual(unknown.read_bytes(), b"owned")
+                        for path in (*records, recovery):
+                            self.assertFalse(path.exists())
+                    self.run_case(app, body)
+
     def test_gui_shortcut_cleanup_preserves_modified_and_unexpected_locations(self):
         app = next(app for app in APPS if app.APP_ID == "zai-cli")
 

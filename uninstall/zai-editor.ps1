@@ -507,7 +507,10 @@ def _uninstall(home: Path, directory: Path, dry_run: bool, recovery: Path, paylo
         write_object(recovery, payload, False)
     for path, updated in updates:
         write_object(path, updated, dry_run)
-    for path in sorted(set(paths), key=lambda item: len(item.parts), reverse=True):
+    # Keep the hashes and paths needed to retry until every dependent removal succeeds.
+    ownership_records = {directory / ".desktop-shortcut.json",
+                         directory / "desktop" / ".installed-files.json"}
+    for path in sorted(set(paths), key=lambda item: (item in ownership_records, -len(item.parts))):
         remove(path, dry_run)
     # Retire only app-modified, otherwise empty theme documents.
     for path, payload in updates:
