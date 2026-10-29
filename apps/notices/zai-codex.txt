@@ -1,9 +1,9 @@
-zai-codex 0.1.2 — license and third-party notices
-Source commit: ef97d7e12893891ff3d1b2ce3cfe7d6661f244c9
+zai-codex 0.1.3 — license and third-party notices
+Source commit: 7b79c094952ad5d5d7a9ff20ba9a406bf5f27dd0
 
 
 ===== LICENSE =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -210,17 +210,17 @@ limitations under the License.
 
 
 ===== MODIFICATIONS.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 zai-codex is a modified OpenAI Codex distribution.
 Fork modifications: GitHub Copilot subscription support; telemetry,
 remote feedback, and error-report uploads disabled. Local logs remain.
-Source: https://github.com/phoenixzqy/zai-codex/tree/ef97d7e12893891ff3d1b2ce3cfe7d6661f244c9
+Source: https://github.com/phoenixzqy/zai-codex/tree/7b79c094952ad5d5d7a9ff20ba9a406bf5f27dd0
 
 
 
 ===== NOTICE =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 OpenAI Codex
 Copyright 2025 OpenAI
@@ -232,7 +232,7 @@ Copyright (c) 2023-2025 The Ratatui Developers
 
 
 ===== third-party-notices/ABSEIL-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 
                                  Apache License
@@ -443,7 +443,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/BUBBLEWRAP-COPYING.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
                   GNU LIBRARY GENERAL PUBLIC LICENSE
                        Version 2, June 1991
@@ -932,7 +932,7 @@ That's all there is to it!
 
 
 ===== third-party-notices/BUBBLEWRAP-SOURCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Bubblewrap 0.11.2 is licensed under LGPL-2.0-or-later.
 The bundled executable uses the unmodified vendored bubblewrap source and Cargo build wrapper from upstream OpenAI Codex. Corresponding source and build files are publicly available at:
@@ -945,7 +945,7 @@ The LGPL permits modification and reverse engineering for debugging such modific
 
 
 ===== third-party-notices/ICU-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 UNICODE LICENSE V3
 
@@ -1495,7 +1495,7 @@ without express or implied warranty.
 
 
 ===== third-party-notices/LIBCAP2-COPYRIGHT.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libcap
@@ -1611,7 +1611,7 @@ License: GPL-2+
 
 
 ===== third-party-notices/LLVM-libc-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -1897,7 +1897,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/LLVM-libcxx-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -2216,7 +2216,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/LLVM-libcxxabi-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -2535,7 +2535,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/OPENSSL-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 
                                  Apache License
@@ -2720,7 +2720,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/PCRE2-LICENCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 PCRE2 License
 =============
@@ -2831,7 +2831,7 @@ End
 
 
 ===== third-party-notices/RIPGREP-LICENSE-MIT.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 The MIT License (MIT)
 
@@ -2860,7 +2860,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/RIPGREP-UNLICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 This is free and unencumbered software released into the public domain.
 
@@ -2892,7 +2892,7 @@ For more information, please refer to <http://unlicense.org/>
 
 
 ===== third-party-notices/RUST-DEPENDENCIES.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Third-party Rust dependency notices
 Generated with cargo-about 0.9.2 for the Linux x64 CLI dependency graph, including build dependencies.
@@ -26659,7 +26659,7 @@ the following restrictions:
 
 
 ===== third-party-notices/RUST-MPL-SOURCE-ACCESS.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Rust source access for MPL-2.0 components
 These components are distributed without changes. Corresponding versioned source archives are available from crates.io.
@@ -26682,7 +26682,7 @@ symphonia-metadata 0.6.0: https://crates.io/api/v1/crates/symphonia-metadata/0.6
 
 
 ===== third-party-notices/RUSTY-V8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 MIT License
 
@@ -26711,7 +26711,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/V8-LICENSE.fdlibm.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Copyright (C) 1993-2004 by Sun Microsystems, Inc. All rights reserved.
 
@@ -26725,7 +26725,7 @@ is preserved.
 
 
 ===== third-party-notices/V8-LICENSE.strongtalk.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Copyright (c) 1994-2006 Sun Microsystems Inc.
 All Rights Reserved.
@@ -26762,7 +26762,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 This license applies to all parts of V8 that are not externally
 maintained libraries.  The externally maintained libraries used by V8
@@ -26831,7 +26831,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-LICENSE.v8.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Copyright 2006-2011, the V8 project authors. All rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -26865,7 +26865,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-third_party-fp16-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 The MIT License (MIT)
 
@@ -26885,7 +26885,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ===== third-party-notices/V8-third_party-glibc-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
@@ -27395,7 +27395,7 @@ That's all there is to it!
 
 
 ===== third-party-notices/V8-third_party-highway-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -27603,7 +27603,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/V8-third_party-inspector_protocol-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 // Copyright 2016 The Chromium Authors
 //
@@ -27638,7 +27638,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/V8-third_party-jsoncpp-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 The JsonCpp library's source code, including accompanying documentation, 
 tests and demonstration applications, are licensed under the following
@@ -27701,7 +27701,7 @@ license you like.
 
 
 ===== third-party-notices/V8-third_party-rapidhash-v8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 /*
  * rapidhash - Very fast, high quality, platform independant hashing algorithm.
@@ -27743,7 +27743,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/V8-third_party-re2-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 // Copyright (c) 2009 The RE2 Authors. All rights reserved.
 //
@@ -27778,7 +27778,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/V8-third_party-siphash-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 CC0 1.0 Universal
 
@@ -27902,7 +27902,7 @@ For more information, please see
 
 
 ===== third-party-notices/V8-third_party-utf8-decoder-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 
@@ -27929,7 +27929,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/V8-third_party-v8-builtins-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 A. HISTORY OF THE SOFTWARE
 ==========================
@@ -28191,7 +28191,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 ===== third-party-notices/V8-third_party-v8-codegen-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 The MIT License (MIT)
 
@@ -28210,7 +28210,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ===== third-party-notices/V8-third_party-valgrind-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 ----------------------------------------------------------------
 
@@ -28272,7 +28272,7 @@ COPYING file in the source distribution for details.
 
 
 ===== third-party-notices/V8-third_party-vtune-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 All files in this directory are provided by the following license if not stated
 otherwise in the individual file:
@@ -28320,7 +28320,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-third_party-wasm-api-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -28530,7 +28530,7 @@ Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-
 
 
 ===== third-party-notices/WEZTERM-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 MIT License
 
@@ -28559,7 +28559,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/ZLIB-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Copyright notice:
 
@@ -28589,7 +28589,7 @@ Copyright notice:
 
 
 ===== third-party-notices/ZSH-LICENCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.2-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.2-x86_64-apple-darwin.zip, zai-codex-0.1.2-aarch64-apple-darwin.zip
+Packages: zai-codex-0.1.3-x86_64-unknown-linux-gnu.zip, zai-codex-0.1.3-aarch64-unknown-linux-gnu.zip, zai-codex-0.1.3-x86_64-apple-darwin.zip, zai-codex-0.1.3-aarch64-apple-darwin.zip
 
 Unless otherwise noted in the header of specific files, files in this
 distribution have the licence shown below.
@@ -28633,7 +28633,7 @@ maintenance, support, updates, enhancements, or modifications.
 
 
 ===== LICENSE =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -28840,17 +28840,17 @@ limitations under the License.
 
 
 ===== MODIFICATIONS.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 zai-codex is a modified OpenAI Codex distribution.
 Fork modifications: GitHub Copilot subscription support; telemetry,
 remote feedback, and error-report uploads disabled. Local logs remain.
-Source: https://github.com/phoenixzqy/zai-codex/tree/ef97d7e12893891ff3d1b2ce3cfe7d6661f244c9
+Source: https://github.com/phoenixzqy/zai-codex/tree/7b79c094952ad5d5d7a9ff20ba9a406bf5f27dd0
 
 
 
 ===== NOTICE =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 OpenAI Codex
 Copyright 2025 OpenAI
@@ -28862,7 +28862,7 @@ Copyright (c) 2023-2025 The Ratatui Developers
 
 
 ===== third-party-notices/ABSEIL-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 
                                  Apache License
@@ -29073,7 +29073,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/BUBBLEWRAP-COPYING.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
                   GNU LIBRARY GENERAL PUBLIC LICENSE
                        Version 2, June 1991
@@ -29562,7 +29562,7 @@ That's all there is to it!
 
 
 ===== third-party-notices/BUBBLEWRAP-SOURCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Bubblewrap 0.11.2 is licensed under LGPL-2.0-or-later.
 The bundled executable uses the unmodified vendored bubblewrap source and Cargo build wrapper from upstream OpenAI Codex. Corresponding source and build files are publicly available at:
@@ -29575,7 +29575,7 @@ The LGPL permits modification and reverse engineering for debugging such modific
 
 
 ===== third-party-notices/ICU-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 UNICODE LICENSE V3
 
@@ -30125,7 +30125,7 @@ without express or implied warranty.
 
 
 ===== third-party-notices/LIBCAP2-COPYRIGHT.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libcap
@@ -30241,7 +30241,7 @@ License: GPL-2+
 
 
 ===== third-party-notices/LLVM-libc-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -30527,7 +30527,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/LLVM-libcxx-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -30846,7 +30846,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/LLVM-libcxxabi-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 ==============================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
@@ -31165,7 +31165,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/OPENSSL-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 
                                  Apache License
@@ -31350,7 +31350,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/PCRE2-LICENCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 PCRE2 License
 =============
@@ -31461,7 +31461,7 @@ End
 
 
 ===== third-party-notices/RIPGREP-LICENSE-MIT.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 The MIT License (MIT)
 
@@ -31490,7 +31490,7 @@ THE SOFTWARE.
 
 
 ===== third-party-notices/RIPGREP-UNLICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 This is free and unencumbered software released into the public domain.
 
@@ -31522,7 +31522,7 @@ For more information, please refer to <http://unlicense.org/>
 
 
 ===== third-party-notices/RUST-DEPENDENCIES.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Third-party Rust dependency notices
 Generated with cargo-about 0.9.2 for the Linux x64 CLI dependency graph, including build dependencies.
@@ -55289,7 +55289,7 @@ the following restrictions:
 
 
 ===== third-party-notices/RUST-MPL-SOURCE-ACCESS.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Rust source access for MPL-2.0 components
 These components are distributed without changes. Corresponding versioned source archives are available from crates.io.
@@ -55312,7 +55312,7 @@ symphonia-metadata 0.6.0: https://crates.io/api/v1/crates/symphonia-metadata/0.6
 
 
 ===== third-party-notices/RUSTY-V8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 MIT License
 
@@ -55341,7 +55341,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/V8-LICENSE.fdlibm.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Copyright (C) 1993-2004 by Sun Microsystems, Inc. All rights reserved.
 
@@ -55355,7 +55355,7 @@ is preserved.
 
 
 ===== third-party-notices/V8-LICENSE.strongtalk.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Copyright (c) 1994-2006 Sun Microsystems Inc.
 All Rights Reserved.
@@ -55392,7 +55392,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 This license applies to all parts of V8 that are not externally
 maintained libraries.  The externally maintained libraries used by V8
@@ -55461,7 +55461,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-LICENSE.v8.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Copyright 2006-2011, the V8 project authors. All rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -55495,7 +55495,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-third_party-fp16-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 The MIT License (MIT)
 
@@ -55515,7 +55515,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ===== third-party-notices/V8-third_party-glibc-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
@@ -56025,7 +56025,7 @@ That's all there is to it!
 
 
 ===== third-party-notices/V8-third_party-highway-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -56233,7 +56233,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/V8-third_party-inspector_protocol-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 // Copyright 2016 The Chromium Authors
 //
@@ -56268,7 +56268,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/V8-third_party-jsoncpp-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 The JsonCpp library's source code, including accompanying documentation, 
 tests and demonstration applications, are licensed under the following
@@ -56331,7 +56331,7 @@ license you like.
 
 
 ===== third-party-notices/V8-third_party-rapidhash-v8-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 /*
  * rapidhash - Very fast, high quality, platform independant hashing algorithm.
@@ -56373,7 +56373,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/V8-third_party-re2-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 // Copyright (c) 2009 The RE2 Authors. All rights reserved.
 //
@@ -56408,7 +56408,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/V8-third_party-siphash-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 CC0 1.0 Universal
 
@@ -56532,7 +56532,7 @@ For more information, please see
 
 
 ===== third-party-notices/V8-third_party-utf8-decoder-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 
@@ -56559,7 +56559,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/V8-third_party-v8-builtins-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 A. HISTORY OF THE SOFTWARE
 ==========================
@@ -56821,7 +56821,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 ===== third-party-notices/V8-third_party-v8-codegen-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 The MIT License (MIT)
 
@@ -56840,7 +56840,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ===== third-party-notices/V8-third_party-valgrind-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 ----------------------------------------------------------------
 
@@ -56902,7 +56902,7 @@ COPYING file in the source distribution for details.
 
 
 ===== third-party-notices/V8-third_party-vtune-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 All files in this directory are provided by the following license if not stated
 otherwise in the individual file:
@@ -56950,7 +56950,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===== third-party-notices/V8-third_party-wasm-api-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
                                  Apache License
                            Version 2.0, January 2004
@@ -57160,7 +57160,7 @@ Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc
 
 
 ===== third-party-notices/WEZTERM-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 MIT License
 
@@ -57189,7 +57189,7 @@ SOFTWARE.
 
 
 ===== third-party-notices/ZLIB-LICENSE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Copyright notice:
 
@@ -57219,7 +57219,7 @@ Copyright notice:
 
 
 ===== third-party-notices/ZSH-LICENCE.txt =====
-Packages: zai-codex-0.1.2-x86_64-pc-windows-msvc.zip, zai-codex-0.1.2-aarch64-pc-windows-msvc.zip
+Packages: zai-codex-0.1.3-x86_64-pc-windows-msvc.zip, zai-codex-0.1.3-aarch64-pc-windows-msvc.zip
 
 Unless otherwise noted in the header of specific files, files in this
 distribution have the licence shown below.
