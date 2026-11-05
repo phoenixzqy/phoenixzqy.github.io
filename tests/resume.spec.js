@@ -92,6 +92,7 @@ test("printing from About includes the full resume and restores collapsed detail
   await expect(page.locator("details")).toHaveAttribute("open", "");
   await page.emulateMedia({ media: "print" });
   await expect(page.locator(".neural-scene")).not.toBeVisible();
+  await expect(page.locator("#theme-panel")).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Selected engineering work", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Epi & Panda Harness", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Lecture Assistant", exact: true })).toBeVisible();
@@ -136,6 +137,7 @@ test("content and static artwork remain usable without JavaScript", async ({ bro
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".neural-fallback")).toBeVisible();
   await expect(page.locator(".hero-actions [data-print]")).not.toBeVisible();
+  await expect(page.locator("#theme-panel")).not.toBeVisible();
   await page.locator("summary").click();
   await expect(page.getByRole("heading", { name: "Lecture Assistant", exact: true })).toBeVisible();
   await context.close();
@@ -151,3 +153,142 @@ test("page and command dialog pass accessibility checks", async ({ page }) => {
   const dialogResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(dialogResults.violations).toEqual([]);
 });
+
+test("themes support keyboard selection, saved preferences, and shareable previews", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/about/?design=constellation&theme=moss#about");
+  await page.getByRole("button", { name: "Theme", exact: true }).click();
+  const themes = page.getByRole("group", { name: "Color theme" });
+  const canvas = page.locator("#neural-canvas");
+  const originalFrame = await canvas.evaluate((element) => element.toDataURL());
+  await themes.getByRole("radio", { name: "Moss", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(themes.getByRole("radio", { name: "Paper", exact: true })).toBeChecked();
+  await expect(page).toHaveURL(/theme=paper#about$/);
+  expect(await canvas.evaluate((element) => element.toDataURL())).not.toBe(originalFrame);
+  for (const url of ["/about/", "/about/?theme=unknown"]) {
+    await page.goto(url);
+    await page.getByRole("button", { name: "Theme", exact: true }).click();
+    await expect(themes.getByRole("radio", { name: "Paper", exact: true })).toBeChecked();
+  }
+  await page.goto("/about/?theme=original");
+  await page.getByRole("button", { name: "Theme", exact: true }).click();
+  await expect(themes.getByRole("radio", { name: "Moss", exact: true })).toBeChecked();
+});
+
+test("theme controls work when browser storage is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "localStorage", { get() { throw new Error("Storage unavailable"); } });
+  });
+  await page.goto("/about/?theme=paper");
+  await page.getByRole("button", { name: "Theme", exact: true }).click();
+  await page.getByRole("radio", { name: "Paper", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("radio", { name: "Linen", exact: true })).toBeChecked();
+  await expect(page).toHaveURL(/\?theme=linen$/);
+  await page.getByRole("group", { name: "Visual design" }).getByRole("radio", { name: "Studio", exact: true }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-design", "studio");
+});
+
+for (const theme of ["paper", "linen", "slate"]) {
+  test(`${theme} theme is accessible and fits desktop and narrow screens`, async ({ page, isMobile }) => {
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`/about/?theme=${theme}`);
+    await page.locator("summary").click();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(results.violations).toEqual([]);
+    await page.keyboard.press("Control+k");
+    const dialogResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(dialogResults.violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Theme", exact: true }).click();
+    for (const width of isMobile ? [320, 390] : [768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      const bounds = await page.getByRole("group", { name: "Color theme" }).boundingBox();
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+
+test("design and color can be selected independently and retained in preview links", async ({ page }) => {
+  await page.goto("/about/?theme=linen#about");
+  await page.getByRole("button", { name: "Theme", exact: true }).click();
+  const designs = page.getByRole("group", { name: "Visual design" });
+  const colors = page.getByRole("group", { name: "Color theme" });
+  await expect(designs.getByRole("radio", { name: "Blueprint", exact: true })).toBeChecked();
+  await designs.getByRole("radio", { name: "Constellation", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(designs.getByRole("radio", { name: "Editorial", exact: true })).toBeChecked();
+  await expect(colors.getByRole("radio", { name: "Linen", exact: true })).toBeChecked();
+  await expect(page).toHaveURL(/\?theme=linen&design=editorial#about$/);
+  await colors.getByRole("radio", { name: "Paper", exact: true }).check();
+  for (const url of ["/about/", "/about/?design=unknown"]) {
+    await page.goto(url);
+    await page.getByRole("button", { name: "Theme", exact: true }).click();
+    await expect(designs.getByRole("radio", { name: "Editorial", exact: true })).toBeChecked();
+    await expect(colors.getByRole("radio", { name: "Paper", exact: true })).toBeChecked();
+  }
+  await page.goto("/about/?design=original");
+  await page.getByRole("button", { name: "Theme", exact: true }).click();
+  await expect(designs.getByRole("radio", { name: "Constellation", exact: true })).toBeChecked();
+});
+
+for (const design of ["editorial", "blueprint", "studio"]) {
+  test(`${design} design preserves content and works with every color palette`, async ({ page, isMobile }) => {
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about/?design=original&theme=original");
+    const content = await page.locator("main > section").allTextContents();
+    for (const theme of ["moss", "paper", "linen", "slate"]) {
+      await page.goto(`/about/?design=${design}&theme=${theme}`);
+      await page.evaluate(() => document.fonts.ready);
+      expect(await page.locator("main > section").allTextContents()).toEqual(content);
+      await page.locator("summary").click();
+      const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+      expect(results.violations).toEqual([]);
+      await page.getByRole("button", { name: "Theme", exact: true }).click();
+      const panelResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+      expect(panelResults.violations).toEqual([]);
+      for (const width of isMobile ? [320, 390, 760] : [768, 1024, 1440, 1920]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        const controls = await page.locator("#theme-panel").boundingBox();
+        expect(controls.x).toBeGreaterThanOrEqual(0);
+        expect(controls.x + controls.width).toBeLessThanOrEqual(width);
+      }
+    }
+    if (!isMobile) {
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      // Opening the earlier roles scrolled down; compare the initial composition at the top.
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const hero = await page.locator(".hero").boundingBox();
+      const work = await page.locator("#work").boundingBox();
+      if (design === "studio") {
+        expect(hero.x + hero.width).toBeLessThan(work.x);
+        expect(Math.abs(hero.y - work.y)).toBeLessThan(5);
+      } else {
+        expect(hero.y + hero.height).toBeLessThan(work.y);
+      }
+      if (design === "blueprint") {
+        const header = await page.locator(".site-header").boundingBox();
+        expect(header.x + header.width).toBeLessThan(hero.x);
+        const first = await page.locator(".work-card").nth(1).boundingBox();
+        const second = await page.locator(".work-card").nth(2).boundingBox();
+        expect(first.x + first.width).toBeLessThan(second.x);
+      } else {
+        await expect(page.locator(".project-art").first()).not.toBeVisible();
+      }
+    }
+    await page.keyboard.press("Control+k");
+    const dialog = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(dialog.violations).toEqual([]);
+    expect(errors).toEqual([]);
+  });
+}

@@ -281,6 +281,33 @@ The resulting direction is an original dark technical/editorial layout:
 warm off-white type, acid-lime accents, a connected spherical node field,
 schematic project illustrations, and a quiet chronological résumé underneath.
 
+On November 5, 2026, the author requested alternative designs and improved
+readability. Three original screen compositions share the same résumé markup:
+Editorial uses a serif masthead and numbered journal rows; Blueprint uses a
+navigation rail, schematic hero, and framed engineering modules; Studio places
+a persistent profile column beside a text-led portfolio. All four compositions
+use larger reading text, with typography consistent across colors. No new
+external references or assets were used; all existing résumé claims and
+provenance remain unchanged.
+
+Design and color are independent controls, opened with the site's Theme button.
+The original design is named Constellation; its dark, lime-accented palette is
+named Moss. Paper (white and blue), Linen (warm cream), and Slate (navy and pale
+blue) remain available for every design. Blueprint and Linen are the defaults.
+Colors apply to the résumé, app catalog, app details, downloads, and documentation;
+the design choice applies to the résumé. The shared controls support keyboard
+navigation, Escape and outside-click dismissal, and English/Simplified Chinese
+app locales. Controls save separate local preferences; explicit query parameters
+override the corresponding preference. For example,
+`/about/?design=editorial&theme=linen`,
+`/about/?design=blueprint&theme=slate`, and
+`/about/?design=studio&theme=paper` open the suggested pairings. Earlier
+`original` links and saved preferences map to Constellation/Moss. `theme.js`
+restores the palette before rendering and shares saved colors across pages and
+tabs; `theme.css` supplies the common controls. `about/designs.css` applies only
+on screen; all combinations print the same complete, two-page A4/Letter résumé.
+Without JavaScript, Blueprint and Linen and all résumé content remain available.
+
 ## Checks
 
 Run `npm run validate:apps` for app/release metadata, or `npm test` for the
