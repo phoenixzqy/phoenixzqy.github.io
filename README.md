@@ -112,6 +112,61 @@ information has been invented. Both Microsoft roles retain the supplied
 The introduction paraphrases the supplied experience; project artwork is
 conceptual, not an actual Microsoft product interface.
 
+For the November 5, 2026 résumé refresh, the author authorized reading the
+[LinkedIn profile](https://www.linkedin.com/in/qiyu-zhao-b02352b6/) in their
+personal Edge profile. Only the Experience paragraphs informed the new copy:
+Copilot Tasks architecture and implementation; Panda/AIX Harness platform
+capabilities and adoption across SuperApp, 1JS, Mobile, and partner teams;
+SuperApp engineering; msn.com migration and experimentation; Outlook growth;
+and the listed full-stack roles. The legacy LinkedIn Projects section was
+excluded at the author's request. Existing education and earlier-role facts
+retain their original provenance above. No new metrics, credentials, private
+profile information, or inferred role end dates were added.
+
+Later on November 5, 2026, the author supplied additional CodeTab and Autopilot
+product descriptions, contributions, and a repository-activity snapshot for
+the résumé. These features are explicitly identified as pre-GA; the copy
+distinguishes direct CodeTab feature implementation from shared integration,
+accessibility, usability, testing, and delivery work across both experiences.
+The activity counts are author-supplied, not independently audited here:
+401 authored PRs, 369 merged, and recorded review votes on 1,977 other authors’
+PRs in June–November 2026, checked November 5. Reviews include manual and
+harness-assisted activity, excluding own PRs and assignments without votes.
+The test-selection result is one documented comparison: approximately 55
+minutes to 399 seconds, running 97 rather than 1,620 test files (about 94%
+fewer), not a repository-wide average. Internal evidence links and source
+repository identifiers are intentionally omitted from the public tree.
+
+The Epi/Panda impact update uses the author's `harness-usage-2026` report,
+read November 5, 2026. Its aggregate data and counting notes substantiate
+18,146 Panda run attempts across 16 named repositories, 16,980 reported
+successful runs (93.6%), 8,499 review runs, and 2,094 PR-follow-up service
+runs in the retained August 7–November 5 window. These are service attempts,
+including repeated attempts and housekeeping, not unique tasks, PRs, users,
+or verified shipped changes. Epi's retained April 20–November 5 activity
+contains 42,784 ingested task records across 37 repository IDs and recorded
+merge transitions linked to 3,983 distinct primary PRs. Epi task totals
+exclude Panda imports but include tests, other imports, and replay records;
+repository aliases are not consolidated. Recorded merges do not establish
+harness authorship or exclusive causation. November 5 is partial. The site
+keeps the systems' figures separate and does not infer labor savings,
+production-only adoption, or full-year Panda totals. Raw reports, internal
+dashboards, queries, repository identities, and operator identifiers remain
+outside the public tree.
+
+The refreshed print layout is original: a professional identity and summary,
+readable profile links, project contributions, chronological experience, and
+compact skills and education. It uses the same content as the screen page,
+with a restrained green typographic hierarchy and rules on white paper;
+conceptual artwork and navigation are omitted from print.
+
+The Fortinet employer mark was checked against [Fortinet's official
+site](https://www.fortinet.com/) on November 5, 2026. Its locally hosted vector
+comes from [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/fortinet.svg),
+whose artwork is distributed under [CC0 1.0](https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md).
+The icon uses the source's `#EE3124` brand color and identifies the listed employer
+on screen and in print.
+
 The zai-cli, zai-editor, and zai-gitter descriptions and comparison tables
 paraphrase the app author's supplied README material; the comparison sections
 link back to those public README evidence and methodology sections. The

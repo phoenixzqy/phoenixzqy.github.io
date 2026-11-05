@@ -79,19 +79,21 @@ test("keyboard command navigation opens, closes, and transfers focus", async ({ 
   await expect(page.getByRole("dialog")).not.toBeVisible();
 });
 
-test("print includes all earlier roles and restores collapsed details", async ({ page }) => {
-  await page.goto("/about/");
+test("printing from About includes the full resume and restores collapsed details", async ({ page }) => {
+  await page.goto("/about/#about");
   await page.evaluate(() => {
     window.print = () => {
       window.dispatchEvent(new Event("beforeprint"));
       document.body.dataset.printRequested = "true";
     };
   });
-  await page.getByRole("button", { name: "Print résumé", exact: true }).first().click();
+  await page.locator(".about-resume-actions").getByRole("button", { name: "Print résumé", exact: true }).click();
   await expect(page.locator("body")).toHaveAttribute("data-print-requested", "true");
   await expect(page.locator("details")).toHaveAttribute("open", "");
   await page.emulateMedia({ media: "print" });
   await expect(page.locator(".neural-scene")).not.toBeVisible();
+  await expect(page.getByRole("heading", { name: "Selected engineering work", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Epi & Panda Harness", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Lecture Assistant", exact: true })).toBeVisible();
   await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
   await expect(page.locator("details")).not.toHaveAttribute("open", "");

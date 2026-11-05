@@ -3,7 +3,7 @@ import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 
 for (const format of ["A4", "Letter"]) {
   test(`${format} PDF retains the complete resume in two unclipped pages`, async ({ page }, testInfo) => {
-    await page.goto("/about/");
+    await page.goto("/about/#about");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".earlier-experience")).not.toHaveAttribute("open", "");
     const path = testInfo.outputPath(`resume-${format}.pdf`);
@@ -42,7 +42,17 @@ for (const format of ["A4", "Letter"]) {
 
       const fullText = pages.map(({ text }) => text).join(" ");
       for (const text of [
-        "Qiyu Zhao", "Always building. Always evolving.", "Member of Technical Staff",
+        "Qiyu Zhao", "Professional experience", "Member of Technical Staff",
+        "Selected engineering work", "Microsoft Copilot Tasks", "Epi & Panda Harness", "SuperApp",
+        "18,146 run attempts", "16 named repositories", "93.6% reported success",
+        "8,499 review runs", "2,094 PR follow-up runs", "Aug 7–Nov 5, 2026",
+        "42,784 ingested task records", "37 repository IDs", "3,983 distinct PRs",
+        "including tests/imports", "recorded merge evidence", "Apr 20–Nov 5, 2026",
+        "Copilot CodeTab & Autopilot", "PRE-GA", "Canvas", "Plan mode",
+        "401 PRs (369 merged)", "1,977 other authors’ PRs", "manual and harness-assisted",
+        "one documented comparison", "399 seconds", "97 of 1,620 test files",
+        "repository profiles", "runtime packaging", "1JS", "Outlook", "msn.com",
+        "phoenixzqy.github.io/about", "/in/qiyu-zhao-b02352b6", "/phoenixzqy",
         "Senior Software Engineer", "Fortinet", "Cozystay", "Intelli Management Group",
         "Lecture Assistant", "Langara College", "Yippon Marketing", "Shanghai High Wind",
         "Iowa State University", "LinkedIn", "GitHub",
