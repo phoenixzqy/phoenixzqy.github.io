@@ -32,6 +32,40 @@ test("layouts fit small and large viewports without horizontal overflow", async 
   }
 });
 
+test("Blueprint navigation stays reachable in short windows and compact headers", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 400 });
+  await page.goto("/about/?design=blueprint");
+  const header = page.locator(".site-header");
+  await header.getByRole("link", { name: "Qiyu Zhao, home" }).focus();
+  for (const name of ["Work", "Experience", "Apps", "About me"]) {
+    await page.keyboard.press("Tab");
+    const link = header.getByRole("link", { name, exact: true });
+    await expect(link).toBeFocused();
+    await expect(link).toBeInViewport({ ratio: 1 });
+  }
+  await page.keyboard.press("Tab");
+  const quickNavigation = header.getByRole("button", { name: "Open quick navigation" });
+  await expect(quickNavigation).toBeFocused();
+  await expect(quickNavigation).toBeInViewport({ ratio: 1 });
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(quickNavigation).toBeFocused();
+  await page.keyboard.press("Tab");
+  const contact = header.getByRole("link", { name: "Let's talk" });
+  await expect(contact).toBeFocused();
+  await expect(contact).toBeInViewport({ ratio: 1 });
+
+  await page.setViewportSize({ width: 960, height: 400 });
+  await page.locator("#work").scrollIntoViewIfNeeded();
+  await expect(header).toBeInViewport({ ratio: 1 });
+  for (const link of await header.locator("nav a").all()) {
+    await expect(link).toBeInViewport({ ratio: 1 });
+  }
+  await page.emulateMedia({ media: "print" });
+  await expect(header).not.toBeVisible();
+});
+
 test("motion respects system preference and can be paused manually", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/about/");

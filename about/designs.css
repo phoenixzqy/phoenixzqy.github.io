@@ -82,7 +82,7 @@
     & body { padding-left: 208px; }
     & body::before { background: linear-gradient(var(--scene-grid) 1px, transparent 1px), linear-gradient(90deg, var(--scene-grid) 1px, transparent 1px); background-size: 28px 28px; }
     & .section-shell { width: min(1160px, calc(100% - 72px)); }
-    & .site-header { position: fixed; width: 208px; height: 100dvh; inset: 0 auto 0 0; padding: 38px 26px; flex-direction: column; align-items: flex-start; justify-content: flex-start; border-bottom: 0; border-right: 1px solid var(--line); background: var(--surface); }
+    & .site-header { position: fixed; width: 208px; height: 100dvh; overflow-y: auto; inset: 0 auto 0 0; padding: 38px 26px; flex-direction: column; align-items: flex-start; justify-content: flex-start; border-bottom: 0; border-right: 1px solid var(--line); background: var(--surface); }
     & .brand { flex-direction: column; align-items: flex-start; gap: 20px; }
     & .brand-label { padding: 0; border: 0; font-size: 10px; }
     & .site-header nav { flex-direction: column; gap: 6px; margin-top: 64px; width: 100%; counter-reset: nav; }
@@ -214,7 +214,7 @@
 @media screen and (max-width: 960px) {
   html[data-design="blueprint"] {
     & body { padding-left: 0; }
-    & .site-header { position: sticky; height: 76px; width: 100%; padding: 0 20px; flex-direction: row; align-items: center; justify-content: space-between; border: 0; border-bottom: 1px solid var(--line); }
+    & .site-header { position: sticky; height: 76px; width: 100%; overflow: visible; padding: 0 20px; flex-direction: row; align-items: center; justify-content: space-between; border: 0; border-bottom: 1px solid var(--line); }
     & .brand { display: block; }
     & .brand-label, & .header-actions { display: none; }
     & .site-header nav { width: auto; flex-direction: row; margin: 0; gap: 18px; }
