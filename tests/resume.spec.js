@@ -274,13 +274,13 @@ test("design and color can be selected independently and retained in preview lin
 });
 
 for (const design of ["editorial", "blueprint", "studio"]) {
-  test(`${design} design preserves content and works with every color palette`, async ({ page, isMobile }) => {
-    const errors = [];
-    page.on("pageerror", (error) => errors.push(error.message));
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/about/?design=original&theme=original");
-    const content = await page.locator("main > section").allTextContents();
-    for (const theme of ["moss", "paper", "linen", "slate"]) {
+  for (const theme of ["moss", "paper", "linen", "slate"]) {
+    test(`${design} design with ${theme} palette preserves content and layout`, async ({ page, isMobile }) => {
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/about/?design=original&theme=original");
+      const content = await page.locator("main > section").allTextContents();
       await page.goto(`/about/?design=${design}&theme=${theme}`);
       await page.evaluate(() => document.fonts.ready);
       expect(await page.locator("main > section").allTextContents()).toEqual(content);
@@ -297,32 +297,32 @@ for (const design of ["editorial", "blueprint", "studio"]) {
         expect(controls.x).toBeGreaterThanOrEqual(0);
         expect(controls.x + controls.width).toBeLessThanOrEqual(width);
       }
-    }
-    if (!isMobile) {
-      await page.setViewportSize({ width: 1440, height: 1000 });
-      // Opening the earlier roles scrolled down; compare the initial composition at the top.
-      await page.evaluate(() => window.scrollTo(0, 0));
-      const hero = await page.locator(".hero").boundingBox();
-      const work = await page.locator("#work").boundingBox();
-      if (design === "studio") {
-        expect(hero.x + hero.width).toBeLessThan(work.x);
-        expect(Math.abs(hero.y - work.y)).toBeLessThan(5);
-      } else {
-        expect(hero.y + hero.height).toBeLessThan(work.y);
+      if (!isMobile) {
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        // Opening the earlier roles scrolled down; compare the initial composition at the top.
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const hero = await page.locator(".hero").boundingBox();
+        const work = await page.locator("#work").boundingBox();
+        if (design === "studio") {
+          expect(hero.x + hero.width).toBeLessThan(work.x);
+          expect(Math.abs(hero.y - work.y)).toBeLessThan(5);
+        } else {
+          expect(hero.y + hero.height).toBeLessThan(work.y);
+        }
+        if (design === "blueprint") {
+          const header = await page.locator(".site-header").boundingBox();
+          expect(header.x + header.width).toBeLessThan(hero.x);
+          const first = await page.locator(".work-card").nth(1).boundingBox();
+          const second = await page.locator(".work-card").nth(2).boundingBox();
+          expect(first.x + first.width).toBeLessThan(second.x);
+        } else {
+          await expect(page.locator(".project-art").first()).not.toBeVisible();
+        }
       }
-      if (design === "blueprint") {
-        const header = await page.locator(".site-header").boundingBox();
-        expect(header.x + header.width).toBeLessThan(hero.x);
-        const first = await page.locator(".work-card").nth(1).boundingBox();
-        const second = await page.locator(".work-card").nth(2).boundingBox();
-        expect(first.x + first.width).toBeLessThan(second.x);
-      } else {
-        await expect(page.locator(".project-art").first()).not.toBeVisible();
-      }
-    }
-    await page.keyboard.press("Control+k");
-    const dialog = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
-    expect(dialog.violations).toEqual([]);
-    expect(errors).toEqual([]);
-  });
+      await page.keyboard.press("Control+k");
+      const dialog = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+      expect(dialog.violations).toEqual([]);
+      expect(errors).toEqual([]);
+    });
+  }
 }
