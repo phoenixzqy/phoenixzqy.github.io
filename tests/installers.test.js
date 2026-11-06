@@ -15,6 +15,13 @@ const run = promisify(execFile);
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const installerPath = (name) => join(siteRoot, "install", name);
 
+// Generic shell/Python fixtures run on the actual host; package selection must
+// reach the behavior under test on both macOS and Linux, including ARM hosts.
+const hostPlatform = process.platform === "darwin" ? "macos" : "linux";
+const hostArchitecture = process.arch === "arm64" ? "arm64" : "x64";
+const otherArchitecture = hostArchitecture === "arm64" ? "x64" : "arm64";
+const hostAsset = (file, bytes) => asset(hostPlatform, hostArchitecture, file, bytes);
+
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 function manifest(appId, assets) {
@@ -74,6 +81,7 @@ async function withHome(body) {
 }
 
 const shellPath = (await run("sh", ["-c", "command -v sh"])).stdout.trim();
+const checksumTool = (await run(shellPath, ["-c", "command -v sha256sum || command -v shasum"])).stdout.trim().split("/").at(-1);
 const zshAvailable = await run(shellPath, ["-c", "command -v zsh"]).then(() => true).catch(() => false);
 const fishAvailable = await run(shellPath, ["-c", "command -v fish"]).then(() => true).catch(() => false);
 
@@ -156,14 +164,14 @@ test("PowerShell installers stay compatible with Windows PowerShell 5.1", async 
 
 test("the shell installer verifies, extracts, and installs a published package", async () => {
   const bytes = createZip({
-    "zai-editor-0.1.0-linux-x64/zai-editor": "#!/bin/sh\necho test-only fixture\n",
-    "zai-editor-0.1.0-linux-x64/LICENSE": "Apache License 2.0 (test fixture)\n",
+    [`zai-editor-0.1.0-${hostPlatform}-${hostArchitecture}/zai-editor`]: "#!/bin/sh\necho test-only fixture\n",
+    [`zai-editor-0.1.0-${hostPlatform}-${hostArchitecture}/LICENSE`]: "Apache License 2.0 (test fixture)\n",
   });
-  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const file = `zai-editor-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   const files = new Map([
     ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [
-      asset("linux", "x64", file, bytes),
-      asset("linux", "arm64", "zai-editor-0.1.0-linux-arm64.zip", Buffer.from("other")),
+      hostAsset(file, bytes),
+      asset(hostPlatform, otherArchitecture, `zai-editor-0.1.0-${hostPlatform}-${otherArchitecture}.zip`, Buffer.from("other")),
     ]), null, 2))],
     [`/${file}`, bytes],
   ]);
@@ -191,9 +199,9 @@ test("standalone installers replace only their own app in a family installation"
   for (const appId of ["zai-editor", "zai-gitter"]) {
     const bytes = createZip(Object.fromEntries(["zai", "zai-editor", "zai-gitter"].map((app) =>
       [app, `#!/bin/sh\necho package-${app}\n`])));
-    const file = `${appId}-0.1.0-linux-x64.zip`;
+    const file = `${appId}-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
     await withServer(new Map([
-      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", "x64", file, bytes)])))],
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [hostAsset(file, bytes)])))],
       [`/${file}`, bytes],
     ]), (origin) => withHome(async (home) => {
       const installDir = join(home, "installed");
@@ -213,15 +221,15 @@ test("standalone installers replace only their own app in a family installation"
 
 test("the shell installer parses minified manifests with localized asset text", async () => {
   const bytes = createZip({ "zai-editor": "#!/bin/sh\necho localized fixture\n" });
-  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const file = `zai-editor-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   const localized = manifest("zai-editor", [
     {
-      ...asset("linux", "arm64", "zai-editor-0.1.0-linux-arm64.zip", Buffer.from("other")),
+      ...asset(hostPlatform, otherArchitecture, `zai-editor-0.1.0-${hostPlatform}-${otherArchitecture}.zip`, Buffer.from("other")),
       name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
       installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
     },
     {
-      ...asset("linux", "x64", file, bytes),
+      ...hostAsset(file, bytes),
       name: { en: "Linux application", "zh-CN": "Linux 应用程序" },
       installNotes: { en: "Extract the archive.", "zh-CN": "请解压缩归档。" },
       metadata: {
@@ -261,10 +269,10 @@ test("the shell installer rejects malformed JSON rather than partially parsing i
 
 test("the shell installer quotes metacharacters before updating startup PATH", async () => {
   const bytes = createZip({ "zai-editor": "#!/bin/sh\nexit 0\n" });
-  const file = "zai-editor-0.1.0-linux-x64.zip";
+  const file = `zai-editor-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   await withServer(new Map([
     ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [
-      asset("linux", "x64", file, bytes),
+      hostAsset(file, bytes),
     ])))],
     [`/${file}`, bytes],
   ]), (origin) => withHome(async (home) => {
@@ -311,8 +319,8 @@ test("PowerShell installers select only an unambiguous ZIP package", async () =>
 
 test("a checksum mismatch is rejected and nothing is installed", async () => {
   const bytes = createZip({ "zai-gitter": "#!/bin/sh\nexit 0\n" });
-  const file = "zai-gitter-0.1.0-linux-x64.zip";
-  const tampered = manifest("zai-gitter", [asset("linux", "x64", file, bytes)]);
+  const file = `zai-gitter-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
+  const tampered = manifest("zai-gitter", [hostAsset(file, bytes)]);
   tampered.release.assets[0].sha256 = "0".repeat(64);
   const files = new Map([
     ["/manifest.json", Buffer.from(JSON.stringify(tampered, null, 2))],
@@ -330,8 +338,8 @@ test("a checksum mismatch is rejected and nothing is installed", async () => {
 
 test("a declared byte count that does not match the download is rejected", async () => {
   const bytes = createZip({ "zai-gitter": "#!/bin/sh\nexit 0\n" });
-  const file = "zai-gitter-0.1.0-linux-x64.zip";
-  const wrong = manifest("zai-gitter", [asset("linux", "x64", file, bytes)]);
+  const file = `zai-gitter-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
+  const wrong = manifest("zai-gitter", [hostAsset(file, bytes)]);
   wrong.release.assets[0].bytes = bytes.length + 10;
   await withServer(new Map([
     ["/manifest.json", Buffer.from(JSON.stringify(wrong, null, 2))],
@@ -362,7 +370,7 @@ test("a release without a package for this machine names the pages that list wha
   ]), (origin) => withHome(async (home) => {
     const result = await runInstaller("zai-gitter.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });
     assert.equal(result.code, 1);
-    assert.match(result.stderr, /no package for linux\/x64/);
+    assert.ok(result.stderr.includes(`no package for ${hostPlatform}/${hostArchitecture}`), result.stderr);
   }));
 });
 
@@ -389,9 +397,9 @@ test("the zai installer runs install.py from the archive root and forwards argum
     "install_path.py": "raise SystemExit('the wrong script ran')\n",
     ".copilot/scripts/install.py": "raise SystemExit('the wrong script ran')\n",
   });
-  const file = "zai-0.1.0-linux-x64.zip";
+  const file = `zai-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   await withServer(new Map([
-    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)]), null, 2))],
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [hostAsset(file, bytes)]), null, 2))],
     [`/${file}`, bytes],
   ]), (origin) => withHome(async (home) => {
     const receipt = join(home, "receipt.txt");
@@ -449,9 +457,9 @@ test("piped shell installers download and install macOS packages under POSIX Bas
 
 test("the zai installer refuses an archive without install.py at its root", async () => {
   const bytes = createZip({ "zai-0.1.0-linux-x64/install.py": "print('nested')\n" });
-  const file = "zai-0.1.0-linux-x64.zip";
+  const file = `zai-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   await withServer(new Map([
-    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)]), null, 2))],
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [hostAsset(file, bytes)]), null, 2))],
     [`/${file}`, bytes],
   ]), (origin) => withHome(async (home) => {
     const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home });
@@ -503,7 +511,7 @@ test("fixture archives round-trip through the extraction tools the installer use
 });
 
 function codexPackage(version = "0.1.0") {
-  const target = process.arch === "arm64" ? "aarch64-unknown-linux-gnu" : "x86_64-unknown-linux-gnu";
+  const target = `${hostArchitecture === "arm64" ? "aarch64" : "x86_64"}-${hostPlatform === "macos" ? "apple-darwin" : "unknown-linux-gnu"}`;
   const file = `zai-codex-${version}-${target}.zip`;
   const bytes = createZip({
     "bin/codex": `#!/bin/sh\necho codex-cli 0.0.0\n`,
@@ -517,7 +525,7 @@ function codexPackage(version = "0.1.0") {
     "zai-release.json": JSON.stringify({ repository: "phoenixzqy/zai-codex", branch: "zai-codex",
       commit: "a".repeat(40), version, tag: `zai-codex-v${version}` }),
   });
-  return { file, bytes, architecture: process.arch === "arm64" ? "arm64" : "x64" };
+  return { file, bytes, architecture: hostArchitecture };
 }
 
 test("zai-codex installs and upgrades complete bundles as codex", { skip: process.platform !== "linux" }, async () => {
@@ -617,7 +625,6 @@ async function withToolPath(home, names) {
 }
 
 async function installerToolPath(home, extra = []) {
-  const checksumTool = (await run(shellPath, ["-c", "command -v sha256sum || command -v shasum"])).stdout.trim().split("/").at(-1);
   return withToolPath(home, ["python3", "curl", "mktemp", "rm", "sed", "cut", "wc", "tr", "mkdir",
     "find", "cp", "chmod", "mv", "grep", "unzip", "ps", "sh", "tail", "cat", checksumTool, ...extra]);
 }
@@ -625,7 +632,7 @@ async function installerToolPath(home, extra = []) {
 test("Python preflight rejects missing, old, and broken interpreters before downloads", async () => {
   for (const kind of ["missing", "old", "broken"]) {
     await withHome(async (home) => {
-      const bin = await withToolPath(home, ["uname", "sha256sum"]);
+      const bin = await withToolPath(home, ["uname", checksumTool]);
       const interpreter = (await run("python3", ["-c", "import sys; print(sys.executable)"])).stdout.trim();
       const touched = join(home, "downloaded");
       await writeFile(join(bin, "curl"), `#!/bin/sh\n: > '${touched}'\nexit 99\n`, { mode: 0o755 });
@@ -648,12 +655,12 @@ test("Python preflight rejects missing, old, and broken interpreters before down
 test("the selected Python fallback handles metadata, ZIP extraction, and package installation", async () => {
   const bytes = createZip({ "zai": "fixture", "zai-editor": "fixture", "zai-gitter": "fixture",
     "install.py": "import pathlib\npathlib.Path.home().joinpath('receipt').write_text('installed')\n" });
-  const file = "zai-0.1.0-linux-x64.zip";
+  const file = `zai-0.1.0-${hostPlatform}-${hostArchitecture}.zip`;
   await withServer(new Map([
-    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)])))],
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [hostAsset(file, bytes)])))],
     [`/${file}`, bytes],
   ]), (origin) => withHome(async (home) => {
-    const bin = await withToolPath(home, ["uname", "curl", "sha256sum", "mktemp", "rm", "sed", "cut", "wc", "tr", "mkdir"]);
+    const bin = await withToolPath(home, ["uname", "curl", checksumTool, "mktemp", "rm", "sed", "cut", "wc", "tr", "mkdir"]);
     await writeFile(join(bin, "python3"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
     const interpreter = (await run("python3", ["-c", "import sys; print(sys.executable)"])).stdout.trim();
     await symlink(interpreter, join(bin, "python"));
@@ -777,7 +784,7 @@ test("all zai shell installers print activation commands that expose the install
   for (const { appId, mode, executable } of INSTALLERS) {
     for (const shell of ["/bin/bash", "/bin/zsh", "/bin/sh"]) {
       const packageData = mode === "codex" ? codexPackage() : {
-        file: `${appId}-0.1.0-linux-x64.zip`, architecture: "x64",
+        file: `${appId}-0.1.0-${hostPlatform}-${hostArchitecture}.zip`, architecture: hostArchitecture,
         bytes: createZip(mode === "python" ? {
           "zai": "fixture", "zai-editor": "fixture", "zai-gitter": "fixture",
           "install.py": [
@@ -797,7 +804,7 @@ test("all zai shell installers print activation commands that expose the install
       };
       const { file, bytes, architecture } = packageData;
       await withServer(new Map([
-        ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", architecture, file, bytes)])))],
+        ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset(hostPlatform, architecture, file, bytes)])))],
         [`/${file}`, bytes],
       ]), (origin) => withHome(async (home) => {
         const installDir = join(home, "installed");
@@ -912,7 +919,7 @@ test("calling shell detection takes precedence over the login shell", async () =
   const file = "zai-editor.zip";
   const bytes = createZip({ "zai-editor": "#!/bin/sh\nexit 0\n" });
   await withServer(new Map([
-    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [asset("linux", "x64", file, bytes)])))],
+    ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-editor", [hostAsset(file, bytes)])))],
     [`/${file}`, bytes],
   ]), (origin) => withHome(async (home) => {
     const result = await runInstaller("zai-editor.sh", {
@@ -1103,7 +1110,7 @@ test("tool installers add only their own available shortcuts, preserve collision
       ].join("\n"),
     } : { [executable]: binary });
     await withServer(new Map([
-      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [asset("linux", "x64", file, bytes)])))],
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest(appId, [hostAsset(file, bytes)])))],
       [`/${file}`, bytes],
     ]), (origin) => withHome(async (home) => {
       const installDir = join(home, "space ' quote $HOME");
@@ -1176,10 +1183,10 @@ test("bundled installer failure highlights the original reason and preserves its
     'raise SystemExit("Attach with zai and choose Close completely before installing or updating.")\n',
     'import sys\nsys.stderr.write("Service still running\\n")\nraise SystemExit(7)\n',
   ]) {
-    const file = "zai-test-linux-x64.zip";
+    const file = `zai-test-${hostPlatform}-${hostArchitecture}.zip`;
     const bytes = createZip({ "install.py": program });
     await withServer(new Map([
-      ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [asset("linux", "x64", file, bytes)])))],
+      ["/manifest.json", Buffer.from(JSON.stringify(manifest("zai-cli", [hostAsset(file, bytes)])))],
       [`/${file}`, bytes],
     ]), (origin) => withHome(async (home) => {
       const result = await runInstaller("zai-cli.sh", { manifestUrl: `${origin}/manifest.json`, home, installDir: join(home, "installed") });

@@ -19,18 +19,21 @@ payload = json.loads(sys.argv[1])
 master, slave = pty.openpty()
 try:
     result = subprocess.run(payload, stderr=slave, stdout=subprocess.PIPE)
+    # macOS discards unread PTY output when the last slave descriptor closes.
+    # The child has exited; drain its output while our slave is still open.
+    os.set_blocking(master, False)
+    output = b""
+    while True:
+        try:
+            chunk = os.read(master, 4096)
+        except (BlockingIOError, OSError):
+            break
+        if not chunk:
+            break
+        output += chunk
 finally:
     os.close(slave)
-output = b""
-while True:
-    try:
-        chunk = os.read(master, 4096)
-    except OSError:
-        break
-    if not chunk:
-        break
-    output += chunk
-os.close(master)
+    os.close(master)
 sys.stdout.buffer.write(output)
 raise SystemExit(result.returncode)
 `;

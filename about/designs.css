@@ -1,0 +1,286 @@
+/* Three compositions share the canonical résumé markup and independent palettes.
+   This stylesheet is screen-only; every design prints the same complete résumé. */
+@media screen {
+  :where(html[data-design="editorial"], html[data-design="blueprint"], html[data-design="studio"]) {
+    & body { font-size: 16px; }
+    & .hero-description { font-size: 16px; line-height: 1.8; max-width: 580px; }
+    & .hero .eyebrow { white-space: normal; flex-wrap: wrap; font-size: 10px; }
+    & .resume-links { font-size: 12px; }
+    & .project-copy > p:not(.project-role) { font-size: 15px; line-height: 1.8; min-height: 0; }
+    & .project-contributions, & .experience-body ul { font-size: 15px; line-height: 1.8; }
+    & .project-contributions strong, & .experience-body strong { font-weight: 650; }
+    & .project-role, & .card-topline, & .section-index { font-size: 10px; }
+    & .section-heading > p, & .work-context p { font-size: 15px; }
+    & .experience-meta > .mono, & .role-heading > .mono, & .role-location { font-size: 11px; }
+    & .earlier-grid p { font-size: 14px; }
+    & .about-intro > p:not(.eyebrow) { font-size: 16px; line-height: 1.8; }
+    & .about-intro > p.about-lead { font-size: 20px; }
+    & .tags span { font-size: 11px; }
+    & .work-note { font-size: 10px; }
+    & .work-card:hover { transform: none; }
+    & .hero-bottom { display: none; }
+  }
+
+  /* Editorial: an oversized masthead and a journal of numbered, open work rows. */
+  html[data-design="editorial"] {
+    --heading-font: "Instrument Serif", Georgia, serif;
+    & body::before { display: none; }
+    & .section-shell { width: min(1200px, calc(100% - 96px)); }
+    & .site-header { width: min(1200px, calc(100% - 96px)); height: 80px; padding: 0; margin-inline: auto; border-top: 4px solid var(--text); }
+    & .brand-mark { font-family: Georgia, serif; font-style: italic; letter-spacing: -3px; }
+    & .brand-label { border: 0; padding: 0; }
+    & .hero { display: block; min-height: 0; padding-block: 48px 56px; }
+    & .hero-copy { display: grid; grid-template-columns: 1.15fr 1fr; gap: 0 8%; grid-template-areas: "eyebrow eyebrow" "name name" "statement title" "statement description" "statement profiles" "footnote actions"; }
+    & .hero .eyebrow { grid-area: eyebrow; padding-bottom: 20px; border-bottom: 1px solid var(--line); letter-spacing: 1.5px; }
+    & .hero h1 { grid-area: name; font-size: clamp(100px, 16vw, 218px); font-weight: 400; letter-spacing: -.055em; margin: 12px 0 30px; border-bottom: 1px solid var(--line); padding-bottom: 28px; }
+    & .hero-statement { grid-area: statement; font-family: var(--heading-font); font-size: clamp(40px, 4.8vw, 66px); line-height: 1.02; letter-spacing: -1.5px; }
+    & .hero-statement .serif-accent { font-size: 1em; }
+    & .professional-title { grid-area: title; margin-top: 4px; font-size: 14px; }
+    & .hero-description { grid-area: description; margin-top: 16px; }
+    & .resume-links { grid-area: profiles; }
+    & .hero-actions { grid-area: actions; margin-top: 24px; }
+    & .hero-footnote { grid-area: footnote; align-self: end; gap: 8px; font-size: 8px; }
+    & .neural-scene { display: none; }
+    & .button { border-radius: 0; }
+    & .focus-strip { background: none; padding-block: 17px; border-block: 3px double var(--line); }
+    & .focus-strip span { font-size: 9px; }
+    & .work-section { padding-block: 70px; }
+    & .section-heading { align-items: flex-start; margin-bottom: 35px; }
+    & .section-index { color: var(--muted); margin-bottom: 15px; }
+    & h2 { font-size: 56px; font-weight: 400; letter-spacing: -1.5px; }
+    & .section-heading h2 br { display: none; }
+    & .section-heading h2 .muted { color: var(--text); font-style: italic; }
+    & .section-heading > p { max-width: 310px; padding-top: 28px; }
+    & .work-grid { display: block; counter-reset: editorial-work; }
+    & .work-card { position: relative; border: 0; border-top: 1px solid var(--text); border-radius: 0; background: none; padding: 30px 0 36px 62px; counter-increment: editorial-work; }
+    & .work-card::before { content: "0" counter(editorial-work); position: absolute; left: 0; top: 28px; color: var(--accent); font: italic 28px var(--heading-font); }
+    & .card-topline { margin: 0 0 22px; font-size: 9px; }
+    & .project-art { display: none; }
+    & .project-copy, & .copilot-card .project-copy { padding: 0; display: grid; grid-template-columns: .9fr 1.3fr; gap: 0 7%; }
+    & .project-identity { grid-row: span 3; }
+    & .project-role { margin-bottom: 14px; line-height: 1.7; }
+    & .project-copy h3, & .copilot-card .project-copy h3 { font-size: 38px; letter-spacing: -.7px; }
+    & .project-contributions, & .copilot-card .project-contributions { margin-top: 12px; }
+    & .tags { grid-column: 2; margin-top: 12px; }
+    & .tags span { border: 0; border-bottom: 1px solid var(--line); padding: 3px 0; border-radius: 0; background: none; margin-right: 12px; }
+    & .experience-section { padding-block: 20px 70px; }
+    & .experience-entry { grid-template-columns: 25% 1fr; gap: 6%; padding-block: 38px; }
+    & .company-name { font-family: var(--heading-font); font-size: 31px; }
+    & .experience-body h3 { font-size: 29px; }
+    & .role-heading { align-items: flex-start; }
+    & .about-section { padding-block: 60px; gap: 9%; }
+    & .about-intro h2 { font-size: 52px; }
+    & .contact-section { padding-block: 50px; border-top: 3px double var(--line); }
+    & .contact-orb { border-radius: 0; width: 110px; height: 110px; background: none; }
+    & .contact-section h2 { font-size: 64px; }
+    & .site-footer { border-top: 3px solid var(--text); }
+  }
+
+  /* Blueprint: a navigation rail, a schematic hero, and framed engineering modules. */
+  html[data-design="blueprint"] {
+    --heading-font: var(--sans);
+    & body { padding-left: 208px; }
+    & body::before { background: linear-gradient(var(--scene-grid) 1px, transparent 1px), linear-gradient(90deg, var(--scene-grid) 1px, transparent 1px); background-size: 28px 28px; }
+    & .section-shell { width: min(1160px, calc(100% - 72px)); }
+    & .site-header { position: fixed; width: 208px; height: 100dvh; overflow-y: auto; inset: 0 auto 0 0; padding: 38px 26px; flex-direction: column; align-items: flex-start; justify-content: flex-start; border-bottom: 0; border-right: 1px solid var(--line); background: var(--surface); }
+    & .brand { flex-direction: column; align-items: flex-start; gap: 20px; }
+    & .brand-label { padding: 0; border: 0; font-size: 10px; }
+    & .site-header nav { flex-direction: column; gap: 6px; margin-top: 64px; width: 100%; counter-reset: nav; }
+    & .site-header nav a { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--line); font: 12px var(--mono); padding-block: 18px; counter-increment: nav; }
+    & .site-header nav a::before { content: "0" counter(nav); color: var(--muted); font-size: 9px; }
+    & .header-actions { flex-direction: column; align-items: flex-start; margin-top: auto; padding-top: 25px; }
+    & .hero { min-height: 0; padding-block: 52px 32px; grid-template-columns: 1.25fr .85fr; gap: 30px; }
+    & .hero h1 { font-family: var(--mono); font-size: clamp(45px, 5.2vw, 78px); letter-spacing: -5px; line-height: 1.1; margin-block: 26px 20px; }
+    & .hero-statement { font-size: clamp(26px, 2.8vw, 40px); letter-spacing: -1px; line-height: 1.2; }
+    & .hero-statement .serif-accent { font: inherit; color: var(--accent); }
+    & .hero-description { font-size: 15px; }
+    & .professional-title { font-size: 13px; }
+    & .hero-footnote { padding-block: 16px; border-block: 1px dashed var(--line); gap: 8px; letter-spacing: 0; }
+    & .neural-scene { border: 1px solid var(--art-line); background: var(--surface); }
+    & .scene-topline, & .scene-bottomline { padding: 12px; font-size: 7px; }
+    & .node-label { font-size: 7px; padding: 5px; }
+    & .node-label-two { right: 3%; }
+    & .scene-coordinate { display: none; }
+    & .button { border-radius: 0; font: 11px var(--mono); padding-inline: 12px; gap: 12px; }
+    & .focus-strip { width: min(1160px, calc(100% - 72px)); margin-inline: auto; padding-block: 20px; background: var(--surface); border: 1px solid var(--line); }
+    & .focus-strip > div { width: auto; padding-inline: 18px; flex-wrap: wrap; justify-content: center; gap: 8px 18px; }
+    & .focus-strip span { font-size: 8px; letter-spacing: .5px; }
+    & .work-section { padding-block: 60px; }
+    & .section-heading { align-items: flex-start; border-top: 1px solid var(--art-line); padding-top: 22px; }
+    & .section-index { margin-bottom: 14px; }
+    & h2 { font-size: 36px; letter-spacing: -1px; }
+    & .section-heading > p { max-width: 270px; font-size: 13px; }
+    & .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    & .work-card { border-radius: 0; border: 1px solid var(--art-line); background: var(--surface); }
+    & .card-topline { border-bottom: 1px dashed var(--line); padding-bottom: 16px; font-size: 9px; }
+    & .project-copy { padding: 20px 24px 28px; }
+    & .project-copy h3 { font-size: 26px; }
+    & .project-art { height: 190px; background-image: linear-gradient(var(--scene-grid) 1px, transparent 1px), linear-gradient(90deg, var(--scene-grid) 1px, transparent 1px); background-size: 20px 20px; margin: 16px 16px 0; border: 1px dashed var(--line); }
+    & .copilot-card .project-copy { grid-template-columns: 1fr 1.4fr; gap: 0 30px; }
+    & .copilot-card .project-copy h3 { font-size: 31px; }
+    & .work-card:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1.4fr; }
+    & .work-card:last-child .card-topline { grid-column: 1 / -1; }
+    & .work-card:last-child .project-art { height: 230px; margin-bottom: 20px; }
+    & .tags span { border-radius: 0; }
+    & .experience-entry { grid-template-columns: 24% 1fr; gap: 30px; border-top-style: dashed; }
+    & .company-name { font-size: 21px; }
+    & .experience-meta > .mono { font-size: 10px; letter-spacing: 0; }
+    & .role-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
+    & .about-section { padding: 32px; border: 1px solid var(--art-line); background: var(--surface); gap: 6%; }
+    & .about-intro h2 { font-size: 34px; }
+    & .contact-section { margin-top: 50px; border-top: 1px dashed var(--art-line); }
+    & .contact-section h2 { font-size: 42px; }
+    & .contact-orb { border-radius: 0; width: 112px; height: 112px; margin-right: 0; }
+  }
+
+  /* Studio: a persistent personal column next to a calm, text-led portfolio. */
+  html[data-design="studio"] {
+    --heading-font: var(--sans);
+    & body::before { display: none; }
+    & .site-header { height: 80px; border-bottom: 0; max-width: 1320px; margin-inline: auto; padding-inline: 48px; }
+    & .brand-label { display: none; }
+    & .site-header nav a { font-size: 13px; }
+    & main { display: grid; grid-template-columns: 290px minmax(0, 1fr); column-gap: 70px; width: min(1224px, calc(100% - 96px)); margin: 36px auto 0; align-items: start; }
+    & .section-shell { width: 100%; }
+    & .hero { display: block; grid-column: 1; grid-row: 1 / 6; position: sticky; top: 108px; min-height: 0; padding: 0 0 30px; max-height: calc(100dvh - 130px); overflow-y: auto; scrollbar-width: thin; }
+    & .hero .eyebrow { font-size: 8px; gap: 7px; line-height: 1.8; }
+    & .hero h1 { font-size: 53px; letter-spacing: -3px; margin-block: 24px; }
+    & .hero-statement { font-size: 28px; letter-spacing: -1px; line-height: 1.2; }
+    & .hero-statement .serif-accent { font-family: var(--sans); font-size: 1em; font-style: normal; }
+    & .professional-title { font-size: 12px; line-height: 1.8; }
+    & .professional-title > span { margin-inline: 4px; }
+    & .hero-description { font-size: 14px; line-height: 1.8; margin-top: 18px; }
+    & .resume-links { font-size: 11px; gap: 8px 16px; }
+    & .hero-actions { flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 24px; }
+    & .button { padding: 10px 16px; border-radius: 30px; font-size: 11px; }
+    & .neural-scene, & .hero-footnote, & .focus-strip { display: none; }
+    & .work-section, & .experience-section, & .about-section, & .contact-section { grid-column: 2; padding-block: 0 56px; margin: 0; }
+    & .section-heading { display: block; margin-bottom: 30px; border-bottom: 1px solid var(--line); padding-bottom: 26px; }
+    & .section-index { margin-bottom: 14px; }
+    & h2, & .about-intro h2 { font-size: 34px; letter-spacing: -1.2px; }
+    & h2 br { display: none; }
+    & .section-heading > p { margin-top: 16px; font-size: 14px; }
+    & .section-heading > p br { display: none; }
+    & .work-grid { display: block; }
+    & .work-card { padding: 0 0 30px; margin-bottom: 30px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; }
+    & .card-topline { margin: 0 0 18px; font-size: 9px; }
+    & .project-art { display: none; }
+    & .project-copy, & .copilot-card .project-copy { display: block; padding: 0; }
+    & .project-role { font-size: 9px; }
+    & .project-copy h3, & .copilot-card .project-copy h3 { font-size: 26px; letter-spacing: -.7px; margin-bottom: 14px; }
+    & .project-contributions { margin-top: 14px; }
+    & .tags { margin-top: 16px; }
+    & .tags span { border: 0; padding: 4px 10px; border-radius: 20px; }
+    & .work-context { padding-block: 18px; margin-top: 0; }
+    & .experience-entry { grid-template-columns: 1fr; gap: 20px; padding-block: 28px; }
+    & .experience-meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
+    & .company-name { font-size: 20px; margin-right: auto; }
+    & .experience-meta > .mono { font-size: 10px; }
+    & .current-badge { display: none; }
+    & .role-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
+    & .experience-body h3 { font-size: 21px; }
+    & .earlier-grid { grid-template-columns: 1fr; gap: 26px; }
+    & .about-section { display: block; padding-top: 30px; }
+    & .about-details { margin-top: 38px; }
+    & .contact-section { border-top: 1px solid var(--line); padding-top: 30px; grid-template-columns: 1fr; gap: 28px; }
+    & .contact-section h2 { font-size: 36px; }
+    & .contact-orb { width: auto; height: auto; margin: 0; padding: 14px 20px; justify-self: start; border-radius: 30px; flex-direction: row; }
+    & .contact-orb > span:first-child { font-size: 22px; }
+    & .contact-links { flex-wrap: wrap; }
+    & .site-footer { width: min(1224px, calc(100% - 96px)); margin-inline: auto; }
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  html[data-design="editorial"] {
+    & .hero-footnote { display: none; }
+    & .role-heading { flex-direction: column; }
+  }
+  html[data-design="blueprint"] {
+    & .hero { grid-template-columns: 1fr; }
+    & .neural-scene { width: min(100%, 380px); justify-self: center; }
+    & .hero-copy { display: block; }
+    & .experience-entry { grid-template-columns: 1fr; gap: 20px; }
+    & .experience-meta { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    & .about-section { grid-template-columns: 1fr; gap: 32px; }
+  }
+  html[data-design="studio"] {
+    & main { grid-template-columns: 240px minmax(0, 1fr); column-gap: 40px; width: calc(100% - 72px); }
+    & .hero h1 { font-size: 44px; }
+    & .site-header { padding-inline: 36px; }
+  }
+}
+
+@media screen and (max-width: 960px) {
+  html[data-design="blueprint"] {
+    & body { padding-left: 0; }
+    & .site-header { position: sticky; height: 76px; width: 100%; overflow: visible; padding: 0 20px; flex-direction: row; align-items: center; justify-content: space-between; border: 0; border-bottom: 1px solid var(--line); }
+    & .brand { display: block; }
+    & .brand-label, & .header-actions { display: none; }
+    & .site-header nav { width: auto; flex-direction: row; margin: 0; gap: 18px; }
+    & .site-header nav a { display: block; font: 11px var(--sans); border: 0; padding-block: 14px; }
+    & .site-header nav a::before { display: none; }
+  }
+}
+
+@media screen and (max-width: 760px) {
+  html[data-design="editorial"] {
+    & .section-shell, & .site-header { width: calc(100% - 40px); }
+    & .site-header { height: 72px; }
+    & .hero { padding-block: 30px 36px; }
+    & .hero-copy { display: block; }
+    & .hero h1 { font-size: clamp(64px, 15vw, 115px); padding-block: 8px 22px; margin-block: 10px 24px; }
+    & .hero .eyebrow { font-size: 8px; }
+    & .hero-statement { font-size: 44px; }
+    & .professional-title { margin-top: 24px; }
+    & .hero-description { margin-top: 16px; }
+    & .hero-actions { flex-wrap: wrap; }
+    & .work-section { padding-block: 44px; }
+    & .section-heading > p { padding: 0; margin-top: 18px; }
+    & h2, & .about-intro h2 { font-size: 42px; }
+    & .work-card { padding: 24px 0 28px 38px; }
+    & .work-card::before { font-size: 22px; top: 22px; }
+    & .project-copy, & .copilot-card .project-copy { display: block; }
+    & .project-copy h3, & .copilot-card .project-copy h3 { font-size: 32px; }
+    & .project-role { margin-bottom: 10px; }
+    & .experience-entry { grid-template-columns: 1fr; gap: 22px; }
+    & .experience-body h3 { font-size: 27px; }
+    & .contact-section h2 { font-size: 46px; }
+  }
+  html[data-design="blueprint"] {
+    & .section-shell, & .focus-strip { width: calc(100% - 40px); }
+    & .hero { padding-top: 32px; }
+    & .hero-copy { display: block; }
+    & .hero h1 { font-size: clamp(44px, 10vw, 70px); letter-spacing: -3px; }
+    & .hero-statement { font-size: 32px; }
+    & .hero-footnote { font-size: 7px; }
+    & .hero-actions { flex-wrap: wrap; }
+    & .work-grid { grid-template-columns: 1fr; }
+    & .copilot-card .project-copy, & .work-card:last-child { display: block; }
+    & .work-card:last-child .project-art { height: 210px; }
+    & .work-section { padding-block: 44px; }
+    & .section-heading { display: block; }
+    & h2 { font-size: 32px; }
+    & .about-section { padding: 24px 20px; }
+    & .contact-section h2 { font-size: 36px; }
+  }
+  html[data-design="studio"] {
+    & .site-header { height: 72px; padding-inline: 20px; border-bottom: 1px solid var(--line); }
+    & .site-header nav a { font-size: 11px; }
+    & main { display: block; width: calc(100% - 40px); margin-top: 32px; }
+    & .hero { position: static; max-height: none; overflow: visible; padding-bottom: 40px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+    & .hero h1 { font-size: 60px; }
+    & .hero .eyebrow { font-size: 9px; }
+    & .hero-description { font-size: 16px; max-width: 560px; }
+    & .hero-actions { flex-direction: row; flex-wrap: wrap; }
+    & .hero-statement { font-size: 34px; }
+    & .section-heading { margin-bottom: 26px; }
+    & .about-section { padding-top: 30px; }
+    & .experience-meta > .company-name { flex-basis: 100%; }
+    & .site-footer { width: calc(100% - 40px); }
+  }
+}
+
+@media screen and (max-width: 380px) {
+  html[data-design="blueprint"] .site-header nav { gap: 16px; }
+}

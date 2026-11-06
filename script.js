@@ -7,6 +7,8 @@ const motionLabel = document.querySelector("[data-motion-label]");
 let manuallyPaused = false;
 let updateScene = () => {};
 
+window.addEventListener("site-theme-change", () => updateScene());
+
 function syncMotion() {
   const paused = reducedMotion.matches || manuallyPaused;
   root.dataset.motion = paused ? "off" : "on";
@@ -137,13 +139,17 @@ function initNeuralScene() {
 
   function draw() {
     if (!size) return;
+    const palette = getComputedStyle(root);
+    const colors = Object.fromEntries(["--scene-rgb", "--scene-node-rgb", "--scene-glow-rgb", "--scene-beacon-rgb"]
+      .map((token) => [token, palette.getPropertyValue(token).trim()]));
+    const color = (token, opacity) => `rgba(${colors[token]}, ${opacity})`;
     context.clearRect(0, 0, size, size);
     const center = size / 2;
     const radius = size * 0.355;
     const glow = context.createRadialGradient(center, center, 0, center, center, size * 0.48);
-    glow.addColorStop(0, "rgba(146, 213, 71, 0.10)");
-    glow.addColorStop(0.65, "rgba(146, 213, 71, 0.025)");
-    glow.addColorStop(1, "rgba(146, 213, 71, 0)");
+    glow.addColorStop(0, color("--scene-glow-rgb", 0.10));
+    glow.addColorStop(0.65, color("--scene-glow-rgb", 0.025));
+    glow.addColorStop(1, color("--scene-glow-rgb", 0));
     context.fillStyle = glow;
     context.fillRect(0, 0, size, size);
 
@@ -162,7 +168,7 @@ function initNeuralScene() {
       const a = projected[i];
       const b = projected[j];
       const opacity = 0.08 + ((a.depth + b.depth + 2) / 4) * 0.28;
-      context.strokeStyle = `rgba(176, 223, 114, ${opacity})`;
+      context.strokeStyle = color("--scene-rgb", opacity);
       context.beginPath();
       context.moveTo(a.x, a.y);
       context.lineTo(b.x, b.y);
@@ -172,12 +178,12 @@ function initNeuralScene() {
       const front = (point.depth + 1) / 2;
       const isBeacon = i % 19 === 0;
       context.beginPath();
-      context.fillStyle = `rgba(205, 252, 147, ${0.22 + front * 0.78})`;
+      context.fillStyle = color("--scene-node-rgb", 0.22 + front * 0.78);
       context.arc(point.x, point.y, (isBeacon ? 2.5 : 1.2) * (0.6 + front * 0.7), 0, Math.PI * 2);
       context.fill();
       if (isBeacon && front > 0.4) {
         context.beginPath();
-        context.strokeStyle = `rgba(189, 245, 119, ${front * 0.23})`;
+        context.strokeStyle = color("--scene-beacon-rgb", front * 0.23);
         context.arc(point.x, point.y, 6, 0, Math.PI * 2);
         context.stroke();
       }
@@ -232,4 +238,8 @@ function initNeuralScene() {
   updateScene();
 }
 
-initNeuralScene();
+// WebKit can execute deferred scripts before imported styles finish loading.
+// Keep the SVG fallback until the palette is available for the canvas.
+window.addEventListener("load", () => {
+  initNeuralScene();
+});
