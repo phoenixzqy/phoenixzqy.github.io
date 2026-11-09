@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import hashlib
+import http.client
 from pathlib import PurePosixPath
 import stat
 import posixpath
+import time
 import zipfile
+import urllib.error
 import urllib.request
 
 DEBUG_SUFFIXES = ('.map', '.pdb', '.debug', '.symbols', '.dsym', '.dwo', '.dwp', '.sym', '.dbg')
@@ -76,12 +79,25 @@ def download(asset, directory):
     if not url.startswith('https://github.com/'):
         raise ValueError('Expected public GitHub release download')
     opener = urllib.request.build_opener(HTTPSOnly())
-    with opener.open(url, timeout=120) as response, path.open('wb') as output:
-        size = 0
-        while block := response.read(1024 * 1024):
-            size += len(block)
-            if size > asset['bytes']:
-                raise ValueError('Downloaded package exceeds manifest size')
-            output.write(block)
-    verify_file(path, asset)
-    return path
+    for attempt in range(4):
+        try:
+            with opener.open(url, timeout=120) as response, path.open('wb') as output:
+                size = 0
+                while block := response.read(1024 * 1024):
+                    size += len(block)
+                    if size > asset['bytes']:
+                        raise ValueError('Downloaded package exceeds manifest size')
+                    output.write(block)
+            verify_file(path, asset)
+            return path
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError,
+                ConnectionError, http.client.IncompleteRead) as error:
+            path.unlink(missing_ok=True)
+            transient = not isinstance(error, urllib.error.HTTPError) or 500 <= error.code < 600
+            if not transient or attempt == 3:
+                raise RuntimeError(f'Public download of {path.name} failed after {attempt + 1} attempt(s): {error}') from error
+            time.sleep(2 ** (attempt + 1))
+            continue
+        except Exception:
+            path.unlink(missing_ok=True)
+            raise
