@@ -19,11 +19,7 @@ import sys
 import tempfile
 
 
-GROUPS = {
-    'zai': ('release_apps.py', ('zai-cli', 'zai-editor', 'zai-gitter'), True),
-    'bplayer': ('release_apps.py', ('BPlayer',), True),
-    'codex': ('release_codex.py', (), False),
-}
+GROUPS = ('zai', 'bplayer', 'codex')
 SITE_URL = 'https://github.com/phoenixzqy/phoenixzqy.github.io.git'
 
 
@@ -69,8 +65,7 @@ def native_environment(path: Path, env: dict[str, str], temporary: str):
     return module.native_environment(env, temporary)
 
 
-def launch(args):
-    entrypoint, apps, skip_tests = GROUPS[args.group]
+def launch(args, entrypoint, apps=(), skip_tests=False):
     env = dict(os.environ, GIT_TERMINAL_PROMPT='0', PYTHONDONTWRITEBYTECODE='1')
     for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR'):
         env.pop(key, None)
@@ -114,6 +109,19 @@ def launch(args):
         return run(command, cwd=checkout, env=env)
 
 
+def release_zai_apps(args):
+    return launch(args, 'release_apps.py',
+                  apps=('zai-cli', 'zai-editor', 'zai-gitter'), skip_tests=True)
+
+
+def release_bplayer(args):
+    return launch(args, 'release_apps.py', apps=('BPlayer',), skip_tests=True)
+
+
+def release_codex(args):
+    return launch(args, 'release_codex.py')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--group', required=True, choices=GROUPS)
@@ -138,7 +146,8 @@ def main(argv=None):
         # Also wait for a run started before launcher serialization was added.
         with release_lock(args.state_dir / 'release.lock'):
             pass
-        return launch(args)
+        return {'zai': release_zai_apps, 'bplayer': release_bplayer,
+                'codex': release_codex}[args.group](args)
 
 
 if __name__ == '__main__':
