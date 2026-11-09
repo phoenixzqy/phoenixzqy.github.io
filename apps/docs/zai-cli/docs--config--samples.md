@@ -23,7 +23,7 @@ Default combination (the built-in selection):
 
 ```jsonc
 {
-  "schema_version": 26,
+  "schema_version": 27,
   "repo": { "forge": "github", "full_name": "acme/widgets", "repo": "widgets" },
   "poll_interval_seconds": 60,
   "working_directory": ".",
@@ -34,17 +34,17 @@ Default combination (the built-in selection):
     "dev":           { "model": "auto", "agent_name": "", "agent_limit": 3, "agent_timeout_minutes": 360, "poller": { "scope": "assigned" } },
     "review":        { "model": "auto", "agent_limit": 4, "agent_timeout_minutes": 360, "review_vote": "default", "max_group_reviewers": 3, "poller": { "scope": "assigned" } },
     "pr-babysitter": { "model": "auto", "agent_limit": 4, "agent_timeout_minutes": 360, "poller": { "scope": "authored" } },
-    "housekeep":     { "model": "auto", "agent_name": "", "agent_timeout_minutes": 360, "interval_seconds": 10800, "detect_maintained_branches": true, "sync_maintained_branches": true, "cleanup_stale_worktrees": false, "cleanup_stale_branches": false, "cleanup_logs": false }
+    "housekeep":     { "model": "auto", "agent_name": "", "agent_timeout_minutes": 360, "interval_seconds": 10800, "detect_maintained_branches": true, "sync_maintained_branches": true, "cleanup_stale_worktrees": false, "cleanup_stale_branches": false, "cleanup_logs": false, "cleanup_stale_sessions": false }
   }
 }
 ```
 
 "All" combination — poll all work items, review all PRs, babysit all PRs
-(labels-only). This ADO example stores work items in a separate project:
+(fixed eligibility gates still apply). This ADO example stores work items in a separate project:
 
 ```jsonc
 {
-  "schema_version": 26,
+  "schema_version": 27,
   "repo": {
     "forge": "ado",
     "organization": "https://dev.azure.com/example",
@@ -69,7 +69,7 @@ ADO assigned review with an explicit reviewer-group allowlist:
 
 ```jsonc
 {
-  "schema_version": 26,
+  "schema_version": 27,
   "repo": {
     "forge": "ado",
     "organization": "https://dev.azure.com/example",
@@ -103,7 +103,7 @@ excerpt is shown; the `services` block is unchanged from the samples above:
 
 ```jsonc
 {
-  "schema_version": 26,
+  "schema_version": 27,
   "repo": { "forge": "github", "full_name": "acme/widgets", "repo": "widgets" },
   "poll_interval_seconds": 60,
   "custom_required_labels": "workflow-a",

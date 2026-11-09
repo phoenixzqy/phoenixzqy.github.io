@@ -21,6 +21,11 @@ test("zai-cli distinguishes agent dependencies and cross-platform baselines", as
     const lsp = capabilities.getByRole("row", { name: /Language servers/ });
     await expect(lsp.getByRole("cell").nth(2)).toContainText(locale === "en" ? "Unverified" : "尚未核实");
 
+    const browser = capabilities.getByRole("row", { name: locale === "en" ? /^Same workspace in a browser/ : /^同一工作空间可在浏览器/ });
+    await expect(browser.getByRole("cell").nth(1)).toContainText("✓");
+    await expect(capabilities.getByRole("row", { name: locale === "en" ? /^Phone access/ : /^用手机访问/ }).getByRole("cell").nth(3)).toContainText(locale === "en" ? "Mobile app" : "移动应用");
+    await expect(capabilities.getByRole("row", { name: locale === "en" ? /^Team chatroom/ : /^代理会话可互相发消息/ })).toBeVisible();
+
     const agents = comparison.getByRole("region", { name: titles[1], exact: true });
     for (const agent of ["GitHub Copilot CLI", "Codex", "Pi", "Claude Code", "OpenCode"]) {
       await expect(agents.getByRole("rowheader", { name: agent, exact: true })).toBeVisible();
@@ -33,7 +38,8 @@ test("zai-cli distinguishes agent dependencies and cross-platform baselines", as
     await expect(footprint.getByRole("columnheader", { name: "GitHub Copilot app", exact: true })).toBeVisible();
     await expect(footprint.getByRole("columnheader", { name: agentHeader, exact: true })).toBeVisible();
     await expect(footprint.getByRole("columnheader")).toHaveCount(6);
-    await expect(footprint.getByRole("row", { name: /^Idle memory/ })).toContainText("≈ 40 MiB");
+    await expect(footprint.getByRole("row", { name: /^Idle memory/ })).toContainText("≈ 62 MiB");
+    await expect(footprint.getByRole("row", { name: /^Observed processes/ }).getByRole("cell").first()).toHaveText("2");
     await expect(footprint.getByRole("row", { name: /^Idle memory/ }).getByRole("cell").nth(2)).toContainText("Not measured");
     await expect(footprint.getByRole("row", { name: /^Private memory/ })).toContainText("687.6–959.5 MiB");
     await expect(footprint.getByRole("row", { name: /^Observed processes/ })).toContainText("11–13");

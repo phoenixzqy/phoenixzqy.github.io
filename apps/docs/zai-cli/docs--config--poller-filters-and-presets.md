@@ -25,6 +25,12 @@ invariants always hold.
 An unknown `scope` value is rejected before the poller calls the forge; it is
 never silently widened or remapped to another relationship.
 
+Review's `assigned` scope excludes your own pull requests even when you are an
+individual reviewer, belong to a requested reviewer group/team, or the PR carries
+`zai-need-review`. Scope governs poller selection. A deliberate
+`zai agent:run review --url <pull-request-url>` selects that URL directly without
+applying the poller scope, so it can review your own PR under an `assigned` config.
+
 For a single-contributor repository, set review scope to `all` or `authored`;
 pr-babysitter can retain its default `authored` scope. GitHub forbids native
 self-approval, so a successful approving review uses `zai-approved` plus a
@@ -64,8 +70,7 @@ membership as a reviewer, and never performs an unfiltered active listing for
 group discovery.
 
 Review de-dup is always on and not configurable: the review poller always skips
-a pull request it has already reviewed at its current head SHA, so unchanged
-pull requests are never re-reviewed. (An earlier `require_needs_review` knob is
+a pull request it has already reviewed at its current head SHA, unless a force-review request passes the remaining fixed gates. (An earlier `require_needs_review` knob is
 removed; any value still present in an existing config is ignored on load.)
 
 Pr-babysitter de-dup and no-progress guard are always on and not configurable:
@@ -74,8 +79,8 @@ marker (a GitHub comment or ADO thread) recording the head SHA it acted on, an
 attempt timestamp, an attempt counter, and a fingerprint of the actionable state
 (the unresolved-thread set plus the CI/conflict conclusion). On later rounds the
 poller skips a pull request whose head SHA and fingerprint are unchanged since
-the last marker, so the agent is never re-dispatched to redo the same work; a
-new commit or a changed blocker at the same head still re-selects it. A short
+the last marker, during its cooldown; the attempt cap later blocks repeated unchanged work. A
+new commit or a changed blocker at the same head starts a fresh count. A short
 cooldown prevents re-dispatching the same head while an agent's push is still
 landing, and after a fixed number of attempts at one head with the blocker still
 present the poller applies `zai-blocked` instead of dispatching
@@ -93,9 +98,10 @@ label to a pull request when a babysit pass handled review comments but produced
 no new commit on the pull request head. The review-service poller then includes
 that pull request regardless of its always-on head-SHA de-dup and the draft and
 checks skip gates (the claim, blocked, and conflict gates still apply) — so the
-resolved-but-uncommitted feedback loop does not stall. The poller consumes
-the label under its claim before starting the review, so even an interrupted
-run does not force-re-review indefinitely. This too is fixed behavior, not a configurable
+resolved-but-uncommitted feedback loop does not stall. GitHub consumes
+the label under its claim before starting the review; ADO asks the agent to
+remove it after completing the review. Inspect an interrupted ADO run if its
+override tag remains pending. This too is fixed behavior, not a configurable
 gate.
 
 **Tri-state gate rule:** each gate is optional. Omitted means "Default" in the
@@ -126,8 +132,8 @@ bypass required independent approvals, checks, or branch rules (see above).
   configurable gate).
 - **all** — `scope: all` for a service, so it acts on every marker-labeled item
   regardless of who it is assigned to or authored by (for example review all
-  pull requests, or babysit all pull requests). With no gates set it is
-  labels-only.
+  pull requests, or babysit all pull requests). With no optional gates set, fixed lifecycle, claim, mergeability, and
+  de-dup rules still apply.
 
 > **Scale note:** `scope: all` lists every candidate the forge returns before
 > filtering by the marker label. On GitHub the marker is pushed into

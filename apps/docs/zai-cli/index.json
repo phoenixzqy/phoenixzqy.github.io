@@ -2,86 +2,101 @@
   "schemaVersion": 1,
   "appId": "zai-cli",
   "repository": "phoenixzqy/zai-cli",
-  "ref": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
-  "commit": "93bd83af294f34c9e54f45adb9a5e8420c0c8804",
+  "ref": "0c1974ecbba7cbd6c271e7e3e2e6590f10c45f81",
+  "commit": "0c1974ecbba7cbd6c271e7e3e2e6590f10c45f81",
   "documents": [
     {
       "slug": "docs--install-and-config",
       "title": "Install and configure zai",
       "source": "docs/install-and-config.md",
       "file": "docs--install-and-config.md",
-      "bytes": 4964
+      "bytes": 9103
     },
     {
       "slug": "docs--getting-started",
       "title": "Getting started",
       "source": "docs/getting-started.md",
       "file": "docs--getting-started.md",
-      "bytes": 14814
+      "bytes": 15720
+    },
+    {
+      "slug": "docs--gui-servers",
+      "title": "zai servers setup guide",
+      "source": "docs/gui-servers.md",
+      "file": "docs--gui-servers.md",
+      "bytes": 9063
     },
     {
       "slug": "docs--claude-code",
       "title": "Claude Code",
       "source": "docs/claude-code.md",
       "file": "docs--claude-code.md",
-      "bytes": 7107
+      "bytes": 8952
     },
     {
       "slug": "docs--opencode",
       "title": "OpenCode integration",
       "source": "docs/opencode.md",
       "file": "docs--opencode.md",
-      "bytes": 6674
+      "bytes": 7769
     },
     {
       "slug": "docs--services-and-pollers",
       "title": "Services, pollers, and labels",
       "source": "docs/services-and-pollers.md",
       "file": "docs--services-and-pollers.md",
-      "bytes": 4942
+      "bytes": 13569
     },
     {
       "slug": "docs--config",
       "title": "Per-repository configuration",
       "source": "docs/config.md",
       "file": "docs--config.md",
-      "bytes": 7659
+      "bytes": 11411
     },
     {
       "slug": "docs--config--migration-and-backward-compatibility",
       "title": "Migration and backward compatibility",
       "source": "docs/config/migration-and-backward-compatibility.md",
       "file": "docs--config--migration-and-backward-compatibility.md",
-      "bytes": 14156
+      "bytes": 14728
     },
     {
       "slug": "docs--config--poller-filters-and-presets",
       "title": "Poller filters and presets",
       "source": "docs/config/poller-filters-and-presets.md",
       "file": "docs--config--poller-filters-and-presets.md",
-      "bytes": 9425
+      "bytes": 9966
     },
     {
       "slug": "docs--config--project-registry",
       "title": "Project registry and local project config",
       "source": "docs/config/project-registry.md",
       "file": "docs--config--project-registry.md",
-      "bytes": 3124
+      "bytes": 3181
     },
     {
       "slug": "docs--config--samples",
       "title": "Configuration samples",
       "source": "docs/config/samples.md",
       "file": "docs--config--samples.md",
-      "bytes": 5307
+      "bytes": 5364
     },
     {
       "slug": "docs--config--validation-and-boundaries",
       "title": "Validation and boundaries",
       "source": "docs/config/validation-and-boundaries.md",
       "file": "docs--config--validation-and-boundaries.md",
-      "bytes": 7331
+      "bytes": 7584
     }
   ],
-  "assets": []
+  "assets": [
+    "assets/docs--images--pwa-install-menu.png",
+    "assets/docs--images--pwa-install-toast.png",
+    "assets/docs--images--server-session-status--gui-server-status-flyout.png",
+    "assets/docs--screenshots--gui-access--remote-login-dark.png",
+    "assets/docs--screenshots--gui-dev-tunnel--gui-settings.png",
+    "assets/docs--screenshots--gui-session-placement--split-right.png",
+    "assets/docs--screenshots--gui-tunnel-live-settings--servers-rail.png"
+  ]
 }

@@ -30,6 +30,7 @@ Bounds and their rationale:
 | `interval_seconds` (housekeep) | `30`–`604800` | Same 30s floor; capped at 7 days for this low-urgency maintenance pass. |
 | `temp_retention_days` (app settings only) | `1`–`3650` | Defaults to seven days. Zero, negative, fractional and null values are rejected; invalid settings prevent automatic deletion. |
 | `console_scrollback_lines` (app settings; accepted in legacy project files) | `200`–`50000` | Below 200 a pane cannot scroll back past a screenful on a tall terminal; every retained line is live heap for the pane's life, so the cap bounds console memory. |
+| `editor_auto_save_delay_ms` (app settings only) | `1`–`86400000` | Matches the editor API: a positive delay prevents an immediate retry/write loop, and 24 hours bounds duration conversion. Default: 1000 ms after the last edit. |
 | `console_device_status_interval_seconds` (app settings only) | `1`–`300` | A positive interval prevents a busy loop; the default five seconds balances freshness and idle sampling/rendering cost. |
 | `max_total_agents` | `1`–`80` | Zero would stall every service; the ceiling is the theoretical maximum of all five services running their own `agent_limit` ceiling at once, so a configured value can never promise more parallelism than the per-service contract allows. |
 | `agent_limit` | `1`–`16` | Zero would stall the service; each slot spawns a Copilot subprocess, so the cap prevents resource exhaustion. |
@@ -48,7 +49,7 @@ Bounds and their rationale:
 | `work_item_project` (ADO dev) | bare project name or GUID, ≤64 chars; no URL, organization, credentials, controls, or path separators | Keeps the work-item mutation boundary explicit without changing repository/PR scope. |
 | `poller.scope` | `assigned` \| `authored` \| `all` | Enum enforced (see above). |
 
-Booleans (`console_yolo`, `console_device_status`, `notifications_enabled`) and the
+Booleans (`console_yolo`, `console_device_status`, `editor_auto_save`, `notifications_enabled`) and the
 tri-state poller gates (`include_drafts`, `require_checks_passing`) are
 intentionally unbounded: every value they can hold is valid.
 
