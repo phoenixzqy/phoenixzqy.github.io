@@ -1,10 +1,111 @@
 {
-  "schemaVersion": 1,
   "appId": "zai-cli",
   "release": {
-    "version": "0.1.1112",
+    "assets": [
+      {
+        "architecture": "x64",
+        "bytes": 64845978,
+        "file": "zai-cli-0.1.1124-linux-amd64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI Linux x64",
+          "zh-CN": "zai CLI Linux x64"
+        },
+        "platform": "linux",
+        "sha256": "f94340e701380a57e66e18edac066543ddac259ed17a7b44cee56def0753c886",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-linux-amd64.zip"
+      },
+      {
+        "architecture": "arm64",
+        "bytes": 60657367,
+        "file": "zai-cli-0.1.1124-linux-arm64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI Linux arm64",
+          "zh-CN": "zai CLI Linux arm64"
+        },
+        "platform": "linux",
+        "sha256": "9129d317bac0b23fbefa7c24832e9bd8334092b5d3317caf9a9097ed4260f077",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-linux-arm64.zip"
+      },
+      {
+        "architecture": "x64",
+        "bytes": 63404651,
+        "file": "zai-cli-0.1.1124-darwin-amd64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI macOS x64",
+          "zh-CN": "zai CLI macOS x64"
+        },
+        "platform": "macos",
+        "sha256": "b36321f6614b027efc20b7eadfed037c55b9b7750d3a5df72fe2f77680bfde27",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-darwin-amd64.zip"
+      },
+      {
+        "architecture": "arm64",
+        "bytes": 60464501,
+        "file": "zai-cli-0.1.1124-darwin-arm64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI macOS arm64",
+          "zh-CN": "zai CLI macOS arm64"
+        },
+        "platform": "macos",
+        "sha256": "9c9f789748894efdc17ad67f2eaff9da831db7c250c0f4985998d6ca186358fb",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-darwin-arm64.zip"
+      },
+      {
+        "architecture": "x64",
+        "bytes": 65777815,
+        "file": "zai-cli-0.1.1124-windows-amd64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI Windows x64",
+          "zh-CN": "zai CLI Windows x64"
+        },
+        "platform": "windows",
+        "sha256": "1d723c42e52a466c3e6927a5ffc00ebed35dae1930ef67e84d777869bc5c479e",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-windows-amd64.zip"
+      },
+      {
+        "architecture": "arm64",
+        "bytes": 61094591,
+        "file": "zai-cli-0.1.1124-windows-arm64.zip",
+        "installNotes": {
+          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
+          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
+        },
+        "name": {
+          "en": "zai CLI Windows arm64",
+          "zh-CN": "zai CLI Windows arm64"
+        },
+        "platform": "windows",
+        "sha256": "eb673d0834929d8fcc02997df7a2de9c53dd60d0dbca5c6d55d4a3496ccdf9b5",
+        "signing": "unsigned",
+        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1124/zai-cli-0.1.1124-windows-arm64.zip"
+      }
+    ],
     "channel": "preview",
-    "publishedAt": "2026-11-08T19:19:35Z",
     "notes": [
       {
         "en": "Cross-compiled zai CLI and browser GUI packages built from one pinned source revision.",
@@ -19,109 +120,8 @@
         "zh-CN": "所有压缩包均未签名；请核对下载页显示的 SHA-256 校验值。"
       }
     ],
-    "assets": [
-      {
-        "name": {
-          "en": "zai CLI Linux x64",
-          "zh-CN": "zai CLI Linux x64"
-        },
-        "platform": "linux",
-        "architecture": "x64",
-        "file": "zai-cli-0.1.1112-linux-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-linux-amd64.zip",
-        "bytes": 64809207,
-        "sha256": "435e4c85ce91b9c188820f1c5df952be84e89f832afb609ba88daac77f8c7a93",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      },
-      {
-        "name": {
-          "en": "zai CLI Linux arm64",
-          "zh-CN": "zai CLI Linux arm64"
-        },
-        "platform": "linux",
-        "architecture": "arm64",
-        "file": "zai-cli-0.1.1112-linux-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-linux-arm64.zip",
-        "bytes": 60621786,
-        "sha256": "d449df2e7a87b69b914e6303ac957517397acadfb1e37612e7fbcd8dbfc41195",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      },
-      {
-        "name": {
-          "en": "zai CLI macOS x64",
-          "zh-CN": "zai CLI macOS x64"
-        },
-        "platform": "macos",
-        "architecture": "x64",
-        "file": "zai-cli-0.1.1112-darwin-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-darwin-amd64.zip",
-        "bytes": 63367870,
-        "sha256": "58c1aa177026aee27672fee6f63f0e61240ce8ee616328e5e2215497e40ee5a2",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      },
-      {
-        "name": {
-          "en": "zai CLI macOS arm64",
-          "zh-CN": "zai CLI macOS arm64"
-        },
-        "platform": "macos",
-        "architecture": "arm64",
-        "file": "zai-cli-0.1.1112-darwin-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-darwin-arm64.zip",
-        "bytes": 60435259,
-        "sha256": "72097b57f089bda7f129954c50c1d5f34f96c29b3faf11b330301720a73cb7d7",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      },
-      {
-        "name": {
-          "en": "zai CLI Windows x64",
-          "zh-CN": "zai CLI Windows x64"
-        },
-        "platform": "windows",
-        "architecture": "x64",
-        "file": "zai-cli-0.1.1112-windows-amd64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-windows-amd64.zip",
-        "bytes": 65732865,
-        "sha256": "7205daa5ad1813e9940d5f3e0a1ff2cbf09dcd67beba5a7db951787017633479",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      },
-      {
-        "name": {
-          "en": "zai CLI Windows arm64",
-          "zh-CN": "zai CLI Windows arm64"
-        },
-        "platform": "windows",
-        "architecture": "arm64",
-        "file": "zai-cli-0.1.1112-windows-arm64.zip",
-        "url": "https://github.com/phoenixzqy/phoenixzqy.github.io/releases/download/zai-cli-v0.1.1112/zai-cli-0.1.1112-windows-arm64.zip",
-        "bytes": 61059113,
-        "sha256": "0db386320f7bb99e1cc946b67a2203ee27ed5b9af2afe08d7fdd1cad4c901cdd",
-        "signing": "unsigned",
-        "installNotes": {
-          "en": "Unsigned build. Install with the one-line installer, which verifies this archive's SHA-256. To install manually, extract the whole archive and run 'python3 install.py' ('python install.py' on Windows) from the extracted folder. Python 3.10 or newer is required to install; install your coding-agent CLI separately before using it with zai. The browser GUI is included; use a modern browser and run zai gui stop before external updates.",
-          "zh-CN": "未签名的构建。建议使用一行安装命令，它会校验该压缩包的 SHA-256。如需手动安装，请完整解压后在解压目录运行 “python3 install.py”（Windows 上为 “python install.py”）。安装需要 Python 3.10 及以上；请另行安装所需的编程代理 CLI。内含浏览器界面；需要现代浏览器，外部更新前请运行 zai gui stop。"
-        }
-      }
-    ]
-  }
+    "publishedAt": "2026-11-09T05:21:16Z",
+    "version": "0.1.1124"
+  },
+  "schemaVersion": 1
 }
