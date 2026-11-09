@@ -29,8 +29,9 @@ The default (or explicit `--dry-run`) checks for unpublished updates without
 building or writing to GitHub. `--dry-run` cannot be combined with `--publish`.
 `--publish` authorizes builds, public release assets and website pushes. `--force`
 requires explicit `--apps` and allocates a new version even if already current.
-`--skip-tests` skips the Go source gates, BPlayer's release workflow unit tests,
-and the website pre-push test suite for that invocation. It retains package
+`--skip-tests` skips the Go source gates, zai-cli's frontend and desktop Go
+tests, BPlayer's release workflow unit tests, and the website pre-push test
+suite for that invocation. It retains package
 verification, `npm run validate:apps`, public download checks and Pages verification.
 Normal invocations still run the tests.
 
@@ -55,10 +56,10 @@ For the Go apps, the source's full local validation runs before building unless
 `--skip-tests` is selected. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
-For zai-cli, the adapter installs the locked frontend dependencies with
-`npm ci --no-audit --no-fund` in `src/web-ui` before building. Without
-`--skip-tests`, it
-creates `.venv-local-ci` in the disposable source clone,
+For zai-cli, the frontend packager installs the locked dependencies with
+`npm ci --no-audit --no-fund` in `src/web-ui` and builds production assets. The
+adapter also installs them before source validation when tests are enabled.
+Without `--skip-tests`, it creates `.venv-local-ci` in the disposable source clone,
 installs its pinned performance-toolkit requirements, and runs the gate with
 that environment's Python. This keeps validation dependencies available when
 tests isolate HOME/USERPROFILE. Python must support `venv` and `pip`, with access

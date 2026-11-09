@@ -64,7 +64,7 @@ def build(runtime, source, snapshot, version, output, site, notices, *, run_test
         runtime.stage = f'{name}:validation' if run_tests else f'{name}:build'
         if run_tests:
             interpreter = validation_python(runtime, source, name)
-        if name == 'zai-cli':
+        if name == 'zai-cli' and run_tests:
             runtime.run(['npm', 'ci', '--no-audit', '--no-fund'], cwd=source / 'src/web-ui')
         if run_tests:
             runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
@@ -97,6 +97,8 @@ def build(runtime, source, snapshot, version, output, site, notices, *, run_test
         args = [sys.executable, '-B', f'{prefix}scripts/release_build.py', '--version', version, '--output', output]
         if name == 'zai-cli':
             args += ['--locked-tools', '--require-desktop']
+            if not run_tests:
+                args.append('--skip-tests')
         runtime.run(args, cwd=source)
         args = [sys.executable, '-B', f'{prefix}scripts/release_manifest.py', '--version', version,
                 '--tag', f'{name}-v{version}', '--dir', output, '--output', manifest]
