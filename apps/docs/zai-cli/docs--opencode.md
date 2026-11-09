@@ -8,6 +8,14 @@ npm package is installed only when missing; an existing executable is
 version-checked, not replaced. Node.js/npm is needed for this installation
 route. You can also use OpenCode's official native installation.
 
+zai executes the installed public `opencode` command from its inherited `PATH`,
+not a guessed package-internal binary. Windows `.cmd`/`.bat` launchers run
+through `cmd.exe` with escaped literal arguments; native executables and Unix
+scripts run directly. Shell aliases/functions are not executable discovery.
+Restart zai after installing the CLI or updating `PATH`. Missing commands
+explicitly name `opencode`; detection errors, startup failures, unsuccessful
+exits, and timeouts are distinguished rather than all being reported as missing.
+
 ## Configuration and authentication
 
 Set `"coding_agent": "opencode"` in project configuration. The alias `"oc"`
@@ -17,7 +25,7 @@ Restart services and reopen the console after changing the selected provider.
 OpenCode's native model picker shows the locally available catalog; catalog
 membership does not prove your account is entitled to use a model.
 
-The managed home is `~/.zai/.opencode`. Native configuration, credentials,
+The managed home is `~/.zai/profiles/anonymous/.opencode`. Native configuration, credentials,
 session database, state, and cache remain inside it. OpenCode and XDG path
 variables are scoped only to the child. Personal OpenCode state is never copied
 or modified. Use `/connect` inside the hosted OpenCode session to authenticate
@@ -35,6 +43,14 @@ sessions. Provider credentials, private prompts, and complete environments are
 not copied into diagnostic logs.
 
 ## Workflow compatibility
+
+Only files owned by the installer are imported from the Copilot home. Custom
+skills, agents, instructions, and support files remain specific to the home
+where you install them. Historical copies of custom additions are preserved
+and released from managed ownership; they no longer block resource refresh.
+Use repository-owned resources or install custom resources separately in each
+provider home to share them. A missing or malformed installation ownership
+manifest requires repairing the installation before a provider can launch.
 
 | Surface | OpenCode behavior |
 | --- | --- |

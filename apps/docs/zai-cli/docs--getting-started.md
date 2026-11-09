@@ -1,5 +1,11 @@
 # Getting started
 
+See anonymous profile storage for data ownership.
+Persistent local data belongs exclusively to `<installation-home>/profiles/anonymous`.
+Old installation-root data and migration journals are ignored during launch and
+installation. An absent anonymous profile starts fresh; existing profile data is
+retained on updates.
+
 Documentation index
 
 This guide installs zai, explains its two run modes and shared themes, and
@@ -34,8 +40,7 @@ touching files in your current directory. Open a new terminal afterwards to pick
 up the persistent `PATH` change. `ZAI_INSTALL_DIR` chooses another destination
 and any extra arguments are forwarded to the package installer.
 
-Packages are pre-built, so no source clone or Go toolchain is required. Install
-Python 3.10 or newer on PATH before running the installer. The bootstrap probes
+Install Python 3.10 or newer on PATH before running the package installer. The bootstrap probes
 for a working interpreter before downloading the release and stops with setup
 instructions if none meets the minimum version. macOS/Linux also need `curl`
 for the one-line command and `sha256sum` or `shasum` for verification; ZIP
@@ -46,12 +51,7 @@ OpenCode CLIs when missing; other providers must already be installed.
 - App page: <https://phoenixzqy.github.io/apps/app/?id=zai-cli>
 - All releases and checksums: <https://phoenixzqy.github.io/apps/releases/?id=zai-cli>
 
-Each published release carries a human-readable changelog in its GitHub Release
-body — the merged changes, PR and compare links, and source provenance. The
-Release notes are the canonical changelog; see
-`docs/version-management.md`.
-How releases are built and published is documented in
-`releases.md`.
+Read release details and checksums on the [releases page](https://phoenixzqy.github.io/apps/releases/?id=zai-cli).
 
 ### Repository setup
 
@@ -62,7 +62,7 @@ Follow [Install and configure zai](?id=zai-cli&doc=docs--install-and-config#conf
 Console activity icons are built in, with automatic readable text fallback when
 terminal images are unavailable. No font setup is required.
 
-The bundled Python installer creates `~/.zai` and installs `zai`, `zai-hook`, `zai-editor` and `zai-gitter` executables, and package-owned files there. It installs one Copilot home, `~/.zai/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it replaces unchanged package-owned files while handling locally edited prompts through the conflict policy described below. Upgrading from a release with a separate `~/.zai/.copilot-console` prunes that home's unchanged packaged files; anything left there is inert and can be deleted. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai exposes `zai`, `zai-editor`, and `zai-gitter` on PATH; each tool
+The bundled Python installer creates `~/.zai` and installs `zai`, `zai-hook`, `zai-editor` and `zai-gitter` executables, and package-owned files there. It installs one Copilot home, `~/.zai/profiles/anonymous/.copilot`, as a fresh, isolated, package-owned tree shared by service runs and the console. It never copies or merges your `~/.copilot` into it, and on reinstall or upgrade it replaces unchanged package-owned files while handling locally edited prompts through the conflict policy described below. Old installation-root agent homes are ignored and left untouched. It does not read, delete, or mutate your original `~/.copilot` directory. Installing zai exposes `zai`, `zai-editor`, and `zai-gitter` on PATH; each tool
 can also run independently. Installing either tool separately exposes only its
 own command. Installing zai does not require a coding-agent CLI.
 
@@ -71,7 +71,7 @@ The installer also adds the install directory to your persistent user `PATH`
 run `zai` directly in new terminals. This is idempotent across reinstalls. Open
 a new terminal or restart/source your shell profile to pick up the change.
 
-You may edit the packaged prompt files (the agents and skills under `~/.zai/.copilot`) in place. The installer records a checksum manifest of every file it writes, so on upgrade it replaces unchanged files silently but detects any prompt you modified. When a modified file also changed upstream, it shows an interactive prompt to **back up & install new**, **keep mine**, **overwrite without backup**, or **abort** (with an "apply to all" shortcut). Backups are written under `~/.zai/backups/<timestamp>/`. Non-interactive runs default to keeping your edits; use `--on-conflict` to force a policy.
+You may edit the packaged prompt files (the agents and skills under `~/.zai/profiles/anonymous/.copilot`) in place. The installer records a checksum manifest of every file it writes, so on upgrade it replaces unchanged files silently but detects any prompt you modified. When a modified file also changed upstream, it shows an interactive prompt to **back up & install new**, **keep mine**, **overwrite without backup**, or **abort** (with an "apply to all" shortcut). Backups are written under `~/.zai/profiles/anonymous/backups/<timestamp>/`. Non-interactive runs default to keeping your edits; use `--on-conflict` to force a policy.
 
 ### Updating
 
@@ -82,6 +82,11 @@ zai update
 ```
 
 The command always uses the published release source without a source-selection prompt. Extra arguments are forwarded to the installer (for example `zai update --on-conflict backup`). The console update action asks for confirmation before closing and restarting sessions.
+
+Public release packages include the CLI, terminal tools and browser GUI. Run
+`zai gui` to open the caller's workspace in a modern browser. Closing the tab
+keeps its server and panes running; use `zai gui stop` before an external update
+or uninstall. Completely close the TUI, including a detached console, before updating.
 
 
 ## Uninstall and remove local data
@@ -100,13 +105,13 @@ Windows PowerShell:
 irm https://phoenixzqy.github.io/uninstall/zai-cli.ps1 | iex
 ```
 
-For a local script, download [zai-cli.py](https://phoenixzqy.github.io/uninstall/zai-cli.py) and run `python zai-cli.py --dry-run` to preview. Remove `--dry-run` to uninstall; pass `--install-dir /absolute/install/directory` for a custom installation. The Python, shell, and PowerShell scripts contain the same standalone cleanup implementation and do not fetch more code. Matching scripts also live in the source checkout; see its README for their location.
+For a local script, download [zai-cli.py](https://phoenixzqy.github.io/uninstall/zai-cli.py) and run `python zai-cli.py --dry-run` to preview. Remove `--dry-run` to uninstall; pass `--install-dir /absolute/install/directory` for a custom installation. The Python, shell, and PowerShell scripts contain the same standalone cleanup implementation and do not fetch more code.
 
 For hosted commands, set `ZAI_UNINSTALL_DRY_RUN=1` to preview or `ZAI_INSTALL_DIR` to select the absolute install directory before running the command. Shared theme cleanup respects `ZAI_THEME_CONFIG`. Editor cleanup also respects `ZAI_EDITOR_LSP_HOME` and `ZAI_EDITOR_PREVIEW_HOME`. Custom locations must be supplied again if they differ from their defaults.
 
 For zai-cli outside the default `~/.zai` directory, an executable or installation manifest does not establish ownership of adjacent runtime data. If any cleanup target such as `backups`, `configs`, or `logs` exists, the uninstaller refuses before changing files or PATH. Review those paths' ownership manually; binary-only custom installations remain supported. A recovery marker does not override this safety check.
 
-The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
+The uninstaller removes this app’s executable, licenses, app settings, and local data. It preserves sibling applications, Git worktrees, project files, independently installed coding agents and their normal homes, and unrelated files. The shared install directory remains on PATH while another executable needs it. On Windows, this includes `.com`, `.exe`, `.cmd`, `.bat`, and configured `PATHEXT` commands in both persistent and PowerShell-session PATH; ordinary data files do not retain PATH. Otherwise it removes the installer’s exact PATH lines from common shell profiles or the matching Windows user PATH entry. Manually authored shell PATH configuration remains yours to update. Open a new terminal afterwards; a piped shell script cannot change its parent shell’s environment. Failures report the affected path and return nonzero; correct the problem and rerun. A recovery marker remains after partial cleanup. The shared `releases/install.lock` is retained to coordinate future installations without replacing a lock another installer may hold.
 
 zai cleanup includes its packaged and derived agent homes, configs, service state, runs, logs, backups, legacy private editor/viewer companions, and installer metadata. Standalone editor and viewer installations and their data remain. Git worktrees and their registry are retained because they contain project work.
 
@@ -118,11 +123,11 @@ Both modes are implemented. **Service mode** runs an automated poller+agent loop
 |---|---|---|
 | Command | `zai start <all\|service>` | `zai` from any folder; choose agents from the app picker |
 | Who drives | A repo-scoped daemon runs the selected deterministic service pollers; matching service agents act on selected items within configured limits | A human, live inside the console TUI multiplexer |
-| Copilot home | `~/.zai/.copilot` | `~/.zai/.copilot` (the same home) |
-| Pi home | `~/.zai/.pi`, launched with `--no-extensions` | `~/.zai/.pi` (the same home), loading the extensions of the Pi packages inherited from `~/.pi/agent` |
-| Codex home | `~/.zai/.codex`, unattended full-access mode | `~/.zai/.codex` (the same home), normal interactive approvals unless console YOLO is enabled |
-| Claude home | `~/.zai/.claude`, unattended print mode | `~/.zai/.claude` (the same home), normal interactive approvals unless console YOLO is enabled |
-| OpenCode home | `~/.zai/.opencode`, unattended JSON run mode | `~/.zai/.opencode` (the same home), normal interactive approvals unless console YOLO is enabled |
+| Copilot home | `~/.zai/profiles/anonymous/.copilot` | `~/.zai/profiles/anonymous/.copilot` (the same home) |
+| Pi home | `~/.zai/profiles/anonymous/.pi`, launched with `--no-extensions` | `~/.zai/profiles/anonymous/.pi` (the same home), loading the extensions of the Pi packages inherited from `~/.pi/agent` |
+| Codex home | `~/.zai/profiles/anonymous/.codex`, unattended full-access mode | `~/.zai/profiles/anonymous/.codex` (the same home), normal interactive approvals unless console YOLO is enabled |
+| Claude home | `~/.zai/profiles/anonymous/.claude`, unattended print mode | `~/.zai/profiles/anonymous/.claude` (the same home), normal interactive approvals unless console YOLO is enabled |
+| OpenCode home | `~/.zai/profiles/anonymous/.opencode`, unattended JSON run mode | `~/.zai/profiles/anonymous/.opencode` (the same home), normal interactive approvals unless console YOLO is enabled |
 | Copilot agent | launched per selected item with `--agent <service>-agent --autopilot --yolo -p <prompt>` | plain/default interactive copilot in each TUI tab or split pane (no service agent auto-launched) |
 | Scope | every packaged agent and skill | every packaged agent and skill |
 
@@ -134,9 +139,9 @@ Shared invariant for both modes: provider home variables are set only in the spa
 
 ### Themes and settings
 
-The console, `zai-editor`, and `zai-gitter` share one theme file, `~/.zai/theme.json` (`$ZAI_THEME_CONFIG` overrides the location). Until you pick a theme, the console and native Diff Review rail use Kanagawa Wave dark on any terminal background; the editor uses One Dark and follows the terminal background. Git viewer tabs follow the installed `zai-gitter` companion's default. Every app paints its whole screen with the theme's own colors, so light themes look right on dark terminals and vice versa.
+The console, `zai-editor`, and `zai-gitter` share one theme file, `~/.zai/profiles/anonymous/theme.json` (`$ZAI_THEME_CONFIG` overrides the location). Until you pick a theme, the console and native Diff Review rail use Kanagawa Wave dark on any terminal background; the editor uses Kanagawa Wave dark too. Git viewer tabs follow the installed `zai-gitter` companion's default. Every app paints its whole screen with the theme's own colors, so light themes look right on dark terminals and vice versa.
 
-Open **Settings** from the right activity bar or Right Rail menu to choose:
+Open **Settings** from the left activity bar or Left Rail menu to choose:
 
 | Row | Applies to |
 | --- | --- |
@@ -144,7 +149,9 @@ Open **Settings** from the right activity bar or Right Rail menu to choose:
 | Editor theme | The editor rail and tabs, and the embedded config editor |
 | Git viewer theme | The native diff rail and gitter tabs |
 
-Pick from built-in themes such as Tokyo Night, Catppuccin, Gruvbox, Dracula, Nord, Rosé Pine, Kanagawa, and One Dark (families follow the terminal background). With no explicit selection, the console and native Diff Review rail use Kanagawa Wave dark even on a light terminal; the editor keeps its background-following One Dark default. **Reset to default** (`r`) restores those defaults; Git viewer tabs follow the installed companion's default (earlier `zai`, `zai-dark` and `zai-light` choices keep working as One Dark). Explicit app and shared selections remain selected. Saved changes, including hand edits to the file, apply to running apps immediately. `$ZAI_THEME` overrides every app for one launch, and a broken file never blocks startup: the apps fall back to the defaults and warn. `zai config update` and the Service Monitor page use the console theme. Inside zai, zai owns the tools' settings: editor tabs, the editor rail and gitter tabs launch with `ZAI_SETTINGS_HOST=zai`, so they hide their own F2 Settings (F2 points here instead), while still restyling live when you change the **Editor theme** or **Git viewer theme** row. See [theming](https://github.com/phoenixzqy/zai-design-system/blob/main/docs/theming.md) for the file format and custom themes.
+Pick from built-in themes such as Tokyo Night, Catppuccin, Gruvbox, Dracula, Nord, Rosé Pine, Kanagawa, and One Dark (families follow the terminal background). With no explicit selection, the console and native Diff Review rail use Kanagawa Wave dark even on a light terminal; the editor defaults to Kanagawa Wave dark too. **Reset to default** (`r`) restores those defaults; Git viewer tabs follow the installed companion's default (earlier `zai`, `zai-dark` and `zai-light` choices keep working as One Dark). Explicit app and shared selections remain selected. Saved changes, including hand edits to the file, apply to running apps immediately. `$ZAI_THEME` overrides every app for one launch, and a broken file never blocks startup: the apps fall back to the defaults and warn. `zai config update` and the Service Monitor page use the console theme. Inside zai, zai owns the tools' settings: editor tabs, the editor rail and gitter tabs launch with `ZAI_SETTINGS_HOST=zai`, so they hide their own F2 Settings (F2 points here instead), while still restyling live when you change the **Editor theme** or **Git viewer theme** row. Use the Settings pickers to preview and save a theme; run `zai doc` for settings, overrides, and reload behavior.
+
+For app-wide YOLO, scrollback, editor auto-save, device status, shortcuts, and temporary retention, see App settings. Project configuration and scheduled tasks remain separate.
 
 ## Command reference
 
@@ -160,8 +167,9 @@ Installed help is the source of truth: run `zai -h` for the summary,
 | `zai repo-harness <eval\|eval-and-fix>` | Score a repository's docs, AI instructions/skills, and test-coverage readiness in an HTML report; `eval-and-fix` also fixes the issues found. |
 | `zai doctor` | Check package layout and the configured coding agent's CLI availability. |
 | `zai update` | Download the latest release and reinstall. |
+| `zai gui [status\|stop]` | Open the browser GUI, inspect its server or stop it. |
 | `zai version` / `zai doc` | Print the version, or detailed workflows and help pointers. |
-| `zai poller:item` / `zai poller:pr` / `zai poller:pr-babysitter` | Run one round of a service poller for testing. |
+| `zai poller:item` / `zai poller:pr` / `zai poller:pr-babysitter` | Run a real selection/claim round without launching an agent; not a read-only dry run. |
 | `zai agent:run <service>` | Invoke one configured service agent for testing; item services need `--url`. |
 | `zai review:validate-comments` | Validate proposed review findings against changed diff lines. |
 | `zai worktree <claim\|release\|cleanup>` | Internal: shared worktree claims used by agent sessions. |

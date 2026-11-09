@@ -95,11 +95,16 @@ test("mirrored links point at the viewer or lose their link entirely", () => {
   for (const source of sources.apps) {
     const mirror = JSON.parse(readFileSync(join(root, "apps/docs", source.appId, "index.json"), "utf8"));
     const slugs = new Set(mirror.documents.map((document_) => document_.slug));
+    const assets = new Set(mirror.assets ?? []);
     for (const document_ of mirror.documents) {
       const text = readFileSync(join(root, "apps/docs", source.appId, document_.file), "utf8");
-      for (const match of text.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
-        const target = match[1];
+      for (const match of text.matchAll(/(!?)\[[^\]]*\]\(([^)\s]+)\)/g)) {
+        const [, image, target] = match;
         if (/^(https?:|mailto:|#)/.test(target)) continue;
+        if (image && assets.has(target)) {
+          assert.ok(existsSync(join(root, "apps/docs", source.appId, target)), `${target} is a mirrored image`);
+          continue;
+        }
         assert.match(target, /^\?id=/, `${source.appId}/${document_.file} links to ${target}`);
         const params = new URLSearchParams(target.slice(1).split("#")[0]);
         assert.equal(params.get("id"), source.appId);
@@ -141,6 +146,10 @@ test("validation rejects a half-finished or stale documentation mirror", async (
     await assert.rejects(validateSite(site), /documentation files are missing/);
     for (const document_ of mirror.documents) {
       await writeFile(join(site, "apps/docs", entry.id, document_.file), "# Test fixture\n");
+    }
+    if (mirror.assets?.length) await mkdir(join(site, "apps/docs", entry.id, "assets"), { recursive: true });
+    for (const asset of mirror.assets ?? []) {
+      await writeFile(join(site, "apps/docs", entry.id, asset), "");
     }
     assert.equal((await validateSite(site)).documents, mirror.documents.length);
     await writeFile(join(site, "apps/docs", entry.id, "stale.md"), "# Removed upstream\n");

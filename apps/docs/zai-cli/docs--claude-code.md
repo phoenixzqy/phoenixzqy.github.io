@@ -13,7 +13,21 @@ original installation method. Selecting Claude Code offers the missing CLI's
 installation path. Authentication can require a browser and an eligible Claude
 account; signing into Copilot does not authenticate Claude.
 
-The managed home is `<zai-install>/.claude` (normally `~/.zai/.claude`).
+zai uses the installed public `claude` command found on its inherited `PATH`,
+including native installations and npm's Windows `.cmd` launcher. It does not
+guess paths inside the package or bypass its launcher. Native executables and
+Unix scripts run directly; Windows batch launchers use `cmd.exe` with escaped
+literal arguments. Shell aliases, functions, and profile-only PATH changes are
+not loaded. Restart zai after changing `PATH`.
+
+The npm installation route runs Claude's required postinstall scripts. A missing
+command reports `claude is not installed or was not found on PATH`. A command
+that is found but cannot start is reported as a broken installation or missing
+runtime/platform dependency, not as an absent CLI. Version-check failures and
+timeouts are distinct. Repair a broken installation with its original installer;
+zai does not silently select another installation or replace an existing one.
+
+The managed home is `<zai-install>/.claude` (normally `~/.zai/profiles/anonymous/.claude`).
 `CLAUDE_CONFIG_DIR` is set only on child processes. Personal `~/.claude`
 credentials, trust decisions, settings, and history are never copied or changed.
 Existing provider API environment variables are inherited.
@@ -56,7 +70,21 @@ successful process exit. A zero exit, truncated output, or a success event
 followed by failure is not completion. Shared final-comment and review-vote
 validation remains authoritative; a review Stop hook can request a repair turn.
 
+Teams background turns resolve creation separately from delivery success. A
+retry creates the conversation if no native transcript exists, or resumes its
+validated session and working directory when one does. The first captured
+evidence stays unchanged; later attempts use temporary evidence through stream
+and process validation, then remove it with their resource snapshot.
+
 ## Instructions, skills, and agents
+
+Only files owned by the installer are imported from the Copilot home. Custom
+skills, agents, instructions, and support files remain specific to the home
+where you install them. Historical copies of custom additions are preserved
+and released from managed ownership; they no longer block resource refresh.
+Use repository-owned resources or install custom resources separately in each
+provider home to share them. A missing or malformed installation ownership
+manifest requires repairing the installation before a provider can launch.
 
 The packaged runtime's reusable agents, skills, tools, schemas, and global
 instructions are translated into the managed Claude home. The source remains

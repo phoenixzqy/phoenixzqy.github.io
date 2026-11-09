@@ -45,7 +45,7 @@ no schema-version bump or rewrite. An existing directory containing only
 `default`. Named profile files are normalized and migrated independently the
 first time each one is loaded.
 
-The project registry is seeded once when `~/.zai/projects.json` is missing.
+The project registry is seeded once when `~/.zai/profiles/anonymous/projects.json` is missing.
 Existing service history contributes forge projects with known checkout paths;
 existing forge config directories contribute projects whose location is bound
 later when a matching checkout is opened. This migration does not rewrite
@@ -221,6 +221,14 @@ profile saves and live reloads. This fourth task runs deterministic, install-wid
 14-day diagnostic/session-log cleanup before any selected agent duties; selecting
 only this task does not launch an AI agent. Existing automatic retention budgets
 remain independent.
+
+Schema version 27 adds `services.housekeep.cleanup_stale_sessions`, defaulting
+to false. Existing installations never opt into full session deletion during
+migration. TUI and GUI Project Config expose the same checkbox. Explicit choices
+survive normalization, profile saves and live reloads. This fifth task is an
+agent duty with a fixed seven-day last-activity cutoff across the installation's
+managed agent homes; `cleanup_logs` retains its independent 14-day log-only
+behavior. All tasks off and managed-worktree maintenance retain their contracts.
 
 The change is also backward compatible: a newer file read by an older build is
 not considered outdated, so the old build never rewrites or downgrades it, and Go

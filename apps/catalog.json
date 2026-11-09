@@ -198,21 +198,33 @@
         "zh-CN": "开发者工具"
       },
       "tagline": {
-        "en": "Coding agents, an editor, and Git review in one terminal.",
-        "zh-CN": "在一个终端中使用编码代理、编辑器与 Git 审阅。"
+        "en": "Coding agents, an editor, and Git review — in your terminal, browser, or phone.",
+        "zh-CN": "在终端、浏览器或手机中使用编码代理、编辑器与 Git 审阅。"
       },
       "summary": {
-        "en": "Coding agents, an editor, Git review, and delivery services in one terminal workspace, with a persistent console server available from v0.1.394.",
-        "zh-CN": "在一个终端工作空间中运行编码代理、编辑器、Git 审阅与交付服务，v0.1.394 起提供持久控制台服务。"
+        "en": "One workspace for many coding agents: a terminal UI and a browser GUI with an editor, Git review, a Teams chatroom for agents, delivery services, and secure remote access from any device.",
+        "zh-CN": "一个承载多个编码代理的工作空间：终端界面与浏览器 GUI，内置编辑器、Git 审阅、代理 Teams 聊天室、交付服务，并可从任意设备安全远程访问。"
       },
       "description": [
         {
-          "en": "The whole workspace is a terminal UI, so it runs over plain SSH, inside tmux, and on headless machines without a desktop client. Projects hold tabs and split panes for coding agents, shells, the bundled editor, and the bundled Git viewer.",
-          "zh-CN": "整个工作空间都是终端界面，因此可以直接在 SSH、tmux 和无图形界面的机器上运行，无需桌面客户端。项目内可以打开标签页和分屏，用于编码代理、终端、内置编辑器和内置 Git 查看器。"
+          "en": "Use the same workspace as a terminal UI — over plain SSH, inside tmux, and on headless machines — or as a browser GUI. Projects hold tabs and split panes for coding agents, shells, the bundled editor, and the bundled Git viewer.",
+          "zh-CN": "同一个工作空间既可作为终端界面使用（支持 SSH、tmux 和无图形界面的机器），也可作为浏览器 GUI 使用。项目内可以打开标签页和分屏，用于编码代理、终端、内置编辑器和内置 Git 查看器。"
         },
         {
           "en": "From v0.1.394, a local console server keeps agents, shells, tabs, splits, and activated automation schedules running after detach or client closure, with reattachment on the same host and runtime home. Live processes require the host to stay awake and the server running; a server or machine restart ends them. Close completely stops the console-owned processes.",
           "zh-CN": "从 v0.1.394 起，本地控制台服务在分离连接或关闭客户端后保持代理、终端、标签页、分屏与已激活的自动化计划运行，并支持在同一主机上使用相同的运行目录重新连接。保留原有进程需要主机保持唤醒且服务持续运行；服务或机器重启将终止这些进程。Close completely 会停止控制台所属的进程。"
+        },
+        {
+          "en": "Run zai gui to open the workspace in any modern browser or as an installable web app. The GUI hosts the same projects, agent panes, editor, Diff Review, Teams, and services as the terminal UI, with native pages for configuration, automations, service monitoring, usage, and settings. Closing the tab keeps the server and its panes running.",
+          "zh-CN": "运行 zai gui 即可在任意现代浏览器中打开工作空间，也可以安装为 Web 应用。GUI 承载与终端界面相同的项目、代理分屏、编辑器、Diff Review、Teams 与服务，并为配置、自动化、服务监控、用量和设置提供原生页面。关闭标签页后，服务及其分屏仍会继续运行。"
+        },
+        {
+          "en": "zai gui --tunnel publishes the GUI through a password-protected Microsoft Dev Tunnel while the server keeps listening only on 127.0.0.1, so you can check on agents from another computer or a phone. A Home GUI can switch between up to 32 of your zai servers from its Servers rail. There is no native mobile app; phones use the browser or an installed web app.",
+          "zh-CN": "zai gui --tunnel 通过受密码保护的 Microsoft Dev Tunnel 发布 GUI，而服务仍只监听 127.0.0.1，因此可以从另一台电脑或手机查看代理。Home GUI 可在 Servers 侧栏中切换最多 32 台你的 zai 服务器。zai 没有原生移动应用，手机通过浏览器或已安装的 Web 应用访问。"
+        },
+        {
+          "en": "Teams turns coding-agent sessions from any project into chat members with @handles. Humans and agents share chats with mentions, reply threads, search, and attachments, and agents coordinate in a linked agent room with a Pause handoffs control to stop loops.",
+          "zh-CN": "Teams 将任意项目中的编码代理会话变成带 @ 名称的聊天成员。人与代理在聊天中使用提及、回复线程、搜索与附件，代理还可以在关联的代理房间中协作，并可通过 Pause handoffs 停止循环交接。"
         },
         {
           "en": "Every agent session shows a live status mark — running, waiting for you, or done — that rolls up from the pane to the tab, worktree, and project, so one waiting agent in a background project still flags that project. Updates are event-driven rather than polled.",
@@ -242,6 +254,32 @@
       },
       "screenshots": [
         {
+          "src": "/apps/media/zai-cli/zai-cli-gui-split-panes.webp",
+          "alt": {
+            "en": "The zai browser GUI with a coding-agent session split to the right of another pane.",
+            "zh-CN": "zai 浏览器 GUI 中，一个编码代理会话分屏显示在另一个分屏右侧。"
+          },
+          "caption": {
+            "en": "Browser GUI with split panes",
+            "zh-CN": "带分屏的浏览器 GUI"
+          },
+          "width": 1440,
+          "height": 960
+        },
+        {
+          "src": "/apps/media/zai-cli/zai-cli-gui-phone-keys.webp",
+          "alt": {
+            "en": "The zai GUI on a phone-sized screen with a coding agent question and the Keys menu.",
+            "zh-CN": "手机尺寸屏幕上的 zai GUI，显示编码代理的问题与 Keys 菜单。"
+          },
+          "caption": {
+            "en": "On your phone through a tunnel",
+            "zh-CN": "通过隧道在手机上使用"
+          },
+          "width": 390,
+          "height": 844
+        },
+        {
           "src": "/apps/media/zai-cli/zai-cli-app-init-page.webp",
           "alt": {
             "en": "The zai console Welcome screen with the new-tab app picker open.",
@@ -255,42 +293,42 @@
           "height": 1164
         },
         {
-          "src": "/apps/media/zai-cli/zai-cli-realtime-coding-agent-status-hint.png",
+          "src": "/apps/media/zai-cli/zai-cli-gui-diff-review.webp",
           "alt": {
-            "en": "A real-time coding-agent status hint in the zai console.",
-            "zh-CN": "zai 控制台中的编码代理实时状态提示。"
+            "en": "The zai GUI Diff Review page showing a side-by-side diff with History, Branches, and Graph tabs.",
+            "zh-CN": "zai GUI 的 Diff Review 页面，以并排视图显示差异，并提供 History、Branches 与 Graph 标签。"
           },
           "caption": {
-            "en": "Real-time coding-agent status hint",
-            "zh-CN": "编码代理实时状态提示"
+            "en": "Diff review in the GUI",
+            "zh-CN": "GUI 中的差异审阅"
           },
-          "width": 600,
-          "height": 376
+          "width": 1600,
+          "height": 1000
         },
         {
-          "src": "/apps/media/zai-cli/zai-cli-working-with-managed-worktrees.webp",
+          "src": "/apps/media/zai-cli/zai-cli-teams-chatroom.webp",
           "alt": {
-            "en": "The zai console showing managed worktrees shared by humans and agents.",
-            "zh-CN": "zai 控制台展示由人和代理共享的托管工作树。"
+            "en": "A zai Teams chat with human and agent messages, an expanded reply thread, and chat members.",
+            "zh-CN": "zai Teams 聊天，包含人与代理的消息、展开的回复线程和聊天成员。"
           },
           "caption": {
-            "en": "Working with managed worktrees",
-            "zh-CN": "使用托管工作树"
+            "en": "Teams chatroom for coding agents",
+            "zh-CN": "编码代理的 Teams 聊天室"
           },
-          "width": 2560,
-          "height": 1392
+          "width": 1440,
+          "height": 1400
         },
         {
-          "src": "/apps/media/zai-cli/context-menu.png",
+          "src": "/apps/media/zai-cli/zai-cli-gui-servers-rail.webp",
           "alt": {
-            "en": "zai’s tab context menu open above an editor pane, offering rename, close, new tab, and vertical or horizontal splits.",
-            "zh-CN": "zai 的标签页右键菜单位于编辑器分屏上方，提供重命名、关闭、新建标签页与垂直或水平分屏。"
+            "en": "The Servers rail listing Home and outbound servers next to the Outbound servers settings.",
+            "zh-CN": "Servers 侧栏列出 Home 与出站服务器，旁边是 Outbound servers 设置。"
           },
           "caption": {
-            "en": "Shape your workspace from the tab menu. Captured terminal frame with demo content.",
-            "zh-CN": "通过标签页菜单调整工作空间。使用演示内容捕获的终端画面。"
+            "en": "Switch between your zai servers",
+            "zh-CN": "在你的多台 zai 服务器之间切换"
           },
-          "width": 1356,
+          "width": 1440,
           "height": 900
         }
       ],
@@ -329,6 +367,46 @@
           "description": {
             "en": "Available from v0.1.394: Detach keeps live work running for reconnection on the same host and runtime home; Close completely stops it. The host must stay awake and the server running; a server or machine restart ends live processes.",
             "zh-CN": "从 v0.1.394 起提供：Detach 保持任务运行，并支持在同一主机与运行目录重新连接；Close completely 停止任务。主机必须保持唤醒且服务持续运行；服务或机器重启会终止原有进程。"
+          }
+        },
+        {
+          "title": {
+            "en": "Browser GUI",
+            "zh-CN": "浏览器 GUI"
+          },
+          "description": {
+            "en": "Open the same workspace in a browser or installed web app with session placement, Diff Review with Ask AI, waiting-agent toasts, file and image drops onto agent terminals, and native pages for Project Config, Automations, Service Monitor, Usage, and Settings.",
+            "zh-CN": "在浏览器或已安装的 Web 应用中打开同一个工作空间：支持会话放置、带 Ask AI 的 Diff Review、等待代理提醒、向代理终端拖放文件和图片，并为项目配置、自动化、服务监控、用量和设置提供原生页面。"
+          }
+        },
+        {
+          "title": {
+            "en": "Remote servers, from anywhere",
+            "zh-CN": "随时随地访问远程服务器"
+          },
+          "description": {
+            "en": "zai gui --tunnel prints a public HTTPS URL for a password-protected Dev Tunnel, or zai gui --public-url uses your own HTTPS proxy. Add up to 32 outbound servers and switch between them from the Servers rail; Update and restart also updates a remote server. The servers setup guide covers each step.",
+            "zh-CN": "zai gui --tunnel 为受密码保护的 Dev Tunnel 输出公共 HTTPS 地址，也可用 zai gui --public-url 接入你自己的 HTTPS 代理。最多可添加 32 台出站服务器，并在 Servers 侧栏中切换；Update and restart 同样可以更新远程服务器。服务器设置指南介绍了每个步骤。"
+          }
+        },
+        {
+          "title": {
+            "en": "Agents on your phone",
+            "zh-CN": "在手机上查看代理"
+          },
+          "description": {
+            "en": "Open the tunnel URL in a phone browser or install the web app. Narrow layouts overlay rails, one-finger swipes scroll terminals, and the Keys button sends Shift+Left, Esc, and Shift+Enter to agents.",
+            "zh-CN": "在手机浏览器中打开隧道地址，或安装 Web 应用。窄屏布局以浮层显示侧栏，单指滑动即可滚动终端，Keys 按钮可向代理发送 Shift+Left、Esc 和 Shift+Enter。"
+          }
+        },
+        {
+          "title": {
+            "en": "Teams chatroom",
+            "zh-CN": "Teams 聊天室"
+          },
+          "description": {
+            "en": "Mix Copilot CLI, Codex, Pi, Claude Code, and OpenCode sessions from any project in one chat with @mentions, threads, search, attachments, and agent questions. Agents read and reply with the zai chat CLI, and a context badge shows each member's context-window usage. Available in the TUI and GUI.",
+            "zh-CN": "在同一个聊天中混合来自任意项目的 Copilot CLI、Codex、Pi、Claude Code 和 OpenCode 会话，支持 @ 提及、线程、搜索、附件与代理提问。代理通过 zai chat CLI 读取和回复，上下文徽标显示每位成员的上下文窗口用量。终端界面与 GUI 均可使用。"
           }
         },
         {
@@ -417,8 +495,8 @@
             "zh-CN": "实测控制台基线，而非完整代理环境"
           },
           "description": {
-            "en": "On the published Linux test machine, zai without an agent idled at about 40 MiB PSS and one process. Your chosen CLI and runtime add to that footprint. The README labels Linux baselines and native Windows GitHub Copilot app first-run observations in one shared table; it does not rank complete AI setups.",
-            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 空闲时约占 40 MiB PSS，只有一个进程。所选 CLI 及其运行时会增加资源占用。README 在共享表格中分别标明 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测，并不对完整 AI 编码环境排名。"
+            "en": "On the published Linux test machine, zai 0.1.1126 without an agent idled at about 62 MiB PSS and 0.5% of one core across two processes: the terminal client and its console server. The 59.0 MB download includes the browser GUI, editor, and Git viewer. Your chosen CLI and runtime add to that footprint. The README labels Linux baselines and native Windows GitHub Copilot app first-run observations in one shared table; it does not rank complete AI setups.",
+            "zh-CN": "在已公布的 Linux 测试机上，未运行代理的 zai 0.1.1126 空闲时约占 62 MiB PSS 和单核 0.5% 的 CPU，共两个进程：终端客户端及其控制台服务。59.0 MB 的下载包含浏览器 GUI、编辑器和 Git 查看器。所选 CLI 及其运行时会增加资源占用。README 在共享表格中分别标明 Linux 基线与原生 Windows GitHub Copilot 应用的首次启动观测，并不对完整 AI 编码环境排名。"
           }
         }
       ],
@@ -467,8 +545,8 @@
       ],
       "comparison": {
         "intro": {
-          "en": "zai-cli, Orca, and herdr are workspaces for your pick of separately installed coding-agent CLI. GitHub Copilot app includes its Copilot CLI engine; VS Code is a broader editor/IDE and needs an agent extension for AI coding. Compare complete setups with those dependencies included. The shared footprint table labels Linux workspace baselines and Windows first-run observations separately: different platforms, states, and memory metrics prevent a matched ranking.",
-          "zh-CN": "zai-cli、Orca 和 herdr 是承载自选、另行安装的编码代理 CLI 的工作空间。GitHub Copilot 应用包含 Copilot CLI 引擎；VS Code 是功能更广的编辑器/IDE，AI 编码需要代理扩展。公平比较须计入这些依赖。共享资源表明确标出 Linux 工作空间基线与 Windows 首次启动观测：平台、状态和内存指标不同，不能据此排名。"
+          "en": "zai-cli, Orca, and herdr host your pick of separately installed coding-agent CLI; GitHub Copilot app includes its Copilot CLI engine; VS Code is a broader editor/IDE that needs an agent extension. Remote access is shared: VS Code, Orca, and herdr each reach agents on another machine with different clients. The footprint table labels Linux baselines and Windows first-run observations separately, so it is not a ranking.",
+          "zh-CN": "zai-cli、Orca 和 herdr 承载自选、另行安装的编码代理 CLI；GitHub Copilot 应用包含 Copilot CLI 引擎；VS Code 是功能更广的编辑器/IDE，需要代理扩展。远程访问并非独有：VS Code、Orca 和 herdr 都能以不同客户端访问另一台机器上的代理。资源表分别标出 Linux 基线与 Windows 首次启动观测，不构成排名。"
         },
         "groups": [
           {
@@ -509,6 +587,75 @@
               },
               {
                 "label": {
+                  "en": "Same workspace in a browser, served from your machine",
+                  "zh-CN": "同一工作空间可在浏览器中使用，由你的机器提供服务"
+                },
+                "values": [
+                  "✓ [8]",
+                  "✓ [9]",
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  "— [10]",
+                  "— [11]"
+                ]
+              },
+              {
+                "label": {
+                  "en": "Phone access to running agents",
+                  "zh-CN": "用手机访问运行中的代理"
+                },
+                "values": [
+                  {
+                    "en": "✓ Browser/PWA [8]",
+                    "zh-CN": "✓ 浏览器/PWA [8]"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "✓ Mobile app [10]",
+                    "zh-CN": "✓ 移动应用 [10]"
+                  },
+                  {
+                    "en": "✓ Any SSH client [11]",
+                    "zh-CN": "✓ 任意 SSH 客户端 [11]"
+                  }
+                ]
+              },
+              {
+                "label": {
+                  "en": "Switch between several remote machines in one UI",
+                  "zh-CN": "在一个界面中切换多台远程机器"
+                },
+                "values": [
+                  "✓ [8]",
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "✓ Beta [10]",
+                    "zh-CN": "✓ 测试版 [10]"
+                  },
+                  {
+                    "en": "✓ Herdr app [11]",
+                    "zh-CN": "✓ Herdr 应用 [11]"
+                  }
+                ]
+              },
+              {
+                "label": {
                   "en": "Built-in server keeps live work running after detach",
                   "zh-CN": "内置服务在分离连接后保持工作运行"
                 },
@@ -526,10 +673,35 @@
                     "zh-CN": "未评估 [7]"
                   },
                   {
-                    "en": "Not assessed [7]",
-                    "zh-CN": "未评估 [7]"
+                    "en": "✓ Remote server [10]",
+                    "zh-CN": "✓ 远程服务 [10]"
                   },
                   "✓ [7]"
+                ]
+              },
+              {
+                "label": {
+                  "en": "Team chatroom where agent sessions message each other",
+                  "zh-CN": "代理会话可互相发消息的团队聊天室"
+                },
+                "values": [
+                  "✓",
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  },
+                  {
+                    "en": "Not assessed",
+                    "zh-CN": "未评估"
+                  }
                 ]
               },
               {
@@ -593,8 +765,24 @@
                 "zh-CN": "zai-cli（自选编码代理）、Orca 和 herdr 承载另行安装的编码代理 CLI；工作空间功能不包含编码模型。Copilot 应用包含 Copilot CLI 引擎，VS Code 的 AI 编码需要代理扩展。公平比较须计入所选代理、运行时、语言服务器或扩展及适用的终端宿主。资源表按各项基线说明，不包含另行安装的代理。"
               },
               {
-                "en": "Checked 2026-10-06: zai’s local console server is included in v0.1.394, whose public release provenance matches the console-server revision reviewed for this page. It reattaches on the same host and runtime home, with one active controller. herdr documents a background server that keeps terminals running when its client closes or an SSH connection drops. Both servers require the server and host to remain running for live processes to survive. This does not claim herdr’s combined multi-machine view for zai. This server lifecycle was not assessed for the other columns.",
-                "zh-CN": "核查于 2026-10-06：zai 的 v0.1.394 包含本地控制台服务，公开发布记录中的源代码修订版与本页核查的控制台服务版本一致。该服务在同一主机与运行目录重新连接，且只有一个活动控制端。herdr 文档说明其后台服务会在客户端关闭或 SSH 断连后保持终端运行。两种服务都需要服务与主机持续运行，才能保留原有进程。此处不声称 zai 具备 herdr 的多机器统一视图。其他列的此项服务生命周期未作评估。"
+                "en": "Checked 2026-10-06: zai’s local console server is included in v0.1.394, whose public release provenance matches the console-server revision reviewed for this page. It reattaches on the same host and runtime home, with one active controller. herdr documents a background server that keeps terminals running when its client closes or an SSH connection drops. Both servers require the server and host to remain running for live processes to survive. This does not claim herdr’s combined multi-machine view for zai. Orca's remote server is described in note [10]. This server lifecycle was not assessed for VS Code or GitHub Copilot app.",
+                "zh-CN": "核查于 2026-10-06：zai 的 v0.1.394 包含本地控制台服务，公开发布记录中的源代码修订版与本页核查的控制台服务版本一致。该服务在同一主机与运行目录重新连接，且只有一个活动控制端。herdr 文档说明其后台服务会在客户端关闭或 SSH 断连后保持终端运行。两种服务都需要服务与主机持续运行，才能保留原有进程。此处不声称 zai 具备 herdr 的多机器统一视图。Orca 的远程服务见注 [10]。VS Code 与 GitHub Copilot 应用的此项服务生命周期未作评估。"
+              },
+              {
+                "en": "zai’s browser GUI binds only to 127.0.0.1; remote browsers and phones reach it through zai gui --tunnel (Microsoft Dev Tunnels) or your own HTTPS proxy and must sign in. One Home GUI switches between up to 32 outbound zai servers. There is no native mobile app; phones use the browser or an installed PWA.",
+                "zh-CN": "zai 的浏览器 GUI 只绑定 127.0.0.1；远程浏览器和手机需通过 zai gui --tunnel（Microsoft Dev Tunnels）或你自己的 HTTPS 代理访问，并且必须登录。一个 Home GUI 可切换最多 32 台出站 zai 服务器。zai 没有原生移动应用，手机通过浏览器或已安装的 PWA 使用。"
+              },
+              {
+                "en": "Checked 2026-11-09: VS Code Remote Tunnels lets a desktop client or vscode.dev in a browser connect to a machine through Microsoft dev tunnels.",
+                "zh-CN": "核查于 2026-11-09：VS Code Remote Tunnels 允许桌面客户端或浏览器中的 vscode.dev 通过 Microsoft dev tunnels 连接到一台机器。"
+              },
+              {
+                "en": "Checked 2026-11-09: Orca documents an iOS/Android mobile companion (beta, a read-mostly remote control) and Remote Orca Servers (beta) that keep sessions on another machine for paired desktop and mobile clients over a private network such as Tailscale. No browser client served by the workspace was found in its documentation.",
+                "zh-CN": "核查于 2026-11-09：Orca 文档介绍了 iOS/Android 移动伴侣应用（测试版，以只读为主的远程控制）和 Remote Orca Servers（测试版），可通过 Tailscale 等私有网络让配对的桌面和移动客户端使用另一台机器上的会话。其文档中未找到由工作空间提供的浏览器客户端。"
+              },
+              {
+                "en": "Checked 2026-11-09: the measured herdr 0.9.1 is now called Herdr TUI, a terminal app that other machines and phones reach over SSH. The separate native Herdr app built on herdr-core lists SSH machines in one sidebar. “Not assessed” means no source was checked for this refresh.",
+                "zh-CN": "核查于 2026-11-09：所测量的 herdr 0.9.1 现称为 Herdr TUI，其他机器和手机可通过 SSH 访问这一终端应用。另有基于 herdr-core 的原生 Herdr 应用，可在一个侧栏中列出多台 SSH 机器。“未评估”表示本次更新未核查相关来源。"
               }
             ]
           },
@@ -708,7 +896,7 @@
               {
                 "label": "Download",
                 "values": [
-                  "30.0 MB",
+                  "59.0 MB",
                   "341.8 MB",
                   "264.6 MB",
                   "216.7 MB",
@@ -718,7 +906,7 @@
               {
                 "label": "On disk",
                 "values": [
-                  "72.7 MB",
+                  "135.7 MB",
                   "1,007.7 MB",
                   "640.2 MB",
                   "610.3 MB",
@@ -728,7 +916,7 @@
               {
                 "label": "Idle memory (PSS)",
                 "values": [
-                  "≈ 40 MiB",
+                  "≈ 62 MiB",
                   "745.9 MiB",
                   "Not measured",
                   "≈ 543 MiB",
@@ -758,7 +946,7 @@
               {
                 "label": "Idle CPU (one core)",
                 "values": [
-                  "0.07–0.15%",
+                  "0.48–0.50%",
                   "≥ 7.1%",
                   "0.34–0.39% root; ≥ 0.03–0.60% descendants",
                   "0.3%",
@@ -768,7 +956,7 @@
               {
                 "label": "Observed processes",
                 "values": [
-                  "1",
+                  "2",
                   "13",
                   "11–13",
                   "8",
@@ -777,8 +965,8 @@
               }
             ],
             "notes": [
-              "Linux figures measured on one machine in September 2026 with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1. The agent-qualified headers describe working setups, but these measurements cover only the stated baselines, excluding separately installed agents.",
-              "The zai download and on-disk sizes are from the zai-cli 0.1.127 Linux x64 release archive, measured on 2026-09-29. The on-disk size excludes the coding-agent CLI, and the idle console has no agent running. These are workspace-only figures, not full AI setup totals.",
+              "Linux figures measured on one machine with VS Code 1.139.1, Orca 1.4.216, and herdr 0.9.1 in September 2026, and with the published zai-cli 0.1.1126 Linux x64 archive on 2026-11-09. Competitor figures were not re-measured. The agent-qualified headers describe working setups, but these measurements cover only the stated baselines, excluding separately installed agents.",
+              "zai’s download and on-disk sizes are from the zai-cli 0.1.1126 Linux x64 release archive; the install includes the browser GUI, zai-editor, and zai-gitter, and excludes the coding-agent CLI. Idle figures cover the terminal client and its background console server with no agent running; the GUI server was not measured. These are workspace-only figures, not full AI setup totals.",
               "herdr is a terminal multiplexer for agents; it does not include zai’s editor, diff review, language servers, or delivery services.",
               "Measured on 2026-09-30 with app 1.1.24 on native Windows 11 Enterprise x64, using three consecutive 60-second samples of the already-open first-run page. No sign-in, repository, task, or UI interaction; SDK CLI 1.0.90-0 helpers are included in the observed tree.",
               "Installed files total 488.3 MB for the app plus 151.9 MB for its provisioned SDK CLI cache, excluding shared WebView2/runtime files and user data. Summed RSS can double-count shared pages; USS is private memory, not Linux PSS. These Windows results must not be ranked against the Linux columns.",

@@ -4,7 +4,7 @@
 Configuration field reference | Next:
 [Poller filters and presets](?id=zai-cli&doc=docs--config--poller-filters-and-presets)
 
-The interactive console stores registered projects in `~/.zai/projects.json`.
+The interactive console stores registered projects in `~/.zai/profiles/anonymous/projects.json`.
 Entries are ordered by the user and have one of three kinds:
 
 - `forge`: a Git repository on GitHub or Azure DevOps. Its identity is the
@@ -15,11 +15,11 @@ Entries are ordered by the user and have one of three kinds:
 - `directory`: a plain folder.
 
 Forge projects use the established service config directory
-`~/.zai/configs/<repo-slug>/` and may run services. Git projects have worktrees
+`~/.zai/profiles/anonymous/configs/<repo-slug>/` and may run services. Git projects have worktrees
 but no services. Directory projects have neither services nor worktrees.
 
 Non-forge projects retain a minimal compatibility config in
-`~/.zai/configs/_project-<name>-<12-hex-sha256-prefix>/config.json`. The local project
+`~/.zai/profiles/anonymous/configs/_project-<name>-<12-hex-sha256-prefix>/config.json`. The local project
 id starts with `_project-`, includes a sanitized path basename, and ends with the
 first six bytes of a SHA-256 digest of the normalized root path. The file shape
 is:

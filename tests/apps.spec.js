@@ -174,18 +174,19 @@ test("zai-cli detail page presents its supplied screenshots and demos", async ({
   await page.goto("/apps/app/?id=zai-cli&lang=en");
 
   const screenshots = page.locator(".screenshot-card img");
-  await expect(screenshots).toHaveCount(4);
+  await expect(screenshots).toHaveCount(6);
   await expect(page.locator(".screenshot-card.screenshot-row")).toHaveCount(4);
-  await expect(page.locator(".screenshot-card").nth(1)).toHaveClass(/screenshot-compact/);
+  await expect(page.locator(".screenshot-card").nth(1)).not.toHaveClass(/screenshot-row/);
   await screenshots.first().scrollIntoViewIfNeeded();
-  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 2560);
-  await expect(screenshots.first()).toHaveAttribute("alt", "The zai console Welcome screen with the new-tab app picker open.");
+  await expect(screenshots.first()).toHaveJSProperty("naturalWidth", 1440);
+  await expect(screenshots.first()).toHaveAttribute("alt", "The zai browser GUI with a coding-agent session split to the right of another pane.");
+  await expect(screenshots.nth(2)).toHaveAttribute("alt", "The zai console Welcome screen with the new-tab app picker open.");
   await expect(page.locator(".video-player")).toHaveCount(2);
   await expect(page.getByText("General features, recorded while running 7 LLM coding sessions", { exact: true })).toBeVisible();
   await expect(page.getByText("Themes", { exact: true })).toBeVisible();
 
   await page.goto("/apps/app/?id=zai-cli&lang=zh-CN");
-  await expect(page.locator(".screenshot-card img").first()).toHaveAttribute("alt", "zai 控制台欢迎页，已打开新标签页应用选择器。");
+  await expect(page.locator(".screenshot-card img").nth(2)).toHaveAttribute("alt", "zai 控制台欢迎页，已打开新标签页应用选择器。");
 });
 
 test("metadata failures and unsafe URLs never become successful or downloadable releases", async ({ page }) => {

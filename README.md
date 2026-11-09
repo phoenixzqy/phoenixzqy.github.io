@@ -256,6 +256,27 @@ The privacy-reviewed documentation mirrors record their exact source revisions
 in `apps/docs/sources.json`; release archives contain approved runtime files
 and license notices, not private application source or debugging symbols.
 
+The November 9, 2026 zai-cli intro refresh follows the author's request to
+cover the browser GUI, remote servers and phones, the Teams chatroom, and a
+servers setup guide. Product claims follow the author's zai-cli README and
+`docs/gui-servers.md` at revision `0c1974ec`, checked against that revision's
+CLI help and source. Screenshots are the repository's own demo captures,
+converted to WebP without content changes. zai's footprint was re-measured
+from the published zai-cli 0.1.1126 Linux x64 archive on 2026-11-09 (three
+60-second idle trials: two processes, 61.8–63.3 MiB PSS, 0.48–0.50% of one
+core); competitor footprints were not re-measured. Sources read directly on
+2026-11-09:
+
+| Source | Verified claim and editorial use |
+| --- | --- |
+| [VS Code Remote Tunnels](https://code.visualstudio.com/docs/remote/tunnels) | Desktop or vscode.dev browser clients reach a machine through Microsoft dev tunnels; mark browser access supported. |
+| [Orca mobile](https://www.onorca.dev/docs/mobile) and [Remote Orca Servers](https://www.onorca.dev/docs/remote-servers) | Beta iOS/Android companion and beta remote servers over private networks; no workspace-served browser client found. |
+| [Herdr TUI](https://herdr.dev/tui/) and [Herdr app](https://herdr.dev/) | The measured herdr 0.9.1 is now Herdr TUI, reached over SSH; the native Herdr app lists SSH machines in one sidebar. |
+
+GitHub Copilot app remote, phone, and chatroom capabilities were not assessed
+and are labeled that way. The documentation mirror adds the privacy-reviewed
+servers setup guide.
+
 ## Design research
 
 Ten established developer/AI-industry personal sites were researched online
