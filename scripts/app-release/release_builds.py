@@ -54,18 +54,20 @@ def validation_python(runtime, source, name):
     return interpreter
 
 
-def build(runtime, source, snapshot, version, output, site, notices):
+def build(runtime, source, snapshot, version, output, site, notices, *, run_tests=True):
     name = snapshot['repository'].split('/')[1]
     output.mkdir(parents=True)
     manifest = output / 'manifest.json'
     if name == 'zai-codex' and (not notices or not notices.is_dir()):
         raise ValueError('zai-codex requires --codex-notices with reviewed dependency notices')
     if name != 'zai-codex':
-        runtime.stage = f'{name}:validation'
-        interpreter = validation_python(runtime, source, name)
+        runtime.stage = f'{name}:validation' if run_tests else f'{name}:build'
+        if run_tests:
+            interpreter = validation_python(runtime, source, name)
         if name == 'zai-cli':
             runtime.run(['npm', 'ci', '--no-audit', '--no-fund'], cwd=source / 'src/web-ui')
-        runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
+        if run_tests:
+            runtime.run([interpreter, '-B', '.github/scripts/local_ci.py'], cwd=source)
     runtime.stage = f'{name}:build'
     if name == 'zai-codex':
         if not notices or not notices.is_dir():

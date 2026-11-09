@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import json
-import os
 from pathlib import Path
 import re
 import sys
@@ -26,13 +25,18 @@ from release_sources import APPS, changed, clone, discover, provenance, remote_s
 OTHER_APPS = tuple(app for app in APPS if app != 'zai-codex')
 
 
-def configure_site(runtime, site):
-    runtime.run(['git', 'config', '--local', 'core.hooksPath', '.githooks'], cwd=site)
+def configure_site(runtime, site, skip_tests=False):
+    hooks = '.githooks'
+    if skip_tests:
+        hooks = site / '.git' / 'app-release-no-hooks'
+        hooks.mkdir()
+    runtime.run(['git', 'config', '--local', 'core.hooksPath', hooks], cwd=site)
     # Fresh isolated clones do not inherit the caller's local author settings.
     runtime.run(['git', 'config', '--local', 'user.name', 'App release automation'], cwd=site)
     runtime.run(['git', 'config', '--local', 'user.email', 'phoenixzqy@users.noreply.github.com'], cwd=site)
-    runtime.run(['npm', 'ci'], cwd=site)
-    runtime.run(['npx', 'playwright', 'install', 'chromium', 'webkit'], cwd=site)
+    if not skip_tests:
+        runtime.run(['npm', 'ci'], cwd=site)
+        runtime.run(['npx', 'playwright', 'install', 'chromium', 'webkit'], cwd=site)
 
 
 def detect_tasks(runtime, args, snapshots, site, root):
@@ -78,7 +82,8 @@ def detect_tasks(runtime, args, snapshots, site, root):
             resumable = pending and (journal.get('create_intent') or
                         (app in ('bplayer', 'zai-codex') and (journal.get('dispatch_intent') or journal.get('run_id'))))
             if not resumable:
-                journal = {'app': app, 'snapshot': snapshot, 'complete': False}
+                journal = {'app': app, 'snapshot': snapshot, 'complete': False,
+                           'skip_tests': args.skip_tests}
             tasks.append({'name': name, 'snapshot': journal['snapshot'], 'journal': journal,
                           'pending': bool(resumable), 'journal_path': journal_path,
                           'output': root / f'{app}-assets'})
@@ -113,7 +118,7 @@ def process(runtime, args, root):
     tasks, reports = detect_tasks(runtime, args, snapshots, site, root)
     if not tasks:
         return reports
-    configure_site(runtime, site)
+    configure_site(runtime, site, args.skip_tests)
     # Recovery and native/workflow releases remain serialized. Only fresh Go
     # builds are independent and never write to the shared site checkout.
     go_tasks = [task for task in tasks if task['name'] in GO_APPS and not task['pending']]
@@ -152,7 +157,8 @@ def process(runtime, args, root):
         try:
             if task['name'] == 'BPlayer':
                 write_json(task['journal_path'], task['journal'])
-                run_bplayer(runtime, task['snapshot'], site, task['journal_path'], task['journal'], task['output'])
+                run_bplayer(runtime, task['snapshot'], site, task['journal_path'], task['journal'], task['output'],
+                            skip_tests=task['journal'].get('skip_tests', False))
             elif task['name'] == 'zai-codex' and not task['journal'].get('create_intent'):
                 write_json(task['journal_path'], task['journal'])
                 run_codex(runtime, args, task, root, site)
@@ -187,6 +193,8 @@ def main(argv=None, *, allowed_apps=OTHER_APPS):
     mode.add_argument('--dry-run', action='store_false', dest='publish',
                       help='Detect updates without building or publishing (default).')
     parser.add_argument('--force', action='store_true', help='Release selected apps even when already current.')
+    parser.add_argument('--skip-tests', action='store_true',
+                        help='Skip source and website test suites; retain build, package and release checks.')
     parser.add_argument('--apps', nargs='+', choices=allowed_apps,
                         help='Limit releases within this script\'s app group.')
     parser.add_argument('--owner', default='phoenixzqy')

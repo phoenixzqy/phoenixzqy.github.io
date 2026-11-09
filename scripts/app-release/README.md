@@ -14,6 +14,7 @@ explicit prerequisite error; install the standard Node.js toolchain.
 ```sh
 python3 -B scripts/app-release/release_apps.py
 python3 -B scripts/app-release/release_apps.py --publish
+python3 -B scripts/app-release/release_apps.py --publish --skip-tests
 python3 -B scripts/app-release/release_apps.py --publish --apps zai-cli zai-editor zai-gitter --jobs 3
 python3 -B scripts/app-release/release_codex.py --dry-run
 python3 -B scripts/app-release/release_codex.py --publish
@@ -28,6 +29,10 @@ The default (or explicit `--dry-run`) checks for unpublished updates without
 building or writing to GitHub. `--dry-run` cannot be combined with `--publish`.
 `--publish` authorizes builds, public release assets and website pushes. `--force`
 requires explicit `--apps` and allocates a new version even if already current.
+`--skip-tests` skips the Go source gates, BPlayer's release workflow unit tests,
+and the website pre-push test suite for that invocation. It retains package
+verification, `npm run validate:apps`, public download checks and Pages verification.
+Normal invocations still run the tests.
 
 Together the approved adapters cover zai-cli, zai-editor, zai-gitter, zai-codex and BPlayer.
 zai-claude-code and zai-design-system are excluded as release targets. A new
@@ -46,11 +51,13 @@ All temporary clones and package staging directories are removed when the
 invocation exits.
 
 The source packagers and version allocation functions remain authoritative.
-For the Go apps, the source's full local validation runs before building. Go dependencies are
+For the Go apps, the source's full local validation runs before building unless
+`--skip-tests` is selected. Go dependencies are
 resolved from their remote default branches before building; the CLI's existing
 refresh tool resolves them once and the build then uses those exact records.
 For zai-cli, the adapter installs the locked frontend dependencies with
-`npm ci --no-audit --no-fund` in `src/web-ui` before the full source gate. It
+`npm ci --no-audit --no-fund` in `src/web-ui` before building. Without
+`--skip-tests`, it
 creates `.venv-local-ci` in the disposable source clone,
 installs its pinned performance-toolkit requirements, and runs the gate with
 that environment's Python. This keeps validation dependencies available when
@@ -81,9 +88,11 @@ upstream workflow contains debug-artifact sanitization. Remote workflows continu
 if the local process is stopped; the next run resumes monitoring via its journal.
 An uncertain dispatch is never blindly repeated.
 
-Public assets become available before the manifest is pushed. The fresh site
-clone installs its pre-push hook and dependencies, and every push runs the full
-site suite. Concurrent website changes are fetched/rebased and validated; pushes
+Public assets become available before the manifest is pushed. Without
+`--skip-tests`, the fresh site clone installs its pre-push hook and dependencies,
+and each push runs the full site suite. With `--skip-tests`, the clone disables
+its pre-push hook and omits test-only dependencies. Concurrent website changes
+are fetched/rebased and validated; pushes
 are never forced. Deployed manifest bytes and unauthenticated package hashes
 are verified before reporting success.
 
@@ -228,7 +237,7 @@ logs remain private and are never copied to the public site.
 
 ## Parallel Go builds and combined publishing
 
-zai-cli, zai-editor and zai-gitter validate and build in isolated clones with
+zai-cli, zai-editor and zai-gitter build in isolated clones with
 three concurrent jobs by default, so none waits for another app to finish.
 `--jobs 1` runs them sequentially; `--jobs 2` limits builds to two at once.
 The CLI starts first when build slots are limited because it also validates
@@ -236,13 +245,14 @@ and packages bundled tools and desktop assets. Host-specific automation launcher
 should omit an explicit `--jobs` override to inherit this default, or select
 `--jobs 3`; an existing `--jobs 2` override still limits concurrency.
 Each job has its own log directory under the run
-report and bounded Go compiler/test parallelism (at most four processes per
+report and bounded Go compiler parallelism (at most four processes per
 job, reduced further for small CPU counts or a lower existing GOMAXPROCS).
 All consumers resolve shared producer revisions before jobs start.
 
-Only successfully validated packages are published. Public assets and their
+Only successfully verified packages are published. Public assets and their
 downloaded checksums are verified serially, then successful Go manifests share
-one website commit, full pre-push gate and Pages deployment. An app build
+one website commit and Pages deployment. The pre-push test gate runs unless
+`--skip-tests` is selected. An app build
 failure still permits successful apps to publish, while the run exits nonzero
 and reports the failure. A combined website failure leaves every unfinished
 app journal recoverable and stops later releases from using dirty site state.
@@ -250,8 +260,8 @@ A newer remote manifest is checked again before the combined commit.
 
 Codex, BPlayer workflow dispatches and interrupted-publication recovery stay
 sequential. Ctrl+C or termination cancels and joins owned workers before
-temporary clones and staging are removed. Existing release locks, checksums,
-per-app validation described above and website hooks still apply to every outgoing release.
+temporary clones and staging are removed. Existing release locks, checksums and
+package validation still apply to every outgoing release.
 
 ### Codex publication recovery
 

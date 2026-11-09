@@ -32,7 +32,8 @@ def prepare(runtime, args, task, root, site):
         versions = history(runtime, snapshot['repository']) + history(runtime, runtime.site_repository)
         version = allocate(runtime, source, name, versions)
         journal.update(version=version, tag=f'{name}-v{version}')
-    data = build(runtime, source, snapshot, version, task['output'], site, args.codex_notices)
+    data = build(runtime, source, snapshot, version, task['output'], site, args.codex_notices,
+                 run_tests=not args.skip_tests)
     if not task['pending']:
         journal['manifest'] = data
         write_json(task['journal_path'], journal)

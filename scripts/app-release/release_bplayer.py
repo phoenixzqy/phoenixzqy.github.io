@@ -13,7 +13,7 @@ from release_runtime import timestamp, write_json
 from release_sources import provenance, remote_snapshot
 
 
-def run_bplayer(runtime, snapshot, site, journal_path, journal, output):
+def run_bplayer(runtime, snapshot, site, journal_path, journal, output, *, skip_tests=False):
     if not journal.get('dispatch_intent'):
         snapshot.update(remote_snapshot(runtime, snapshot['repository']))
         journal['snapshot'] = snapshot
@@ -23,6 +23,8 @@ def run_bplayer(runtime, snapshot, site, journal_path, journal, output):
     if ('release_artifacts.py check' not in content or 'release_artifacts.py prepare-aab' not in content or
             'automation_request_id' not in content):
         raise RuntimeError('BPlayer remote default branch lacks debug-artifact sanitization; merge the root workflow fix first')
+    if skip_tests and 'skip_tests:' not in content:
+        raise RuntimeError('BPlayer remote default branch does not support skipping release tests')
     workflow_path = 'release.yml'
     endpoint = f'repos/{repository}/actions/workflows/{workflow_path}'
     if not journal.get('run_id'):
@@ -35,8 +37,11 @@ def run_bplayer(runtime, snapshot, site, journal_path, journal, output):
             old_ids = [run['id'] for run in runs]
             journal.update(dispatch_intent=True, before_run_ids=old_ids, request_id=uuid.uuid4().hex)
             write_json(journal_path, journal)
-            runtime.run(['gh', 'api', '--method', 'POST', f'{endpoint}/dispatches', '-f', f'ref={branch}',
-                         '-f', f'inputs[automation_request_id]={journal["request_id"]}'])
+            command = ['gh', 'api', '--method', 'POST', f'{endpoint}/dispatches', '-f', f'ref={branch}',
+                       '-f', f'inputs[automation_request_id]={journal["request_id"]}']
+            if skip_tests:
+                command.extend(['-F', 'inputs[skip_tests]=true'])
+            runtime.run(command)
         deadline = time.monotonic() + 120
         while time.monotonic() < deadline:
             runs = runtime.api(f'{endpoint}/runs?per_page=100')['workflow_runs']
