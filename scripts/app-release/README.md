@@ -204,37 +204,28 @@ or website metadata were published; it is not evidence that nothing was written.
 Uncertain release ownership, missing approved metadata, checksum differences or
 an unreconciled partial publication require operator repair before either path.
 
-Use two Script automations. Preserve the existing app automation's schedule/id
-and select the other-app entry point:
+For Script automations, fetch the portable launcher from website `main`. This
+avoids depending on an operator checkout that may be stale or dirty. The
+bootstrap downloads the complete script before executing it, so a failed
+download cannot appear successful. Set each saved command's `--group` to `zai`,
+`bplayer`, or `codex`:
 
-```json
-{
-  "kind": "script",
-  "command": "python3 -B scripts/app-release/release_apps.py --publish",
-  "skip_log": false
-}
+```sh
+python3 -u -B -c 'import urllib.request; u="https://raw.githubusercontent.com/phoenixzqy/phoenixzqy.github.io/main/scripts/app-release/scheduled_release.py"; exec(compile(urllib.request.urlopen(u, timeout=60).read(), u, "exec"))' --group zai
 ```
 
-Create a separate enabled Codex Script automation with a new ID and the same
-trigger, schedule and logging settings:
+The zai and BPlayer groups each pass `--skip-tests`; Codex retains its native
+release checks. The launcher fetches fresh website tooling, queues overlapping
+runs with the private state-directory lock, and propagates release failures.
+For Codex, supply `--native-env-file /absolute/host/path/release-native-env.py`
+after `--group codex`. Keep that module, its native toolchain, automation
+definitions, credentials, build staging, journals, and logs outside the website.
+Use `--check` to inspect updates without building or publishing; `--tooling-dir`
+selects a local checkout for checking an unpublished launcher change.
 
-```json
-{
-  "kind": "script",
-  "command": "python3 -B scripts/app-release/release_codex.py --publish",
-  "skip_log": false
-}
-```
-
-Use `python` on Windows. Keep host-specific launchers and native environment
-settings outside the website. Only the Codex launcher needs its native toolchain
-and reviewed notice-directory option. Test the other-app command normally and
-use `--dry-run` for a short Codex discovery check; this does not validate a Codex
-build or package. Both scripts share the state-directory release lock, so local
-launchers must queue overlapping runs rather than fail or bypass that lock.
-zai must remain open
-for scheduled execution; an OS scheduler can also invoke this command. Detailed
-logs remain private and are never copied to the public site.
+The installed zai console must stay open for scheduled execution; an OS
+scheduler can also invoke the command. Detailed logs remain private and are
+never copied to the public site.
 
 ## Parallel Go builds and combined publishing
 
