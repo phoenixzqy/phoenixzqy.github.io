@@ -204,24 +204,34 @@ or website metadata were published; it is not evidence that nothing was written.
 Uncertain release ownership, missing approved metadata, checksum differences or
 an unreconciled partial publication require operator repair before either path.
 
-For Script automations, fetch the portable launcher from website `main`. This
-avoids depending on an operator checkout that may be stale or dirty. The
-bootstrap downloads the complete script before executing it, so a failed
-download cannot appear successful. Set each saved command's `--group` to `zai`,
+For Linux/macOS Script automations, clone website `main` into a disposable
+directory and invoke its portable launcher. This avoids depending on an
+operator checkout that may be stale or dirty, and selects the launcher and
+tooling from the same commit. Set each saved command's `--group` to `zai`,
 `bplayer`, or `codex`:
 
 ```sh
-python3 -u -B -c 'import urllib.request; u="https://raw.githubusercontent.com/phoenixzqy/phoenixzqy.github.io/main/scripts/app-release/scheduled_release.py"; exec(compile(urllib.request.urlopen(u, timeout=60).read(), u, "exec"))' --group zai
+python3 -u -B -c '
+from pathlib import Path
+import subprocess, sys, tempfile
+cache = Path.home() / ".cache"
+cache.mkdir(exist_ok=True)
+with tempfile.TemporaryDirectory(prefix="ar-bootstrap-", dir=cache) as temporary:
+    site = Path(temporary) / "site"
+    subprocess.run(["git", "clone", "--branch", "main", "--depth", "1", "--filter=blob:none", "--sparse", "https://github.com/phoenixzqy/phoenixzqy.github.io.git", str(site)], check=True)
+    subprocess.run(["git", "sparse-checkout", "set", "scripts/app-release"], cwd=site, check=True)
+    raise SystemExit(subprocess.call([sys.executable, "-u", "-B", str(site / "scripts/app-release/scheduled_release.py"), "--tooling-dir", str(site), *sys.argv[1:]]))
+' --group zai
 ```
 
 The zai and BPlayer groups each pass `--skip-tests`; Codex retains its native
-release checks. The launcher fetches fresh website tooling, queues overlapping
-runs with the private state-directory lock, and propagates release failures.
+release checks. The bootstrap fetches fresh website tooling; the launcher queues
+overlapping runs with the private state-directory lock and propagates failures.
 For Codex, supply `--native-env-file /absolute/host/path/release-native-env.py`
 after `--group codex`. Keep that module, its native toolchain, automation
 definitions, credentials, build staging, journals, and logs outside the website.
-Use `--check` to inspect updates without building or publishing; `--tooling-dir`
-selects a local checkout for checking an unpublished launcher change.
+Use `--check` to inspect updates without building or publishing. `--tooling-dir`
+also allows checking an unpublished launcher change in a local checkout.
 
 The installed zai console must stay open for scheduled execution; an OS
 scheduler can also invoke the command. Detailed logs remain private and are
