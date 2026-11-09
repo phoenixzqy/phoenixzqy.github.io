@@ -12,6 +12,7 @@ import urllib.error
 import urllib.request
 
 DEBUG_SUFFIXES = ('.map', '.pdb', '.debug', '.symbols', '.dsym', '.dwo', '.dwp', '.sym', '.dbg')
+DOWNLOAD_ATTEMPTS = 8
 
 
 def inspect_archive(path):
@@ -79,7 +80,7 @@ def download(asset, directory):
     if not url.startswith('https://github.com/'):
         raise ValueError('Expected public GitHub release download')
     opener = urllib.request.build_opener(HTTPSOnly())
-    for attempt in range(4):
+    for attempt in range(DOWNLOAD_ATTEMPTS):
         try:
             with opener.open(url, timeout=120) as response, path.open('wb') as output:
                 size = 0
@@ -94,9 +95,11 @@ def download(asset, directory):
                 ConnectionError, http.client.IncompleteRead) as error:
             path.unlink(missing_ok=True)
             transient = not isinstance(error, urllib.error.HTTPError) or 500 <= error.code < 600
-            if not transient or attempt == 3:
-                raise RuntimeError(f'Public download of {path.name} failed after {attempt + 1} attempt(s): {error}') from error
-            time.sleep(2 ** (attempt + 1))
+            if not transient or attempt + 1 == DOWNLOAD_ATTEMPTS:
+                raise RuntimeError(
+                    f'Public download of {path.name} failed after {attempt + 1} attempt(s): {error}'
+                ) from error
+            time.sleep(min(2 ** (attempt + 1), 30))
             continue
         except Exception:
             path.unlink(missing_ok=True)
