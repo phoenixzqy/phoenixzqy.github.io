@@ -144,7 +144,8 @@ test("PowerShell installers stay compatible with Windows PowerShell 5.1", async 
     assert.match(script, /#Requires -Version 5\.1/, label);
     assert.match(script, /SecurityProtocolType\]::Tls12/, label);
     assert.match(script, /\$actualHash = Get-ZaiFileSha256 \$archive/, label);
-    assert.match(script, /Expand-Archive/, label);
+    assert.match(script, /\[IO\.Compression\.ZipFile\]::ExtractToDirectory\(\$archive, \$extract\)/, label);
+    assert.doesNotMatch(script, /Expand-Archive/, label);
     // The user PATH is edited through the registry so REG_EXPAND_SZ entries
     // such as %USERPROFILE%\bin keep their unexpanded form and value kind.
     assert.match(script, /Registry\]::CurrentUser\.OpenSubKey\('Environment', \$true\)/, label);
@@ -714,8 +715,12 @@ test("PowerShell installer verifies downloads when Get-FileHash is unavailable",
     await writeFile(driver, `
 $ErrorActionPreference = 'Stop'
 function Get-FileHash { throw 'Get-FileHash is unavailable in this update process' }
-# Stop before extraction/installation so this test never changes the user's apps or PATH.
-function Expand-Archive {
+# Stop after real extraction, before installation changes the user's apps or PATH.
+function Get-ChildItem {
+    param($Path, $Filter, [switch] $Recurse, [switch] $File)
+    if ([IO.File]::ReadAllText((Join-Path $Path 'zai-editor.exe')) -ne 'test-only fixture') {
+        throw 'fixture package was not extracted'
+    }
     [IO.File]::WriteAllText($env:ZAI_TEST_RECEIPT, $work)
     throw 'fixture reached extraction after checksum verification'
 }

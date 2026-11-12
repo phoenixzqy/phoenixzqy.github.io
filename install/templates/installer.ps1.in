@@ -187,7 +187,10 @@ try {
     $extract = Join-Path $work 'extract'
     New-Item -ItemType Directory -Path $extract -Force | Out-Null
     try {
-        Expand-Archive -Path $archive -DestinationPath $extract -Force
+        # An update can inherit PowerShell 7's Archive module in Windows PowerShell 5.1.
+        # Use the .NET Framework-compatible overload; the destination is fresh.
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [IO.Compression.ZipFile]::ExtractToDirectory($archive, $extract)
     } catch {
         Stop-Install "the downloaded archive could not be extracted: $($_.Exception.Message)"
     }
