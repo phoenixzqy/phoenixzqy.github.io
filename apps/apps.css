@@ -81,7 +81,9 @@ html[lang="zh-CN"] .app-detail-hero .app-lead { font-family: inherit; font-style
 .screenshot-row { grid-column: 1 / -1; }
 .screenshot-compact { justify-self: start; width: min(100%, 640px); }
 .screenshot-card figcaption { padding: 13px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; letter-spacing: .7px; }
-.app-art-image { padding: 30px; }
+/* Transparent logos need a stable dark surface, independent of the page theme. */
+.app-art-image { padding: 30px; background: radial-gradient(ellipse at 50% 35%, #29353e, transparent 70%), #11181e; }
+.app-art-image > .mono { color: #b7c4ce; }
 .app-artwork { position: relative; z-index: 1; display: block; width: min(100%, 300px); height: auto; }
 .app-art-large .app-artwork { width: min(100%, 360px); }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
